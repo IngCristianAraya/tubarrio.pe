@@ -35,38 +35,38 @@ const CategorySections = () => {
       services: [
         {
           id: 1,
-          name: 'Pizza Italiana',
+          name: 'Pizzería Toscana',
           category: 'Pizzería',
           image: 'https://images.pexels.com/photos/315755/pexels-photo-315755.jpeg?auto=compress&cs=tinysrgb&w=400',
           rating: 4.7,
-          location: '8 min',
-          description: 'Pizzas artesanales con masa madre'
+          location: 'Av. Universitaria 1697',
+          description: 'Pizzas a la piedra'
         },
         {
           id: 2,
           name: 'Angie Corazón',
           category: 'Anticuchos',
-          image: 'https://images.pexels.com/photos/4958792/pexels-photo-4958792.jpeg?auto=compress&cs=tinysrgb&w=400',
+          image: '/images/anticuchos.webp',
           rating: 4.5,
           location: 'Sta. Teodosia 573',
           description: 'Anticuchos de corazón de Res'
         },
         {
           id: 3,
-          name: 'Sushi Express',
+          name: 'Iro Sushi',
           category: 'Comida Japonesa',
           image: 'https://images.pexels.com/photos/357756/pexels-photo-357756.jpeg?auto=compress&cs=tinysrgb&w=400',
           rating: 4.8,
-          location: '12 min',
+          location: 'Av. Universitaria 1743',
           description: 'Sushi fresco y rollos especiales'
         },
         {
           id: 4,
-          name: 'Café Central',
+          name: 'Oliver Bar',
           category: 'Cafetería',
           image: 'https://images.pexels.com/photos/302899/pexels-photo-302899.jpeg?auto=compress&cs=tinysrgb&w=400',
           rating: 4.6,
-          location: '3 min',
+          location: 'Av. Universitaria 1747',
           description: 'Café de especialidad y postres'
         }
       ]
@@ -143,20 +143,20 @@ const CategorySections = () => {
         },
         {
           id: 11,
-          name: 'Cerrajería 24/7',
-          category: 'Cerrajería',
-          image: 'https://images.pexels.com/photos/4480505/pexels-photo-4480505.jpeg?auto=compress&cs=tinysrgb&w=400',
+          name: 'Imana tu vida',
+          category: 'Salud integral',
+          image: '/images/biomagnetismo.webp',
           rating: 4.8,
-          location: '5 min',
-          description: 'Servicio de emergencia disponible'
+          location: 'Santa Paula 555',
+          description: 'Terapia natural que utiliza imanes para equilibrar la energía del cuerpo.'
         },
         {
           id: 12,
-          name: 'Peluquería Estilo',
+          name: 'Angela Valles',
           category: 'Belleza',
           image: 'https://images.pexels.com/photos/3993449/pexels-photo-3993449.jpeg?auto=compress&cs=tinysrgb&w=400',
           rating: 4.7,
-          location: '8 min',
+          location: 'Santa Teodosia 550',
           description: 'Cortes y peinados modernos'
         }
       ]
