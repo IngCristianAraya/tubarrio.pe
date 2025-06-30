@@ -85,7 +85,7 @@ const allServices: Service[] = [
   // Abarrotes
   {
     id: 7,
-    name: 'Abarrotes Don José',
+    name: 'Abarrotes Don Richard',
     category: 'Abarrotes',
     image: 'https://images.pexels.com/photos/264636/pexels-photo-264636.jpeg?auto=compress&cs=tinysrgb&w=800',
     rating: 4.6,

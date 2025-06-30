@@ -25,12 +25,12 @@ const FeaturedServices = () => {
     },
     {
       id: 2,
-      name: 'Abarrotes Don José',
+      name: 'Abarrotes Don Richard',
       category: 'Abarrotes',
       image: 'https://images.pexels.com/photos/264636/pexels-photo-264636.jpeg?auto=compress&cs=tinysrgb&w=800',
       rating: 4.6,
       description: 'Productos frescos, abarrotes y todo lo que necesitas para el hogar',
-      location: 'Barrio Norte, 3 min',
+      location: 'La Comercial, 3 min',
       phone: '+1234567891',
       hours: 'Abierto hasta 10:00 PM',
       badge: 'Mejor Precio'

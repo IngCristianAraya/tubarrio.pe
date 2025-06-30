@@ -45,6 +45,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es">
+      <head>
+        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+      </head>
       <body className={`${geist.variable} antialiased min-h-screen bg-white`}>
         <ServicesProvider>
           {children}

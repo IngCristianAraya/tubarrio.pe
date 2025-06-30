@@ -44,12 +44,12 @@ const CategorySections = () => {
         },
         {
           id: 2,
-          name: 'Tacos El Güero',
-          category: 'Comida Mexicana',
+          name: 'Angie Corazón',
+          category: 'Anticuchos',
           image: 'https://images.pexels.com/photos/4958792/pexels-photo-4958792.jpeg?auto=compress&cs=tinysrgb&w=400',
           rating: 4.5,
-          location: '5 min',
-          description: 'Tacos tradicionales y quesadillas'
+          location: 'Sta. Teodosia 573',
+          description: 'Anticuchos de corazón de Res'
         },
         {
           id: 3,

@@ -87,7 +87,7 @@ const Header = () => {
           {/* Navegación desktop */}
           <nav className="hidden md:flex gap-3 lg:gap-6 items-center mx-4">
             <NavItem href="/">Inicio</NavItem>
-            <NavItem href="#servicios">Servicios</NavItem>
+            <NavItem href="#servicios">Destacados</NavItem>
             <NavItem href="#categorias">Categorías</NavItem>
             <NavItem href="#cobertura">Cobertura</NavItem>
             <NavItem href="#revista">Catálogo Digital</NavItem>
@@ -110,7 +110,7 @@ const Header = () => {
           <div className="md:hidden bg-white border-t border-gray-200 py-4 px-4 shadow-inner">
             <nav className="flex flex-col space-y-4">
               <NavItem href="/">Inicio</NavItem>
-              <NavItem href="#servicios">Servicios</NavItem>
+              <NavItem href="#servicios">Destacados</NavItem>
               <NavItem href="#categorias">Categorías</NavItem>
               <NavItem href="#cobertura">Cobertura</NavItem>
               <NavItem href="#revista">Catálogo Digital</NavItem>
