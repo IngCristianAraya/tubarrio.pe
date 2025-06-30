@@ -111,7 +111,7 @@ const Hero = () => {
                     <input
                       type="text"
                       placeholder="¿Qué estás buscando?"
-                      className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-orange-500 focus:border-orange-500"
+                      className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-orange-500 focus:border-orange-500 bg-white text-gray-800 placeholder-gray-500"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
@@ -124,7 +124,7 @@ const Hero = () => {
                       <Filter className="h-5 w-5 text-gray-400" />
                     </div>
                     <select
-                      className="block w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg appearance-none focus:ring-orange-500 focus:border-orange-500"
+                      className="block w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg appearance-none focus:ring-orange-500 focus:border-orange-500 bg-white text-gray-800"
                       value={selectedCategory}
                       onChange={(e) => setSelectedCategory(e.target.value)}
                     >

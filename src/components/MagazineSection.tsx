@@ -123,6 +123,7 @@ const Page = React.forwardRef<HTMLDivElement, { businesses: Business[]; pageNumb
 const MagazineSection: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const { services } = useServices();
+  const flipBookRef = React.useRef<any>(null);
   
   // Recopilar todos los servicios de todas las categorías
   const getAllServices = () => {
@@ -156,46 +157,57 @@ const MagazineSection: React.FC = () => {
   const businessPairs = getBusinessPairs();
   const totalPages = businessPairs.length + 1; // +1 para la portada
   
+  const handleFlip = (e: any) => {
+    setCurrentPage(e.data);
+  };
+  
+  // Función para ir a una página específica
+  const goToPage = (pageNumber: number) => {
+    setCurrentPage(pageNumber);
+    if (flipBookRef.current) {
+      flipBookRef.current.pageFlip().turnToPage(pageNumber);
+    }
+  };
+  
   return (
-    <section id="revista" className="py-10 md:py-16 bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="revista" className="py-20 bg-gray-50">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold mb-3 text-gray-900">
-            📚 <span className="text-gray-800">Nuestra</span> <span className="text-orange-500">Revista Digital</span>
-          </h2>
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Nuestra Revista Digital</h2>
+          <div className="w-24 h-1 bg-gradient-to-r from-orange-500 to-yellow-500 mx-auto mb-6"></div>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Explora nuestra revista digital con los negocios y emprendimientos más destacados de la zona.
+            Descubre los mejores negocios y servicios locales en nuestra revista digital interactiva.
           </p>
         </div>
         
-        <div className="magazine-container">
-          <div className="flex flex-col items-center">
-            {/* Libro interactivo */}
-            <HTMLFlipBook 
+        <div className="magazine-container flex flex-col items-center">
+          <div className="magazine-wrapper w-full max-w-4xl mx-auto overflow-hidden">
+            <HTMLFlipBook
               width={550}
               height={733}
               size="stretch"
-              minWidth={315}
+              minWidth={280}
               maxWidth={1000}
-              minHeight={400}
+              minHeight={350}
               maxHeight={1533}
               maxShadowOpacity={0.5}
               showCover={true}
               mobileScrollSupport={true}
-              className="magazine-book"
+              className="mx-auto"
+              ref={flipBookRef}
+              onFlip={handleFlip}
               startPage={currentPage}
-              onFlip={(e) => setCurrentPage(e.data)}
               style={{}}
               drawShadow={true}
               flippingTime={1000}
-              usePortrait={true}
               startZIndex={0}
-              autoSize={true}
               clickEventForward={true}
               useMouseEvents={true}
-              swipeDistance={0}
+              swipeDistance={30}
               showPageCorners={true}
               disableFlipByClick={false}
+              autoSize={true}
+              usePortrait={true}
             >
               {/* Portada */}
               <Page pageNumber={0} businesses={[]} />
