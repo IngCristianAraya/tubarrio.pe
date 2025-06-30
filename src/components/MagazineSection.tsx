@@ -1,8 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import HTMLFlipBook from 'react-pageflip';
+import Image from 'next/image';
 import { useServices } from '../context/ServicesContext';
+import { Plus, Star, MapPin, ChevronLeft, ChevronRight, Info } from 'lucide-react';
 
 // Definir la interfaz para un negocio
 interface Business {
@@ -27,76 +29,80 @@ const Page = React.forwardRef<HTMLDivElement, { businesses: Business[]; pageNumb
         {pageNumber === 0 ? (
           // Diseño especial para la portada
           <div className="cover-page flex flex-col items-center justify-center h-full text-center">
-            <div className="cover-image mb-8 w-full h-[400px] relative overflow-hidden rounded-lg">
-              <img 
-                src="/images/hero_3.webp" 
-                alt="Portada"
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end justify-center pb-8">
-                <h1 className="text-white text-4xl font-bold drop-shadow-lg">Revista Digital</h1>
+            <div className="cover-image mb-4 sm:mb-8 w-full h-[250px] sm:h-[300px] md:h-[400px] relative overflow-hidden rounded-lg">
+              <div className="relative w-full h-full">
+                <Image 
+                  src="/images/hero_3.webp" 
+                  alt="Portada"
+                  className="object-cover"
+                  fill
+                  sizes="(max-width: 640px) 100vw, (max-width: 768px) 80vw, 60vw"
+                  priority
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end justify-center pb-4 sm:pb-8">
+                  <h1 className="text-white text-2xl sm:text-3xl md:text-4xl font-bold drop-shadow-lg">Revista Digital</h1>
+                </div>
               </div>
             </div>
             
-            <h2 className="text-4xl font-bold text-gray-800 mb-4">Revista Pando</h2>
-            <div className="w-16 h-1 bg-gradient-to-r from-orange-500 to-yellow-500 mb-6"></div>
-            <p className="text-xl text-gray-600 mb-8 max-w-md">Bienvenido a nuestra revista digital de negocios locales y emprendimientos.</p>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-800 mb-2 sm:mb-4">Revista Pando</h2>
+            <div className="w-12 sm:w-16 h-1 bg-gradient-to-r from-orange-500 to-yellow-500 mb-3 sm:mb-6"></div>
+            <p className="text-sm sm:text-base md:text-xl text-gray-600 mb-4 sm:mb-8 max-w-md px-2">Bienvenido a nuestra revista digital de negocios locales y emprendimientos.</p>
             
             <div className="mt-auto">
-              <p className="text-sm text-gray-500 italic">Edición {new Date().toLocaleDateString('es-ES', { month: 'long', year: 'numeric' })}</p>
+              <p className="text-xs sm:text-sm text-gray-500 italic">Edición {new Date().toLocaleDateString('es-ES', { month: 'long', year: 'numeric' })}</p>
             </div>
           </div>
         ) : businesses.length > 0 ? (
           // Diseño para páginas interiores con dos negocios por página
           <div className="flex flex-col h-full">
-            <div className="page-header mb-4 border-b border-gray-100 pb-2">
-              <h2 className="text-2xl font-bold text-gray-800">Negocios Destacados</h2>
-              <p className="text-sm text-gray-500">Página {pageNumber}</p>
+            <div className="page-header mb-3 sm:mb-4 border-b border-gray-100 pb-2">
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-800">Negocios Destacados</h2>
+              <p className="text-xs sm:text-sm text-gray-500">Página {pageNumber}</p>
             </div>
             
             <div className="grid grid-cols-1 gap-6 h-full">
               {businesses.map((business, index) => (
                 <div key={index} className="business-card border border-gray-100 rounded-lg overflow-hidden shadow-sm">
                   <div className="flex flex-col h-full">
-                    <div className="flex items-center justify-between p-4 border-b border-gray-100">
-                      <h3 className="text-xl font-bold text-gray-800">{business.name}</h3>
-                      <span className="px-3 py-1 bg-orange-100 text-orange-600 rounded-full text-xs font-medium">
+                    <div className="flex items-center justify-between p-3 sm:p-4 border-b border-gray-100">
+                      <h3 className="text-base sm:text-xl font-bold text-gray-800 truncate max-w-[70%]">{business.name}</h3>
+                      <span className="px-2 sm:px-3 py-1 bg-orange-100 text-orange-600 rounded-full text-[10px] sm:text-xs font-medium whitespace-nowrap">
                         {business.category}
                       </span>
                     </div>
                     
-                    <div className="flex md:flex-row flex-col h-full">
-                      <div className="md:w-2/5 w-full">
-                        <div className="relative h-full min-h-[180px]">
-                          <img 
-                            src={business.image || '/images/placeholder-business.jpg'} 
-                            alt={business.name}
-                            className="w-full h-full object-cover"
-                          />
+                    <div className="flex flex-col sm:flex-row h-full">
+                      <div className="sm:w-2/5 w-full">
+                        <div className="relative h-[140px] sm:h-full sm:min-h-[160px]">
+                          <div className="relative w-full h-full">
+                            <Image 
+                              src={business.image || '/images/placeholder-business.jpg'} 
+                              alt={business.name}
+                              className="object-cover"
+                              fill
+                              sizes="(max-width: 640px) 100vw, 40vw"
+                            />
+                          </div>
                           <div className="absolute top-2 right-2 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-full flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 text-yellow-400 fill-current" viewBox="0 0 20 20" fill="currentColor">
-                              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                            </svg>
+                            <Star className="h-3 w-3 text-yellow-400 fill-current" />
                             <span className="text-xs font-semibold ml-1">{business.rating || '4.5'}</span>
                           </div>
                         </div>
                       </div>
                       
-                      <div className="md:w-3/5 w-full p-4 flex flex-col">
-                        <p className="text-gray-700 text-sm leading-relaxed mb-4">{business.description}</p>
+                      <div className="sm:w-3/5 w-full p-3 sm:p-4 flex flex-col">
+                        <p className="text-gray-700 text-xs sm:text-sm leading-relaxed mb-2 sm:mb-4 line-clamp-3">{business.description}</p>
                         
-                        <div className="flex items-center text-sm text-gray-500 mb-3">
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                          </svg>
-                          {business.location || 'Lima, Perú'}
+                        <div className="flex items-center text-gray-500 text-xs sm:text-sm mb-3 sm:mb-4">
+                          <MapPin className="w-3 h-3 sm:w-4 sm:h-4 mr-1 text-blue-500 flex-shrink-0" />
+                          <span className="truncate">{business.location}</span>
                         </div>
                         
-                        <div className="mt-auto pt-3 border-t border-gray-100 flex justify-between items-center">
-                          <span className="text-xs text-gray-500">Contacto: (01) 123-4567</span>
-                          <button className="px-3 py-1 bg-orange-500 text-white text-xs rounded-full hover:bg-orange-600 transition-colors">
-                            Ver detalles
+                        <div className="mt-auto flex justify-between items-center">
+                          <button className="w-full px-3 sm:px-4 py-2 bg-gradient-to-r from-orange-500 to-yellow-500 text-white rounded-lg text-xs sm:text-sm font-medium hover:from-orange-600 hover:to-yellow-600 transition-all flex items-center justify-center">
+                            <span>Ver detalles</span>
+                            <ChevronRight className="w-3 h-3 ml-1" />
                           </button>
                         </div>
                       </div>
@@ -170,18 +176,17 @@ const MagazineSection: React.FC = () => {
   };
   
   return (
-    <section id="revista" className="py-20 bg-gray-50">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Nuestra Revista Digital</h2>
-          <div className="w-24 h-1 bg-gradient-to-r from-orange-500 to-yellow-500 mx-auto mb-6"></div>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Descubre los mejores negocios y servicios locales en nuestra revista digital interactiva.
+    <section id="revista" className="py-12 sm:py-16 md:py-20 bg-gray-50">
+      <div className="container mx-auto px-3 sm:px-4">
+        <div className="text-center mb-8 sm:mb-12">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-3 sm:mb-4">Nuestra Revista Digital</h2>
+          <p className="text-sm sm:text-base md:text-lg text-gray-600 max-w-2xl mx-auto px-2">
+            Explora nuestra revista digital con los mejores negocios y emprendimientos locales.
           </p>
         </div>
         
-        <div className="magazine-container flex flex-col items-center">
-          <div className="magazine-wrapper w-full max-w-4xl mx-auto overflow-hidden">
+        <div className="magazine-container relative mx-auto max-w-4xl">
+          <div className="magazine-wrapper overflow-hidden">
             <HTMLFlipBook
               width={550}
               height={733}
@@ -193,21 +198,23 @@ const MagazineSection: React.FC = () => {
               maxShadowOpacity={0.5}
               showCover={true}
               mobileScrollSupport={true}
-              className="mx-auto"
-              ref={flipBookRef}
-              onFlip={handleFlip}
               startPage={currentPage}
-              style={{}}
+              onFlip={(e) => setCurrentPage(e.data)}
+              ref={flipBookRef}
+              className="mx-auto"
+              style={{
+                touchAction: 'none'
+              }}
               drawShadow={true}
-              flippingTime={1000}
-              startZIndex={0}
-              clickEventForward={true}
+              flippingTime={800}
+              usePortrait={true}
               useMouseEvents={true}
-              swipeDistance={30}
+              clickEventForward={true}
+              swipeDistance={20}
               showPageCorners={true}
               disableFlipByClick={false}
               autoSize={true}
-              usePortrait={true}
+              startZIndex={0}
             >
               {/* Portada */}
               <Page pageNumber={0} businesses={[]} />
@@ -222,43 +229,41 @@ const MagazineSection: React.FC = () => {
               ))}
             </HTMLFlipBook>
             
-            <div className="magazine-controls flex flex-col items-center mt-8 md:mt-12">
-              <div className="flex flex-wrap items-center justify-center gap-3 md:gap-6 mb-4 md:mb-6">
+            <div className="magazine-controls flex flex-col items-center mt-4 sm:mt-6 md:mt-10">
+              <div className="flex flex-wrap items-center justify-center gap-2 md:gap-4 mb-3 md:mb-5">
                 <button 
                   onClick={() => setCurrentPage(Math.max(0, currentPage - 1))}
-                  className="flex items-center px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg hover:from-orange-600 hover:to-orange-700 transition-all shadow-md disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed disabled:shadow-none"
+                  className="flex items-center px-3 sm:px-5 py-2 text-xs sm:text-sm bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg hover:from-orange-600 hover:to-orange-700 active:scale-95 transition-all shadow-md disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed disabled:shadow-none disabled:active:scale-100 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-opacity-50"
                   disabled={currentPage <= 0}
+                  aria-label="Página anterior"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 sm:h-5 sm:w-5 mr-1 sm:mr-2" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
-                  <span className="hidden sm:inline">Página</span> Anterior
+                  <ChevronLeft className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1" />
+                  <span className="hidden xs:inline">Anterior</span>
                 </button>
                 
-                <div className="px-3 sm:px-6 py-2 sm:py-3 bg-white border border-gray-200 rounded-lg shadow-sm flex items-center">
-                  <span className="text-gray-800 font-medium text-sm sm:text-base">
+                <div className="px-3 sm:px-4 py-2 bg-white border border-gray-200 rounded-lg shadow-sm flex items-center">
+                  <span className="text-gray-800 font-medium text-xs sm:text-sm">
                     {currentPage + 1}/{totalPages}
                   </span>
                 </div>
                 
                 <button 
                   onClick={() => setCurrentPage(Math.min(totalPages - 1, currentPage + 1))}
-                  className="flex items-center px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg hover:from-orange-600 hover:to-orange-700 transition-all shadow-md disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed disabled:shadow-none"
+                  className="flex items-center px-3 sm:px-5 py-2 text-xs sm:text-sm bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg hover:from-orange-600 hover:to-orange-700 active:scale-95 transition-all shadow-md disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed disabled:shadow-none disabled:active:scale-100 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-opacity-50"
                   disabled={currentPage >= totalPages - 1}
+                  aria-label="Página siguiente"
                 >
-                  <span className="hidden sm:inline">Página</span> Siguiente
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 sm:h-5 sm:w-5 ml-1 sm:ml-2" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
-                  </svg>
+                  <span className="hidden xs:inline">Siguiente</span>
+                  <ChevronRight className="h-3.5 w-3.5 sm:h-4 sm:w-4 ml-1" />
                 </button>
               </div>
               
-              <div className="flex gap-2 mt-2 flex-wrap justify-center">
+              <div className="flex gap-2 mt-2 flex-wrap justify-center max-w-full px-2 overflow-x-auto">
                 {Array.from({ length: totalPages }, (_, i) => (
                   <button
                     key={i}
                     onClick={() => setCurrentPage(i)}
-                    className={`w-3 h-3 rounded-full transition-all ${currentPage === i ? 'bg-orange-500 scale-125' : 'bg-gray-300 hover:bg-gray-400'}`}
+                    className={`w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full transition-all ${currentPage === i ? 'bg-orange-500 scale-125' : 'bg-gray-300 hover:bg-gray-400'}`}
                     aria-label={`Ir a la página ${i + 1}`}
                   />
                 ))}
@@ -267,15 +272,16 @@ const MagazineSection: React.FC = () => {
           </div>
         </div>
         
-        <div className="magazine-info mt-16 text-center">
-          <p className="text-gray-600 mb-4">
+        <div className="magazine-info mt-10 sm:mt-12 md:mt-16 text-center px-4 sm:px-0">
+          <p className="text-gray-600 mb-3 sm:mb-4 text-sm sm:text-base">
             ¿Quieres que tu negocio aparezca en nuestra revista digital?
           </p>
           <a 
             href="#contacto" 
-            className="inline-block px-6 py-3 bg-gradient-to-r from-orange-500 to-yellow-500 text-white font-bold rounded-lg hover:from-orange-600 hover:to-yellow-600 transition-all shadow-md"
+            className="inline-flex items-center justify-center px-5 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-orange-500 to-yellow-500 text-white font-medium sm:font-bold rounded-lg hover:from-orange-600 hover:to-yellow-600 active:scale-95 transition-all shadow-md text-sm sm:text-base"
           >
-            Contáctanos
+            <span>Contáctanos</span>
+            <Plus className="ml-2 h-4 w-4" />
           </a>
         </div>
       </div>

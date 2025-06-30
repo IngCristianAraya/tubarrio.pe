@@ -1,7 +1,7 @@
 'use client';
 
-import { Star, MapPin, Phone } from 'lucide-react';
-import OptimizedImage from './OptimizedImage';
+import { Star, MapPin, Phone, ExternalLink } from 'lucide-react';
+import Image from 'next/image';
 
 interface Service {
   id: number;
@@ -19,51 +19,57 @@ interface ServiceCardProps {
 
 const ServiceCard = ({ service }: ServiceCardProps) => {
   return (
-    <div className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-100 overflow-hidden group">
+    <div className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 active:scale-98 border border-gray-100 overflow-hidden group h-full flex flex-col">
       {/* Image */}
-      <div className="relative overflow-hidden h-40">
-        <OptimizedImage
+      <div className="relative overflow-hidden h-36 sm:h-40 md:h-48">
+        <Image
           src={service.image}
           alt={service.name}
-          className="w-full h-full group-hover:scale-110 transition-transform duration-300"
-          objectFit="cover"
-          height={160}
-          loading="lazy"
+          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+          width={300}
+          height={200}
+          sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw"
+          priority={false}
+          placeholder="blur"
+          blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+P+/HgAFdQIhgcBbaQAAAABJRU5ErkJggg=="
         />
+        {/* Category Badge */}
+        <div className="absolute top-2 left-2 bg-white/90 backdrop-blur-sm px-1.5 py-0.5 sm:px-2 sm:py-1 rounded-full shadow-sm">
+          <span className="text-2xs sm:text-xs font-medium text-gray-800">{service.category}</span>
+        </div>
         {/* Rating */}
-        <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-full flex items-center">
-          <Star className="w-3 h-3 text-yellow-400 fill-current" />
-          <span className="text-xs font-semibold ml-1">{service.rating}</span>
+        <div className="absolute top-2 right-2 bg-white/90 backdrop-blur-sm px-1.5 py-0.5 sm:px-2 sm:py-1 rounded-full flex items-center shadow-sm">
+          <Star className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-yellow-400 fill-current" />
+          <span className="text-2xs sm:text-xs font-semibold ml-0.5 sm:ml-1">{service.rating}</span>
         </div>
       </div>
 
       {/* Content */}
-      <div className="p-4">
-        <div className="flex items-center justify-between mb-2">
-          <h3 className="text-lg font-bold text-gray-900 truncate">{service.name}</h3>
-          <span className="text-xs text-orange-500 font-medium bg-orange-50 px-2 py-1 rounded-full">
-            {service.category}
-          </span>
+      <div className="p-3 sm:p-4 flex flex-col flex-grow">
+        <div className="mb-1 sm:mb-2">
+          <h3 className="text-sm sm:text-base md:text-lg font-bold text-gray-900 truncate">{service.name}</h3>
         </div>
 
-        <p className="text-gray-600 mb-3 text-sm leading-relaxed line-clamp-2">
+        <p className="text-gray-600 mb-2 sm:mb-3 text-2xs sm:text-xs md:text-sm leading-relaxed line-clamp-2 flex-grow">
           {service.description}
         </p>
 
-        {/* Location */}
-        <div className="flex items-center text-sm text-gray-500 mb-4">
-          <MapPin className="w-4 h-4 mr-1 text-blue-500" />
-          {service.location}
+        {/* Location and Rating */}
+        <div className="flex items-center justify-between text-2xs sm:text-xs text-gray-500 mb-3 sm:mb-4">
+          <div className="flex items-center">
+            <MapPin className="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-0.5 sm:mr-1 text-blue-500 flex-shrink-0" />
+            <span className="truncate">{service.location}</span>
+          </div>
         </div>
 
         {/* Actions */}
-        <div className="flex gap-2">
-          <button className="flex-1 bg-gradient-to-r from-orange-500 to-yellow-400 hover:from-orange-600 hover:to-yellow-500 text-white font-semibold py-2 px-3 rounded-lg transition-all duration-200 text-sm">
-            <Phone className="w-3 h-3 inline-block mr-1" />
-            Contactar
+        <div className="flex gap-1.5 sm:gap-2 mt-auto">
+          <button className="flex-1 bg-gradient-to-r from-orange-500 to-yellow-400 hover:from-orange-600 hover:to-yellow-500 active:from-orange-700 active:to-yellow-600 text-white font-medium sm:font-semibold py-2 sm:py-2.5 px-2 sm:px-3 rounded-lg transition-all duration-200 text-2xs sm:text-xs md:text-sm min-h-[36px] sm:min-h-[40px] md:min-h-[44px] focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-opacity-50 flex items-center justify-center">
+            <Phone className="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-1 flex-shrink-0" />
+            <span>Contactar</span>
           </button>
-          <button className="bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-lg transition-colors duration-200">
-            <MapPin className="w-4 h-4" />
+          <button className="bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white p-2 sm:p-2.5 rounded-lg transition-all duration-200 min-w-[36px] sm:min-w-[40px] md:min-w-[44px] min-h-[36px] sm:min-h-[40px] md:min-h-[44px] flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
+            <ExternalLink className="w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4" />
           </button>
         </div>
       </div>
