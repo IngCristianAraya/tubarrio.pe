@@ -164,13 +164,13 @@ export default function MapSection() {
   }, [])
 
   return (
-    <section id="cobertura" className="w-full py-12">
+    <section id="cobertura" className="w-full py-8 md:py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-10">
-          <h2 className="text-3xl md:text-4xl font-bold mb-3 text-gray-900">
+        <div className="text-center mb-6 md:mb-10">
+          <h2 className="text-2xl md:text-4xl font-bold mb-2 md:mb-3 text-gray-900">
             🗺️ <span className="text-gray-800">Zona de</span> <span className="text-orange-500">Cobertura</span>
           </h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          <p className="text-base md:text-lg text-gray-600 max-w-2xl mx-auto">
             Nuestro mapa muestra el área donde Revista Pando ofrece sus servicios y cobertura.
           </p>
         </div>

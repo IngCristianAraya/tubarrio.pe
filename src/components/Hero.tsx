@@ -61,7 +61,7 @@ const Hero = () => {
         keywords="revista digital, negocios locales, Lima Este, Pando, restaurantes, servicios, directorio comercial, buscar servicios"
         image="/images/hero_3.webp"
       />
-      <section id="inicio" className="relative min-h-[80vh] md:min-h-screen overflow-hidden">
+      <section id="inicio" className="relative min-h-[70vh] md:min-h-screen overflow-hidden">
         {/* Imagen de fondo */}
         <div className="absolute inset-0 z-0">
           <Image
@@ -78,7 +78,7 @@ const Hero = () => {
 
         {/* Contenido principal alineado a la izquierda */}
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex flex-col items-start justify-start">
-          <div className="w-full max-w-lg text-left flex flex-col gap-y-8 mt-24 md:mt-32">
+          <div className="w-full max-w-lg text-left flex flex-col gap-y-4 sm:gap-y-8 mt-16 md:mt-32">
             {/* Título moderno con gradiente */}
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-extrabold leading-tight text-left">
               <span className="bg-gradient-to-r from-orange-400 to-yellow-300 bg-clip-text text-transparent drop-shadow-md">

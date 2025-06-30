@@ -157,7 +157,7 @@ const MagazineSection: React.FC = () => {
   const totalPages = businessPairs.length + 1; // +1 para la portada
   
   return (
-    <section id="revista" className="w-full py-16 bg-gray-50">
+    <section id="revista" className="py-10 md:py-16 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold mb-3 text-gray-900">
@@ -210,32 +210,32 @@ const MagazineSection: React.FC = () => {
               ))}
             </HTMLFlipBook>
             
-            <div className="magazine-controls flex flex-col items-center mt-12">
-              <div className="flex items-center justify-center gap-6 mb-6">
+            <div className="magazine-controls flex flex-col items-center mt-8 md:mt-12">
+              <div className="flex flex-wrap items-center justify-center gap-3 md:gap-6 mb-4 md:mb-6">
                 <button 
                   onClick={() => setCurrentPage(Math.max(0, currentPage - 1))}
-                  className="flex items-center px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg hover:from-orange-600 hover:to-orange-700 transition-all shadow-md disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed disabled:shadow-none"
+                  className="flex items-center px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg hover:from-orange-600 hover:to-orange-700 transition-all shadow-md disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed disabled:shadow-none"
                   disabled={currentPage <= 0}
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 sm:h-5 sm:w-5 mr-1 sm:mr-2" viewBox="0 0 20 20" fill="currentColor">
                     <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
                   </svg>
-                  Página Anterior
+                  <span className="hidden sm:inline">Página</span> Anterior
                 </button>
                 
-                <div className="px-6 py-3 bg-white border border-gray-200 rounded-lg shadow-sm flex items-center">
-                  <span className="text-gray-800 font-medium">
-                    Página {currentPage + 1} de {totalPages}
+                <div className="px-3 sm:px-6 py-2 sm:py-3 bg-white border border-gray-200 rounded-lg shadow-sm flex items-center">
+                  <span className="text-gray-800 font-medium text-sm sm:text-base">
+                    {currentPage + 1}/{totalPages}
                   </span>
                 </div>
                 
                 <button 
                   onClick={() => setCurrentPage(Math.min(totalPages - 1, currentPage + 1))}
-                  className="flex items-center px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg hover:from-orange-600 hover:to-orange-700 transition-all shadow-md disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed disabled:shadow-none"
+                  className="flex items-center px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg hover:from-orange-600 hover:to-orange-700 transition-all shadow-md disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed disabled:shadow-none"
                   disabled={currentPage >= totalPages - 1}
                 >
-                  Página Siguiente
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-2" viewBox="0 0 20 20" fill="currentColor">
+                  <span className="hidden sm:inline">Página</span> Siguiente
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 sm:h-5 sm:w-5 ml-1 sm:ml-2" viewBox="0 0 20 20" fill="currentColor">
                     <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
                   </svg>
                 </button>

@@ -7,8 +7,8 @@ import Link from 'next/link';
 const Footer = () => {
   return (
     <footer className="bg-gray-900 text-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
           {/* Brand */}
           <div className="lg:col-span-2">
             <div className="flex items-center mb-4">
@@ -94,11 +94,11 @@ const Footer = () => {
         </div>
 
         {/* Bottom */}
-        <div className="border-t border-gray-800 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
-          <p className="text-gray-400 text-sm">
+        <div className="border-t border-gray-800 mt-6 sm:mt-8 pt-6 sm:pt-8 flex flex-col md:flex-row justify-between items-center">
+          <p className="text-gray-400 text-sm text-center md:text-left">
             © {new Date().getFullYear()} <a href="https://creciendodigitalweb.vercel.app/" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:underline">Creciendo digital</a>. Todos los derechos reservados.
           </p>
-          <div className="flex space-x-6 mt-4 md:mt-0">
+          <div className="flex flex-col sm:flex-row sm:space-x-6 space-y-3 sm:space-y-0 mt-4 md:mt-0 items-center">
             <Link href="/terminos-condiciones" className="text-gray-400 hover:text-orange-400 transition-colors duration-200 text-sm">
               Términos y Condiciones
             </Link>

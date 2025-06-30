@@ -60,7 +60,7 @@ const Header = () => {
   };
 
   return (
-    <header className="bg-white/90 backdrop-blur-lg shadow-sm sticky top-0 z-50 border-b border-gray-200" ref={menuRef}>
+    <header className="bg-white/95 backdrop-blur-lg shadow-sm sticky top-0 z-50 border-b border-gray-200" ref={menuRef}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo y menú móvil */}
@@ -78,7 +78,7 @@ const Header = () => {
             </button>
 
             <div className="flex-shrink-0 flex items-center">
-              <Link href="/" className="text-2xl font-extrabold text-gray-900 tracking-tight select-none">
+              <Link href="/" className="text-xl sm:text-2xl font-extrabold text-gray-900 tracking-tight select-none">
                 Revista <span className="text-orange-500">Pando</span>
               </Link>
             </div>
@@ -107,8 +107,8 @@ const Header = () => {
 
         {/* Menú móvil */}
         {isMenuOpen && (
-          <div className="md:hidden bg-white border-t border-gray-200 py-3 px-4 shadow-inner">
-            <nav className="flex flex-col space-y-3">
+          <div className="md:hidden bg-white border-t border-gray-200 py-4 px-4 shadow-inner">
+            <nav className="flex flex-col space-y-4">
               <NavItem href="/">Inicio</NavItem>
               <NavItem href="#servicios">Servicios</NavItem>
               <NavItem href="#categorias">Categorías</NavItem>
@@ -116,10 +116,10 @@ const Header = () => {
               <NavItem href="#revista">Catálogo Digital</NavItem>
               <a
                 href="#registro"
-                className="block w-full px-4 py-2 text-center rounded-xl font-bold bg-gradient-to-r from-orange-500 to-yellow-400 text-white shadow-md hover:from-orange-600 hover:to-yellow-500 transition-all duration-200 mt-4"
+                className="block w-full px-4 py-3 text-center rounded-xl font-bold bg-gradient-to-r from-orange-500 to-yellow-400 text-white shadow-md hover:from-orange-600 hover:to-yellow-500 transition-all duration-200 mt-6"
                 onClick={() => playFolderSound()}
               >
-                Registrar Negocio
+                + Registrar Negocio
               </a>
             </nav>
           </div>
