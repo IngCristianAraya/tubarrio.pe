@@ -151,11 +151,8 @@ const Hero = () => {
               </div>
             </div>
             
-            {/* Espaciador mínimo */}
-            <div className="h-6"></div>
-            
-            {/* Quick Category Buttons */}
-            <div className="flex flex-wrap gap-3 mt-4">
+            {/* Quick Category Buttons - Reposicionados más arriba con margen adecuado */}
+            <div className="flex flex-wrap justify-center sm:justify-start gap-3 mt-8 mb-12 sm:mb-16">
               {quickCategories.map((item) => (
                 <button
                   key={item.name}
@@ -177,6 +174,8 @@ const Hero = () => {
           </div>
         </div>
       </section>
+      {/* Espaciador adicional entre Hero y MapSection, más grande en móviles */}
+      <div className="h-12 sm:h-8 md:h-4"></div>
       
       {/* Sección de resultados de búsqueda */}
       {isSearching && (
