@@ -11,6 +11,8 @@ interface Service {
   rating: number;
   location: string;
   description: string;
+  contactUrl?: string;
+  detailsUrl?: string;
 }
 
 interface ServiceCardProps {
@@ -64,13 +66,42 @@ const ServiceCard = ({ service }: ServiceCardProps) => {
 
         {/* Actions */}
         <div className="flex gap-1.5 sm:gap-2 mt-auto">
-          <button className="flex-1 bg-gradient-to-r from-orange-500 to-yellow-400 hover:from-orange-600 hover:to-yellow-500 active:from-orange-700 active:to-yellow-600 text-white font-medium sm:font-semibold py-2 sm:py-2.5 px-2 sm:px-3 rounded-lg transition-all duration-200 text-2xs sm:text-xs md:text-sm min-h-[36px] sm:min-h-[40px] md:min-h-[44px] focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-opacity-50 flex items-center justify-center">
-            <Phone className="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-1 flex-shrink-0" />
-            <span>Contactar</span>
-          </button>
-          <button className="bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white p-2 sm:p-2.5 rounded-lg transition-all duration-200 min-w-[36px] sm:min-w-[40px] md:min-w-[44px] min-h-[36px] sm:min-h-[40px] md:min-h-[44px] flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
-            <ExternalLink className="w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4" />
-          </button>
+          {service.contactUrl ? (
+            <a
+              href={service.contactUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex-1 bg-gradient-to-r from-orange-500 to-yellow-400 hover:from-orange-600 hover:to-yellow-500 active:from-orange-700 active:to-yellow-600 text-white font-medium sm:font-semibold py-2 sm:py-2.5 px-2 sm:px-3 rounded-lg transition-all duration-200 text-2xs sm:text-xs md:text-sm min-h-[36px] sm:min-h-[40px] md:min-h-[44px] focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-opacity-50 flex items-center justify-center"
+            >
+              <Phone className="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-1 flex-shrink-0" />
+              <span>Contactar</span>
+            </a>
+          ) : (
+            <button
+              className="flex-1 bg-gradient-to-r from-orange-500 to-yellow-400 text-white font-medium sm:font-semibold py-2 sm:py-2.5 px-2 sm:px-3 rounded-lg opacity-50 cursor-not-allowed text-2xs sm:text-xs md:text-sm min-h-[36px] sm:min-h-[40px] md:min-h-[44px] flex items-center justify-center"
+              disabled
+            >
+              <Phone className="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-1 flex-shrink-0" />
+              <span>Contactar</span>
+            </button>
+          )}
+          {service.detailsUrl ? (
+            <a
+              href={service.detailsUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white p-2 sm:p-2.5 rounded-lg transition-all duration-200 min-w-[36px] sm:min-w-[40px] md:min-w-[44px] min-h-[36px] sm:min-h-[40px] md:min-h-[44px] flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+            >
+              <ExternalLink className="w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4" />
+            </a>
+          ) : (
+            <button
+              className="bg-blue-500 text-white p-2 sm:p-2.5 rounded-lg opacity-50 cursor-not-allowed min-w-[36px] sm:min-w-[40px] md:min-w-[44px] min-h-[36px] sm:min-h-[40px] md:min-h-[44px] flex items-center justify-center"
+              disabled
+            >
+              <ExternalLink className="w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4" />
+            </button>
+          )}
         </div>
       </div>
     </div>

@@ -1,167 +1,68 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { ShoppingCart, Utensils, Shirt, Cake, Truck, Wrench, ChevronLeft, ChevronRight } from 'lucide-react';
 import ServiceCard from './ServiceCard';
 
+import { useServices } from '../context/ServicesContext';
+
+const CATEGORY_META = [
+  {
+    id: 'Restaurantes',
+    title: 'Sabores de la zona',
+    subtitle: 'Restaurantes, hamburguesas, shawarmas y más',
+    icon: <Utensils className="w-6 h-6" />, color: 'from-red-500 to-orange-500',
+  },
+  {
+    id: 'Abarrotes',
+    title: 'Mercado local',
+    subtitle: 'Abarrotes, panaderías y productos frescos',
+    icon: <ShoppingCart className="w-6 h-6" />, color: 'from-green-500 to-emerald-500',
+  },
+  {
+    id: 'Lavanderías',
+    title: 'Limpieza y lavandería',
+    subtitle: 'Lavanderías, tintorerías y más',
+    icon: <Shirt className="w-6 h-6" />, color: 'from-blue-500 to-cyan-500',
+  },
+  {
+    id: 'Delivery',
+    title: 'Delivery & Mensajería',
+    subtitle: 'Delivery, mensajería y envíos rápidos',
+    icon: <Truck className="w-6 h-6" />, color: 'from-yellow-500 to-orange-400',
+  },
+  {
+    id: 'Servicios',
+    title: 'Servicios y más',
+    subtitle: 'Peluquerías, clases, técnicos y más',
+    icon: <Wrench className="w-6 h-6" />, color: 'from-purple-500 to-pink-500',
+  },
+];
+
 const CategorySections = () => {
-  // Estado para controlar la paginación y filtros
+  const router = useRouter();
+  const { services } = useServices();
   const [currentPage, setCurrentPage] = useState<Record<string, number>>({});
   const [activeFilters, setActiveFilters] = useState<Record<string, string>>({});
   const [isMobile, setIsMobile] = useState(false);
-  
-  // Detectar si es dispositivo móvil
+
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 640);
     };
-    
-    // Verificar al cargar y cuando cambia el tamaño de la ventana
     checkMobile();
     window.addEventListener('resize', checkMobile);
-    
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
-  
-  // Número de servicios por página (adaptativo)
+
   const servicesPerPage = isMobile ? 1 : 4;
-  const categories = [
-    {
-      id: 'food',
-      title: 'Sabores de la zona',
-      subtitle: 'Restaurantes, hamburguesas, shawarmas y más',
-      icon: <Utensils className="w-6 h-6" />,
-      color: 'from-red-500 to-orange-500',
-      services: [
-        {
-          id: 1,
-          name: 'Pizzería Toscana',
-          category: 'Pizzería',
-          image: 'https://images.pexels.com/photos/315755/pexels-photo-315755.jpeg?auto=compress&cs=tinysrgb&w=400',
-          rating: 4.7,
-          location: 'Av. Universitaria 1697',
-          description: 'Pizzas a la piedra'
-        },
-        {
-          id: 2,
-          name: 'Angie Corazón',
-          category: 'Anticuchos',
-          image: '/images/anticuchos.webp',
-          rating: 4.5,
-          location: 'Sta. Teodosia 573',
-          description: 'Anticuchos de corazón de Res'
-        },
-        {
-          id: 3,
-          name: 'Iro Sushi',
-          category: 'Comida Japonesa',
-          image: 'https://images.pexels.com/photos/357756/pexels-photo-357756.jpeg?auto=compress&cs=tinysrgb&w=400',
-          rating: 4.8,
-          location: 'Av. Universitaria 1743',
-          description: 'Sushi fresco y rollos especiales'
-        },
-        {
-          id: 4,
-          name: 'Oliver Bar',
-          category: 'Cafetería',
-          image: 'https://images.pexels.com/photos/302899/pexels-photo-302899.jpeg?auto=compress&cs=tinysrgb&w=400',
-          rating: 4.6,
-          location: 'Av. Universitaria 1747',
-          description: 'Café de especialidad y postres'
-        }
-      ]
-    },
-    {
-      id: 'groceries',
-      title: 'Mercado local',
-      subtitle: 'Abarrotes, panaderías y productos frescos',
-      icon: <ShoppingCart className="w-6 h-6" />,
-      color: 'from-green-500 to-emerald-500',
-      services: [
-        {
-          id: 5,
-          name: 'Super Familiar',
-          category: 'Supermercado',
-          image: 'https://images.pexels.com/photos/1005638/pexels-photo-1005638.jpeg?auto=compress&cs=tinysrgb&w=400',
-          rating: 4.4,
-          location: '6 min',
-          description: 'Todo lo que necesitas para el hogar'
-        },
-        {
-          id: 6,
-          name: 'Panadería San Miguel',
-          category: 'Panadería',
-          image: 'https://images.pexels.com/photos/1070850/pexels-photo-1070850.jpeg?auto=compress&cs=tinysrgb&w=400',
-          rating: 4.9,
-          location: '4 min',
-          description: 'Pan fresco horneado diariamente'
-        },
-        {
-          id: 7,
-          name: 'Frutas y Verduras María',
-          category: 'Frutería',
-          image: 'https://images.pexels.com/photos/1300972/pexels-photo-1300972.jpeg?auto=compress&cs=tinysrgb&w=400',
-          rating: 4.6,
-          location: '7 min',
-          description: 'Productos frescos del campo'
-        },
-        {
-          id: 8,
-          name: 'Carnicería El Buen Corte',
-          category: 'Carnicería',
-          image: 'https://images.pexels.com/photos/128401/pexels-photo-128401.jpeg?auto=compress&cs=tinysrgb&w=400',
-          rating: 4.7,
-          location: '9 min',
-          description: 'Carnes frescas y embutidos'
-        }
-      ]
-    },
-    {
-      id: 'services',
-      title: 'Servicios express',
-      subtitle: 'Lavanderías, delivery y servicios rápidos',
-      icon: <Wrench className="w-6 h-6" />,
-      color: 'from-blue-500 to-cyan-500',
-      services: [
-        {
-          id: 9,
-          name: 'Lavandería Antares',
-          category: 'Lavandería',
-          image: 'https://cdn.pixabay.com/photo/2017/09/14/19/34/laundry-2750158_1280.jpg',
-          rating: 4.5,
-          location: '10 min',
-          description: 'Servicio rápido y de calidad'
-        },
-        {
-          id: 10,
-          name: 'Mensajería Express',
-          category: 'Delivery',
-          image: 'https://images.pexels.com/photos/4391478/pexels-photo-4391478.jpeg?auto=compress&cs=tinysrgb&w=400',
-          rating: 4.3,
-          location: '15 min',
-          description: 'Entregas en tiempo récord'
-        },
-        {
-          id: 11,
-          name: 'Imana tu vida',
-          category: 'Salud integral',
-          image: '/images/biomagnetismo.webp',
-          rating: 4.8,
-          location: 'Santa Paula 555',
-          description: 'Terapia natural que utiliza imanes para equilibrar la energía del cuerpo.'
-        },
-        {
-          id: 12,
-          name: 'Angela Valles',
-          category: 'Belleza',
-          image: 'https://images.pexels.com/photos/3993449/pexels-photo-3993449.jpeg?auto=compress&cs=tinysrgb&w=400',
-          rating: 4.7,
-          location: 'Santa Teodosia 550',
-          description: 'Cortes y peinados modernos'
-        }
-      ]
-    }
-  ];
+
+  const categories = CATEGORY_META.map(meta => {
+    const categoryServices = services.filter(s => s.category === meta.id);
+    return { ...meta, services: categoryServices };
+  }).filter(cat => cat.services.length > 0);
 
   // Función para obtener subcategorías únicas por categoría
   const getUniqueSubcategories = (categoryId: string) => {
@@ -351,9 +252,17 @@ const CategorySections = () => {
 
             {/* View More Button */}
             <div className="text-center mt-8">
-              <button className={`bg-gradient-to-r ${category.color} hover:shadow-lg text-white font-semibold py-3 px-8 rounded-xl transition-all duration-200 transform hover:scale-105`}>
-                Ver todos en {category.title}
-              </button>
+              <button
+  onClick={() => {
+    router.push('/todos-los-servicios');
+    setTimeout(() => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, 100);
+  }}
+  className={`bg-gradient-to-r ${category.color} hover:shadow-lg text-white font-semibold py-3 px-8 rounded-xl transition-all duration-200 transform hover:scale-105 inline-block`}
+>
+  Ver todos en {category.title}
+</button>
             </div>
           </div>
         ))}
