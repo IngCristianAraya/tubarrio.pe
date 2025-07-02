@@ -38,6 +38,7 @@ export const metadata: Metadata = {
   },
 };
 
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -47,6 +48,8 @@ export default function RootLayout({
     <html lang="es">
       <head>
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, orientation=portrait" />
+        <link rel="manifest" href="/manifest.json" />
       </head>
       <body className={`${geist.variable} antialiased min-h-screen bg-white`}>
         <ServicesProvider>

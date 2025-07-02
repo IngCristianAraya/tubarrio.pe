@@ -100,18 +100,16 @@ const CategorySections = () => {
     <section id="categorias" className="py-8 md:py-16 bg-gray-50">
       <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
         {categories.map((category, index) => (
-          <div key={category.id} className={`mb-12 md:mb-16 ${index !== categories.length - 1 ? 'border-b border-gray-200 pb-12 md:pb-16' : ''}`}>
+          <div key={category.id} className={`mb-8 md:mb-16 ${index !== categories.length - 1 ? 'border-b border-gray-200 pb-8 md:pb-16' : ''}`}>
             {/* Category Header */}
-            <div className="text-center mb-8 md:mb-12">
-              <div className={`inline-flex items-center justify-center w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-gradient-to-r ${category.color} text-white mb-3 md:mb-4`}>
+            <div className="mb-4 md:mb-12 text-left md:text-center">
+              <div className={`inline-flex items-center justify-center w-10 h-10 md:w-16 md:h-16 rounded-2xl bg-gradient-to-r ${category.color} text-white mb-2 md:mb-4`}>
                 {category.icon}
               </div>
-              <h2 className="text-2xl md:text-4xl font-bold text-gray-900 mb-3 md:mb-4">
+              <h2 className="text-lg md:text-4xl font-bold text-gray-900 mb-1 md:mb-4">
                 {category.title}
               </h2>
-              <p className="text-sm md:text-lg text-gray-600 max-w-2xl mx-auto">
-                {category.subtitle}
-              </p>
+              <div className="text-gray-500 text-xs md:text-base mb-1 md:mb-2">{category.subtitle}</div>
             </div>
             
             {/* Filter Controls */}
@@ -135,59 +133,46 @@ const CategorySections = () => {
               </div>
             </div>
 
-            {/* Services Display - Grid for desktop, Slider for mobile */}
-            {isMobile ? (
-              <div className="relative overflow-hidden py-2">
-                <div className="flex flex-col items-center">
-                  {getFilteredServices(category.id).length > 0 ? (
-                    <div className="w-full max-w-sm mx-auto">
-                      {getFilteredServices(category.id)
-                        .slice(
-                          ((currentPage[category.id] || 1) - 1) * servicesPerPage,
-                          (currentPage[category.id] || 1) * servicesPerPage
-                        )
-                        .map((service) => (
-                          <div key={service.id} className="w-full px-2">
-                            <ServiceCard service={service} />
-                          </div>
-                        ))}
-                    </div>
-                  ) : (
-                    <div className="py-12 text-center w-full">
-                      <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-gray-100 text-gray-400 mb-4">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                      </div>
-                      <p className="text-gray-500">No se encontraron servicios en esta categoría</p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+            {/* Mobile: horizontal scroll sin paginación */}
+            <div className="block md:hidden overflow-x-auto pb-2 -mx-2">
+              <div className="flex gap-3 px-2" style={{minWidth:'100%'}}>
                 {getFilteredServices(category.id)
-                  .slice(
-                    ((currentPage[category.id] || 1) - 1) * servicesPerPage,
-                    (currentPage[category.id] || 1) * servicesPerPage
-                  )
                   .map((service) => (
-                    <ServiceCard key={service.id} service={service} />
+                    <div key={service.id + service.name} className="min-w-[220px] max-w-[70vw] flex-shrink-0">
+                      <ServiceCard service={service} />
+                    </div>
                   ))}
-                
-                {/* Mensaje cuando no hay resultados */}
                 {getFilteredServices(category.id).length === 0 && (
-                  <div className="col-span-full py-12 text-center">
+                  <div className="flex flex-col items-center justify-center min-w-[220px] max-w-[70vw] py-8">
                     <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-gray-100 text-gray-400 mb-4">
                       <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
                     </div>
-                    <p className="text-gray-500">No se encontraron servicios en esta categoría</p>
+                    <p className="text-gray-500 text-center">No se encontraron servicios en esta categoría</p>
                   </div>
                 )}
               </div>
-            )}
+            </div>
+
+            {/* Desktop: grid de 4 columnas */}
+            <div className="hidden md:grid grid-cols-4 gap-6">
+              {getFilteredServices(category.id)
+                .slice(0, servicesPerPage * (currentPage[category.id] || 1))
+                .map((service) => (
+                  <ServiceCard key={service.id + service.name} service={service} />
+                ))}
+              {getFilteredServices(category.id).length === 0 && (
+                <div className="col-span-4 flex flex-col items-center justify-center py-8">
+                  <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-gray-100 text-gray-400 mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <p className="text-gray-500 text-center">No se encontraron servicios en esta categoría</p>
+                </div>
+              )}
+            </div>
 
             {/* Pagination Controls */}
             {getFilteredServices(category.id).length > servicesPerPage && (

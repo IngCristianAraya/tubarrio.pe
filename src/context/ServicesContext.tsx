@@ -35,7 +35,7 @@ const allServices: Service[] = [
     category: 'Restaurantes',
     image: 'https://images.pexels.com/photos/1639557/pexels-photo-1639557.jpeg?auto=compress&cs=tinysrgb&w=800',
     rating: 4.8,
-    description: 'Las mejores hamburguesas artesanales de la zona con ingredientes frescos',
+    description: 'Las mejores hamburguesas artesanales.',
     location: 'Centro, 5 min',
     contactUrl: 'https://www.hamburguesaselrey.com',
     detailsUrl: 'https://www.hamburguesaselrey.com'
@@ -103,7 +103,7 @@ const allServices: Service[] = [
     category: 'Abarrotes',
     image: 'https://images.pexels.com/photos/264636/pexels-photo-264636.jpeg?auto=compress&cs=tinysrgb&w=800',
     rating: 4.6,
-    description: 'Productos frescos, abarrotes y todo lo que necesitas para el hogar',
+    description: 'Venta de abarrotes, frutas y verduras ',
     location: 'La comercial, 3 min',
     contactUrl: 'https://www.abarrotesdonrichard.com',
     detailsUrl: 'https://www.abarrotesdonrichard.com'

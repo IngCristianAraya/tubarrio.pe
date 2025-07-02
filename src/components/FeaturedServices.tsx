@@ -32,7 +32,7 @@ const FeaturedServices = () => {
       description: 'Productos frescos, abarrotes y todo lo que necesitas para el hogar',
       location: 'La Comercial, 3 min',
       phone: '+1234567891',
-      hours: 'Abierto hasta 10:00 PM',
+      hours: 'Abierto hasta 11:00 PM',
       badge: 'Mejor Precio'
     },
     {

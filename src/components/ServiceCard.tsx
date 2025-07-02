@@ -1,7 +1,7 @@
 'use client';
 
 import { Star, MapPin, Phone, ExternalLink } from 'lucide-react';
-import Image from 'next/image';
+import OptimizedImage from './OptimizedImage';
 
 interface Service {
   id: number;
@@ -21,28 +21,29 @@ interface ServiceCardProps {
 
 const ServiceCard = ({ service }: ServiceCardProps) => {
   return (
-    <div className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 active:scale-98 border border-gray-100 overflow-hidden group h-full flex flex-col">
+    <div className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 active:scale-98 border border-gray-100 overflow-hidden group h-full flex flex-col min-w-0">
       {/* Image */}
-      <div className="relative overflow-hidden h-36 sm:h-40 md:h-48">
-        <Image
+      <div className="relative overflow-hidden h-36 sm:h-40 md:h-48 min-w-0">
+        <OptimizedImage
           src={service.image}
-          alt={service.name}
-          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+          alt={`Foto de ${service.name}`}
+          className="w-full h-full object-cover group-hover:scale-105 group-hover:ring-2 group-hover:ring-orange-300 transition-transform duration-300"
           width={300}
           height={200}
-          sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw"
-          priority={false}
-          placeholder="blur"
-          blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+P+/HgAFdQIhgcBbaQAAAABJRU5ErkJggg=="
+          loading="lazy"
+          
+          placeholderColor="#f3f4f6"
+          objectFit="cover"
+          fallbackSrc="/images/placeholder-business.jpg"
         />
         {/* Category Badge */}
-        <div className="absolute top-2 left-2 bg-white/90 backdrop-blur-sm px-1.5 py-0.5 sm:px-2 sm:py-1 rounded-full shadow-sm">
-          <span className="text-2xs sm:text-xs font-medium text-gray-800">{service.category}</span>
+        <div className="absolute top-2 left-2 bg-gradient-to-r from-orange-400 to-yellow-300/90 px-2 py-1 rounded-full shadow-md ring-1 ring-orange-300">
+          <span className="text-2xs sm:text-xs font-bold text-gray-900 drop-shadow">{service.category}</span>
         </div>
         {/* Rating */}
-        <div className="absolute top-2 right-2 bg-white/90 backdrop-blur-sm px-1.5 py-0.5 sm:px-2 sm:py-1 rounded-full flex items-center shadow-sm">
-          <Star className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-yellow-400 fill-current" />
-          <span className="text-2xs sm:text-xs font-semibold ml-0.5 sm:ml-1">{service.rating}</span>
+        <div className="absolute top-2 right-2 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-full flex items-center shadow-md ring-1 ring-yellow-300">
+          <Star className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-yellow-400 fill-current drop-shadow" />
+          <span className="text-2xs sm:text-xs font-bold ml-1 text-yellow-700">{service.rating}</span>
         </div>
       </div>
 
