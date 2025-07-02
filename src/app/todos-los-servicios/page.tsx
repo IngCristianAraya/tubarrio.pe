@@ -9,6 +9,7 @@ import GoToTopButton from '../../components/GoToTopButton';
 import CategoryChips from '../../components/CategoryChips';
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
+import BusinessBanner from '../../components/BusinessBanner';
 import Image from 'next/image';
 
 
@@ -170,6 +171,7 @@ function TodosLosServiciosPage() {
         >Siguiente</button>
       </div>
     </main>
+    <BusinessBanner />
     <Footer />
     </>
   );
