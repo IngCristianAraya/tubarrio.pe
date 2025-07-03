@@ -19,6 +19,8 @@ interface ServiceCardProps {
   service: Service;
 }
 
+import React from 'react';
+
 const ServiceCard = ({ service }: ServiceCardProps) => {
   return (
     <div className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 active:scale-98 border border-gray-100 overflow-hidden group h-full flex flex-col min-w-0">
@@ -72,18 +74,18 @@ const ServiceCard = ({ service }: ServiceCardProps) => {
               href={service.contactUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex-1 bg-gradient-to-r from-orange-500 to-yellow-400 hover:from-orange-600 hover:to-yellow-500 active:from-orange-700 active:to-yellow-600 text-white font-medium sm:font-semibold py-2 sm:py-2.5 px-2 sm:px-3 rounded-lg transition-all duration-200 text-2xs sm:text-xs md:text-sm min-h-[36px] sm:min-h-[40px] md:min-h-[44px] focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-opacity-50 flex items-center justify-center"
+              className="flex-1 bg-[#25D366] hover:bg-[#128C7E] active:bg-[#075e54] text-white font-semibold tracking-wide py-2 sm:py-2.5 px-2 sm:px-3 rounded-xl border border-white/40 hover:border-white/70 shadow-lg hover:shadow-xl transition-all duration-200 text-2xs sm:text-xs md:text-sm min-h-[36px] sm:min-h-[40px] md:min-h-[44px] flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 hover:-translate-y-0.5"
             >
-              <Phone className="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-1 flex-shrink-0" />
-              <span>Contactar</span>
+              <Phone className="w-3 h-3 sm:w-4 sm:h-4 mr-1 flex-shrink-0 text-white" />
+              <span>Contacto</span>
             </a>
           ) : (
             <button
-              className="flex-1 bg-gradient-to-r from-orange-500 to-yellow-400 text-white font-medium sm:font-semibold py-2 sm:py-2.5 px-2 sm:px-3 rounded-lg opacity-50 cursor-not-allowed text-2xs sm:text-xs md:text-sm min-h-[36px] sm:min-h-[40px] md:min-h-[44px] flex items-center justify-center"
+              className="flex-1 bg-[#25D366] text-white font-semibold tracking-wide py-2 sm:py-2.5 px-2 sm:px-3 rounded-xl border border-white/40 shadow-lg opacity-50 cursor-not-allowed text-2xs sm:text-xs md:text-sm min-h-[36px] sm:min-h-[40px] md:min-h-[44px] flex items-center justify-center"
               disabled
             >
-              <Phone className="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-1 flex-shrink-0" />
-              <span>Contactar</span>
+              <Phone className="w-3 h-3 sm:w-4 sm:h-4 mr-1 flex-shrink-0 text-white" />
+              <span>Contacto</span>
             </button>
           )}
           {service.detailsUrl ? (
@@ -91,16 +93,16 @@ const ServiceCard = ({ service }: ServiceCardProps) => {
               href={service.detailsUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white p-2 sm:p-2.5 rounded-lg transition-all duration-200 min-w-[36px] sm:min-w-[40px] md:min-w-[44px] min-h-[36px] sm:min-h-[40px] md:min-h-[44px] flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+              className="flex-1 bg-[#fb8500] hover:bg-[#e65100] active:bg-[#b45309] text-white font-semibold tracking-wide py-2 sm:py-2.5 px-2 sm:px-3 rounded-xl border border-white/40 hover:border-white/70 shadow-lg hover:shadow-xl transition-all duration-200 text-2xs sm:text-xs md:text-sm min-h-[36px] sm:min-h-[40px] md:min-h-[44px] flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-opacity-50 hover:-translate-y-0.5"
             >
-              <ExternalLink className="w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4" />
+              <ExternalLink className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
             </a>
           ) : (
             <button
-              className="bg-blue-500 text-white p-2 sm:p-2.5 rounded-lg opacity-50 cursor-not-allowed min-w-[36px] sm:min-w-[40px] md:min-w-[44px] min-h-[36px] sm:min-h-[40px] md:min-h-[44px] flex items-center justify-center"
+              className="flex-1 bg-[#fb8500] text-white font-semibold tracking-wide py-2 sm:py-2.5 px-2 sm:px-3 rounded-xl border border-white/40 shadow-lg opacity-50 cursor-not-allowed text-2xs sm:text-xs md:text-sm min-h-[36px] sm:min-h-[40px] md:min-h-[44px] flex items-center justify-center"
               disabled
             >
-              <ExternalLink className="w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4" />
+              <ExternalLink className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
             </button>
           )}
         </div>
@@ -109,4 +111,4 @@ const ServiceCard = ({ service }: ServiceCardProps) => {
   );
 };
 
-export default ServiceCard;
+export default React.memo(ServiceCard);

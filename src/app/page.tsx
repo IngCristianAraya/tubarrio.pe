@@ -1,7 +1,6 @@
 import { Metadata } from 'next';
 import Image from 'next/image';
-import MapSection from '@/components/MapSection';
-import MagazineSection from '@/components/MagazineSection';
+import HomeClient from '@/components/HomeClient';
 import WhatsAppButton from '@/components/WhatsAppButton';
 import CustomCursor from '@/components/CustomCursor';
 import Header from '@/components/Header';
@@ -30,23 +29,7 @@ export default function Home() {
         {/* Hero Section */}
         <Hero />
         
-        {/* Sección de Cobertura */}
-        <MapSection />
-        
-        {/* Servicios Destacados */}
-        <FeaturedServices />
-
-        {/* Categorías de Servicios */}
-        <CategorySections />
-        
-        {/* Revista Digital */}
-        <MagazineSection />
-        
-        {/* Sección de Registro de Negocios */}
-        <BusinessRegistration />
-        
-        {/* Botón flotante de WhatsApp */}
-        <WhatsAppButton phoneNumber="+51906684284" />
+        <HomeClient />
       </main>
 
       <Footer />

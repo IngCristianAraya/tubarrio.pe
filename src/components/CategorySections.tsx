@@ -1,256 +1,241 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ShoppingCart, Utensils, Shirt, Cake, Truck, Wrench, ChevronLeft, ChevronRight } from 'lucide-react';
-import ServiceCard from './ServiceCard';
+import { Utensils, ShoppingCart, Shirt, Cake, Truck, Home, Book, PawPrint, HeartPulse, User2 } from 'lucide-react';
+import React, { useState } from "react";
 
-import { useServices } from '../context/ServicesContext';
-
-const CATEGORY_META = [
+const CATEGORIES = [
   {
-    id: 'Restaurantes',
-    title: 'Sabores de la zona',
-    subtitle: 'Restaurantes, hamburguesas, shawarmas y más',
-    icon: <Utensils className="w-6 h-6" />, color: 'from-red-500 to-orange-500',
+    icon: <Utensils className="w-8 h-8 text-orange-500" />, // Alimentos y Gastronomía
+    image: 'https://images.pexels.com/photos/461382/pexels-photo-461382.jpeg?auto=compress&w=400&h=400&fit=crop',
+    title: 'Alimentos y Gastronomía',
+    subcategories: [
+      'Restaurantes',
+      'Comida Rápida',
+      'Cafeterías',
+      'Juguerías',
+    ],
   },
   {
-    id: 'Abarrotes',
-    title: 'Mercado local',
-    subtitle: 'Abarrotes, panaderías y productos frescos',
-    icon: <ShoppingCart className="w-6 h-6" />, color: 'from-green-500 to-emerald-500',
+    icon: <ShoppingCart className="w-8 h-8 text-orange-500" />, // Abarrotes y Tiendas
+    image: 'https://images.pexels.com/photos/264636/pexels-photo-264636.jpeg?auto=compress&w=400&h=400&fit=crop',
+    title: 'Abarrotes y Tiendas',
+    subcategories: [
+      'Abarrotes',
+      'Lácteos',
+      'Fruterías',
+      'Bodegas',
+    ],
   },
   {
-    id: 'Lavanderías',
-    title: 'Limpieza y lavandería',
-    subtitle: 'Lavanderías, tintorerías y más',
-    icon: <Shirt className="w-6 h-6" />, color: 'from-blue-500 to-cyan-500',
+    icon: <Shirt className="w-8 h-8 text-orange-500" />, // Ventas y Productos
+    image: 'https://images.pexels.com/photos/2983464/pexels-photo-2983464.jpeg?auto=compress&w=400&h=400&fit=crop',
+    title: 'Ventas y Productos',
+    subcategories: [
+      'Catálogo (ropa, maquillaje)',
+      'Ecommerce Local',
+      'Tecnología',
+      'Ferretería',
+    ],
   },
   {
-    id: 'Delivery',
-    title: 'Delivery & Mensajería',
-    subtitle: 'Delivery, mensajería y envíos rápidos',
-    icon: <Truck className="w-6 h-6" />, color: 'from-yellow-500 to-orange-400',
+    icon: <Cake className="w-8 h-8 text-orange-500" />, // Belleza y Cuidado Personal
+    image: 'https://images.pexels.com/photos/853427/pexels-photo-853427.jpeg?auto=compress&w=400&h=400&fit=crop',
+    title: 'Belleza y Cuidado Personal',
+    subcategories: [
+      'Peluquería',
+      'Spa',
+      'Maquillaje',
+      'Cosméticos',
+    ],
   },
   {
-    id: 'Servicios',
-    title: 'Servicios y más',
-    subtitle: 'Peluquerías, clases, técnicos y más',
-    icon: <Wrench className="w-6 h-6" />, color: 'from-purple-500 to-pink-500',
+    icon: <Truck className="w-8 h-8 text-orange-500" />, // Servicios Técnicos y Profesionales
+    image: 'https://images.pexels.com/photos/209251/pexels-photo-209251.jpeg?auto=compress&w=400&h=400&fit=crop',
+    title: 'Servicios Técnicos y Profesionales',
+    subcategories: [
+      'Gasfitería',
+      'Técnicos',
+      'Reparaciones',
+      'Fletes',
+    ],
+  },
+  {
+    icon: <Home className="w-8 h-8 text-orange-500" />, // Hogar y Decoración
+    image: 'https://images.pexels.com/photos/271816/pexels-photo-271816.jpeg?auto=compress&w=400&h=400&fit=crop',
+    title: 'Hogar y Decoración',
+    subcategories: [
+      'Hogar',
+      'Decoración',
+      'Muebles',
+    ],
+  },
+  {
+    icon: <Book className="w-8 h-8 text-orange-500" />, // Educación y Desarrollo
+    image: 'https://images.pexels.com/photos/256401/pexels-photo-256401.jpeg?auto=compress&w=400&h=400&fit=crop',
+    title: 'Educación y Desarrollo',
+    subcategories: [
+      'Clases',
+      'Psicología',
+      'Talleres',
+      'Copias',
+    ],
+  },
+  {
+    icon: <PawPrint className="w-8 h-8 text-orange-500" />, // Mascotas
+    image: 'https://images.pexels.com/photos/1108099/pexels-photo-1108099.jpeg?auto=compress&w=400&h=400&fit=crop',
+    title: 'Mascotas',
+    subcategories: [
+      'Veterinaria',
+      'Peluquería Canina',
+      'Accesorios',
+    ],
+  },
+  {
+    icon: <HeartPulse className="w-8 h-8 text-orange-500" />, // Salud y Bienestar
+    image: 'https://images.pexels.com/photos/40568/medical-appointment-doctor-healthcare-40568.jpeg?auto=compress&w=400&h=400&fit=crop',
+    title: 'Salud y Bienestar',
+    subcategories: [
+      'Medicina Natural',
+      'Nutrición',
+      'Farmacia',
+    ],
+  },
+  {
+    icon: <User2 className="w-8 h-8 text-orange-500" />, // Emprendimientos Personales
+    image: 'https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&w=400&h=400&fit=crop',
+    title: 'Emprendimientos Personales',
+    subcategories: [
+      'Consultores',
+      'Negocio en Casa',
+      'Emprendedoras',
+    ],
   },
 ];
 
-const CategorySections = () => {
-  const router = useRouter();
-  const { services } = useServices();
-  const [currentPage, setCurrentPage] = useState<Record<string, number>>({});
-  const [activeFilters, setActiveFilters] = useState<Record<string, string>>({});
-  const [isMobile, setIsMobile] = useState(false);
+import Image from 'next/image';
 
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 640);
-    };
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
+interface CategoryCardProps {
+  icon: React.ReactNode;
+  image: string;
+  title: string;
+  subcategories: string[];
+  idx: number;
+}
 
-  const servicesPerPage = isMobile ? 1 : 4;
-
-  const categories = CATEGORY_META.map(meta => {
-    const categoryServices = services.filter(s => s.category === meta.id);
-    return { ...meta, services: categoryServices };
-  }).filter(cat => cat.services.length > 0);
-
-  // Función para obtener subcategorías únicas por categoría
-  const getUniqueSubcategories = (categoryId: string) => {
-    const category = categories.find(cat => cat.id === categoryId);
-    if (!category) return [];
-    
-    const subcategories = category.services.map(service => service.category);
-    return ['Todos', ...Array.from(new Set(subcategories))];
-  };
-
-  // Función para filtrar servicios por subcategoría
-  const getFilteredServices = (categoryId: string) => {
-    const category = categories.find(cat => cat.id === categoryId);
-    if (!category) return [];
-    
-    const filter = activeFilters[categoryId] || 'Todos';
-    return filter === 'Todos' ? category.services : category.services.filter(service => service.category === filter);
-  };
-
-  // Manejador para cambiar filtro
-  const handleFilterChange = (categoryId: string, value: string) => {
-    setActiveFilters(prev => ({
-      ...prev,
-      [categoryId]: value
-    }));
-    
-    // Reiniciar a la página 1 cuando se cambia el filtro
-    setCurrentPage(prev => ({
-      ...prev,
-      [categoryId]: 1
-    }));
-  };
+const CategoryCard: React.FC<CategoryCardProps> = ({ icon, image, title, subcategories, idx }) => {
+  const [isFlipped, setIsFlipped] = useState(false);
 
   return (
-    <section id="categorias" className="py-8 md:py-16 bg-gray-50">
-      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
-        {categories.map((category, index) => (
-          <div key={category.id} className={`mb-8 md:mb-16 ${index !== categories.length - 1 ? 'border-b border-gray-200 pb-8 md:pb-16' : ''}`}>
-            {/* Category Header */}
-            <div className="mb-4 md:mb-12 text-left md:text-center">
-              <div className={`inline-flex items-center justify-center w-10 h-10 md:w-16 md:h-16 rounded-2xl bg-gradient-to-r ${category.color} text-white mb-2 md:mb-4`}>
-                {category.icon}
-              </div>
-              <h2 className="text-lg md:text-4xl font-bold text-gray-900 mb-1 md:mb-4">
-                {category.title}
-              </h2>
-              <div className="text-gray-500 text-xs md:text-base mb-1 md:mb-2">{category.subtitle}</div>
-            </div>
-            
-            {/* Filter Controls */}
-            <div className="flex flex-wrap items-center justify-center mb-6 md:mb-8">
-              <div className="relative w-full max-w-xs mx-auto">
-                <select
-                  value={activeFilters[category.id] || 'Todas'}
-                  onChange={(e) => handleFilterChange(category.id, e.target.value)}
-                  className="w-full p-3 text-sm md:text-base bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent appearance-none cursor-pointer"
-                  aria-label="Filtrar por subcategoría"
-                >
-                  {getUniqueSubcategories(category.id).map((subcat) => (
-                    <option key={subcat} value={subcat}>{subcat}</option>
-                  ))}
-                </select>
-                <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-                  <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
-                  </svg>
-                </div>
-              </div>
-            </div>
-
-            {/* Mobile: horizontal scroll sin paginación */}
-            <div className="block md:hidden overflow-x-auto pb-2 -mx-2">
-              <div className="flex gap-3 px-2" style={{minWidth:'100%'}}>
-                {getFilteredServices(category.id)
-                  .map((service) => (
-                    <div key={service.id + service.name} className="min-w-[220px] max-w-[70vw] flex-shrink-0">
-                      <ServiceCard service={service} />
-                    </div>
-                  ))}
-                {getFilteredServices(category.id).length === 0 && (
-                  <div className="flex flex-col items-center justify-center min-w-[220px] max-w-[70vw] py-8">
-                    <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-gray-100 text-gray-400 mb-4">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                    </div>
-                    <p className="text-gray-500 text-center">No se encontraron servicios en esta categoría</p>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Desktop: grid de 4 columnas */}
-            <div className="hidden md:grid grid-cols-4 gap-6">
-              {getFilteredServices(category.id)
-                .slice(0, servicesPerPage * (currentPage[category.id] || 1))
-                .map((service) => (
-                  <ServiceCard key={service.id + service.name} service={service} />
-                ))}
-              {getFilteredServices(category.id).length === 0 && (
-                <div className="col-span-4 flex flex-col items-center justify-center py-8">
-                  <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-gray-100 text-gray-400 mb-4">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                  </div>
-                  <p className="text-gray-500 text-center">No se encontraron servicios en esta categoría</p>
-                </div>
-              )}
-            </div>
-
-            {/* Pagination Controls */}
-            {getFilteredServices(category.id).length > servicesPerPage && (
-              <div className="flex justify-center items-center mt-6 md:mt-8 space-x-2">
-                <button 
-                  onClick={() => setCurrentPage(prev => ({
-                    ...prev,
-                    [category.id]: Math.max(1, (prev[category.id] || 1) - 1)
-                  }))}
-                  disabled={(currentPage[category.id] || 1) === 1}
-                  className={`${isMobile ? 'w-8 h-8 sm:w-9 sm:h-9' : 'p-3 min-w-[48px] min-h-[48px]'} rounded-lg flex items-center justify-center ${(currentPage[category.id] || 1) === 1 ? 'text-gray-400 bg-gray-100 cursor-not-allowed' : `text-white bg-gradient-to-r ${category.color} hover:shadow-md transition-all duration-200`}`}
-                  aria-label="Página anterior"
-                >
-                  <ChevronLeft className={`${isMobile ? 'w-4 h-4' : 'w-5 h-5'}`} />
-                </button>
-                
-                {isMobile ? (
-                  <div className="flex flex-wrap justify-center gap-1.5">
-                    {Array.from({ length: Math.ceil(getFilteredServices(category.id).length / servicesPerPage) }, (_, i) => i + 1).map((page) => {
-                      // En móviles, mostrar solo página actual, primera, última y una antes/después de la actual
-                      const isCurrentPage = (currentPage[category.id] || 1) === page;
-                      const isFirstPage = page === 1;
-                      const isLastPage = page === Math.ceil(getFilteredServices(category.id).length / servicesPerPage);
-                      const isAdjacentPage = Math.abs((currentPage[category.id] || 1) - page) === 1;
-                      const shouldShowOnMobile = isCurrentPage || isFirstPage || isLastPage || isAdjacentPage;
-                      
-                      return shouldShowOnMobile ? (
-                        <button
-                          key={page}
-                          onClick={() => setCurrentPage(prev => ({
-                            ...prev,
-                            [category.id]: page
-                          }))}
-                          className={`w-6 h-6 sm:w-7 sm:h-7 rounded-lg flex items-center justify-center text-xs ${isCurrentPage ? `bg-gradient-to-r ${category.color} text-white` : 'bg-gray-100 text-gray-700 hover:bg-gray-200 active:bg-gray-300'} transition-colors duration-200`}
-                          aria-label={`Página ${page}`}
-                          aria-current={isCurrentPage ? 'page' : undefined}
-                        >
-                          {page}
-                        </button>
-                      ) : null;
-                    })}
-                  </div>
-                ) : (
-                  <div className="text-xs sm:text-sm font-medium text-gray-700 bg-white px-3 py-2 rounded-lg shadow-sm border border-gray-200">
-                    Página {currentPage[category.id] || 1} de {Math.ceil(getFilteredServices(category.id).length / servicesPerPage)}
-                  </div>
-                )}
-                
-                <button 
-                  onClick={() => setCurrentPage(prev => ({
-                    ...prev,
-                    [category.id]: Math.min(Math.ceil(getFilteredServices(category.id).length / servicesPerPage), (prev[category.id] || 1) + 1)
-                  }))}
-                  disabled={(currentPage[category.id] || 1) >= Math.ceil(getFilteredServices(category.id).length / servicesPerPage)}
-                  className={`${isMobile ? 'w-8 h-8 sm:w-9 sm:h-9' : 'p-3 min-w-[48px] min-h-[48px]'} rounded-lg flex items-center justify-center ${(currentPage[category.id] || 1) >= Math.ceil(getFilteredServices(category.id).length / servicesPerPage) ? 'text-gray-400 bg-gray-100 cursor-not-allowed' : `text-white bg-gradient-to-r ${category.color} hover:shadow-md transition-all duration-200`}`}
-                  aria-label="Página siguiente"
-                >
-                  <ChevronRight className={`${isMobile ? 'w-4 h-4' : 'w-5 h-5'}`} />
-                </button>
-              </div>
-            )}
-
-            {/* View More Button */}
-            <div className="text-center mt-8">
-              <button
-  onClick={() => {
-    router.push('/todos-los-servicios');
-    setTimeout(() => {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }, 100);
-  }}
-  className={`bg-gradient-to-r ${category.color} hover:shadow-lg text-white font-semibold py-3 px-8 rounded-xl transition-all duration-200 transform hover:scale-105 inline-block`}
->
-  Ver todos en {category.title}
-</button>
+    <div
+      className="flip-card group w-full aspect-square min-w-[140px] max-w-xs mx-auto relative select-none mb-8 min-h-[210px]"
+      tabIndex={0}
+      role="button"
+      aria-pressed={isFlipped}
+      onClick={() => setIsFlipped((f) => !f)}
+      onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && setIsFlipped((f) => !f)}
+    >
+      <div className={`flip-card-inner w-full h-full transition-transform duration-500 [transform-style:preserve-3d] ${isFlipped ? 'rotate-y-180' : ''}`}>
+        {/* Frente */}
+        <div className="flip-card-front absolute w-full h-full bg-white rounded-2xl shadow-lg flex flex-col backface-hidden border-2 border-orange-100 cursor-pointer p-0">
+          {/* Imagen cubre la mitad superior */}
+          <div className="w-full h-[90%] rounded-t-2xl overflow-hidden flex-shrink-0 relative">
+            <Image
+              src={image}
+              alt={title}
+              fill
+              style={{objectFit:'cover'}}
+              className="w-full h-full object-cover"
+              priority={idx < 4}
+            />
+            {/* Título sobre la imagen */}
+            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-[90%] bg-white/70 backdrop-blur-md rounded-xl px-2 py-1 shadow-md flex items-center justify-center">
+              <h3 className="text-base sm:text-lg font-bold text-orange-500 text-center select-none line-clamp-2 w-full">
+                {title}
+              </h3>
             </div>
           </div>
-        ))}
+          {/* Contenido inferior */}
+          <div className="flex flex-col items-center justify-end h-[10%] w-full pb-1">
+            <span className="text-xs text-gray-400 select-none">Haz clic para ver más</span>
+          </div>
+        </div>
+        {/* Reverso */}
+        <div className="flip-card-back absolute w-full h-full bg-orange-50 rounded-2xl shadow-lg flex flex-col items-center justify-start pt-8 pb-6 px-4 backface-hidden border-2 border-orange-400 rotate-y-180 cursor-pointer">
+          <span className="text-4xl text-orange-500 mt-1 mb-2">{icon}</span>
+          <ul className="w-full flex-1 flex flex-col gap-1 items-start justify-center text-gray-700 text-xs sm:text-sm">
+            {subcategories.map((sub, i) => (
+              <li key={i} className="w-full flex items-start gap-2 border-b border-orange-100 last:border-b-0 pb-0.5">
+                <span className="mt-1 text-orange-400">•</span>
+                <span>{sub}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+      <style jsx>{`
+        .flip-card {
+          perspective: 1200px;
+          position: relative;
+        }
+        .flip-card-inner {
+          position: relative;
+          width: 100%;
+          height: 100%;
+          transition: transform 0.5s cubic-bezier(0.4,0.2,0.2,1);
+          transform-style: preserve-3d;
+        }
+        .rotate-y-180 {
+          transform: rotateY(180deg);
+        }
+        .flip-card-front, .flip-card-back {
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          backface-visibility: hidden;
+        }
+        .flip-card-back {
+          transform: rotateY(180deg);
+        }
+      `}</style>
+    </div>
+  );
+};
+
+const CategorySections = () => {
+  return (
+    <section className="w-full py-8 md:py-12 lg:py-16 bg-white border-b-4 border-orange-400/70">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="mb-6 text-center relative">
+          <span className="inline-block text-3xl align-middle mr-2">🗂️</span>
+          <h2 className="inline-block text-2xl md:text-4xl font-extrabold tracking-tight drop-shadow-sm align-middle mb-1">
+            <span className="text-orange-500">Categorías </span>
+            <span className="text-black">principales</span>
+          </h2>
+          <div className="mx-auto mt-2 h-1 w-32 md:w-48 rounded-full bg-gradient-to-r from-orange-400 via-yellow-300 to-orange-400 opacity-90" />
+        </div>
+        <p className="text-center text-gray-600 mb-8 text-base md:text-lg max-w-2xl mx-auto">
+          Explora los servicios y productos más populares de la zona
+        </p>
+        <div className="grid gap-10 px-1 grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 mb-4">
+          {CATEGORIES.map((cat, idx) => (
+            <CategoryCard
+              key={idx}
+              icon={cat.icon}
+              image={cat.image}
+              title={cat.title}
+              subcategories={cat.subcategories}
+              idx={idx}
+            />
+          ))}
+        </div>
+        <div className="text-center mb-8">
+          <Link href="/todos-los-servicios">
+            <span className="inline-block bg-gradient-to-r from-orange-500 to-yellow-400 hover:from-orange-600 hover:to-yellow-500 text-white font-semibold py-4 px-10 rounded-2xl text-lg md:text-xl shadow-lg transition-all duration-200 transform hover:scale-105">
+              Ver todos los servicios
+            </span>
+          </Link>
+        </div>
       </div>
     </section>
   );

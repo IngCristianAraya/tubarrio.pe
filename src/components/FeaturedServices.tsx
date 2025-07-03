@@ -243,4 +243,5 @@ const FeaturedServices = () => {
   );
 };
 
-export default FeaturedServices;
+import React from 'react';
+export default React.memo(FeaturedServices);

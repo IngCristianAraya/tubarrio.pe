@@ -68,7 +68,7 @@ const Hero = () => {
             src="/images/hero_3.webp"
             alt="Negocios locales en tu zona"
             fill
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover object-[left_30%] md:object-center"
             priority
             quality={90}
           />
