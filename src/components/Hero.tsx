@@ -64,16 +64,23 @@ const Hero = () => {
       <section id="inicio" className="relative min-h-[70vh] md:min-h-screen overflow-hidden">
         {/* Imagen de fondo */}
         <div className="absolute inset-0 z-0">
-          <Image
-            src="/images/hero_3.webp"
-            alt="Negocios locales en tu zona"
-            fill
-            className="w-full h-full object-cover object-[left_30%] md:object-center"
-            priority
-            quality={90}
-          />
-          {/* Overlay para mejor legibilidad */}
-          <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent" />
+          {/* Imagen principal optimizada para LCP (Largest Contentful Paint)
+    - 'priority' y 'fetchPriority="high"' aseguran carga anticipada
+    - 'placeholder="blur"' y 'blurDataURL' mejoran la experiencia visual
+    - Overlay removido para evitar retrasar el LCP visual
+*/}
+<Image
+  src="/images/hero_3.webp"
+  alt="Negocios locales en tu zona, descubre servicios cerca de ti"
+  fill
+  className="w-full h-full object-cover object-[left_30%] md:object-center"
+  priority
+  quality={90}
+  fetchPriority="high"
+  placeholder="blur"
+  blurDataURL="data:image/webp;base64,UklGRiIAAABXRUJQVlA4ICgAAADQAgCdASoEAAQAAVAfJZgCdAD0oQAA/vuUAAA=="
+  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 80vw, 60vw"
+/>
         </div>
 
         {/* Contenido principal alineado a la izquierda */}

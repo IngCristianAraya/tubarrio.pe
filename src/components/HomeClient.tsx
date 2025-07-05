@@ -1,10 +1,10 @@
 "use client";
 import dynamic from "next/dynamic";
-import BankAgentsSection from "./BankAgentsSection";
-import BusinessRegistration from "./BusinessRegistration";
-import WhatsAppButton from "./WhatsAppButton";
-import LazyMapSection from "./LazyMapSection";
 
+const BankAgentsSection = dynamic(() => import("./BankAgentsSection"), { ssr: false });
+const BusinessRegistration = dynamic(() => import("./BusinessRegistration"), { ssr: false });
+const WhatsAppButton = dynamic(() => import("./WhatsAppButton"), { ssr: false });
+const LazyMapSection = dynamic(() => import("./LazyMapSection"), { ssr: false });
 const FeaturedServices = dynamic(() => import("./FeaturedServices"), { ssr: false });
 const CategorySections = dynamic(() => import("./CategorySections"), { ssr: false });
 const MagazineSection = dynamic(() => import("./MagazineSection"), { ssr: false });
