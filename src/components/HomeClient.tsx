@@ -9,6 +9,8 @@ const FeaturedServices = dynamic(() => import("./FeaturedServices"), { ssr: fals
 const CategorySections = dynamic(() => import("./CategorySections"), { ssr: false });
 const MagazineSection = dynamic(() => import("./MagazineSection"), { ssr: false });
 
+import LazyMagazineSection from "./LazyMagazineSection";
+
 export default function HomeClient() {
   return (
     <>
@@ -20,8 +22,8 @@ export default function HomeClient() {
       <FeaturedServices />
       {/* Categorías de Servicios */}
       <CategorySections />
-      {/* Revista Digital */}
-      <MagazineSection />
+      {/* Revista Digital: OCULTA TEMPORALMENTE POR PETICIÓN DEL USUARIO */}
+      {/* <LazyMagazineSection /> */}
       {/* Sección de Registro de Negocios */}
       <BusinessRegistration />
       {/* Botón flotante de WhatsApp */}
