@@ -1,18 +1,21 @@
 "use client";
 import dynamic from "next/dynamic";
-import FeaturedServices from "./FeaturedServices";
-import CategorySections from "./CategorySections";
+import BankAgentsSection from "./BankAgentsSection";
 import BusinessRegistration from "./BusinessRegistration";
 import WhatsAppButton from "./WhatsAppButton";
+import LazyMapSection from "./LazyMapSection";
 
-const MapSection = dynamic(() => import("./MapSection"), { ssr: false });
+const FeaturedServices = dynamic(() => import("./FeaturedServices"), { ssr: false });
+const CategorySections = dynamic(() => import("./CategorySections"), { ssr: false });
 const MagazineSection = dynamic(() => import("./MagazineSection"), { ssr: false });
 
 export default function HomeClient() {
   return (
     <>
       {/* Sección de Cobertura */}
-      <MapSection />
+      <LazyMapSection />
+      {/* Agentes Bancarios */}
+      <BankAgentsSection />
       {/* Servicios Destacados */}
       <FeaturedServices />
       {/* Categorías de Servicios */}

@@ -32,4 +32,13 @@ const nextConfig = {
   },
 };
 
+// SUGERENCIA: Para builds modernos, asegúrate de tener un archivo .browserslistrc con:
+// last 2 Chrome versions
+// last 2 Edge versions
+// last 2 Firefox versions
+// last 2 Safari versions
+// not IE 11
+// not dead
+// Esto evitará polyfills y transpile innecesario para navegadores legacy.
+
 module.exports = withBundleAnalyzer(nextConfig);

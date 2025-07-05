@@ -88,7 +88,7 @@ const Header = () => {
           <nav className="hidden md:flex gap-3 lg:gap-6 items-center mx-4">
             <NavItem href="/">Inicio</NavItem>
             <NavItem href="#servicios">Destacados</NavItem>
-            <NavItem href="#categorias">Categorías</NavItem>
+            <NavItem href="/todos-los-servicios">Categorías</NavItem>
             <NavItem href="#cobertura">Cobertura</NavItem>
             <NavItem href="#revista">Catálogo Digital</NavItem>
           </nav>
@@ -111,7 +111,7 @@ const Header = () => {
             <nav className="flex flex-col space-y-4">
               <NavItem href="/">Inicio</NavItem>
               <NavItem href="#servicios">Destacados</NavItem>
-              <NavItem href="#categorias">Categorías</NavItem>
+              <NavItem href="/todos-los-servicios">Categorías</NavItem>
               <NavItem href="#cobertura">Cobertura</NavItem>
               <NavItem href="#revista">Catálogo Digital</NavItem>
               <a
