@@ -4,7 +4,7 @@ import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 // Definición de tipos
 export interface Service {
-  id: number;
+  id: string; // Cambiado de number a string para slugs amigables con URL
   name: string;
   category: string;
   image: string;
@@ -13,6 +13,7 @@ export interface Service {
   description: string;
   contactUrl?: string;
   detailsUrl?: string;
+  tags?: string[]; // Nuevo: palabras clave para búsqueda avanzada
 }
 
 interface ServicesContextType {
@@ -30,7 +31,7 @@ const ServicesContext = createContext<ServicesContextType | undefined>(undefined
 const allServices: Service[] = [
   // Restaurantes
   {
-    id: 1,
+    id: 'superburger',
     name: 'Superburger',
     category: 'Restaurantes',
     image: 'https://images.pexels.com/photos/1639557/pexels-photo-1639557.jpeg?auto=compress&cs=tinysrgb&w=800',
@@ -38,10 +39,11 @@ const allServices: Service[] = [
     description: 'Las mejores hamburguesas artesanales.',
     location: 'Sta. Teodosia 573',
     contactUrl: 'https://www.hamburguesaselrey.com',
-    detailsUrl: 'https://www.hamburguesaselrey.com'
+    detailsUrl: 'https://delifoods-gamma.vercel.app/',
+    tags: ['hamburguesa', 'comida rápida', 'carne', 'papas', 'queso']
   },
   {
-    id: 2,
+    id: 'pizzeria-toscana',
     name: 'Pizzería Toscana',
     category: 'Restaurantes',
     image: 'https://images.pexels.com/photos/315755/pexels-photo-315755.jpeg?auto=compress&cs=tinysrgb&w=400',
@@ -49,10 +51,11 @@ const allServices: Service[] = [
     location: 'Av. Universitaria 1697',
     description: 'Pizzas a la piedra',
     contactUrl: 'https://www.pizzaitaliana.com',
-    detailsUrl: 'https://www.pizzaitaliana.com'
+    detailsUrl: 'https://www.pizzaitaliana.com',
+    tags: ['pizza', 'italiana', 'queso', 'pasta', 'horno', 'comida italiana', 'familiar', 'delivery', 'mozarella', 'tomate']
   },
   {
-    id: 3,
+    id: 'rey-del-shawarma',
     name: 'Rey del Shawarma',
     category: 'Restaurantes',
     image: 'https://images.pexels.com/photos/4958792/pexels-photo-4958792.jpeg?auto=compress&cs=tinysrgb&w=400',
@@ -60,10 +63,11 @@ const allServices: Service[] = [
     location: 'jr. Santa Nicerata 334',
     description: 'Tacos tradicionales y quesadillas',
     contactUrl: 'https://www.tacoselguero.com',
-    detailsUrl: 'https://www.tacoselguero.com'
+    detailsUrl: 'https://www.tacoselguero.com',
+    tags: ['shawarma', 'taco', 'quesadilla', 'mexicana', 'árabe', 'pollo', 'carne', 'wrap', 'comida rápida', 'delivery']
   },
   {
-    id: 4,
+    id: 'iro-sushi',
     name: 'IRO Sushi',
     category: 'Restaurantes',
     image: 'https://images.pexels.com/photos/357756/pexels-photo-357756.jpeg?auto=compress&cs=tinysrgb&w=400',
@@ -71,10 +75,11 @@ const allServices: Service[] = [
     location: 'Av. Universitaria 1743',
     description: 'Sushi fresco y rollos especiales',
     contactUrl: 'https://www.sushiexpress.com',
-    detailsUrl: 'https://www.sushiexpress.com'
+    detailsUrl: 'https://www.sushiexpress.com',
+    tags: ['sushi', 'japonés', 'makis', 'rollos', 'pescado', 'arroz', 'soya', 'wasabi', 'delivery', 'comida oriental']
   },
   {
-    id: 5,
+    id: 'bobocha-bubble-tea-shop',
     name: 'Bobocha Bubble Tea Shop',
     category: 'Cafeteria',
     image: 'https://images.pexels.com/photos/302899/pexels-photo-302899.jpeg?auto=compress&cs=tinysrgb&w=400',
@@ -82,10 +87,11 @@ const allServices: Service[] = [
     location: 'Av. Universitaria 1795',
     description: 'Tienda de bubble té',
     contactUrl: 'https://www.cafecentral.com',
-    detailsUrl: 'https://www.cafecentral.com'
+    detailsUrl: 'https://www.cafecentral.com',
+    tags: ['bubble tea', 'té', 'bebidas', 'perlas', 'fruta', 'cafetería', 'postres', 'dulces', 'snacks', 'leche']
   },
   {
-    id: 6,
+    id: 'shawarma-el-faraon',
     name: 'Shawarma El Faraón',
     category: 'Restaurantes',
     image: 'https://images.pexels.com/photos/4394613/pexels-photo-4394613.jpeg?auto=compress&cs=tinysrgb&w=800',
@@ -93,106 +99,59 @@ const allServices: Service[] = [
     description: 'Auténticos shawarmas y comida árabe preparada con recetas tradicionales',
     location: 'Av. Universitaria 1687',
     contactUrl: 'https://www.shawarmpalace.com',
-    detailsUrl: 'https://www.shawarmpalace.com'
+    detailsUrl: 'https://www.shawarmpalace.com',
+    tags: ['shawarma', 'árabe', 'pollo', 'carne', 'wrap', 'pan pita', 'delivery', 'comida rápida', 'kebab', 'ensalada']
   },
-
-  // Abarrotes
   {
-    id: 7,
+    id: 'abarrotes-don-richard',
     name: 'Abarrotes Don Richard',
     category: 'Abarrotes',
     image: 'https://images.pexels.com/photos/264636/pexels-photo-264636.jpeg?auto=compress&cs=tinysrgb&w=800',
     rating: 4.6,
-    description: 'Venta de abarrotes, frutas y verduras ',
-    location: 'Jirón Sáenz Peña 392',
+    location: 'Av. Universitaria 1701',
+    description: 'Abarrotes y productos de primera necesidad',
     contactUrl: 'https://www.abarrotesdonrichard.com',
-    detailsUrl: 'https://www.abarrotesdonrichard.com'
+    detailsUrl: 'https://www.abarrotesdonrichard.com',
+    tags: ['arroz', 'azúcar', 'aceite', 'fideos', 'lentejas', 'menestras', 'galletas', 'leche', 'productos básicos', 'conservas', 'granos', 'harina', 'snacks']
   },
   {
-    id: 8,
+    id: 'lacteos-y-embutidos-ayc',
     name: 'Lácteos y Embutidos A&C',
     category: 'Abarrotes',
     image: 'https://images.pexels.com/photos/1005638/pexels-photo-1005638.jpeg?auto=compress&cs=tinysrgb&w=400',
-    rating: 4.4,
-    location: 'Calle Sta Nicerata 354',
-    description: 'Lácteos y embutidos',
-    contactUrl: 'https://www.supervisorfamiliar.com',
-    detailsUrl: 'https://www.supervisorfamiliar.com'
+    rating: 4.7,
+    location: 'Sta. Paula 123',
+    description: 'Lácteos frescos y embutidos',
+    contactUrl: 'https://www.lacteosayc.com',
+    detailsUrl: 'https://www.lacteosayc.com',
+    tags: ['queso', 'leche', 'yogurt', 'embutidos', 'mantequilla', 'jamón', 'salchicha', 'pan', 'arroz']
   },
   {
-    id: 9,
-    name: 'Bodega Mercedes',
-    category: 'Abarrotes',
-    image: 'https://images.pexels.com/photos/1300972/pexels-photo-1300972.jpeg?auto=compress&cs=tinysrgb&w=400',
-    rating: 4.6,
-    location: 'Calle Sta Nicerata 152',
-    description: 'Productos frescos del campo',
-    contactUrl: 'https://www.frutasyverdurasmaria.com',
-    detailsUrl: 'https://www.frutasyverdurasmaria.com'
-  },
-  {
-    id: 10,
+    id: 'carniceria-el-buen-corte',
     name: 'Carnicería El Buen Corte',
     category: 'Carnicería',
     image: 'https://images.pexels.com/photos/128401/pexels-photo-128401.jpeg?auto=compress&cs=tinysrgb&w=400',
     rating: 4.7,
-    location: 'Calle Sta Nicerata 120',
-    description: 'Carnes frescas y embutidos',
-    contactUrl: 'https://www.carniceriabuenacorte.com',
-    detailsUrl: 'https://www.carniceriabuenacorte.com'
-  },
-
-  // Panaderías
-  {
-    id: 11,
-    name: 'Panadería El Molino',
-    category: 'Panaderías',
-    image: 'https://images.pexels.com/photos/1070850/pexels-photo-1070850.jpeg?auto=compress&cs=tinysrgb&w=400',
-    rating: 4.9,
-    location: 'Calle Sta Nicerata 314',
-    description: 'Pan fresco horneado diariamente',
-    contactUrl: 'https://www.panaderiasanmiguel.com',
-    detailsUrl: 'https://www.panaderiasanmiguel.com'
+    location: 'Av. Universitaria 1727',
+    description: 'Carnes frescas y cortes especiales',
+    contactUrl: 'https://www.carniceriaelbuencorte.com',
+    detailsUrl: 'https://www.carniceriaelbuencorte.com',
+    tags: ['carne', 'pollo', 'cerdo', 'res', 'cordero', 'chuleta', 'bistec', 'embutidos', 'milanesa', 'pescado', 'hueso', 'asado']
   },
   {
-    id: 12,
-    name: 'D Landa Alfajores',
-    category: 'Pastelería',
-    image: 'https://images.pexels.com/photos/205961/pexels-photo-205961.jpeg?auto=compress&cs=tinysrgb&w=400',
-    rating: 4.8,
-    location: 'Calle Santa Teodosia 580',
-    description: 'Pasteles artesanales para toda ocasión',
-    contactUrl: 'https://www.pasteleriadulcehogar.com',
-    detailsUrl: 'https://www.pasteleriadulcehogar.com'
-  },
-
-  // Lavanderías
-  {
-    id: 13,
+    id: 'lavanderia-antares',
     name: 'Lavandería Antares',
     category: 'Lavanderías',
     image: 'https://cdn.pixabay.com/photo/2017/09/14/19/34/laundry-2750158_1280.jpg',
-    rating: 4.5,
-    location: 'Sta. Teodosia 593',
+    rating: 4.7,
+    location: 'Av. Universitaria 1733',
     description: 'Lavado y planchado profesional',
-    contactUrl: 'https://www.lavanderiasantares.com',
-    detailsUrl: 'https://www.lavanderiasantares.com'
+    contactUrl: 'https://www.lavanderiaantares.com',
+    detailsUrl: 'https://www.lavanderiaantares.com',
+    tags: ['lavandería', 'lavado', 'planchado', 'ropa', 'servicio a domicilio', 'secado', 'limpieza', 'blanco', 'camisas', 'uniforme']
   },
   {
-    id: 14,
-    name: 'Lavandería Floiki',
-    category: 'Lavanderías',
-    image: 'https://images.pexels.com/photos/4239091/pexels-photo-4239091.jpeg?auto=compress&cs=tinysrgb&w=400',
-    rating: 4.6,
-    location: 'Sta. Teodosia 593',
-    description: 'Servicio de lavado y secado en 1 hora',
-    contactUrl: 'https://www.lavanderiayfloyki.com',
-    detailsUrl: 'https://www.lavanderiayfloyki.com'
-  },
-
-  // Delivery
-  {
-    id: 15,
+    id: 'clock-box',
     name: 'CLOCK BOX',
     category: 'Delivery',
     image: 'https://images.pexels.com/photos/4393426/pexels-photo-4393426.jpeg?auto=compress&cs=tinysrgb&w=400',
@@ -200,10 +159,11 @@ const allServices: Service[] = [
     location: 'Julio Rodavero 971',
     description: 'Envíos rápidos a toda la ciudad',
     contactUrl: 'https://www.deliveryrapido.com',
-    detailsUrl: 'https://www.deliveryrapido.com'
+    detailsUrl: 'https://www.deliveryrapido.com',
+    tags: ['delivery', 'envío', 'reparto', 'paquetería', 'mensajería', 'domicilio', 'rápido', 'servicio express', 'entrega', 'ciudad']
   },
   {
-    id: 16,
+    id: 'agente-bcp',
     name: 'Agente BCP',
     category: 'Agentes bancarios',
     image: 'https://images.pexels.com/photos/7706434/pexels-photo-7706434.jpeg?auto=compress&cs=tinysrgb&w=400',
@@ -211,12 +171,11 @@ const allServices: Service[] = [
     location: 'Calle Sta Nicerata 334',
     description: 'Entregas en menos de 30 minutos',
     contactUrl: 'https://www.mensajeriaveloz.com',
-    detailsUrl: 'https://www.mensajeriaveloz.com'
+    detailsUrl: 'https://www.mensajeriaveloz.com',
+    tags: ['banco', 'depósito', 'retiro', 'transferencia', 'pagos', 'servicios', 'agente', 'bcp', 'recargas', 'cuenta', 'dinero']
   },
-
-  // Servicios
   {
-    id: 17,
+    id: 'trino-tech-solution',
     name: 'Trino Tech Solution',
     category: 'Servicios',
     image: 'https://images.pexels.com/photos/356056/pexels-photo-356056.jpeg?auto=compress&cs=tinysrgb&w=400',
@@ -224,10 +183,11 @@ const allServices: Service[] = [
     location: 'Av. Universitaria 1581',
     description: 'Reparación de celulares y computadoras',
     contactUrl: 'https://www.reparaciones.tech',
-    detailsUrl: 'https://www.reparaciones.tech'
+    detailsUrl: 'https://www.reparaciones.tech',
+    tags: ['celulares', 'computadoras', 'reparación', 'tecnología', 'soporte técnico', 'pantalla', 'batería', 'software', 'hardware', 'accesorios']
   },
   {
-    id: 18,
+    id: 'peluqueria-estilo',
     name: 'Peluquería Estilo',
     category: 'Servicios',
     image: 'https://images.pexels.com/photos/3993449/pexels-photo-3993449.jpeg?auto=compress&cs=tinysrgb&w=400',
@@ -235,10 +195,11 @@ const allServices: Service[] = [
     location: 'Sta. Paula 567',
     description: 'Cortes y peinados modernos',
     contactUrl: 'https://www.peluqueriaestilo.com',
-    detailsUrl: 'https://www.peluqueriaestilo.com'
+    detailsUrl: 'https://www.peluqueriaestilo.com',
+    tags: ['peluquería', 'corte', 'cabello', 'peinado', 'tinte', 'barbería', 'secado', 'alisado', 'niños', 'damas', 'caballeros']
   },
   {
-    id: 19,
+    id: 'salsa-bachatera',
     name: 'Salsa Bachatera',
     category: 'Servicios',
     image: 'https://images.pexels.com/photos/8957662/pexels-photo-8957662.jpeg?auto=compress&cs=tinysrgb&w=400',
@@ -246,9 +207,11 @@ const allServices: Service[] = [
     location: 'Parque Santa Teodosia',
     description: 'Clases de bailes Salsa y bachata',
     contactUrl: 'https://www.salsabachatera.com',
-    detailsUrl: 'https://www.salsabachatera.com'
+    detailsUrl: 'https://www.salsabachatera.com',
+    tags: ['baile', 'salsa', 'bachata', 'clases', 'danza', 'música', 'academia', 'show', 'ritmo', 'pareja']
   }
 ];
+    
 
 // Provider del contexto
 export const ServicesProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
@@ -273,7 +236,10 @@ export const ServicesProvider: React.FC<{ children: ReactNode }> = ({ children }
         const descriptionMatch = searchTerms.some(term => 
           service.description.toLowerCase().includes(term)
         );
-        return nameMatch || descriptionMatch;
+        const tagsMatch = service.tags
+          ? searchTerms.some(term => service.tags!.some(tag => tag.toLowerCase().includes(term)))
+          : false;
+        return nameMatch || descriptionMatch || tagsMatch;
       });
     }
 

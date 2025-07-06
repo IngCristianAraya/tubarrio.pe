@@ -128,7 +128,7 @@ const CategoryCard: React.FC<CategoryCardProps> = ({ icon, image, title, subcate
 
   return (
     <div
-      className="flip-card group w-full aspect-square min-w-[140px] max-w-xs mx-auto relative select-none mb-8 min-h-[210px]"
+      className="flip-card group w-full aspect-square min-w-[180px] max-w-sm mx-auto relative select-none mb-8 min-h-[240px] sm:min-h-[260px] md:min-h-[300px]"
       tabIndex={0}
       role="button"
       aria-pressed={isFlipped}
@@ -217,7 +217,7 @@ const CategorySections = () => {
         <p className="text-center text-gray-600 mb-8 text-base md:text-lg max-w-2xl mx-auto">
           Explora los servicios y productos más populares de la zona
         </p>
-        <div className="grid gap-10 px-1 grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 mb-4">
+        <div className="grid gap-12 px-1 grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 mb-4">
           {CATEGORIES.map((cat, idx) => (
             <CategoryCard
               key={idx}

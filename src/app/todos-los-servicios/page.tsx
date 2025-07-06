@@ -72,7 +72,11 @@ function TodosLosServiciosPage() {
 
   // Filtrado
   const filtered = services.filter((s) => {
-    const matchesSearch = s.name.toLowerCase().includes(search.toLowerCase()) || s.description.toLowerCase().includes(search.toLowerCase());
+    const searchLower = search.toLowerCase();
+    const matchesName = s.name.toLowerCase().includes(searchLower);
+    const matchesDescription = s.description.toLowerCase().includes(searchLower);
+    const matchesTags = s.tags ? s.tags.some(tag => tag.toLowerCase().includes(searchLower)) : false;
+    const matchesSearch = matchesName || matchesDescription || matchesTags;
     const matchesCategory = category ? s.category === category : true;
     return matchesSearch && matchesCategory;
   });
