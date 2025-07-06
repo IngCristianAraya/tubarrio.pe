@@ -1,9 +1,10 @@
-import { notFound } from 'next/navigation';
+'use client';
+
+import { notFound, useParams } from 'next/navigation';
 import { useServices } from '@/context/ServicesContext';
 import React from 'react';
 
-// Next.js 13+ Server Component with dynamic params
-export default function ServicioDetallePage({ params }: { params: { id: string } }) {
+export default function ServicioDetallePage() {
   // Obtener todos los servicios del contexto (esto solo funciona en Client Components)
   // Para Server Components, normalmente cargarías los datos desde una fuente persistente (DB/API).
   // Aquí, por simplicidad, se hace una búsqueda dummy. Puedes migrar a fetch real si lo necesitas.
@@ -11,6 +12,9 @@ export default function ServicioDetallePage({ params }: { params: { id: string }
 
   // Ejemplo de importación directa (ajusta la ruta si es necesario):
   // import { allServices } from '@/context/ServicesContext';
+
+  // Obtener el id dinámico de la URL
+  const { id } = useParams() as { id: string };
 
   // Simulación de datos (reemplaza por fetch real si tienes backend)
   const allServices = [
@@ -206,7 +210,7 @@ export default function ServicioDetallePage({ params }: { params: { id: string }
     }
   ];
 
-  const service = allServices.find(s => s.id === params.id);
+  const service = allServices.find(s => s.id === id);
 
   if (!service) return notFound();
 

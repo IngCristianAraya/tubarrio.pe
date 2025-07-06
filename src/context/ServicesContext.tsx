@@ -209,6 +209,18 @@ const allServices: Service[] = [
     contactUrl: 'https://www.salsabachatera.com',
     detailsUrl: 'https://www.salsabachatera.com',
     tags: ['baile', 'salsa', 'bachata', 'clases', 'danza', 'música', 'academia', 'show', 'ritmo', 'pareja']
+  },
+  {
+    id: 'Panaderia-El-Molino',
+    name: 'Panaderia El Molino',
+    category: 'Panaderías',
+    image: 'https://images.pexels.com/photos/8957662/pexels-photo-8957662.jpeg?auto=compress&cs=tinysrgb&w=400',
+    rating: 4.7,
+    location: 'Av. Universitaria 1733',
+    description: 'Panaderia El Molino',
+    contactUrl: 'https://www.panaderiaelmolino.com',
+    detailsUrl: 'https://www.panaderiaelmolino.com',
+    tags: ['Pan', 'harina', 'panaderia', 'pastel','Tortas','Pastel', 'Pastelería','Repostería', 'Panadería artesanal', 'Horno', 'Productos horneados', 'Desayunos', 'Meriendas', 'Pan de molde','Baguettes']
   }
 ];
     

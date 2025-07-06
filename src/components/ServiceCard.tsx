@@ -3,17 +3,7 @@
 import { Star, MapPin, Phone, ExternalLink } from 'lucide-react';
 import OptimizedImage from './OptimizedImage';
 
-interface Service {
-  id: number;
-  name: string;
-  category: string;
-  image: string;
-  rating: number;
-  location: string;
-  description: string;
-  contactUrl?: string;
-  detailsUrl?: string;
-}
+import type { Service } from '../context/ServicesContext';
 
 interface ServiceCardProps {
   service: Service;
