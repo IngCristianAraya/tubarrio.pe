@@ -153,13 +153,20 @@ const Hero = () => {
         </div>
         
         {/* Botón de búsqueda */}
-        <button
-          className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-6 rounded-lg flex items-center justify-center transition-all duration-300 shadow-md hover:shadow-lg"
-          onClick={handleSearch}
-        >
-          <Search className="w-5 h-5 mr-2" />
-          Buscar Servicios
-        </button>
+        <div className="flex flex-col sm:flex-row gap-3 w-full justify-center items-center text-center">
+          <button
+            className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-6 rounded-lg flex items-center justify-center transition-all duration-300 shadow-md hover:shadow-lg w-full sm:w-auto"
+            onClick={handleSearch}
+          >
+            <Search className="w-5 h-5 mr-2" />
+            Buscar servicios
+          </button>
+          <Link href="/todos-los-servicios" passHref legacyBehavior>
+            <a className="bg-white border-2 border-orange-500 text-orange-600 font-bold py-3 px-6 rounded-lg flex items-center justify-center transition-all duration-300 shadow-md hover:bg-orange-50 hover:text-orange-700 w-full sm:w-auto">
+              Explora todos los servicios
+            </a>
+          </Link>
+        </div>
       </div>
     </div>
     

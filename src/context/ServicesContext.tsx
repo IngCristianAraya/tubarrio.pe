@@ -13,7 +13,11 @@ export interface Service {
   description: string;
   contactUrl?: string;
   detailsUrl?: string;
+  horario?: string;
   tags?: string[]; // Nuevo: palabras clave para búsqueda avanzada
+  hours?: string; // Horario de atención
+  social?: string; // Enlace a red social
+  whatsapp?: string; // Número de WhatsApp
 }
 
 interface ServicesContextType {
@@ -37,6 +41,7 @@ const allServices: Service[] = [
     image: 'https://images.pexels.com/photos/1639557/pexels-photo-1639557.jpeg?auto=compress&cs=tinysrgb&w=800',
     rating: 4.8,
     description: 'Las mejores hamburguesas artesanales.',
+    horario: 'Lunes a Viernes: 10:00 - 22:00',
     location: 'Sta. Teodosia 573',
     contactUrl: 'https://www.hamburguesaselrey.com',
     detailsUrl: 'https://delifoods-gamma.vercel.app/',

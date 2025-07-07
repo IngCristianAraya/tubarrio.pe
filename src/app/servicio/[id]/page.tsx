@@ -3,6 +3,10 @@
 import { notFound, useParams } from 'next/navigation';
 import { useServices } from '@/context/ServicesContext';
 import React from 'react';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
 
 export default function ServicioDetallePage() {
   // Obtener todos los servicios del contexto (esto solo funciona en Client Components)
@@ -16,213 +20,119 @@ export default function ServicioDetallePage() {
   // Obtener el id dinámico de la URL
   const { id } = useParams() as { id: string };
 
-  // Simulación de datos (reemplaza por fetch real si tienes backend)
-  const allServices = [
-    {
-      id: 'superburger',
-      name: 'Superburger',
-      category: 'Restaurantes',
-      image: 'https://images.pexels.com/photos/1639557/pexels-photo-1639557.jpeg?auto=compress&cs=tinysrgb&w=800',
-      rating: 4.8,
-      location: 'Sta. Teodosia 573',
-      description: 'Las mejores hamburguesas artesanales.',
-      contactUrl: 'https://www.hamburguesaselrey.com',
-    },
-    {
-      id: 'pizzeria-toscana',
-      name: 'Pizzería Toscana',
-      category: 'Restaurantes',
-      image: 'https://images.pexels.com/photos/315755/pexels-photo-315755.jpeg?auto=compress&cs=tinysrgb&w=400',
-      rating: 4.7,
-      location: 'Av. Universitaria 1697',
-      description: 'Pizzas a la piedra',
-      contactUrl: 'https://www.pizzaitaliana.com',
-    },
-    {
-      id: 'rey-del-shawarma',
-      name: 'Rey del Shawarma',
-      category: 'Restaurantes',
-      image: 'https://images.pexels.com/photos/4958792/pexels-photo-4958792.jpeg?auto=compress&cs=tinysrgb&w=400',
-      rating: 4.5,
-      location: 'jr. Santa Nicerata 334',
-      description: 'Tacos tradicionales y quesadillas',
-      contactUrl: 'https://www.tacoselguero.com',
-    },
-    {
-      id: 'iro-sushi',
-      name: 'IRO Sushi',
-      category: 'Restaurantes',
-      image: 'https://images.pexels.com/photos/357756/pexels-photo-357756.jpeg?auto=compress&cs=tinysrgb&w=400',
-      rating: 4.8,
-      location: 'Av. Universitaria 1743',
-      description: 'Sushi fresco y rollos especiales',
-      contactUrl: 'https://www.sushiexpress.com',
-    },
-    {
-      id: 'bobocha-bubble-tea-shop',
-      name: 'Bobocha Bubble Tea Shop',
-      category: 'Cafeteria',
-      image: 'https://images.pexels.com/photos/302899/pexels-photo-302899.jpeg?auto=compress&cs=tinysrgb&w=400',
-      rating: 4.6,
-      location: 'Av. Universitaria 1795',
-      description: 'Tienda de bubble té',
-      contactUrl: 'https://www.cafecentral.com',
-    },
-    {
-      id: 'shawarma-el-faraon',
-      name: 'Shawarma El Faraón',
-      category: 'Restaurantes',
-      image: 'https://images.pexels.com/photos/4394613/pexels-photo-4394613.jpeg?auto=compress&cs=tinysrgb&w=800',
-      rating: 4.9,
-      location: 'Av. Universitaria 1687',
-      description: 'Auténticos shawarmas y comida árabe preparada con recetas tradicionales',
-      contactUrl: 'https://www.shawarmpalace.com',
-    },
-    {
-      id: 'abarrotes-don-richard',
-      name: 'Abarrotes Don Richard',
-      category: 'Abarrotes',
-      image: 'https://images.pexels.com/photos/264636/pexels-photo-264636.jpeg?auto=compress&cs=tinysrgb&w=800',
-      rating: 4.6,
-      location: 'Jirón Sáenz Peña 392',
-      description: 'Venta de abarrotes, frutas y verduras ',
-      contactUrl: 'https://www.abarrotesdonrichard.com',
-    },
-    {
-      id: 'lacteos-y-embutidos-ayc',
-      name: 'Lácteos y Embutidos A&C',
-      category: 'Abarrotes',
-      image: 'https://images.pexels.com/photos/1005638/pexels-photo-1005638.jpeg?auto=compress&cs=tinysrgb&w=400',
-      rating: 4.4,
-      location: 'Calle Sta Nicerata 354',
-      description: 'Lácteos y embutidos',
-      contactUrl: 'https://www.supervisorfamiliar.com',
-    },
-    {
-      id: 'bodega-mercedes',
-      name: 'Bodega Mercedes',
-      category: 'Abarrotes',
-      image: 'https://images.pexels.com/photos/1300972/pexels-photo-1300972.jpeg?auto=compress&cs=tinysrgb&w=400',
-      rating: 4.6,
-      location: 'Calle Sta Nicerata 152',
-      description: 'Productos frescos del campo',
-      contactUrl: 'https://www.frutasyverdurasmaria.com',
-    },
-    {
-      id: 'carniceria-el-buen-corte',
-      name: 'Carnicería El Buen Corte',
-      category: 'Carnicería',
-      image: 'https://images.pexels.com/photos/128401/pexels-photo-128401.jpeg?auto=compress&cs=tinysrgb&w=400',
-      rating: 4.7,
-      location: 'Calle Sta Nicerata 120',
-      description: 'Carnes frescas y embutidos',
-      contactUrl: 'https://www.carniceriabuenacorte.com',
-    },
-    {
-      id: 'panaderia-el-molino',
-      name: 'Panadería El Molino',
-      category: 'Panaderías',
-      image: 'https://images.pexels.com/photos/1070850/pexels-photo-1070850.jpeg?auto=compress&cs=tinysrgb&w=400',
-      rating: 4.8,
-      location: 'Calle Santa Teodosia 580',
-      description: 'Pan fresco horneado diariamente',
-      contactUrl: 'https://www.panaderiasanmiguel.com',
-    },
-    {
-      id: 'd-landa-alfajores',
-      name: 'D Landa Alfajores',
-      category: 'Pastelería',
-      image: 'https://images.pexels.com/photos/205961/pexels-photo-205961.jpeg?auto=compress&cs=tinysrgb&w=400',
-      rating: 4.8,
-      location: 'Calle Santa Teodosia 580',
-      description: 'Pasteles artesanales para toda ocasión',
-      contactUrl: 'https://www.pasteleriadulcehogar.com',
-    },
-    {
-      id: 'lavanderia-antares',
-      name: 'Lavandería Antares',
-      category: 'Lavanderías',
-      image: 'https://cdn.pixabay.com/photo/2017/09/14/19/34/laundry-2750158_1280.jpg',
-      rating: 4.5,
-      location: 'Sta. Teodosia 593',
-      description: 'Lavado y planchado profesional',
-      contactUrl: 'https://www.lavanderiasantares.com',
-    },
-    {
-      id: 'lavanderia-floiki',
-      name: 'Lavandería Floiki',
-      category: 'Lavanderías',
-      image: 'https://images.pexels.com/photos/4239091/pexels-photo-4239091.jpeg?auto=compress&cs=tinysrgb&w=400',
-      rating: 4.6,
-      location: 'Sta. Teodosia 593',
-      description: 'Servicio de lavado y secado en 1 hora',
-      contactUrl: 'https://www.lavanderiayfloyki.com',
-    },
-    {
-      id: 'clock-box',
-      name: 'CLOCK BOX',
-      category: 'Delivery',
-      image: 'https://images.pexels.com/photos/4393426/pexels-photo-4393426.jpeg?auto=compress&cs=tinysrgb&w=400',
-      rating: 4.3,
-      location: 'Julio Rodavero 971',
-      description: 'Envíos rápidos a toda la ciudad',
-      contactUrl: 'https://www.deliveryrapido.com',
-    },
-    {
-      id: 'agente-bcp',
-      name: 'Agente BCP',
-      category: 'Agentes bancarios',
-      image: 'https://images.pexels.com/photos/7706434/pexels-photo-7706434.jpeg?auto=compress&cs=tinysrgb&w=400',
-      rating: 4.4,
-      location: 'Calle Sta Nicerata 334',
-      description: 'Entregas en menos de 30 minutos',
-      contactUrl: 'https://www.mensajeriaveloz.com',
-    },
-    {
-      id: 'trino-tech-solution',
-      name: 'Trino Tech Solution',
-      category: 'Servicios',
-      image: 'https://images.pexels.com/photos/356056/pexels-photo-356056.jpeg?auto=compress&cs=tinysrgb&w=400',
-      rating: 4.8,
-      location: 'Av. Universitaria 1581',
-      description: 'Reparación de celulares y computadoras',
-      contactUrl: 'https://www.reparaciones.tech',
-    },
-    {
-      id: 'peluqueria-estilo',
-      name: 'Peluquería Estilo',
-      category: 'Servicios',
-      image: 'https://images.pexels.com/photos/3993449/pexels-photo-3993449.jpeg?auto=compress&cs=tinysrgb&w=400',
-      rating: 4.7,
-      location: 'Sta. Paula 567',
-      description: 'Cortes y peinados modernos',
-      contactUrl: 'https://www.peluqueriaestilo.com',
-    },
-    {
-      id: 'salsa-bachatera',
-      name: 'Salsa Bachatera',
-      category: 'Servicios',
-      image: 'https://images.pexels.com/photos/8957662/pexels-photo-8957662.jpeg?auto=compress&cs=tinysrgb&w=400',
-      rating: 4.7,
-      location: 'Parque Santa Teodosia',
-      description: 'Clases de bailes Salsa y bachata',
-      contactUrl: 'https://www.salsabachatera.com',
-    }
-  ];
+  // Obtener servicios del contexto global
+  const { services: allServices } = useServices();
+
 
   const service = allServices.find(s => s.id === id);
 
   if (!service) return notFound();
 
   return (
-    <section className="max-w-2xl mx-auto p-6 bg-white rounded-xl shadow-lg mt-10">
-      <h1 className="text-3xl font-bold mb-4 text-gray-900">{service.name}</h1>
-      <img src={service.image} alt={service.name} className="w-full h-64 object-cover rounded-lg mb-4" />
-      <div className="mb-2 text-sm text-gray-600">Categoría: {service.category}</div>
-      <div className="mb-2 text-sm text-gray-600">Ubicación: {service.location}</div>
-      <div className="mb-2 text-yellow-500 font-bold">Calificación: {service.rating} ⭐</div>
-      <p className="mb-4 text-gray-800">{service.description}</p>
-      <a href={service.contactUrl} target="_blank" rel="noopener noreferrer" className="inline-block bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-lg font-semibold transition">Contactar</a>
-    </section>
+    <div className="min-h-screen bg-orange-50 flex flex-col items-center justify-center py-10 px-2">
+      <div className="w-full max-w-2xl bg-gradient-to-br from-orange-400 to-orange-500 rounded-3xl shadow-2xl border border-orange-200 p-0 sm:p-1 md:p-2 relative overflow-hidden">
+        <div className="bg-white/90 rounded-3xl shadow-lg p-6 sm:p-10 flex flex-col items-center text-center relative z-10">
+          <div className="w-40 h-40 sm:w-56 sm:h-56 rounded-2xl overflow-hidden border-4 border-orange-300 shadow-lg -mt-20 mb-6 bg-white">
+            <img src={service.image} alt={service.name} className="w-full h-full object-cover" />
+          </div>
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 mb-2 drop-shadow-md">{service.name}</h1>
+          <div className="flex flex-wrap gap-2 justify-center mb-3">
+            <span className="bg-orange-100 text-orange-700 text-xs font-semibold px-3 py-1 rounded-full border border-orange-200 shadow-sm">{service.category}</span>
+            <span className="bg-yellow-100 text-yellow-700 text-xs font-semibold px-3 py-1 rounded-full border border-yellow-200 shadow-sm">{service.location}</span>
+          </div>
+          <div className="flex items-center justify-center mb-3">
+            {[...Array(5)].map((_, i) => (
+              <svg key={i} className={`w-6 h-6 ${i < Math.round(service.rating) ? 'text-yellow-400' : 'text-gray-300'}`} fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.967a1 1 0 00.95.69h4.178c.969 0 1.371 1.24.588 1.81l-3.385 2.46a1 1 0 00-.364 1.118l1.287 3.966c.3.922-.755 1.688-1.54 1.118l-3.386-2.46a1 1 0 00-1.176 0l-3.386 2.46c-.784.57-1.838-.196-1.539-1.118l1.287-3.966a1 1 0 00-.364-1.118l-3.385-2.46c-.783-.57-.38-1.81.588-1.81h4.178a1 1 0 00.95-.69l1.286-3.967z" /></svg>
+            ))}
+            <span className="ml-2 text-lg font-semibold text-yellow-700">{service.rating.toFixed(1)}</span>
+          </div>
+          <p className="mb-6 text-gray-700 text-base sm:text-lg leading-relaxed">{service.description}</p>
+
+          {/* Inclusiones del negocio */}
+          <div className="w-full bg-orange-100 rounded-xl p-4 mb-6 flex flex-col gap-2 shadow-inner border border-orange-200">
+            <div className="flex items-center gap-2 text-orange-700 font-semibold">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 20l9-5-9-5-9 5 9 5z"/><path d="M12 12V4l9 5-9 5-9-5 9-5z"/></svg>
+              Ficha en la revista digital
+            </div>
+            <div className="flex flex-wrap gap-3 text-sm text-gray-800">
+              <span className="flex items-center gap-1"><b>Nombre:</b> {service.name}</span>
+              <span className="flex items-center gap-1"><b>Rubro:</b> {service.category}</span>
+              
+              {(service.horario || service.hours) && (
+                <span className="flex items-center gap-1">
+                    <span className="flex items-center gap-1"><b>Dirección:</b> {service.location}</span>
+                
+                 
+                  {/* Si existen ambos, mostrar ambos */}
+                  {service.horario && service.hours && service.horario !== service.hours && (
+                    <span className="ml-2 text-xs text-gray-500">({service.hours})</span>
+                  )}
+                </span>
+              )}
+              <span className="flex items-center gap-1"><b>Contacto:</b> <a href={service.contactUrl} target="_blank" rel="noopener noreferrer" className="text-orange-600 underline">Ver contacto</a></span>
+            </div>
+            <div className="flex items-center gap-2 text-orange-700 font-semibold">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+              {service.horario || service.hours ? (
+                <span>
+                  <b>Horario:</b> {service.horario ? service.horario : service.hours}
+                  {service.horario && service.hours && service.horario !== service.hours && (
+                    <span className="ml-2 text-xs text-gray-500">({service.hours})</span>
+                  )}
+                </span>
+              ) : null}
+              {service.social && (
+                <span className="ml-3">|
+                  <a href={service.social} target="_blank" rel="noopener noreferrer" className="text-orange-600 underline ml-1">Red social</a>
+                </span>
+              )}
+              {service.whatsapp && (
+                <span className="ml-3">|
+                  <a href={`https://wa.me/${service.whatsapp}`} target="_blank" rel="noopener noreferrer" className="text-green-600 underline ml-1">WhatsApp</a>
+                </span>
+              )}
+            </div>
+            
+          </div>
+
+          <a href={service.contactUrl} target="_blank" rel="noopener noreferrer" className="inline-block bg-orange-500 hover:bg-orange-600 text-white px-8 py-3 rounded-xl font-bold text-lg shadow-lg transition-all duration-200">
+            Contactar negocio
+          </a>
+        </div>
+        <div className="absolute top-0 left-0 w-full h-20 bg-gradient-to-r from-orange-400/70 to-orange-300/40 rounded-t-3xl blur-xl opacity-70 z-0" />
+        <div className="absolute bottom-0 right-0 w-44 h-44 bg-yellow-300/30 rounded-full blur-2xl opacity-60 z-0" />
+      </div>
+
+      {/* Recomendados */}
+      {/* SwiperJS Slider para recomendados */}
+      <div className="w-full max-w-2xl mt-10">
+        <h2 className="text-2xl font-bold text-orange-700 mb-6">Recomendados en {service.category}</h2>
+        <div>
+          <Swiper
+            spaceBetween={20}
+            slidesPerView={1}
+            breakpoints={{
+              640: { slidesPerView: 2 },
+              1024: { slidesPerView: 3 },
+            }}
+            navigation
+            pagination={{ clickable: true }}
+            className="!pb-10"
+          >
+            {allServices.filter(s => s.category === service.category && s.id !== service.id).map(recomendado => (
+              <SwiperSlide key={recomendado.id}>
+                <div className="bg-white rounded-2xl shadow-md p-4 flex flex-col items-center border border-orange-100">
+                  <img src={recomendado.image} alt={recomendado.name} className="w-28 h-28 object-cover rounded-xl mb-3 border-2 border-orange-200" />
+                  <h3 className="text-lg font-semibold text-gray-900 mb-1">{recomendado.name}</h3>
+                  <span className="text-xs text-orange-700 bg-orange-100 px-2 py-1 rounded-full mb-2">{recomendado.location}</span>
+                  <a href={`/servicio/${recomendado.id}`} className="mt-2 inline-block bg-orange-500 hover:bg-orange-600 text-white px-4 py-1 rounded-lg text-sm font-bold shadow transition-all">Ver detalle</a>
+                </div>
+              </SwiperSlide>
+            ))}
+          </Swiper>
+        </div>
+      </div>
+    </div>
   );
 }
+

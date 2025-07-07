@@ -37,14 +37,14 @@ const FeaturedServices = () => {
     },
     {
       id: 3,
-      name: 'Shawarma Palace',
+      name: 'Shawarma Mabruk',
       category: 'Comida Árabe',
       image: 'https://images.pexels.com/photos/4394613/pexels-photo-4394613.jpeg?auto=compress&cs=tinysrgb&w=800',
-      rating: 4.9,
+      rating: 5.0,
       description: 'Auténticos shawarmas y comida árabe preparada con recetas tradicionales',
       location: 'Plaza Central, 7 min',
       phone: '+1234567892',
-      hours: 'Abierto hasta 12:00 AM',
+      hours: 'Abierto hasta 11:00 AM',
       badge: 'Mejor Calificado'
     }
   ];
