@@ -78,9 +78,11 @@ const Header = () => {
             </button>
 
             <div className="flex-shrink-0 flex items-center">
-              <Link href="/" className="text-2xl sm:text-3xl md:text-2xl lg:text-2xl font-extrabold text-gray-900 tracking-tight select-none">
-                Revista <span className="text-orange-500">Pando</span>
-              </Link>
+              <Link href="/" className="text-2xl sm:text-3xl md:text-2xl lg:text-2xl font-extrabold tracking-tight select-none">
+  <span className="text-black">TU</span>
+  <span className="text-orange-500">BARRIO</span>
+  <span className="text-black">.PE</span>
+</Link>
             </div>
           </div>
 

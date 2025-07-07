@@ -45,6 +45,7 @@ const allServices: Service[] = [
     location: 'Sta. Teodosia 573',
     contactUrl: 'https://www.hamburguesaselrey.com',
     detailsUrl: 'https://delifoods-gamma.vercel.app/',
+    whatsapp: '51906684284',
     tags: ['hamburguesa', 'comida rápida', 'carne', 'papas', 'queso']
   },
   {
@@ -57,6 +58,7 @@ const allServices: Service[] = [
     description: 'Pizzas a la piedra',
     contactUrl: 'https://www.pizzaitaliana.com',
     detailsUrl: 'https://www.pizzaitaliana.com',
+    whatsapp: '51906684285',
     tags: ['pizza', 'italiana', 'queso', 'pasta', 'horno', 'comida italiana', 'familiar', 'delivery', 'mozarella', 'tomate']
   },
   {
@@ -69,6 +71,7 @@ const allServices: Service[] = [
     description: 'Tacos tradicionales y quesadillas',
     contactUrl: 'https://www.tacoselguero.com',
     detailsUrl: 'https://www.tacoselguero.com',
+    whatsapp: '51906684286',
     tags: ['shawarma', 'taco', 'quesadilla', 'mexicana', 'árabe', 'pollo', 'carne', 'wrap', 'comida rápida', 'delivery']
   },
   {
@@ -81,6 +84,7 @@ const allServices: Service[] = [
     description: 'Sushi fresco y rollos especiales',
     contactUrl: 'https://www.sushiexpress.com',
     detailsUrl: 'https://www.sushiexpress.com',
+    whatsapp: '51906684287',
     tags: ['sushi', 'japonés', 'makis', 'rollos', 'pescado', 'arroz', 'soya', 'wasabi', 'delivery', 'comida oriental']
   },
   {

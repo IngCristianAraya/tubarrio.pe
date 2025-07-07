@@ -32,8 +32,8 @@ export default function ServicioDetallePage() {
     <div className="min-h-screen bg-orange-50 flex flex-col items-center justify-center py-10 px-2">
       <div className="w-full max-w-2xl bg-gradient-to-br from-orange-400 to-orange-500 rounded-3xl shadow-2xl border border-orange-200 p-0 sm:p-1 md:p-2 relative overflow-hidden">
         <div className="bg-white/90 rounded-3xl shadow-lg p-6 sm:p-10 flex flex-col items-center text-center relative z-10">
-          <div className="w-40 h-40 sm:w-56 sm:h-56 rounded-2xl overflow-hidden border-4 border-orange-300 shadow-lg -mt-20 mb-6 bg-white">
-            <img src={service.image} alt={service.name} className="w-full h-full object-cover" />
+          <div className="w-40 h-40 sm:w-56 sm:h-56 flex items-center justify-center rounded-2xl overflow-hidden border-4 border-orange-300 shadow-lg -mt-20 mb-6 bg-white">
+            <img src={service.image} alt={service.name} className="w-full h-full object-contain bg-white" />
           </div>
           <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 mb-2 drop-shadow-md">{service.name}</h1>
           <div className="flex flex-wrap gap-2 justify-center mb-3">
@@ -95,9 +95,31 @@ export default function ServicioDetallePage() {
             
           </div>
 
-          <a href={service.contactUrl} target="_blank" rel="noopener noreferrer" className="inline-block bg-orange-500 hover:bg-orange-600 text-white px-8 py-3 rounded-xl font-bold text-lg shadow-lg transition-all duration-200">
-            Contactar negocio
-          </a>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mt-4">
+            <a 
+              href={service.detailsUrl} 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="inline-flex items-center justify-center bg-orange-500 hover:bg-orange-600 text-white px-8 py-3 rounded-xl font-bold text-lg shadow-lg transition-all duration-200 min-w-[210px]"
+            >
+              Contactar negocio
+            </a>
+            {service.whatsapp && (
+              <a 
+                href={`https://wa.me/${service.whatsapp}`} 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="inline-flex bg-green-500 hover:bg-green-600 text-white px-8 py-3 rounded-xl font-bold text-lg shadow-lg transition-all duration-200 items-center justify-center gap-2 min-w-[210px]"
+              >
+                <svg className="w-6 h-6" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="16" cy="16" r="16" fill="#25D366"/>
+  <path d="M22.5 18.7c-.3-.1-1.8-.9-2-1-.3-.1-.5-.1-.7.2-.2.3-.7 1-.9 1.2-.2.2-.4.2-.7.1-.3-.2-1.1-.4-2.1-1.3-.8-.7-1.4-1.6-1.6-1.9-.2-.3 0-.4.1-.6.1-.1.2-.3.3-.4.1-.1.1-.2.2-.4.1-.2 0-.3 0-.5 0-.2-.7-1.7-.9-2.3-.2-.5-.5-.5-.7-.5h-.6c-.2 0-.5.1-.7.3-.2.2-.9.8-.9 2 0 1.2.9 2.3 1 2.5.1.2 1.7 2.6 4.2 3.5.6.2 1 .3 1.3.4.5.1 1 .1 1.4.1.4 0 1.3-.5 1.5-1 .2-.5.2-1 .1-1.1-.1-.1-.3-.2-.6-.3z" fill="#fff"/>
+  <path d="M16 6.5A9.5 9.5 0 0 0 7.3 20.5L6 25.5l5.1-1.3A9.5 9.5 0 1 0 16 6.5zm0 17.2c-1.5 0-3-.4-4.3-1.2l-.3-.2-3 .7.8-2.9-.2-.3A7.8 7.8 0 1 1 16 23.7z" fill="#fff"/>
+</svg>
+                WhatsApp
+              </a>
+            )}
+        </div>
         </div>
         <div className="absolute top-0 left-0 w-full h-20 bg-gradient-to-r from-orange-400/70 to-orange-300/40 rounded-t-3xl blur-xl opacity-70 z-0" />
         <div className="absolute bottom-0 right-0 w-44 h-44 bg-yellow-300/30 rounded-full blur-2xl opacity-60 z-0" />
@@ -122,7 +144,9 @@ export default function ServicioDetallePage() {
             {allServices.filter(s => s.category === service.category && s.id !== service.id).map(recomendado => (
               <SwiperSlide key={recomendado.id}>
                 <div className="bg-white rounded-2xl shadow-md p-4 flex flex-col items-center border border-orange-100">
-                  <img src={recomendado.image} alt={recomendado.name} className="w-28 h-28 object-cover rounded-xl mb-3 border-2 border-orange-200" />
+                  <div className="w-32 h-32 bg-white flex items-center justify-center rounded-xl mb-3 border-2 border-orange-200 overflow-hidden">
+                    <img src={recomendado.image} alt={recomendado.name} className="w-full h-full object-contain" />
+                  </div>
                   <h3 className="text-lg font-semibold text-gray-900 mb-1">{recomendado.name}</h3>
                   <span className="text-xs text-orange-700 bg-orange-100 px-2 py-1 rounded-full mb-2">{recomendado.location}</span>
                   <a href={`/servicio/${recomendado.id}`} className="mt-2 inline-block bg-orange-500 hover:bg-orange-600 text-white px-4 py-1 rounded-lg text-sm font-bold shadow transition-all">Ver detalle</a>

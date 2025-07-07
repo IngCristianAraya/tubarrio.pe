@@ -38,14 +38,14 @@ export default function TermsAndConditions() {
               <div className="absolute left-0 top-0 w-full h-2 bg-gradient-to-r from-orange-300/40 via-orange-100/0 to-blue-200/30 rounded-t-2xl" />
               <h2>1. Introducción</h2>
               <p>
-                Bienvenido a Revista Pando. Estos Términos y Condiciones regulan el uso de nuestra plataforma web y los servicios
+                Bienvenido a TuBarrio.pe. Estos Términos y Condiciones regulan el uso de nuestra plataforma web y los servicios
                 de publicación digital ofrecidos a negocios y emprendedores de la zona. Al contratar nuestros servicios o utilizar
                 nuestro sitio web, usted acepta estos términos en su totalidad.
               </p>
 
               <h2>2. Uso de los Servicios</h2>
               <p>
-                Revista Pando permite a emprendedores, negocios y profesionales aparecer en nuestro directorio digital mediante una
+                TuBarrio.pe permite a emprendedores, negocios y profesionales aparecer en nuestro directorio digital mediante una
                 suscripción mensual. Las páginas personalizadas (landing pages) permiten exhibir productos, servicios y datos de contacto.
               </p>
               <p>
@@ -54,7 +54,7 @@ export default function TermsAndConditions() {
 
               <h2>3. Suscripciones y Pagos</h2>
               <p>
-                Para publicar en Revista Pando se requiere una membresía mensual, desde S/ 15. Esta membresía incluye presencia en el portal,
+                Para publicar en TuBarrio.pe se requiere una membresía mensual, desde S/ 15. Esta membresía incluye presencia en el portal,
                 una landing page con subdominio personalizado y promoción básica en redes locales.
               </p>
               <p>
@@ -65,7 +65,7 @@ export default function TermsAndConditions() {
               <h2>4. Contenido proporcionado por el Cliente</h2>
               <p>
                 Los clientes son responsables de la información enviada para su publicación, incluyendo textos, imágenes, precios y promociones.
-                Al enviarla, nos autorizan a mostrarla en su landing page, en redes sociales, y en otros medios de promoción relacionados con Revista Pando.
+                Al enviarla, nos autorizan a mostrarla en su landing page, en redes sociales, y en otros medios de promoción relacionados con TuBarrio.pe.
               </p>
               <p>
                 No se aceptará contenido ofensivo, engañoso, ilegal o que infrinja derechos de terceros.
@@ -73,13 +73,13 @@ export default function TermsAndConditions() {
 
               <h2>5. Propiedad Intelectual</h2>
               <p>
-                Todo el contenido original de la plataforma, el diseño web y las funcionalidades desarrolladas por Revista Pando son propiedad
+                Todo el contenido original de la plataforma, el diseño web y las funcionalidades desarrolladas por TuBarrio.pe son propiedad
                 intelectual de la empresa. Queda prohibida su copia o uso sin autorización expresa.
               </p>
 
               <h2>6. Enlaces a Otros Sitios</h2>
               <p>
-                Algunas landing pages o publicaciones pueden contener enlaces externos provistos por los clientes. Revista Pando no se responsabiliza
+                Algunas landing pages o publicaciones pueden contener enlaces externos provistos por los clientes. TuBarrio.pe no se responsabiliza
                 por el contenido ni la legalidad de dichos enlaces ni por daños derivados de su uso.
               </p>
 
@@ -91,7 +91,7 @@ export default function TermsAndConditions() {
 
               <h2>8. Limitación de Responsabilidad</h2>
               <p>
-                Revista Pando no garantiza ventas ni resultados específicos para los negocios publicados. No nos hacemos responsables por pérdidas comerciales,
+                TuBarrio.pe no garantiza ventas ni resultados específicos para los negocios publicados. No nos hacemos responsables por pérdidas comerciales,
                 daños indirectos o interrupciones de servicio fuera de nuestro control.
               </p>
 
@@ -104,14 +104,14 @@ export default function TermsAndConditions() {
               <h2>10. Contacto</h2>
               <p>Si tienes alguna duda o consulta relacionada con estos términos, contáctanos:</p>
               <ul>
-                <li>Email: info@revistapando.com</li>
+                <li>Email: info@tubarrio.pe</li>
                 <li>Teléfono: +51 906 684 284</li>
                 <li>Dirección: Lima, Perú</li>
               </ul>
 
               <h2>11. Aceptación</h2>
               <p>
-                Al contratar nuestros servicios o mantener una publicación activa en Revista Pando, usted confirma que ha leído,
+                Al contratar nuestros servicios o mantener una publicación activa en TuBarrio.pe, usted confirma que ha leído,
                 entendido y aceptado estos Términos y Condiciones.
               </p>
             </div>

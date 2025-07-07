@@ -171,7 +171,7 @@ export default function MapSection() {
             🗺️ <span className="text-gray-800">Zona de</span> <span className="text-orange-500">Cobertura</span>
           </h2>
           <p className="text-base md:text-lg text-gray-600 max-w-2xl mx-auto">
-            Nuestro mapa muestra el área donde Revista Pando ofrece sus servicios y cobertura.
+            Nuestro mapa muestra el área donde TuBarrio.pe ofrece sus servicios y cobertura.
           </p>
         </div>
         
@@ -183,7 +183,7 @@ export default function MapSection() {
               <span className="text-orange-500 text-2xl">📍</span>
               <div>
                 <div className="font-semibold text-gray-800">Cobertura local</div>
-                <div className="text-gray-500 text-sm">Revista Pando llega a Pando y zonas aledañas, conectando a la comunidad.</div>
+                <div className="text-gray-500 text-sm">TuBarrio.pe llega a Pando y zonas aledañas, conectando a la comunidad.</div>
               </div>
             </div>
             {/* Card 2 */}

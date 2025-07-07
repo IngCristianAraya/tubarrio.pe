@@ -5,8 +5,8 @@ import WhatsAppButton from '@/components/WhatsAppButton'
 import CustomCursor from '@/components/CustomCursor'
 
 export const metadata: Metadata = {
-  title: 'Política de Privacidad - Revista Pando',
-  description: 'Conoce cómo Revista Pando protege y utiliza tus datos personales y la privacidad de los negocios y usuarios de la plataforma.'
+  title: 'Política de Privacidad - TuBarrio.pe',
+  description: 'Conoce cómo TuBarrio.pe protege y utiliza tus datos personales y la privacidad de los negocios y usuarios de la plataforma.'
 }
 
 export default function PrivacyPolicy() {
@@ -45,7 +45,7 @@ export default function PrivacyPolicy() {
 
               <h2>1. Introducción</h2>
               <p>
-                En Revista Pando valoramos y respetamos la privacidad de nuestros usuarios y clientes. Esta Política describe cómo recopilamos, usamos, almacenamos y protegemos la información personal proporcionada a través de nuestra plataforma.
+                En TuBarrio.pe valoramos y respetamos la privacidad de nuestros usuarios y clientes. Esta Política describe cómo recopilamos, usamos, almacenamos y protegemos la información personal proporcionada a través de nuestra plataforma.
               </p>
 
               <h2>2. Información que Recopilamos</h2>
@@ -78,7 +78,7 @@ export default function PrivacyPolicy() {
 
               <h2>6. Derechos del Usuario</h2>
               <p>
-                Puedes solicitar acceso, modificación o eliminación de tus datos escribiéndonos a <strong>info@revistapando.com</strong>. Atenderemos tu solicitud en el menor tiempo posible.
+                Puedes solicitar acceso, modificación o eliminación de tus datos escribiéndonos a <strong>info@tubarrio.pe</strong>. Atenderemos tu solicitud en el menor tiempo posible.
               </p>
 
               <h2>7. Cookies</h2>
@@ -88,7 +88,7 @@ export default function PrivacyPolicy() {
 
               <h2>8. Enlaces Externos</h2>
               <p>
-                Revista Pando puede contener enlaces a sitios de terceros. No nos hacemos responsables de sus políticas ni de su contenido.
+                TuBarrio.pe puede contener enlaces a sitios de terceros. No nos hacemos responsables de sus políticas ni de su contenido.
               </p>
 
               <h2>9. Cambios en la Política</h2>
@@ -101,7 +101,7 @@ export default function PrivacyPolicy() {
                 Para dudas o solicitudes relacionadas con privacidad, contáctanos:
               </p>
               <ul>
-                <li>Email: info@revistapando.com</li>
+                <li>Email: info@tubarrio.pe</li>
                 <li>Teléfono: +51 906 684 284</li>
                 <li>Dirección: Lima, Perú</li>
               </ul>
