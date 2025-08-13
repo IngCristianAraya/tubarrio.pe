@@ -1,7 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { FiFacebook, FiInstagram, FiPhone, FiMail, FiMapPin } from 'react-icons/fi';
+import { FiFacebook, FiInstagram, FiMail, FiPhone, FiMapPin, FiClock } from 'react-icons/fi';
+import { FaWhatsapp } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 
 const Footer = () => {
@@ -70,9 +71,10 @@ const Footer = () => {
             <ul className="space-y-3">
               {[
                 { href: "/", label: "Inicio" },
-                { href: "/todos-los-servicios", label: "Servicios" },
-                { href: "/sobre-nosotros", label: "Sobre Nosotros" },
-                { href: "/contacto", label: "Contacto" },
+                { href: "#servicios", label: "Destacados" },
+                { href: "/todos-los-servicios", label: "Categorías" },
+                { href: "#cobertura", label: "Cobertura" },
+                { href: "#registro", label: "Registrar Negocio" },
               ].map((item, index) => (
                 <motion.li 
                   key={index} 
@@ -98,10 +100,6 @@ const Footer = () => {
               <span className="absolute bottom-0 left-0 w-1/3 h-1 bg-amber-500 rounded-full"></span>
             </h3>
             <ul className="space-y-4">
-              <li className="flex items-start">
-                <FiMapPin className="text-amber-400 mt-1 mr-3 flex-shrink-0" />
-                <span>Av. Principal 123, Lima, Perú</span>
-              </li>
               <li className="flex items-center">
                 <FiMail className="text-amber-400 mr-3 flex-shrink-0" />
                 <a href="mailto:info@tubarrio.pe" className="hover:text-amber-400 transition-colors">
@@ -127,6 +125,7 @@ const Footer = () => {
               {[
                 { icon: <FiFacebook size={20} />, label: 'Facebook', href: '#' },
                 { icon: <FiInstagram size={20} />, label: 'Instagram', href: '#' },
+                { icon: <FaWhatsapp size={20} />, label: 'WhatsApp', href: '#' },
               ].map((social, index) => (
                 <motion.a
                   key={index}
