@@ -1,22 +1,22 @@
 'use client';
 
 import React from 'react';
+import useWhatsApp from '@/hooks/useWhatsApp';
 
 interface WhatsAppButtonProps {
   phoneNumber: string;
   message?: string;
 }
 
-const WhatsAppButton: React.FC<WhatsAppButtonProps> = ({ phoneNumber, message = 'Hola, me gustaría obtener más información sobre la revista Pando Digital' }) => {
-  // Eliminar cualquier carácter no numérico del número
-  const cleanNumber = phoneNumber.replace(/\D/g, '');
-  
-  // Crear URL de WhatsApp con número y mensaje
-  const whatsappUrl = `https://wa.me/${cleanNumber}?text=${encodeURIComponent(message)}`;
+const WhatsAppButton: React.FC<WhatsAppButtonProps> = ({ 
+  phoneNumber, 
+  message = 'Hola, me gustaría obtener más información sobre Tubarrio.pe' 
+}) => {
+  const { getWhatsAppUrl } = useWhatsApp(phoneNumber, message);
 
   return (
     <a 
-      href={whatsappUrl}
+      href={getWhatsAppUrl()}
       target="_blank"
       rel="noopener noreferrer"
       className="fixed bottom-6 right-6 z-50 flex items-center justify-center w-14 h-14 sm:w-20 sm:h-20 rounded-full bg-green-500 text-white shadow-xl hover:bg-green-600 transition-all duration-300 hover:scale-110 hover:shadow-2xl"

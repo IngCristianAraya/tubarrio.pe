@@ -5,8 +5,8 @@ import WhatsAppButton from '@/components/WhatsAppButton'
 import CustomCursor from '@/components/CustomCursor'
 
 export const metadata: Metadata = {
-  title: 'Términos y Condiciones - Revista Pando',
-  description: 'Conoce las políticas y condiciones de uso de Revista Pando para negocios que deseen aparecer en nuestra plataforma local.'
+  title: 'Términos y Condiciones - Tubarrio.pe',
+  description: 'Conoce las políticas y condiciones de uso de Tubarrio.pe para negocios que deseen aparecer en nuestra plataforma local.'
 }
 
 export default function TermsAndConditions() {

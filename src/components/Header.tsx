@@ -78,10 +78,16 @@ const Header = () => {
             </button>
 
             <div className="flex-shrink-0 flex items-center">
-              <Link href="/" className="text-2xl sm:text-3xl md:text-2xl lg:text-2xl font-extrabold tracking-tight select-none">
-  <span className="text-black">TU</span>
-  <span className="text-orange-500">BARRIO</span>
-  <span className="text-black">.PE</span>
+              <Link href="/" className="flex items-center select-none" aria-label="Ir a inicio">
+  <img
+    src="/images/tubarriope_logo_penegro2.webp"
+    alt="Logo TuBarrio.pe"
+    style={{ height: 60, maxHeight: 60, width: 'auto', display: 'block' }}
+    className="h-14 w-auto mr-2"
+    loading="eager"
+    decoding="async"
+    fetchPriority="high"
+  />
 </Link>
             </div>
           </div>
@@ -92,7 +98,6 @@ const Header = () => {
             <NavItem href="#servicios">Destacados</NavItem>
             <NavItem href="/todos-los-servicios">Categorías</NavItem>
             <NavItem href="#cobertura">Cobertura</NavItem>
-            <NavItem href="#revista">Catálogo Digital</NavItem>
           </nav>
 
           {/* Acciones desktop */}
@@ -115,7 +120,6 @@ const Header = () => {
               <NavItem href="#servicios">Destacados</NavItem>
               <NavItem href="/todos-los-servicios">Categorías</NavItem>
               <NavItem href="#cobertura">Cobertura</NavItem>
-              <NavItem href="#revista">Catálogo Digital</NavItem>
               <a
                 href="#registro"
                 className="block w-full px-4 py-3 text-center rounded-xl font-bold bg-gradient-to-r from-orange-500 to-yellow-400 text-white shadow-md hover:from-orange-600 hover:to-yellow-500 transition-all duration-200 mt-6"

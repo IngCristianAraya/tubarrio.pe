@@ -3,6 +3,15 @@
 import React from 'react';
 import { Metadata } from 'next';
 
+/**
+ * Interfaz que define las propiedades del componente SEO
+ * @property {string} [title] - Título de la página
+ * @property {string} [description] - Descripción para motores de búsqueda
+ * @property {string} [keywords] - Palabras clave para SEO
+ * @property {string} [image] - URL de la imagen para redes sociales
+ * @property {string} [url] - URL canónica de la página
+ * @property {string} [type] - Tipo de contenido (website, article, etc.)
+ */
 interface SEOProps {
   title?: string;
   description?: string;
@@ -13,23 +22,47 @@ interface SEOProps {
 }
 
 /**
- * Componente SEO para gestionar metadatos dinámicos en cada página
- * Adaptado para Next.js 13+ usando el nuevo sistema de metadatos
+ * Componente para gestión de metadatos SEO en la aplicación
+ * 
+ * @component
+ * @description 
+ * Este componente se encarga de gestionar los metadatos SEO de la aplicación.
+ * En Next.js 13+ con App Router, los metadatos se manejan principalmente a través
+ * de la API de metadatos en los archivos layout.tsx o page.tsx. Este componente
+ * se mantiene como compatibilidad con código existente y para casos donde se
+ * necesite manipular metadatos del lado del cliente.
+ * 
+ * Características:
+ * - Proporciona valores por defecto para todos los metadatos
+ * - Construye títulos consistentes
+ * - Es compatible con Open Graph y Twitter Cards
+ * - Sigue las mejores prácticas de SEO
  */
 const SEO = ({
-  title = 'Revista Pando - Descubre todos los servicios de tu zona',
-  description = 'Explora restaurantes, abarrotes, lavanderías, panaderías y más servicios locales en Lima Este. La revista digital que conecta negocios y clientes en tu barrio.',
-  keywords = 'revista digital, negocios locales, Lima Este, Pando, restaurantes, servicios, directorio comercial, emprendimientos',
+  title = 'Tubarrio.pe - Descubre todos los servicios de tu zona',
+  description = 'Explora restaurantes, abarrotes, lavanderías, panaderías y más servicios locales en tu barrio. La plataforma digital que conecta negocios y clientes.',
+  keywords = 'directorio comercial, negocios locales, servicios, restaurantes, emprendimientos, comercios, barrio',
   image = '/images/hero_3.webp',
-  url = 'https://revistapando.com',
+  url = 'https://tubarrio.pe',
   type = 'website'
 }: SEOProps) => {
   // Construir título completo con formato consistente
-  const fullTitle = title.includes('Revista Pando') ? title : `${title} | Revista Pando`;
+  // Si el título ya incluye 'Tubarrio.pe', se usa tal cual
+  // De lo contrario, se agrega como sufijo
+  const fullTitle = title.includes('Tubarrio.pe') ? title : `${title} | Tubarrio.pe`;
   
-  // En Next.js 13+, los metadatos se gestionan de manera diferente
-  // Este componente ahora solo establece metadatos para el cliente
-  // y sirve como compatibilidad con el código existente
+  /* 
+   * NOTA: En Next.js 13+ con App Router, los metadatos se gestionan principalmente
+   * a través de la API de metadatos en los archivos layout.tsx o page.tsx.
+   * 
+   * Este componente se mantiene para:
+   * 1. Compatibilidad con código existente
+   * 2. Casos donde se necesite manipular metadatos del lado del cliente
+   * 3. Como proveedor de valores por defecto
+   * 
+   * Para la mayoría de los casos, es preferible usar la API de metadatos de Next.js
+   * exportando un objeto 'metadata' o 'generateMetadata' en los archivos de página.
+   */
   return (
     <>
       {/* Este componente ya no inserta metadatos directamente en el head */}
@@ -44,14 +77,14 @@ export const generateMetadata = (props: SEOProps): Metadata => {
   const {
     title = 'Revista Pando - Descubre todos los servicios de tu zona',
     description = 'Explora restaurantes, abarrotes, lavanderías, panaderías y más servicios locales en Lima Este. La revista digital que conecta negocios y clientes en tu barrio.',
-    keywords = 'revista digital, negocios locales, Lima Este, Pando, restaurantes, servicios, directorio comercial, emprendimientos',
+    keywords = 'directorio comercial, negocios locales, servicios, restaurantes, emprendimientos, comercios, barrio',
     image = '/images/hero_3.webp',
-    url = 'https://revistapando.com',
+    url = 'https://tubarrio.pe',
     type = 'website' as const
   } = props;
   
   // Construir título completo con formato consistente
-  const fullTitle = title.includes('Revista Pando') ? title : `${title} | Revista Pando`;
+  const fullTitle = title.includes('Tubarrio.pe') ? title : `${title} | Tubarrio.pe`;
   
   return {
     title: fullTitle,
@@ -61,7 +94,7 @@ export const generateMetadata = (props: SEOProps): Metadata => {
       title: fullTitle,
       description,
       url,
-      siteName: 'Revista Pando',
+      siteName: 'Tubarrio.pe',
       images: [{
         url: image.startsWith('http') ? image : `${url}${image}`,
         width: 1200,

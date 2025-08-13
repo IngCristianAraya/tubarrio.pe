@@ -1,3 +1,13 @@
+/**
+ * Componente de esqueleto (skeleton loader) que se muestra mientras se cargan las tarjetas de servicio.
+ * Proporciona una mejor experiencia de usuario durante la carga al mostrar un diseño similar al contenido real.
+ * 
+ * Características:
+ * - Muestra un esqueleto con la misma estructura que ServiceCard
+ - Incluye animación de pulso para indicar carga
+ - Es totalmente responsive
+ - Se integra con el diseño general de la aplicación
+ */
 "use client";
 
 const ServiceCardSkeleton = () => (

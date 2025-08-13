@@ -10,122 +10,113 @@ interface OptimizedImageProps {
   width?: number;
   height?: number;
   loading?: 'lazy' | 'eager';
-  placeholderColor?: string;
   objectFit?: 'cover' | 'contain' | 'fill' | 'none' | 'scale-down';
   onLoad?: () => void;
   fallbackSrc?: string;
+  priority?: boolean;
+  sizes?: string;
 }
 
 /**
- * Componente OptimizedImage para mejorar el rendimiento de carga de imágenes
- * - Carga perezosa (lazy loading) nativa
- * - Placeholder de color mientras carga
- * - Soporte para dimensiones específicas
- * - Transición suave al cargar
- * - Imagen de fallback en caso de error
- * - Precarga para imágenes críticas
+ * Componente OptimizedImage simplificado para cargar imágenes de manera eficiente
+ * - Usa next/image para optimización automática
+ * - Incluye manejo de errores
+ * - Soporte para lazy loading
+ * - Manejo de hidratación mejorado
  */
 const OptimizedImage = ({
   src,
   alt,
   className = '',
-  width,
-  height,
+  width = 500, // Default width if not provided
+  height = 300, // Default height if not provided
   loading = 'lazy',
-  placeholderColor = '#f3f4f6', // Color gris claro por defecto
   objectFit = 'cover',
   onLoad,
-  fallbackSrc = '/images/placeholder.jpg' // Imagen de fallback por defecto
+  fallbackSrc = '/images/placeholder.jpg',
+  priority = false,
+  sizes = '(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw',
 }: OptimizedImageProps) => {
-  const [isLoaded, setIsLoaded] = useState(false);
-  const [imageSrc, setImageSrc] = useState(src);
+  const [isClient, setIsClient] = useState(false);
+  const [currentSrc, setCurrentSrc] = useState(fallbackSrc);
   const [hasError, setHasError] = useState(false);
 
+  // Establecer isClient a true después de la hidratación
   useEffect(() => {
-    // Resetear el estado cuando cambia la fuente
-    if (src !== imageSrc && !hasError) {
-      setIsLoaded(false);
-      setImageSrc(src);
-      setHasError(false);
-    }
-    
-    // Precarga para imágenes con loading='eager'
-    if (loading === 'eager') {
-      const img = new window.Image();
-      img.src = src;
-      img.onload = () => {
-        setIsLoaded(true);
-        if (onLoad) onLoad();
-      };
-      img.onerror = () => {
-        console.error(`Error al precargar la imagen: ${src}`);
-        setHasError(true);
-        setImageSrc(fallbackSrc);
-      };
-    }
-  }, [src, imageSrc, loading, onLoad, fallbackSrc, hasError]);
+    setIsClient(true);
+  }, []);
 
-  // Función para manejar errores de carga
+  // Manejar errores de carga
   const handleError = () => {
-    console.error(`Error al cargar la imagen: ${src}`);
-    setHasError(true);
-    setImageSrc(fallbackSrc);
+    if (fallbackSrc && !hasError) {
+      setCurrentSrc(fallbackSrc);
+      setHasError(true);
+    }
   };
 
-  // Función para manejar la carga exitosa
-  const handleLoad = () => {
-    setIsLoaded(true);
-    if (onLoad) onLoad();
-  };
+  // Actualizar la fuente cuando cambie la prop src
+  useEffect(() => {
+    if (src) {
+      setCurrentSrc(src);
+      setHasError(false);
+    } else if (fallbackSrc) {
+      setCurrentSrc(fallbackSrc);
+    }
+  }, [src, fallbackSrc]);
 
-  // Estilos para el contenedor y la imagen
-  const containerStyle = {
-    backgroundColor: placeholderColor,
-    position: 'relative' as const,
-    overflow: 'hidden' as const,
-    width: width ? `${width}px` : '100%',
-    height: height ? `${height}px` : '100%',
-    display: 'flex' as const,
-    alignItems: 'center' as const,
-    justifyContent: 'center' as const,
-  };
+  // Si no estamos en el cliente, renderizar un placeholder
+  if (!isClient) {
+    return (
+      <div 
+        className={`${className} bg-gray-200 animate-pulse`}
+        style={{
+          width: width ? `${width}px` : '100%',
+          height: height ? `${height}px` : '100%',
+        }}
+      />
+    );
+  }
 
-  const imageStyle = {
-    opacity: isLoaded ? 1 : 0,
-    transition: 'opacity 0.3s ease-in-out',
-    objectFit,
-  };
-
-  // Determinar si la URL es externa o local
-  const isExternalImage = src.startsWith('http');
-
-  // Mostrar un indicador de carga mientras la imagen se está cargando
-  const loadingIndicator = !isLoaded && (
-    <div className="absolute inset-0 flex items-center justify-center">
-      <div className="w-8 h-8 border-4 border-gray-300 border-t-orange-500 rounded-full animate-spin"></div>
-    </div>
-  );
+  // Si no hay fuente, mostrar un placeholder
+  if (!currentSrc) {
+    return (
+      <div 
+        className={`${className} bg-gray-200 flex items-center justify-center`}
+        style={{
+          width: width || '100%',
+          height: height || '100%',
+        }}
+      >
+        <span className="text-gray-400">No image</span>
+      </div>
+    );
+  }
 
   return (
-    <div style={containerStyle} className={className}>
-      {loadingIndicator}
-      
-      {/* Usamos Next/Image para todas las imágenes con configuración optimizada */}
+    <div 
+      className={`relative ${className}`}
+      style={{
+        width: width ? `${width}px` : '100%',
+        height: height ? `${height}px` : '100%',
+      }}
+      suppressHydrationWarning
+    >
       <Image
-        src={imageSrc}
+        src={currentSrc}
         alt={alt}
-        width={width || 500}
-        height={height || 300}
-        onLoad={handleLoad}
-        onError={handleError}
-        style={{
-          ...imageStyle,
-          objectFit: objectFit as any,
-        }}
+        width={width}
+        height={height}
+        loading={loading}
         className="w-full h-full"
-        priority={loading === 'eager'}
-        quality={90}
-        unoptimized={isExternalImage} // Importante para imágenes externas
+        style={{
+          objectFit,
+          objectPosition: 'center',
+        }}
+        onLoad={onLoad}
+        onError={handleError}
+        priority={priority}
+        sizes={sizes}
+        unoptimized={process.env.NODE_ENV !== 'production'}
       />
     </div>
   );

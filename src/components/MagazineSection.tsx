@@ -45,7 +45,7 @@ const Page = React.forwardRef<HTMLDivElement, { businesses: Business[]; pageNumb
               </div>
             </div>
             
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-800 mb-2 sm:mb-4">Revista Pando</h2>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-800 mb-2 sm:mb-4">Tubarrio.pe</h2>
             <div className="w-12 sm:w-16 h-1 bg-gradient-to-r from-orange-500 to-yellow-500 mb-3 sm:mb-6"></div>
             <p className="text-sm sm:text-base md:text-xl text-gray-600 mb-4 sm:mb-8 max-w-md px-2">Bienvenido a nuestra revista digital de negocios locales y emprendimientos.</p>
             

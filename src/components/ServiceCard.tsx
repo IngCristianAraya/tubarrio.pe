@@ -1,19 +1,56 @@
+/**
+ * Componente de tarjeta que muestra la información de un servicio.
+ * 
+ * Características principales:
+ * - Muestra imagen, nombre, descripción y ubicación del servicio
+ * - Incluye etiqueta de categoría y valoración visual
+ * - Botones de acción para contacto y más información
+ * - Diseño responsive con transiciones suaves
+ * - Optimizado para rendimiento con carga lazy de imágenes
+ * 
+ * Props:
+ * @param {Service} service - Objeto con la información del servicio a mostrar
+ * @property {string} service.name - Nombre del servicio
+ * @property {string} service.description - Descripción breve
+ * @property {string} service.image - URL de la imagen del servicio
+ * @property {string} service.category - Categoría del servicio
+ * @property {number} service.rating - Valoración numérica (ej: 4.5)
+ * @property {string} service.location - Ubicación del servicio
+ * @property {string} [service.contactUrl] - URL para contacto (opcional)
+ * @property {string} [service.detailsUrl] - URL para más detalles (opcional)
+ */
 'use client';
 
 import { Star, MapPin, Phone, ExternalLink } from 'lucide-react';
 import OptimizedImage from './OptimizedImage';
-
 import type { Service } from '../context/ServicesContext';
+import React from 'react';
+import { useRouter } from 'next/navigation';
 
 interface ServiceCardProps {
   service: Service;
 }
 
-import React from 'react';
-
 const ServiceCard = ({ service }: ServiceCardProps) => {
+  const router = useRouter();
+  
+  const handleCardClick = (e: React.MouseEvent) => {
+    // Prevenir la navegación si se hace clic en un botón o enlace
+    const target = e.target as HTMLElement;
+    if (target.tagName === 'A' || target.tagName === 'BUTTON' || target.closest('a, button')) {
+      return;
+    }
+    router.push(`/servicio/${service.id}`);
+  };
+
   return (
-    <div className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 active:scale-98 border border-gray-100 overflow-hidden group h-full flex flex-col min-w-0">
+    <div 
+      onClick={handleCardClick}
+      className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 active:scale-98 border border-gray-100 overflow-hidden group h-full flex flex-col min-w-0 cursor-pointer"
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => e.key === 'Enter' && handleCardClick(e as any)}
+    >
       {/* Image */}
       <div className="relative overflow-hidden h-36 sm:h-40 md:h-48 min-w-0">
         <OptimizedImage
@@ -23,8 +60,6 @@ const ServiceCard = ({ service }: ServiceCardProps) => {
           width={300}
           height={200}
           loading="lazy"
-          
-          placeholderColor="#f3f4f6"
           objectFit="cover"
           fallbackSrc="/images/placeholder-business.jpg"
         />
@@ -88,12 +123,9 @@ const ServiceCard = ({ service }: ServiceCardProps) => {
               <ExternalLink className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
             </a>
           ) : (
-            <button
-              className="flex-1 bg-[#fb8500] text-white font-semibold tracking-wide py-2 sm:py-2.5 px-2 sm:px-3 rounded-xl border border-white/40 shadow-lg opacity-50 cursor-not-allowed text-2xs sm:text-xs md:text-sm min-h-[36px] sm:min-h-[40px] md:min-h-[44px] flex items-center justify-center"
-              disabled
-            >
-              <ExternalLink className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
-            </button>
+            <span className="flex-1 text-gray-400 text-xs sm:text-sm font-medium min-h-[36px] sm:min-h-[40px] md:min-h-[44px] flex items-center justify-center bg-gray-100 rounded-xl border border-white/40 shadow-inner">
+              Landing próximamente
+            </span>
           )}
         </div>
       </div>

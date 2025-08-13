@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import "./globals.css";
 import { ServicesProvider } from "@/context/ServicesContext";
+import { SuppressHydrationWarning } from "@/components/SuppressHydrationWarning";
 
 const geist = Geist({
   variable: "--font-geist",
@@ -10,21 +11,21 @@ const geist = Geist({
 
 // Metadatos globales de la aplicación
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || 'https://revistapando.com'),
-  title: "Revista Pando - Descubre todos los servicios de tu zona",
-  description: "Explora restaurantes, abarrotes, lavanderías, panaderías y más servicios locales en Lima Este. La revista digital que conecta negocios y clientes en tu barrio.",
-  keywords: "revista digital, negocios locales, Lima Este, Pando, restaurantes, servicios, directorio comercial, emprendimientos",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || 'https://tubarrio.pe'),
+  title: "Tubarrio.pe - Descubre todos los servicios de tu zona",
+  description: "Explora restaurantes, abarrotes, lavanderías, panaderías y más servicios locales en tu barrio. La plataforma que conecta negocios y clientes en tu comunidad.",
+  keywords: "directorio comercial, negocios locales, servicios, restaurantes, abarrotes, lavanderías, panaderías, emprendimientos, tu barrio",
   openGraph: {
-    title: "Revista Pando - Descubre todos los servicios de tu zona",
-    description: "Explora restaurantes, abarrotes, lavanderías, panaderías y más servicios locales en Lima Este.",
-    url: "https://revistapando.com",
-    siteName: "Revista Pando",
+    title: "Tubarrio.pe - Descubre todos los servicios de tu zona",
+    description: "Explora restaurantes, abarrotes, lavanderías, panaderías y más servicios locales en tu barrio.",
+    url: "https://tubarrio.pe",
+    siteName: "Tubarrio.pe",
     images: [
       {
         url: "/images/hero_3.webp",
         width: 1200,
         height: 630,
-        alt: "Revista Pando"
+        alt: "Tubarrio.pe - Servicios en tu barrio"
       }
     ],
     locale: "es_PE",
@@ -32,11 +33,12 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Revista Pando - Descubre todos los servicios de tu zona",
-    description: "Explora restaurantes, abarrotes, lavanderías, panaderías y más servicios locales en Lima Este.",
+    title: "Tubarrio.pe - Descubre todos los servicios de tu zona",
+    description: "Explora restaurantes, abarrotes, lavanderías, panaderías y más servicios locales en tu barrio.",
     images: ["/images/hero_3.webp"],
   },
 };
+
 
 
 export default function RootLayout({
@@ -45,15 +47,33 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es">
+    <html lang="es" suppressHydrationWarning>
       <head>
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, orientation=portrait" />
         <link rel="manifest" href="/manifest.json" />
+        {/* Prevenir inyección de estilos por extensiones */}
+        <meta name="theme-color" content="#ffffff" />
+        <style dangerouslySetInnerHTML={{
+          __html: `
+            html, body {
+              -webkit-tap-highlight-color: transparent;
+              -webkit-font-smoothing: antialiased;
+              -moz-osx-font-smoothing: grayscale;
+            }
+            /* Prevenir inyección de estilos por extensiones */
+            [data-windsurf-page-id],
+            [data-windsurf-extension-id] {
+              all: unset !important;
+            }
+          `
+        }} />
       </head>
-      <body className={`${geist.variable} antialiased min-h-screen bg-white`}>
+      <body className={`${geist.variable} antialiased min-h-screen bg-white`} suppressHydrationWarning>
         <ServicesProvider>
-          {children}
+          <SuppressHydrationWarning>
+            {children}
+          </SuppressHydrationWarning>
         </ServicesProvider>
       </body>
     </html>

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Search, Filter, ChevronDown, X, MapPin, Star, ChevronLeft, ChevronRight } from 'lucide-react';
-import Image from 'next/image';
+import OptimizedImage from './OptimizedImage';
 import Link from 'next/link';
 import { useServices } from '../context/ServicesContext';
 import SEO from '../components/SEO';
@@ -15,17 +15,7 @@ const Hero = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const resultsPerPage = 8; // Número de resultados por página
 
-  // Arrays de categorías y categorías rápidas
-  const categories = [
-    'Todos los servicios',
-    'Restaurantes',
-    'Abarrotes',
-    'Lavanderías',
-    'Panaderías',
-    'Delivery',
-    'Servicios',
-  ];
-
+  // Categorías rápidas para acceso rápido
   const quickCategories = [
     { icon: '🍔', name: 'Comida', category: 'Restaurantes' },
     { icon: '🛒', name: 'Abarrotes', category: 'Abarrotes' },
@@ -36,7 +26,18 @@ const Hero = () => {
   ];
 
   // Usar el contexto de servicios
-  const { searchServices, filteredServices, isSearching, resetSearch } = useServices();
+  const { searchServices, filteredServices, isSearching, resetSearch, services } = useServices();
+  
+  // Obtener categorías únicas de los servicios
+  const [categories, setCategories] = useState<string[]>(['Todos los servicios']);
+  
+  // Actualizar categorías cuando cambien los servicios
+  useEffect(() => {
+    if (services.length > 0) {
+      const uniqueCategories = ['Todos los servicios', ...new Set(services.map(service => service.category))];
+      setCategories(uniqueCategories);
+    }
+  }, [services]);
 
   // Lógica de búsqueda
   const handleSearch = () => {
@@ -56,9 +57,9 @@ const Hero = () => {
   return (
     <>
       <SEO 
-        title="Inicio - Revista Pando"
-        description="Descubre los mejores servicios y negocios locales en Lima Este. Tu guía digital para encontrar restaurantes, tiendas, servicios y más en tu zona."
-        keywords="revista digital, negocios locales, Lima Este, Pando, restaurantes, servicios, directorio comercial, buscar servicios"
+        title="Inicio - Tubarrio.pe"
+        description="Descubre los mejores servicios y negocios locales en tu barrio. Tu guía digital para encontrar restaurantes, tiendas, servicios y más en tu zona."
+        keywords="directorio comercial, negocios locales, servicios, restaurantes, emprendimientos, comercios, barrio"
         image="/images/hero_3.webp"
       />
       <section id="inicio" className="relative min-h-[70vh] md:min-h-screen overflow-hidden">
@@ -69,17 +70,15 @@ const Hero = () => {
     - 'placeholder="blur"' y 'blurDataURL' mejoran la experiencia visual
     - Overlay removido para evitar retrasar el LCP visual
 */}
-<Image
+<OptimizedImage
   src="/images/hero_3.webp"
   alt="Negocios locales en tu zona, descubre servicios cerca de ti"
-  fill
   className="w-full h-full object-cover object-[left_30%] md:object-center"
-  priority
-  quality={90}
-  fetchPriority="high"
-  placeholder="blur"
-  blurDataURL="data:image/webp;base64,UklGRiIAAABXRUJQVlA4ICgAAADQAgCdASoEAAQAAVAfJZgCdAD0oQAA/vuUAAA=="
-  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 80vw, 60vw"
+  width={1920}
+  height={1080}
+  loading="eager"
+  objectFit="cover"
+  fallbackSrc="/images/hero_3.webp"
 />
 </div>
 
@@ -161,10 +160,11 @@ const Hero = () => {
             <Search className="w-5 h-5 mr-2" />
             Buscar servicios
           </button>
-          <Link href="/todos-los-servicios" passHref legacyBehavior>
-            <a className="bg-white border-2 border-orange-500 text-orange-600 font-bold py-3 px-6 rounded-lg flex items-center justify-center transition-all duration-300 shadow-md hover:bg-orange-50 hover:text-orange-700 w-full sm:w-auto">
-              Explora todos los servicios
-            </a>
+          <Link 
+            href="/todos-los-servicios" 
+            className="bg-white border-2 border-orange-500 text-orange-600 font-bold py-3 px-6 rounded-lg flex items-center justify-center transition-all duration-300 shadow-md hover:bg-orange-50 hover:text-orange-700 w-full sm:w-auto"
+          >
+            Explora todos los servicios
           </Link>
         </div>
       </div>
@@ -218,11 +218,13 @@ const Hero = () => {
                   {filteredServices.slice((currentPage - 1) * resultsPerPage, currentPage * resultsPerPage).map((service) => (
                     <div key={service.id} className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 transition-all hover:shadow-lg">
                       <div className="relative h-48 bg-gray-200">
-                        <Image 
+                        <OptimizedImage 
                           src={service.image} 
                           alt={service.name}
-                          fill
-                          className="object-cover"
+                          width={300}
+                          height={192}
+                          className="w-full h-full"
+                          objectFit="cover"
                         />
                       </div>
                       <div className="p-4">

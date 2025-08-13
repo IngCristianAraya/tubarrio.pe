@@ -1,19 +1,29 @@
 import { Metadata } from 'next';
-import Image from 'next/image';
-import HomeClient from '@/components/HomeClient';
-import WhatsAppButton from '@/components/WhatsAppButton';
-import CustomCursor from '@/components/CustomCursor';
-import Header from '@/components/Header';
-import Hero from '@/components/Hero';
-import Footer from '@/components/Footer';
-import FeaturedServices from '@/components/FeaturedServices';
-import CategorySections from '@/components/CategorySections';
-import BusinessRegistration from '@/components/BusinessRegistration';
+import dynamic from 'next/dynamic';
+
+// Importaciones dinámicas con carga perezosa para componentes que pueden ser renderizados en el servidor
+const Header = dynamic(() => import('@/components/Header'), {
+  loading: () => <header className="h-16 bg-white shadow-sm"></header>,
+  ssr: true
+});
+
+const Hero = dynamic(() => import('@/components/Hero'), {
+  loading: () => <div className="h-[60vh] bg-gray-100 animate-pulse"></div>,
+  ssr: true
+});
+
+const Footer = dynamic(() => import('@/components/Footer'), {
+  loading: () => <footer className="h-20 bg-gray-800"></footer>,
+  ssr: true
+});
+
+// Importamos directamente el componente cliente
+import ClientComponents from '../components/ClientComponents';
 
 // Metadatos específicos para la página de inicio
 export const metadata: Metadata = {
-  title: 'Revista Pando - Descubre todos los servicios de tu zona',
-  description: 'Explora restaurantes, abarrotes, lavanderías, panaderías y más servicios locales en Lima Este. La revista digital que conecta negocios y clientes en tu barrio.'
+  title: 'Tubarrio.pe - Descubre todos los servicios de tu zona',
+  description: 'Explora restaurantes, abarrotes, lavanderías, panaderías y más servicios locales en tu barrio. La plataforma digital que conecta negocios y clientes.'
 };
 
 // Página de inicio
@@ -24,12 +34,11 @@ export default function Home() {
       <Header />
 
       <main className="flex flex-col">
-        {/* CustomCursor para toda la aplicación */}
-        <CustomCursor />
         {/* Hero Section */}
         <Hero />
         
-        <HomeClient />
+        {/* Componentes del cliente que necesitan interactividad del navegador */}
+        <ClientComponents />
       </main>
 
       <Footer />

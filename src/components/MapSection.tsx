@@ -1,24 +1,68 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
-import mapboxgl from 'mapbox-gl'
-import 'mapbox-gl/dist/mapbox-gl.css'
-import { FeatureCollection, Polygon } from 'geojson'
+/**
+ * Componente MapSection
+ * 
+ * @description
+ * Este componente implementa un mapa interactivo utilizando Mapbox GL JS para mostrar la cobertura geográfica
+ * de los servicios ofrecidos. El componente permite visualizar áreas específicas mediante polígonos y marcadores.
+ * 
+ * Características principales:
+ * - Muestra un mapa interactivo con zoom y desplazamiento
+ * - Resalta áreas de cobertura con polígonos personalizables
+ * - Incluye marcadores para ubicaciones específicas
+ * - Optimizado para rendimiento con carga dinámica
+ * 
+ * Dependencias:
+ * - mapbox-gl: Biblioteca para renderizar mapas interactivos
+ * - geojson: Formato para estructuras geográficas
+ * 
+ * Configuración requerida:
+ * - Token de acceso a la API de Mapbox (ya configurado)
+ * - Coordenadas del área de cobertura en formato GeoJSON
+ */
 
-// 🔐 Token de Mapbox
-mapboxgl.accessToken = 'pk.eyJ1Ijoia3VwcmFoIiwiYSI6ImNtY2N2MmNkejBiczIybXEydnF4anpxbGsifQ.PJ9OqAF_AenVETL-ZxtKqQ'
+import { useEffect, useRef } from 'react';
+import mapboxgl from 'mapbox-gl';
+import 'mapbox-gl/dist/mapbox-gl.css';
+import { FeatureCollection, Polygon } from 'geojson';
+import style from 'styled-jsx/style';
 
+// 🔐 Token de acceso a la API de Mapbox
+// Nota: En un entorno de producción, considera usar variables de entorno para almacenar esta información sensible
+mapboxgl.accessToken = 'pk.eyJ1Ijoia3VwcmFoIiwiYSI6ImNtY2N2MmNkejBiczIybXEydnF4anpxbGsifQ.PJ9OqAF_AenVETL-ZxtKqQ';
+
+/**
+ * geojsonZona
+ * 
+ * @description
+ * Define el área de cobertura como un polígono GeoJSON.
+ * 
+ * Estructura:
+ * - type: 'FeatureCollection' - Colección de características geográficas
+ * - features: Array de características (en este caso, un solo polígono)
+ *   - id: Identificador único para interactividad
+ *   - type: 'Feature' - Tipo de característica
+ *   - properties: Metadatos adicionales (vacío en este caso)
+ *   - geometry: Define la forma geográfica
+ *     - type: 'Polygon' - Tipo de geometría
+ *     - coordinates: Array de coordenadas [longitud, latitud] que definen el polígono
+ * 
+ * Nota: Las coordenadas deben formar un polígono cerrado (el primer y último punto deben coincidir)
+ */
 const geojsonZona: FeatureCollection<Polygon> = {
   type: 'FeatureCollection',
   features: [
     {
-      id: 1, // Necesario para feature-state interactivity
+      id: 1, // Identificador único para interactividad con feature-state
       type: 'Feature',
       properties: {},
       geometry: {
         type: 'Polygon',
         coordinates: [
           [
+            // Coordenadas del polígono que define el área de cobertura
+            // Formato: [longitud, latitud]
             [-77.07907987387742, -12.06024728207376],
             [-77.07848823175297, -12.063091969971666],
             [-77.07804450016012, -12.065189305278182],
@@ -31,7 +75,7 @@ const geojsonZona: FeatureCollection<Polygon> = {
             [-77.06732308943505, -12.0588288313632],
             [-77.06703271263005, -12.057963070096804],
             [-77.06708228915795, -12.057609838696393],
-            [-77.07907987387742, -12.06024728207376]
+            [-77.07907987387742, -12.06024728207376]  // Último punto igual al primero para cerrar el polígono
           ]
         ]
       }
@@ -39,90 +83,151 @@ const geojsonZona: FeatureCollection<Polygon> = {
   ]
 }
 
+/**
+ * Componente funcional MapSection
+ * 
+ * @description
+ * Componente que renderiza un mapa interactivo de Mapbox con las siguientes características:
+ * - Muestra un área de cobertura definida por un polígono GeoJSON
+ * - Incluye interactividad al pasar el mouse (hover)
+ * - Muestra un marcador en el centro del área de cobertura
+ * - Incluye controles de navegación personalizados
+ * 
+ * @returns {JSX.Element} Un contenedor div que alberga el mapa interactivo
+ */
 export default function MapSection() {
+  // Referencia al contenedor del mapa
   const mapContainer = useRef<HTMLDivElement>(null)
 
+  /**
+   * Efecto secundario que se ejecuta una vez al montar el componente
+   * Inicializa el mapa de Mapbox y configura todas sus capas y eventos
+   */
   useEffect(() => {
     // Verificar que estamos en el navegador y que el contenedor existe
     if (typeof window === 'undefined' || !mapContainer.current) return
 
-    // Calcular centroide simple (promedio de lat/lng del polígono)
-    const coords = geojsonZona.features[0].geometry.coordinates[0]
-    const lng = coords.reduce((sum, c) => sum + c[0], 0) / coords.length
-    const lat = coords.reduce((sum, c) => sum + c[1], 0) / coords.length
+    /**
+     * Calcula el centroide del polígono para centrar el mapa
+     * @returns {{lng: number, lat: number}} Coordenadas del centroide
+     */
+    const calculateCentroid = () => {
+      const coords = geojsonZona.features[0].geometry.coordinates[0]
+      const lng = coords.reduce((sum, c) => sum + c[0], 0) / coords.length
+      const lat = coords.reduce((sum, c) => sum + c[1], 0) / coords.length
+      return { lng, lat }
+    }
+    
+    const { lng, lat } = calculateCentroid()
 
+    /**
+     * Inicialización del mapa de Mapbox
+     * @type {mapboxgl.Map}
+     */
     const map = new mapboxgl.Map({
-      container: mapContainer.current,
-      style: 'mapbox://styles/mapbox/streets-v12',
-      center: [lng, lat],
-      zoom: 15
+      container: mapContainer.current, // Contenedor del DOM
+      style: 'mapbox://styles/mapbox/streets-v12', // Estilo del mapa
+      center: [lng, lat], // Centro del mapa (centroide del polígono)
+      zoom: 15 // Nivel de zoom inicial
     })
 
-    // Crear un elemento de estilo para personalizar los controles del mapa
-    const style = document.createElement('style')
-    style.textContent = `
-      .mapboxgl-ctrl-logo { display: none !important; }
-      .mapboxgl-ctrl-attrib { display: none !important; }
-      .mapboxgl-ctrl-bottom-left { display: none !important; }
-      .mapboxgl-ctrl-bottom-right { display: none !important; }
-    `
-    document.head.appendChild(style)
+    /**
+     * Estilos CSS personalizados para los controles del mapa
+     * Oculta elementos por defecto de Mapbox para una mejor experiencia de usuario
+     */
+    const addCustomStyles = () => {
+      const style: HTMLStyleElement = document.createElement('style')
+      style.textContent = `
+        .mapboxgl-ctrl-logo { display: none !important; }
+        .mapboxgl-ctrl-attrib { display: none !important; }
+        .mapboxgl-ctrl-bottom-left { display: none !important; }
+        .mapboxgl-ctrl-bottom-right { display: none !important; }
+      `
+      document.head.appendChild(style)
+      return style
+    }
+    
+    const styleElement = addCustomStyles()
 
+    // Evento que se dispara cuando el mapa ha terminado de cargar
     map.on('load', () => {
+      /**
+       * Añade la fuente de datos GeoJSON al mapa
+       * @type {mapboxgl.GeoJSONSourceRaw}
+       */
       map.addSource('zona', {
-        type: 'geojson',
-        data: geojsonZona
+        type: 'geojson', // Tipo de fuente: GeoJSON
+        data: geojsonZona // Datos del área de cobertura
       })
 
-      // Capa de gradiente (más oscuro)
+      /**
+       * Capa de relleno base (fondo más oscuro)
+       * Proporciona un efecto de profundidad al área de cobertura
+       */
       map.addLayer({
         id: 'zona-fill-dark',
         type: 'fill',
         source: 'zona',
         paint: {
-          'fill-color': '#2563eb', // azul oscuro
-          'fill-opacity': 0.18
+          'fill-color': '#2563eb', // Color azul oscuro
+          'fill-opacity': 0.18 // Opacidad baja para el efecto de sombra
         }
       })
 
-      // Capa de gradiente (más claro)
+      /**
+       * Capa de relleno interactiva (capa superior)
+       * Cambia de opacidad al pasar el mouse sobre el área
+       */
       map.addLayer({
         id: 'zona-fill',
         type: 'fill',
         source: 'zona',
         paint: {
-          'fill-color': '#38bdf8', // azul claro
+          'fill-color': '#38bdf8', // Color azul claro
           'fill-opacity': [
             'case',
-            ['boolean', ['feature-state', 'hover'], false],
-            0.55,
-            0.33
+            ['boolean', ['feature-state', 'hover'], false], // Verifica si el mouse está sobre el área
+            0.55, // Opacidad cuando el mouse está sobre el área
+            0.33  // Opacidad normal
           ]
         }
       })
 
+      /**
+       * Capa de borde para el área de cobertura
+       * Añade un borde naranja alrededor del área
+       */
       map.addLayer({
         id: 'zona-outline',
         type: 'line',
         source: 'zona',
         paint: {
-          'line-color': '#fb923c', // naranja
-          'line-width': 2
+          'line-color': '#fb923c', // Color naranja
+          'line-width': 2 // Grosor de la línea
         }
       })
 
-      // Interactividad: hover
+      /**
+       * Gestiona la interacción al pasar el mouse sobre el área
+       * Cambia el cursor y actualiza el estado de hover
+       */
       let hoveredId: number | null = null
+      
+      // Evento cuando el mouse se mueve sobre el área de cobertura
       map.on('mousemove', 'zona-fill', (e: mapboxgl.MapMouseEvent & { features?: mapboxgl.MapboxGeoJSONFeature[] }) => {
         if (e.features && e.features.length > 0) {
           const feature = e.features[0]
           const featureId = feature.id as number | undefined
+          
+          // Restablece el estado de hover anterior
           if (hoveredId !== null && typeof hoveredId !== 'undefined') {
             map.setFeatureState(
               { source: 'zona', id: hoveredId },
               { hover: false }
             )
           }
+          
+          // Aplica el estado de hover al elemento actual
           if (typeof featureId !== 'undefined') {
             hoveredId = featureId
             map.setFeatureState(
@@ -130,37 +235,51 @@ export default function MapSection() {
               { hover: true }
             )
           }
+          
+          // Cambia el cursor a pointer
           map.getCanvas().style.cursor = 'pointer'
         }
       })
+      
+      // Evento cuando el mouse sale del área de cobertura
       map.on('mouseleave', 'zona-fill', () => {
+        // Restablece el estado de hover
         if (hoveredId !== null && typeof hoveredId !== 'undefined') {
           map.setFeatureState(
             { source: 'zona', id: hoveredId },
             { hover: false }
           )
         }
+        hoveredId = null
         map.getCanvas().style.cursor = ''
       })
 
-      // Añadir controles de navegación
+      /**
+       * Añade controles de navegación al mapa
+       * Se posiciona en la esquina superior derecha
+       */
       map.addControl(new mapboxgl.NavigationControl({
-        showCompass: false
+        showCompass: false, // Oculta la brújula
+        showZoom: true      // Muestra los botones de zoom
       }), 'top-right')
 
-      // Añadir marcador en el centro
+      /**
+       * Añade un marcador en el centroide del área de cobertura
+       * @type {mapboxgl.Marker}
+       */
       new mapboxgl.Marker({
-        color: '#f97316', // naranja
-        scale: 0.8
+        color: '#f97316', // Color naranja
+        scale: 0.8       // Tamaño del marcador
       })
-        .setLngLat([lng, lat])
+        .setLngLat([lng, lat]) // Posición del marcador (centroide)
         .addTo(map)
     })
 
     return () => {
-      map.remove()
-      document.head.removeChild(style)
-    }
+      if (map) {
+        map.remove()
+      }
+      document.head.removeChild(styleElement)    }
   }, [])
 
   return (
