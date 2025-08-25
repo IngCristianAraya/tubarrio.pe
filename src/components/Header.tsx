@@ -67,7 +67,7 @@ const Header = () => {
           {/* Logo y menú móvil */}
           <div className="flex items-center">
             <button 
-              className="md:hidden mr-2 p-3 rounded-lg text-gray-700 hover:text-orange-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-orange-400 active:bg-gray-200 transition-all duration-150 min-h-[44px] min-w-[44px] flex items-center justify-center"
+              className="md:hidden mr-2 p-3 rounded-lg !bg-transparent !text-gray-700 hover:!text-orange-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-orange-400 active:bg-gray-200 transition-all duration-150 min-h-[44px] min-w-[44px] flex items-center justify-center"
               onClick={() => {
                 playFolderSound();
                 setIsMenuOpen(!isMenuOpen);
@@ -75,7 +75,7 @@ const Header = () => {
               aria-label={isMenuOpen ? "Cerrar menú" : "Abrir menú"}
               aria-expanded={isMenuOpen}
             >
-              {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              {isMenuOpen ? <X className="w-6 h-6 !text-gray-700 hover:!text-orange-500" /> : <Menu className="w-6 h-6 !text-gray-700 hover:!text-orange-500" />}
             </button>
 
             <div className="flex-shrink-0 flex items-center">

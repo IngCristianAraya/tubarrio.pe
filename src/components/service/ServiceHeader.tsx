@@ -124,6 +124,37 @@ const ServiceHeader: React.FC<ServiceHeaderProps> = ({ service }): ReactElement 
     <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       {/* Header con gradiente sutil */}
       <div className="bg-gradient-to-br from-orange-50 via-white to-orange-50 rounded-3xl p-8 lg:p-12 shadow-xl border border-orange-100">
+        
+        {/* Layout para móvil: Título primero */}
+        <div className="block lg:hidden mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 leading-tight mb-4">
+            {service.name}
+          </h1>
+          
+          {/* Categoría y Rating para móvil */}
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-6">
+            <span className="inline-flex items-center px-3 py-2 bg-gradient-to-r from-orange-100 to-orange-200 text-orange-800 text-sm font-semibold rounded-full border border-orange-300">
+              📂 {service.category}
+            </span>
+            
+            {service.rating && service.rating > 0 && (
+              <div className="flex items-center gap-2">
+                {renderRating(service.rating)}
+              </div>
+            )}
+          </div>
+          
+          {/* Descripción para móvil */}
+          {service.description && (
+            <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm mb-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-3">Descripción</h3>
+              <p className="text-gray-700 leading-relaxed text-base">
+                {service.description}
+              </p>
+            </div>
+          )}
+        </div>
+        
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.2fr] gap-8 lg:gap-16 items-start">
           {/* Columna de la Imagen */}
           <div className="space-y-6 order-1 lg:order-1">
@@ -184,9 +215,10 @@ const ServiceHeader: React.FC<ServiceHeaderProps> = ({ service }): ReactElement 
               </div>
             )}
             
-            {/* Botones de Acción - Movidos aquí */}
+            {/* Botones de Acción */}
             <div className="bg-white p-4 sm:p-6 rounded-2xl border border-gray-100 shadow-sm">
-              <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4 text-center">¿Te interesa este servicio?</h3>
+              <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4 text-center lg:block hidden">¿Te interesa este servicio?</h3>
+              <h3 className="text-base font-semibold text-gray-900 mb-3 text-center lg:hidden">Contactar</h3>
               
               <div className="space-y-3">
                 {/* Botón WhatsApp */}
@@ -255,8 +287,8 @@ const ServiceHeader: React.FC<ServiceHeaderProps> = ({ service }): ReactElement 
 
           {/* Columna de Información */}
           <div className="space-y-6 order-2 lg:order-2">
-            {/* Información básica del servicio */}
-            <div className="space-y-4">
+            {/* Información básica del servicio - Solo visible en desktop */}
+            <div className="hidden lg:block space-y-4">
               <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 leading-tight">
                 {service.name}
               </h1>
@@ -275,9 +307,9 @@ const ServiceHeader: React.FC<ServiceHeaderProps> = ({ service }): ReactElement 
               </div>
             </div>
 
-            {/* Descripción */}
+            {/* Descripción - Solo visible en desktop */}
             {service.description && (
-              <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+              <div className="hidden lg:block bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
                 <h3 className="text-lg font-semibold text-gray-900 mb-3">Descripción</h3>
                 <p className="text-gray-700 leading-relaxed text-base">
                   {service.description}
