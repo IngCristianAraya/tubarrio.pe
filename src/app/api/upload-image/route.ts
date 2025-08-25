@@ -68,10 +68,3 @@ export async function POST(request: NextRequest) {
 }
 
 // Configuración para permitir archivos grandes
-export const config = {
-  api: {
-    bodyParser: {
-      sizeLimit: '5mb',
-    },
-  },
-};
