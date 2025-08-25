@@ -4,7 +4,6 @@ import dynamic from 'next/dynamic';
 import { usePathname } from 'next/navigation';
 import { useEffect } from 'react';
 import { PageTracker } from '@/components/PageTracker';
-import { AnalyticsTestButton } from '@/components/AnalyticsTestButton';
 
 // Dynamic imports for client-side components with custom loading states
 const HomeClient = dynamic(() => import('@/components/HomeClient'), {
@@ -49,9 +48,6 @@ const ClientComponents = () => {
       
       {/* WhatsApp button - shown on all pages */}
       <WhatsAppButton phoneNumber={process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '51901426737'} />
-      
-      {/* Analytics test button - for debugging */}
-      <AnalyticsTestButton />
     </PageTracker>
   );
 };
