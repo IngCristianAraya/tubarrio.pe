@@ -16,7 +16,7 @@
 **Solución**:
 1. Ve a Vercel Dashboard > Tu Proyecto > Settings > Environment Variables
 2. Busca o agrega `NEXT_PUBLIC_SITE_URL`
-3. Configúrala con tu URL de producción: `https://tu-proyecto.vercel.app`
+3. Configúrala con tu URL de producción: `https://www.tubarrio.pe`
 4. Aplica a **Production** y **Preview**
 
 📖 **Guía detallada**: `CONFIGURAR-SITE-URL-VERCEL.md`
