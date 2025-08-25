@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useReducer, useEffect, useCallback, useMemo } from 'react';
 import { collection, addDoc, query, where, getDocs, orderBy, limit } from 'firebase/firestore';
-import { db } from '../firebaseConfig';
+import { db } from '../lib/firebase/config';
 
 interface AnalyticsEvent {
   id?: string;
