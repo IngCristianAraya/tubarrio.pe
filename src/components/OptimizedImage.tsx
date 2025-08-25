@@ -15,6 +15,10 @@ interface OptimizedImageProps {
   fallbackSrc?: string;
   priority?: boolean;
   sizes?: string;
+  quality?: number; // Calidad de la imagen (1-100)
+  placeholder?: 'blur' | 'empty';
+  blurDataURL?: string;
+  isMobile?: boolean;
 }
 
 /**
@@ -33,25 +37,55 @@ const OptimizedImage = ({
   loading = 'lazy',
   objectFit = 'cover',
   onLoad,
-  fallbackSrc = '/images/placeholder.jpg',
+  fallbackSrc = '/images/hero_001.webp',
   priority = false,
   sizes = '(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw',
+  quality = 90, // Calidad por defecto alta
+  placeholder = 'blur',
+  blurDataURL,
+  isMobile = false,
 }: OptimizedImageProps) => {
   const [isClient, setIsClient] = useState(false);
   const [currentSrc, setCurrentSrc] = useState(fallbackSrc);
   const [hasError, setHasError] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   // Establecer isClient a true después de la hidratación
   useEffect(() => {
     setIsClient(true);
   }, []);
 
+  // Detectar si es móvil para optimizar calidad
+  const [isMobileDevice, setIsMobileDevice] = useState(false);
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobileDevice(window.innerWidth <= 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Optimizar calidad basada en dispositivo
+  const optimizedQuality = isMobileDevice || isMobile ? Math.min(quality, 75) : quality;
+
+  // Generar placeholder blur simple si no se proporciona
+  const defaultBlurDataURL = 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q==';
+  const finalBlurDataURL = blurDataURL || defaultBlurDataURL;
+
   // Manejar errores de carga
   const handleError = () => {
     if (fallbackSrc && !hasError) {
       setCurrentSrc(fallbackSrc);
       setHasError(true);
+      setIsLoading(false);
     }
+  };
+
+  // Manejar carga exitosa
+  const handleLoad = () => {
+    setIsLoading(false);
+    onLoad?.();
   };
 
   // Actualizar la fuente cuando cambie la prop src
@@ -64,15 +98,16 @@ const OptimizedImage = ({
     }
   }, [src, fallbackSrc]);
 
-  // Si no estamos en el cliente, renderizar un placeholder
-  if (!isClient) {
+  // Si no estamos en el cliente y no es una imagen prioritaria, renderizar un placeholder
+  if (!isClient && !priority) {
     return (
       <div 
-        className={`${className} bg-gray-200 animate-pulse`}
+        className={`${className} bg-gray-200 animate-pulse rounded-lg`}
         style={{
           width: width ? `${width}px` : '100%',
           height: height ? `${height}px` : '100%',
         }}
+        aria-label={`Cargando imagen: ${alt}`}
       />
     );
   }
@@ -101,22 +136,31 @@ const OptimizedImage = ({
       }}
       suppressHydrationWarning
     >
+      {isLoading && placeholder === 'blur' && (
+        <div 
+          className="absolute inset-0 bg-gray-200 animate-pulse rounded-lg"
+          aria-hidden="true"
+        />
+      )}
       <Image
         src={currentSrc}
         alt={alt}
         width={width}
         height={height}
         loading={loading}
-        className="w-full h-full"
+        className={`w-full h-full transition-opacity duration-300 ${isLoading ? 'opacity-0' : 'opacity-100'}`}
         style={{
           objectFit,
           objectPosition: 'center',
         }}
-        onLoad={onLoad}
+        onLoad={handleLoad}
         onError={handleError}
         priority={priority}
         sizes={sizes}
-        unoptimized={process.env.NODE_ENV !== 'production'}
+        quality={optimizedQuality}
+        placeholder={placeholder}
+        blurDataURL={placeholder === 'blur' ? finalBlurDataURL : undefined}
+        unoptimized={false}
       />
     </div>
   );

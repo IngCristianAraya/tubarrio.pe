@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Menu, X, Search } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 import useSound from '../hooks/useSound';
 
 const Header = () => {
@@ -62,11 +63,11 @@ const Header = () => {
   return (
     <header className="bg-white/95 backdrop-blur-lg shadow-sm sticky top-0 z-50 border-b border-gray-200" ref={menuRef}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-16 sm:h-18">
           {/* Logo y menú móvil */}
           <div className="flex items-center">
             <button 
-              className="md:hidden mr-2 p-2 rounded-md text-gray-700 hover:text-orange-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-orange-400"
+              className="md:hidden mr-2 p-3 rounded-lg text-gray-700 hover:text-orange-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-orange-400 active:bg-gray-200 transition-all duration-150 min-h-[44px] min-w-[44px] flex items-center justify-center"
               onClick={() => {
                 playFolderSound();
                 setIsMenuOpen(!isMenuOpen);
@@ -79,16 +80,17 @@ const Header = () => {
 
             <div className="flex-shrink-0 flex items-center">
               <Link href="/" className="flex items-center select-none" aria-label="Ir a inicio">
-  <img
-    src="/images/tubarriope_logo_penegro2.webp"
-    alt="Logo TuBarrio.pe"
-    style={{ height: 60, maxHeight: 60, width: 'auto', display: 'block' }}
-    className="h-14 w-auto mr-2"
-    loading="eager"
-    decoding="async"
-    fetchPriority="high"
-  />
-</Link>
+                <div className="relative h-[50px] sm:h-[60px] w-auto aspect-[4/1] min-w-[100px] sm:min-w-[120px]">
+                  <Image
+                    src="/images/tubarriope_logo_penegro2.webp"
+                    alt="Logo TuBarrio.pe"
+                    fill
+                    sizes="(max-width: 768px) 100vw, 200px"
+                    className="object-contain"
+                    priority
+                  />
+                </div>
+              </Link>
             </div>
           </div>
 
@@ -114,16 +116,27 @@ const Header = () => {
 
         {/* Menú móvil */}
         {isMenuOpen && (
-          <div className="md:hidden bg-white border-t border-gray-200 py-4 px-4 shadow-inner">
-            <nav className="flex flex-col space-y-4">
-              <NavItem href="/">Inicio</NavItem>
-              <NavItem href="#servicios">Destacados</NavItem>
-              <NavItem href="/todos-los-servicios">Categorías</NavItem>
-              <NavItem href="#cobertura">Cobertura</NavItem>
+          <div className="md:hidden bg-white border-t border-gray-200 py-6 px-4 shadow-inner">
+            <nav className="flex flex-col space-y-2">
+              <div className="py-3 px-4 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors duration-150 min-h-[48px] flex items-center">
+                <NavItem href="/">Inicio</NavItem>
+              </div>
+              <div className="py-3 px-4 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors duration-150 min-h-[48px] flex items-center">
+                <NavItem href="#servicios">Destacados</NavItem>
+              </div>
+              <div className="py-3 px-4 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors duration-150 min-h-[48px] flex items-center">
+                <NavItem href="/todos-los-servicios">Categorías</NavItem>
+              </div>
+              <div className="py-3 px-4 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors duration-150 min-h-[48px] flex items-center">
+                <NavItem href="#cobertura">Cobertura</NavItem>
+              </div>
               <a
                 href="#registro"
-                className="block w-full px-4 py-3 text-center rounded-xl font-bold bg-gradient-to-r from-orange-500 to-yellow-400 text-white shadow-md hover:from-orange-600 hover:to-yellow-500 transition-all duration-200 mt-6"
-                onClick={() => playFolderSound()}
+                className="block w-full px-6 py-4 text-center rounded-xl font-bold bg-gradient-to-r from-orange-500 to-yellow-400 text-white shadow-md hover:from-orange-600 hover:to-yellow-500 active:from-orange-700 active:to-yellow-600 transition-all duration-200 mt-6 min-h-[52px] flex items-center justify-center"
+                onClick={() => {
+                  playFolderSound();
+                  setIsMenuOpen(false);
+                }}
               >
                 + Registrar Negocio
               </a>

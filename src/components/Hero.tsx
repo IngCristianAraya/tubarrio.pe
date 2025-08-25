@@ -34,7 +34,7 @@ const Hero = () => {
   // Actualizar categorías cuando cambien los servicios
   useEffect(() => {
     if (services.length > 0) {
-      const uniqueCategories = ['Todos los servicios', ...new Set(services.map(service => service.category))];
+      const uniqueCategories = ['Todos los servicios', ...Array.from(new Set(services.map(service => service.category)))];
       setCategories(uniqueCategories);
     }
   }, [services]);
@@ -71,15 +71,18 @@ const Hero = () => {
     - Overlay removido para evitar retrasar el LCP visual
 */}
 <OptimizedImage
-  src="/images/hero_3.webp"
-  alt="Negocios locales en tu zona, descubre servicios cerca de ti"
-  className="w-full h-full object-cover object-[left_30%] md:object-center"
-  width={1920}
-  height={1080}
-  loading="eager"
-  objectFit="cover"
-  fallbackSrc="/images/hero_3.webp"
-/>
+          src="/images/prueba_yasmin_hd.webp"
+          alt="Tu Barrio PE - Conectando tu barrio con los mejores servicios locales"
+          className="w-full h-full object-cover object-center"
+          width={1920}
+          height={1080}
+          loading="eager"
+          priority={true}
+          objectFit="cover"
+          fallbackSrc="/images/hero_001.webp"
+          quality={100}
+          sizes="100vw"
+        />
 </div>
 
 {/* Contenido principal alineado a la izquierda */}
@@ -122,7 +125,7 @@ const Hero = () => {
             <input
               type="text"
               placeholder="¿Qué estás buscando?"
-              className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-orange-500 focus:border-orange-500 bg-white text-gray-800 placeholder-gray-500"
+              className="block w-full pl-10 pr-3 py-4 sm:py-3 border border-gray-300 rounded-lg focus:ring-orange-500 focus:border-orange-500 bg-white text-gray-800 placeholder-gray-500 text-base sm:text-sm min-h-[48px] touch-manipulation"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
@@ -135,7 +138,7 @@ const Hero = () => {
               <Filter className="h-5 w-5 text-gray-400" />
             </div>
             <select
-              className="block w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg appearance-none focus:ring-orange-500 focus:border-orange-500 bg-white text-gray-800"
+              className="block w-full pl-10 pr-10 py-4 sm:py-3 border border-gray-300 rounded-lg appearance-none focus:ring-orange-500 focus:border-orange-500 bg-white text-gray-800 text-base sm:text-sm min-h-[48px] touch-manipulation"
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
             >
@@ -154,7 +157,7 @@ const Hero = () => {
         {/* Botón de búsqueda */}
         <div className="flex flex-col sm:flex-row gap-3 w-full justify-center items-center text-center">
           <button
-            className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-6 rounded-lg flex items-center justify-center transition-all duration-300 shadow-md hover:shadow-lg w-full sm:w-auto"
+            className="bg-orange-500 hover:bg-orange-600 active:bg-orange-700 text-white font-bold py-4 px-6 rounded-lg flex items-center justify-center transition-all duration-300 shadow-md hover:shadow-lg w-full sm:w-auto min-h-[48px] touch-manipulation active:scale-95"
             onClick={handleSearch}
           >
             <Search className="w-5 h-5 mr-2" />
@@ -162,7 +165,7 @@ const Hero = () => {
           </button>
           <Link 
             href="/todos-los-servicios" 
-            className="bg-white border-2 border-orange-500 text-orange-600 font-bold py-3 px-6 rounded-lg flex items-center justify-center transition-all duration-300 shadow-md hover:bg-orange-50 hover:text-orange-700 w-full sm:w-auto"
+            className="bg-white border-2 border-orange-500 text-orange-600 font-bold py-4 px-6 rounded-lg flex items-center justify-center transition-all duration-300 shadow-md hover:bg-orange-50 hover:text-orange-700 w-full sm:w-auto min-h-[48px] touch-manipulation active:scale-95"
           >
             Explora todos los servicios
           </Link>
@@ -179,7 +182,7 @@ const Hero = () => {
             setSelectedCategory(item.category);
             handleSearch();
           }}
-          className={`flex items-center gap-2 px-5 py-3 rounded-full shadow-sm hover:shadow-md transition-all duration-200 font-medium ${
+          className={`flex items-center gap-2 px-5 py-4 rounded-full shadow-sm hover:shadow-md transition-all duration-200 font-medium min-h-[44px] touch-manipulation active:scale-95 ${
             selectedCategory === item.category
               ? 'bg-orange-100 text-orange-600 border border-orange-200'
               : 'bg-white text-gray-700 border border-gray-200 hover:border-orange-200 hover:text-orange-600'
@@ -225,6 +228,9 @@ const Hero = () => {
                           height={192}
                           className="w-full h-full"
                           objectFit="cover"
+                          isMobile={true}
+                          placeholder="blur"
+                          loading="lazy"
                         />
                       </div>
                       <div className="p-4">
@@ -263,7 +269,7 @@ const Hero = () => {
                     <button
                       onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
                       disabled={currentPage === 1}
-                      className={`p-2 rounded-lg flex items-center justify-center ${currentPage === 1 ? 'text-gray-400 cursor-not-allowed' : 'text-white bg-gradient-to-r from-orange-500 to-yellow-400 hover:shadow-md'}`}
+                      className={`p-3 rounded-lg flex items-center justify-center min-h-[44px] min-w-[44px] touch-manipulation transition-all duration-200 ${currentPage === 1 ? 'text-gray-400 cursor-not-allowed bg-gray-100' : 'text-white bg-gradient-to-r from-orange-500 to-yellow-400 hover:shadow-md active:scale-95'}`}
                       aria-label="Página anterior"
                     >
                       <ChevronLeft className="w-5 h-5" />
@@ -288,10 +294,10 @@ const Hero = () => {
                     <button
                       onClick={() => setCurrentPage((prev) => prev + 1)}
                       disabled={currentPage >= Math.ceil(filteredServices.length / resultsPerPage)}
-                      className={`p-2 rounded-lg flex items-center justify-center ${
+                      className={`p-3 rounded-lg flex items-center justify-center min-h-[44px] min-w-[44px] touch-manipulation transition-all duration-200 ${
                         currentPage >= Math.ceil(filteredServices.length / resultsPerPage)
-                          ? 'text-gray-400 cursor-not-allowed'
-                          : 'text-white bg-gradient-to-r from-orange-500 to-yellow-400 hover:shadow-md'
+                          ? 'text-gray-400 cursor-not-allowed bg-gray-100'
+                          : 'text-white bg-gradient-to-r from-orange-500 to-yellow-400 hover:shadow-md active:scale-95'
                       }`}
                       aria-label="Página siguiente"
                     >

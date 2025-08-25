@@ -2,7 +2,34 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Getting Started
 
-First, run the development server:
+### Firebase Configuration
+
+1. Create a new Firebase project at [Firebase Console](https://console.firebase.google.com/)
+2. Add a new web app to your Firebase project
+3. Copy the Firebase configuration object from the console
+4. Create a `.env.local` file in the root of the project with the following variables:
+
+```env
+NEXT_PUBLIC_FIREBASE_API_KEY=your-api-key
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your-project-id.firebaseapp.com
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=your-project-id
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your-project-id.appspot.com
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your-messaging-sender-id
+NEXT_PUBLIC_FIREBASE_APP_ID=your-app-id
+NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=your-measurement-id
+```
+
+### Development Setup
+
+First, install the dependencies:
+
+```bash
+npm install
+# or
+yarn install
+```
+
+Then, run the development server:
 
 ```bash
 npm run dev
@@ -28,6 +55,95 @@ To learn more about Next.js, take a look at the following resources:
 - [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+
+## SEO Implementation
+
+This project includes comprehensive SEO optimization with the following features:
+
+### 1. Metadata
+- Dynamic metadata generation using Next.js 13+ `generateMetadata`
+- Automatic title and description generation
+- Open Graph and Twitter Card meta tags for rich social sharing
+- Canonical URLs to prevent duplicate content
+
+### 2. Structured Data (Schema.org)
+- LocalBusiness schema for business listings
+- Breadcrumb navigation markup
+- FAQ schema for common questions
+- Organization schema for the platform
+
+### 3. Technical SEO
+- Dynamic sitemap generation (`/sitemap.xml`)
+- Robots.txt configuration
+- Proper URL canonicalization
+- Mobile-friendly responsive design
+- Fast loading with optimized images
+
+### 4. Performance
+- Image optimization with Next.js Image component
+- Code splitting and lazy loading
+- Font optimization
+- Minimal JavaScript bundle size
+
+## Testing SEO
+
+To test the SEO implementation, run:
+
+```bash
+# Install required dependencies
+npm install axios @types/node --save-dev
+
+# Make sure the development server is running
+npm run dev
+
+# In a new terminal, run the SEO tests
+npx ts-node scripts/test-seo.ts
+```
+
+## Adding SEO to New Pages
+
+1. **Basic Metadata**
+   Use the `generateMetadata` function in your page component:
+
+   ```tsx
+   export async function generateMetadata() {
+     return generateSeoMetadata({
+       title: 'Page Title',
+       description: 'Page description for search engines',
+       url: '/page-path',
+       type: 'website',
+     });
+   }
+   ```
+
+2. **Structured Data**
+   Use the provided JSON-LD components:
+
+   ```tsx
+   import { LocalBusinessJsonLd, BreadcrumbJsonLd } from '@/components/seo/JsonLd';
+   
+   // In your component
+   <LocalBusinessJsonLd
+     name="Business Name"
+     description="Business description"
+     // ... other props
+   />
+   ```
+
+3. **Social Sharing**
+   Use the `SocialMeta` component for Open Graph and Twitter Cards:
+
+   ```tsx
+   import { SocialMeta } from '@/components/seo/SocialMeta';
+   
+   // In your component
+   <SocialMeta 
+     title="Page Title"
+     description="Page description"
+     image="/path/to/image.jpg"
+     url="/page-path"
+   />
+   ```
 
 ## Optimización de Imágenes
 

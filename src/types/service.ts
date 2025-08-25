@@ -9,6 +9,8 @@ export interface Service {
   description: string;
   category: string;
   location: string;
+  address?: string;
+  reference?: string;
   rating: number;
   image: string;
   detailsUrl?: string; // Made optional to match context

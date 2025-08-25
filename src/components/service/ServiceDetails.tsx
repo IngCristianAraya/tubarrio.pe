@@ -50,8 +50,26 @@ const ServiceDetails: React.FC<ServiceDetailsProps> = ({ service }) => {
     return 'No especificado';
   };
 
-  // Función para formatear WhatsApp - Siempre abre web.whatsapp.com
+  // Función para formatear WhatsApp - Prioriza contactUrl si contiene WhatsApp
   const formatWhatsApp = () => {
+    // Verificar si contactUrl contiene un enlace de WhatsApp
+    if (service.contactUrl && (service.contactUrl.includes('wa.me') || service.contactUrl.includes('whatsapp') || service.contactUrl.includes('wa.link'))) {
+      return (
+        <a 
+          href={service.contactUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-green-600 hover:underline flex items-center gap-1"
+        >
+          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M17.5 2h-11C4.02 2 2 4.02 2 6.5v11C2 19.98 4.02 22 6.5 22h11c2.48 0 4.5-2.02 4.5-4.5v-11C22 4.02 19.98 2 17.5 2zm-8.75 15.5c-.41 0-.75-.34-.75-.75s.34-.75.75-.75h1.5c.41 0 .75.34.75.75s-.34.75-.75.75h-1.5zm4.5 0c-.41 0-.75-.34-.75-.75s.34-.75.75-.75h1.5c.41 0 .75.34.75.75s-.34.75-.75.75h-1.5zm-6-3c-.41 0-.75-.34-.75-.75v-7c0-.41.34-.75.75-.75h9c.41 0 .75.34.75.75v7c0 .41-.34.75-.75.75h-9z"/>
+          </svg>
+          WhatsApp
+        </a>
+      );
+    }
+    
+    // Si no hay contactUrl con WhatsApp, usar el campo whatsapp tradicional
     if (!service.whatsapp || service.whatsapp === 'none') return 'No especificado';
     
     // Limpiar el número de teléfono (solo dígitos)

@@ -1,0 +1,23 @@
+# https://www.robotstxt.org/robotstxt.html
+User-agent: *
+Allow: /
+
+# Sitemaps
+Sitemap: https://tubarrio.pe/sitemap.xml
+
+# Crawl-delay: 10
+# Uncomment the above line and set a delay if your server is getting too many requests
+
+# Disallow admin and API routes
+Disallow: /admin/
+Disallow: /api/
+Disallow: /_next/
+Disallow: /*/edit/
+Disallow: /*?*sort=
+Disallow: /*?*filter=
+
+# Allow all other pages
+Allow: /*
+
+# Crawl-delay can be set if needed
+# Crawl-delay: 10

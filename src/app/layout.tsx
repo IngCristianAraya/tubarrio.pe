@@ -1,51 +1,65 @@
-import type { Metadata } from "next";
-import { Geist } from "next/font/google";
+import { GeistSans } from 'geist/font/sans';
+import { Suspense } from 'react';
 import "./globals.css";
-import { ServicesProvider } from "@/context/ServicesContext";
-import { SuppressHydrationWarning } from "@/components/SuppressHydrationWarning";
+import { Providers } from '@/app/providers';
+import { JsonLd } from '@/components/seo/JsonLd';
+import { Skeleton } from '@/components/ui/Skeleton';
+import { SITE_URL } from '@/lib/constants';
+import { generateMetadata } from "@/lib/seo";
+import { ReactNode } from 'react';
+import FirebaseStatusWrapper from '@/components/FirebaseStatusWrapper';
 
-const geist = Geist({
-  variable: "--font-geist",
-  subsets: ["latin"],
-});
+// Loading component for the main layout
+function GlobalLoading() {
+  return (
+    <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-900">
+      <header className="h-16 bg-white dark:bg-gray-800 shadow-sm">
+        <div className="container mx-auto h-full px-4 flex items-center">
+          <Skeleton className="h-8 w-32 bg-gray-200 dark:bg-gray-700" />
+          <div className="ml-auto flex space-x-4">
+            <Skeleton className="h-9 w-24 rounded-md bg-gray-200 dark:bg-gray-700" />
+            <Skeleton className="h-9 w-24 rounded-md bg-gray-200 dark:bg-gray-700" />
+          </div>
+        </div>
+      </header>
+      <main className="flex-1 container mx-auto p-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <Skeleton key={i} className="h-64 w-full rounded-lg bg-gray-200 dark:bg-gray-700" />
+          ))}
+        </div>
+      </main>
+    </div>
+  );
+}
 
-// Metadatos globales de la aplicación
-export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || 'https://tubarrio.pe'),
+// Global application metadata
+export const metadata = generateMetadata({
   title: "Tubarrio.pe - Descubre todos los servicios de tu zona",
   description: "Explora restaurantes, abarrotes, lavanderías, panaderías y más servicios locales en tu barrio. La plataforma que conecta negocios y clientes en tu comunidad.",
-  keywords: "directorio comercial, negocios locales, servicios, restaurantes, abarrotes, lavanderías, panaderías, emprendimientos, tu barrio",
-  openGraph: {
-    title: "Tubarrio.pe - Descubre todos los servicios de tu zona",
-    description: "Explora restaurantes, abarrotes, lavanderías, panaderías y más servicios locales en tu barrio.",
-    url: "https://tubarrio.pe",
-    siteName: "Tubarrio.pe",
-    images: [
-      {
-        url: "/images/hero_3.webp",
-        width: 1200,
-        height: 630,
-        alt: "Tubarrio.pe - Servicios en tu barrio"
-      }
-    ],
-    locale: "es_PE",
-    type: "website"
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Tubarrio.pe - Descubre todos los servicios de tu zona",
-    description: "Explora restaurantes, abarrotes, lavanderías, panaderías y más servicios locales en tu barrio.",
-    images: ["/images/hero_3.webp"],
-  },
-};
+  image: "/images/hero_3.webp",
+  url: "/",
+  type: "website",
+  keywords: [
+    "directorio comercial",
+    "negocios locales",
+    "servicios",
+    "restaurantes",
+    "abarrotes",
+    "lavanderías",
+    "panaderías",
+    "emprendimientos",
+    "tu barrio",
+  ],
+});
 
 
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+interface RootLayoutProps {
+  children: ReactNode;
+}
+
+export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="es" suppressHydrationWarning>
       <head>
@@ -54,6 +68,34 @@ export default function RootLayout({
         <link rel="manifest" href="/manifest.json" />
         {/* Prevenir inyección de estilos por extensiones */}
         <meta name="theme-color" content="#ffffff" />
+        <JsonLd
+          type="LocalBusiness"
+          data={{
+            name: "TuBarrio.pe",
+            description: "Plataforma que conecta negocios locales con su comunidad, ofreciendo un directorio completo de servicios en tu barrio.",
+            url: SITE_URL,
+            logo: `${SITE_URL}/images/logo.png`,
+            address: {
+              '@type': 'PostalAddress',
+              streetAddress: 'Lima',
+              addressLocality: 'Lima',
+              addressRegion: 'Lima',
+              postalCode: '15001',
+              addressCountry: 'PE',
+            },
+            geo: {
+              '@type': 'GeoCoordinates',
+              latitude: '-12.0464',
+              longitude: '-77.0428',
+            },
+            telephone: "+51999999999",
+            openingHours: "Mo-Sa 09:00-18:00",
+            sameAs: [
+              'https://www.facebook.com/tubarriope',
+              'https://www.instagram.com/tubarriope',
+            ]
+          }}
+        />
         <style dangerouslySetInnerHTML={{
           __html: `
             html, body {
@@ -69,12 +111,16 @@ export default function RootLayout({
           `
         }} />
       </head>
-      <body className={`${geist.variable} antialiased min-h-screen bg-white`} suppressHydrationWarning>
-        <ServicesProvider>
-          <SuppressHydrationWarning>
-            {children}
-          </SuppressHydrationWarning>
-        </ServicesProvider>
+      <body className={`${GeistSans.className} antialiased bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-200`}>
+        <Providers>
+          <FirebaseStatusWrapper>
+            <Suspense fallback={<GlobalLoading />}>
+              <div className="min-h-screen flex flex-col">
+                {children}
+              </div>
+            </Suspense>
+          </FirebaseStatusWrapper>
+        </Providers>
       </body>
     </html>
   );

@@ -1,9 +1,18 @@
 {
   "extends": ["next/core-web-vitals"],
   "rules": {
-    "@typescript-eslint/no-unused-vars": "off",
-    "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }],
+    "@typescript-eslint/no-explicit-any": "warn",
     "react/display-name": "off",
-    "@next/next/no-img-element": "warn"
+    "@next/next/no-img-element": "warn",
+    "react-hooks/exhaustive-deps": "warn",
+    "@typescript-eslint/no-non-null-assertion": "warn",
+    "prefer-const": "warn",
+    "no-console": ["warn", { "allow": ["warn", "error"] }]
+  },
+  "env": {
+    "browser": true,
+    "es6": true,
+    "node": true
   }
 }

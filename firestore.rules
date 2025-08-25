@@ -1,0 +1,28 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Permitir lectura a todos
+    match /{document=**} {
+      allow read: if true;
+    }
+    
+    // Permitir escritura en las colecciones services y servicios
+    // NOTA: Esto es para desarrollo/demo. En producción deberías usar autenticación adecuada
+    match /services/{serviceId} {
+      allow write: if true;
+    }
+    
+    match /servicios/{serviceId} {
+      allow write: if true;
+    }
+    
+    // Permitir escritura en otras colecciones que pueda necesitar el admin
+    match /categories/{categoryId} {
+      allow write: if true;
+    }
+    
+    match /stats/{statId} {
+      allow write: if true;
+    }
+  }
+}

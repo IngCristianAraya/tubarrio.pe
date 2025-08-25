@@ -1,0 +1,9 @@
+/* Mapbox GL CSS - Imported directly to avoid build issues */
+@import '~mapbox-gl/dist/mapbox-gl.css';
+
+/* Add any custom map styles here */
+.mapboxgl-canvas {
+  position: relative !important;
+  width: 100% !important;
+  height: 100% !important;
+}

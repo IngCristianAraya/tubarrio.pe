@@ -1,8 +1,26 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-:root {
+@layer base {
+  :root {
   --background: #ffffff;
   --foreground: #171717;
+  --primary: #2563eb;  /* blue-600 for better contrast */
+  --primary-foreground: #ffffff;
+  --muted: #f3f4f6;    /* gray-100 */
+  --muted-foreground: #4b5563; /* gray-600 */
+  --border: #e5e7eb;   /* gray-200 */
+  --input: #9ca3af;    /* gray-400 */
+  --ring: #3b82f6;     /* blue-500 */
+  --destructive: #ef4444; /* red-500 */
+  --success: #10b981;   /* emerald-500 */
+    --radius: 0.5rem;    /* 8px - for border radius */
+  }
+  
+  body {
+    @apply bg-background text-foreground;
+  }
 }
 
 @theme inline {
@@ -14,13 +32,56 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #0f172a; /* slate-900 */
+    --foreground: #f8fafc; /* slate-50 */
+    --primary: #60a5fa;    /* blue-400 for better contrast in dark mode */
+    --primary-foreground: #1e293b; /* slate-800 */
+    --muted: #1e293b;     /* slate-800 */
+    --muted-foreground: #94a3b8; /* slate-400 */
+    --border: #334155;    /* slate-700 */
+    --input: #64748b;     /* slate-500 */
+    --ring: #60a5fa;      /* blue-400 */
+    --destructive: #f87171; /* red-400 */
+    --success: #34d399;    /* emerald-400 */
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer base {
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Better focus styles for better keyboard navigation */
+  *:focus-visible {
+    @apply outline-2 outline-offset-2 outline-primary ring-2 ring-ring ring-offset-2 ring-offset-background;
+  }
+
+  /* Improve contrast for disabled elements */
+  :disabled {
+    @apply opacity-70 cursor-not-allowed;
+  }
+
+  /* Better contrast for links */
+  a {
+    @apply text-primary hover:underline underline-offset-4;
+  }
+
+  /* Better contrast for form elements */
+  input, textarea, select {
+    @apply bg-background border border-input rounded-md px-3 py-2 text-foreground placeholder-muted-foreground;
+  }
+
+  /* Better contrast for buttons */
+  button, [role="button"], [type="button"], [type="submit"] {
+    @apply bg-primary text-primary-foreground px-4 py-2 rounded-md font-medium hover:opacity-90 transition-opacity;
+  }
+
+  /* Better contrast for secondary text */
+  .text-muted-foreground {
+    @apply text-muted-foreground;
+  }
 }

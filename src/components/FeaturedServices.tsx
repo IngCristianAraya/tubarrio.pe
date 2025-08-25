@@ -17,6 +17,7 @@ interface ServiceCardProps {
     name: string;
     category: string;
     image: string;
+    images?: string[];
     rating: number;
     description: string;
     location: string;
@@ -33,14 +34,17 @@ const ServiceCard = memo(({ service }: ServiceCardProps) => {
     <div className="bg-white rounded-lg shadow-md overflow-hidden flex flex-col h-full transition-all duration-300 hover:shadow-lg">
       <div className="relative h-48 overflow-hidden">
         <OptimizedImage
-          src={service.image}
+          src={service.images && service.images.length > 0 ? service.images[0] : service.image}
           alt={service.name}
           className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
           width={400}
           height={300}
           loading="lazy"
           objectFit="cover"
-          fallbackSrc="/images/placeholder-business.jpg"
+          fallbackSrc="/images/hero_001.webp"
+          isMobile={true}
+          placeholder="blur"
+          quality={75}
         />
         {service.rating >= 4.5 && (
           <span className="absolute top-3 right-3 bg-orange-500 text-white text-xs font-semibold px-2.5 py-1 rounded-full">
@@ -96,16 +100,26 @@ const ServiceCard = memo(({ service }: ServiceCardProps) => {
 ServiceCard.displayName = 'ServiceCard';
 
 const FeaturedServices = () => {
-  const { services, filteredServices, isSearching } = useServices();
+  const { 
+    featuredServices, 
+    loading, 
+    loadFeaturedServices, 
+    currentLoadType 
+  } = useServices();
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedCategory, setSelectedCategory] = useState('Todos');
   const [servicesPerPage, setServicesPerPage] = useState(3);
   const [isMounted, setIsMounted] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Efecto para manejar la hidratación
+  // Efecto para cargar servicios destacados al montar el componente
   useEffect(() => {
     setIsMounted(true);
+    
+    // Cargar servicios destacados solo si no están cargados o si no es el tipo correcto
+    if (currentLoadType !== 'featured' || featuredServices.length === 0) {
+      loadFeaturedServices();
+    }
     
     const updateServicesPerPage = () => {
       if (typeof window === 'undefined') return;
@@ -127,20 +141,20 @@ const FeaturedServices = () => {
       window.removeEventListener('resize', handleResize);
       clearTimeout(timeoutId);
     };
-  }, []);
+  }, [loadFeaturedServices, currentLoadType, featuredServices.length]);
 
-  // Obtener categorías únicas de los servicios
+  // Obtener categorías únicas de los servicios destacados
   const categories = useMemo(() => {
-    if (!services || services.length === 0) return ['Todos'];
-    const cats = new Set(services.map(service => service.category));
+    if (!featuredServices || featuredServices.length === 0) return ['Todos'];
+    const cats = new Set(featuredServices.map(service => service.category));
     return ['Todos', ...Array.from(cats)].sort();
-  }, [services]);
+  }, [featuredServices]);
 
-  // Filtrar servicios por categoría
+  // Filtrar servicios destacados por categoría
   const filteredByCategory = useMemo(() => {
-    if (selectedCategory === 'Todos') return filteredServices;
-    return filteredServices.filter(service => service.category === selectedCategory);
-  }, [filteredServices, selectedCategory]);
+    if (selectedCategory === 'Todos') return featuredServices;
+    return featuredServices.filter(service => service.category === selectedCategory);
+  }, [featuredServices, selectedCategory]);
 
   // Calcular servicios paginados
   const currentServices = useMemo(() => {
@@ -171,20 +185,20 @@ const FeaturedServices = () => {
 
   // Efecto para manejar la carga inicial
   useEffect(() => {
-    if (services.length > 0) {
+    if (featuredServices.length > 0 || !loading) {
       setIsLoading(false);
     }
-  }, [services]);
+  }, [featuredServices, loading]);
 
-  // Si no está montado, mostrar un loader simple
-  if (!isMounted) {
+  // Si no está montado o está cargando, mostrar un loader simple
+  if (!isMounted || (loading && featuredServices.length === 0)) {
     return (
       <section id="servicios" className="py-10 sm:py-12 md:py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="animate-pulse space-y-8">
             <div className="h-12 bg-gray-200 rounded w-1/3 mx-auto"></div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[1, 2, 3].map((i) => (
+              {[1, 2, 3, 4, 5, 6].map((i) => (
                 <div key={i} className="h-96 bg-gray-100 rounded-lg"></div>
               ))}
             </div>

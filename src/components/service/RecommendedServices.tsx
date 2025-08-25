@@ -14,12 +14,39 @@
  */
 
 import React from 'react';
+import Image from 'next/image';
+import dynamic from 'next/dynamic';
 import { Service } from '@/types/service';
-import { Swiper, SwiperSlide } from 'swiper/react';
+import Link from 'next/link';
+
+// Cargar Swiper solo en el cliente para SSR
+const SwiperComponent = dynamic(
+  () => import('swiper/react').then(mod => {
+    const { Swiper, SwiperSlide } = mod;
+    return { default: Swiper, SwiperSlide };
+  }),
+  { 
+    ssr: false,
+    loading: () => (
+      <div className="flex space-x-4 overflow-x-auto pb-4 px-2">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="flex-shrink-0 w-64 h-80 bg-gray-200 dark:bg-gray-700 rounded-2xl animate-pulse" />
+        ))}
+      </div>
+    )
+  }
+);
+
+// Necesitamos importar SwiperSlide por separado para TypeScript
+const SwiperSlide = dynamic(
+  () => import('swiper/react').then(mod => mod.SwiperSlide),
+  { ssr: false }
+);
+
+// Importar estilos de Swiper
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
-import Link from 'next/link';
 
 interface RecommendedServicesProps {
   services: Service[];
@@ -47,51 +74,40 @@ const RecommendedServices: React.FC<RecommendedServicesProps> = ({
       </h2>
       
       <div className="px-2">
-        <Swiper
-          spaceBetween={20}
-          slidesPerView={1}
-          breakpoints={{
-            480: { slidesPerView: 1.5 },
-            640: { slidesPerView: 2 },
-            1024: { slidesPerView: 3 },
-          }}
-          navigation
-          pagination={{ 
-            clickable: true,
-            dynamicBullets: true,
-            dynamicMainBullets: 4
-          }}
-          className="!pb-12 !px-2"
-        >
+        <div className="flex gap-4 overflow-x-auto pb-4" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
           {recommendedServices.map(service => (
-            <SwiperSlide key={service.id}>
-              <div className="h-full">
-                <div className="bg-white rounded-2xl shadow-md p-4 flex flex-col items-center h-full border border-orange-100 hover:shadow-lg transition-shadow duration-300">
-                  <div className="w-full h-40 bg-white flex items-center justify-center rounded-xl mb-3 border-2 border-orange-100 overflow-hidden">
-                    <img 
-                      src={service.image} 
-                      alt={service.name} 
-                      className="w-full h-full object-cover"
+            <div key={service.id} className="flex-shrink-0 w-48">
+              <Link href={`/servicio/${service.id}`} className="block group h-full" prefetch={false}>
+                <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-all duration-200 h-full flex flex-col">
+                  <div className="relative h-32 w-full overflow-hidden">
+                    <Image
+                      src={(service.images && service.images.length > 0 ? service.images[0] : service.image) || '/images/default-service.jpg'}
+                      alt={service.name}
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-300"
+                      sizes="(max-width: 640px) 300px, (max-width: 1024px) 250px, 200px"
                       loading="lazy"
+                      placeholder="blur"
+                      blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjE2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjBmMGYwIi8+PC9zdmc+"
                     />
                   </div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-1 text-center">
-                    {service.name}
-                  </h3>
-                  <span className="text-xs text-orange-700 bg-orange-100 px-2 py-1 rounded-full mb-3">
-                    {service.location}
-                  </span>
-                  <Link 
-                    href={`/servicio/${service.id}`} 
-                    className="mt-auto w-full text-center bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg text-sm font-bold shadow transition-all"
-                  >
-                    Ver detalle
-                  </Link>
+                  <div className="p-3 flex flex-col flex-grow">
+                    <h3 className="font-medium text-sm mb-1 text-gray-900 line-clamp-2 group-hover:text-orange-600 transition-colors">
+                      {service.name}
+                    </h3>
+                    <div className="flex items-center text-gray-500 text-xs mt-auto">
+                       <svg className="w-3 h-3 mr-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                      </svg>
+                      <span className="truncate">{service.location}</span>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </SwiperSlide>
+              </Link>
+            </div>
           ))}
-        </Swiper>
+        </div>
       </div>
     </div>
   );

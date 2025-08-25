@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { FiFacebook, FiInstagram, FiMail, FiPhone, FiMapPin, FiClock } from 'react-icons/fi';
 import { FaWhatsapp } from 'react-icons/fa';
 import { motion } from 'framer-motion';
@@ -28,6 +29,15 @@ const Footer = () => {
 
   return (
     <footer className="bg-gradient-to-b from-gray-900 to-gray-800 text-gray-300 py-12 px-4">
+      <style jsx>{`
+        footer a {
+          color: inherit !important;
+          text-decoration: none !important;
+        }
+        footer a:hover {
+          text-decoration: none !important;
+        }
+      `}</style>
       <div className="max-w-7xl mx-auto">
         {/* Sección superior */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8 mb-12">
@@ -38,11 +48,16 @@ const Footer = () => {
               className="bg-gray-800 bg-opacity-50 backdrop-blur-sm rounded-2xl p-6 shadow-neumorph-dark-inner"
             >
               <div className="flex items-center justify-center mb-4">
-                <img 
-                  src="/images/tubarriope_logo_penegro2.webp" 
-                  alt="Tubarrio.pe" 
-                  className="h-30 w-30 object-contain"
-                />
+                <div className="relative h-24 w-48">
+                  <Image 
+                    src="/images/tubarriope_logo_penegro2.webp" 
+                    alt="Tubarrio.pe"
+                    fill
+                    sizes="(max-width: 768px) 100vw, 200px"
+                    className="object-contain"
+                    priority
+                  />
+                </div>
               </div>
               <p className="text-gray-400 text-sm mb-4 leading-relaxed">
                 Conectando negocios locales con la comunidad. Descubre los mejores servicios en tu barrio.
@@ -55,8 +70,9 @@ const Footer = () => {
                 rel="noopener noreferrer"
                 className="flex items-center justify-center bg-gradient-to-r from-green-500 to-emerald-600 text-white px-4 py-2.5 rounded-xl font-medium text-sm shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5"
                 whileHover={buttonHover}
+                style={{ color: 'white !important', textDecoration: 'none !important' }}
               >
-                <FiPhone className="mr-2" />
+                <FaWhatsapp className="mr-2" />
                 Contáctanos por WhatsApp
               </motion.a>
             </motion.div>
@@ -83,7 +99,7 @@ const Footer = () => {
                 >
                   <Link 
                     href={item.href} 
-                    className="flex items-center text-gray-400 hover:text-amber-400 transition-colors duration-300 group"
+                    className="flex items-center text-gray-400 hover:text-amber-400 transition-colors duration-300 group no-underline"
                   >
                     <span className="w-1.5 h-1.5 bg-amber-500 rounded-full mr-2 opacity-0 group-hover:opacity-100 transition-opacity"></span>
                     {item.label}
@@ -102,13 +118,13 @@ const Footer = () => {
             <ul className="space-y-4">
               <li className="flex items-center">
                 <FiMail className="text-amber-400 mr-3 flex-shrink-0" />
-                <a href="mailto:info@tubarrio.pe" className="hover:text-amber-400 transition-colors">
+                <a href="mailto:info@tubarrio.pe" className="text-gray-400 hover:text-amber-400 transition-colors no-underline">
                   info@tubarrio.pe
                 </a>
               </li>
               <li className="flex items-center">
                 <FiPhone className="text-amber-400 mr-3 flex-shrink-0" />
-                <a href="tel:+51901426737" className="hover:text-amber-400 transition-colors">
+                <a href="tel:+51901426737" className="text-gray-400 hover:text-amber-400 transition-colors no-underline">
                   +51 901 426 737
                 </a>
               </li>
@@ -148,12 +164,14 @@ const Footer = () => {
                 <input 
                   type="email" 
                   placeholder="Tu correo electrónico" 
-                  className="bg-gray-800 border border-gray-700 rounded-l-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent w-full"
+                  className="bg-gray-800 border border-gray-700 rounded-l-xl px-4 py-2.5 text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent w-full"
+                  style={{ color: 'white !important' }}
                 />
                 <motion.button 
-                  className="bg-amber-500 text-white px-4 rounded-r-xl font-medium text-sm hover:bg-amber-600 transition-colors"
+                  className="bg-gradient-to-r from-amber-500 to-orange-500 text-white px-4 rounded-r-xl font-medium text-sm hover:from-amber-600 hover:to-orange-600 transition-all duration-300 shadow-lg"
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
+                  style={{ color: 'white !important', textDecoration: 'none !important' }}
                 >
                   Enviar
                 </motion.button>
@@ -163,21 +181,22 @@ const Footer = () => {
         </div>
 
         {/* Línea divisoria */}
-        <div className="h-px bg-gradient-to-r from-transparent via-gray-700 to-transparent my-8"></div>
+        <div className="h-px bg-gradient-to-r from-transparent via-amber-500/30 to-transparent my-8"></div>
 
         {/* Sección inferior */}
         <div className="flex flex-col md:flex-row justify-between items-center text-sm text-gray-500">
-          <div className="mb-4 md:mb-0">
-            © {currentYear} Tubarrio.pe - Todos los derechos reservados
+          <div className="mb-4 md:mb-0 flex items-center">
+            <span className="text-amber-400 mr-2">©</span>
+            <span>{currentYear} Tubarrio.pe - Todos los derechos reservados</span>
           </div>
           <div className="flex space-x-6">
-            <Link href="/terminos-condiciones" className="hover:text-amber-400 transition-colors">
+            <Link href="/terminos-condiciones" className="text-gray-500 hover:text-amber-400 transition-colors no-underline">
               Términos y Condiciones
             </Link>
-            <Link href="/politica-privacidad" className="hover:text-amber-400 transition-colors">
+            <Link href="/politica-privacidad" className="text-gray-500 hover:text-amber-400 transition-colors no-underline">
               Política de Privacidad
             </Link>
-            <Link href="/cookies" className="hover:text-amber-400 transition-colors">
+            <Link href="/cookies" className="text-gray-500 hover:text-amber-400 transition-colors no-underline">
               Cookies
             </Link>
           </div>

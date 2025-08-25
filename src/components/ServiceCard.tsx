@@ -26,6 +26,7 @@ import OptimizedImage from './OptimizedImage';
 import type { Service } from '../context/ServicesContext';
 import React from 'react';
 import { useRouter } from 'next/navigation';
+import { useEventTracking } from '@/hooks/usePageTracking';
 
 interface ServiceCardProps {
   service: Service;
@@ -33,6 +34,7 @@ interface ServiceCardProps {
 
 const ServiceCard = ({ service }: ServiceCardProps) => {
   const router = useRouter();
+  const { trackServiceView, trackWhatsAppClick, trackPhoneClick } = useEventTracking();
   
   const handleCardClick = (e: React.MouseEvent) => {
     // Prevenir la navegación si se hace clic en un botón o enlace
@@ -40,7 +42,18 @@ const ServiceCard = ({ service }: ServiceCardProps) => {
     if (target.tagName === 'A' || target.tagName === 'BUTTON' || target.closest('a, button')) {
       return;
     }
+    // Trackear el clic en el servicio
+    trackServiceView(service.id, service.name);
     router.push(`/servicio/${service.id}`);
+  };
+
+  const handleContactClick = () => {
+    // Determinar si es WhatsApp o teléfono basado en la URL
+    if (service.contactUrl?.includes('whatsapp') || service.contactUrl?.includes('wa.me') || service.contactUrl?.includes('wa.link')) {
+      trackWhatsAppClick(service.id);
+    } else {
+      trackPhoneClick(service.id);
+    }
   };
 
   return (
@@ -54,14 +67,14 @@ const ServiceCard = ({ service }: ServiceCardProps) => {
       {/* Image */}
       <div className="relative overflow-hidden h-36 sm:h-40 md:h-48 min-w-0">
         <OptimizedImage
-          src={service.image}
+          src={service.images && service.images.length > 0 ? service.images[0] : service.image}
           alt={`Foto de ${service.name}`}
           className="w-full h-full object-cover group-hover:scale-105 group-hover:ring-2 group-hover:ring-orange-300 transition-transform duration-300"
           width={300}
           height={200}
           loading="lazy"
           objectFit="cover"
-          fallbackSrc="/images/placeholder-business.jpg"
+          fallbackSrc="/images/hero_001.webp"
         />
         {/* Category Badge */}
         <div className="absolute top-2 left-2 bg-gradient-to-r from-orange-400 to-yellow-300/90 px-2 py-1 rounded-full shadow-md ring-1 ring-orange-300">
@@ -99,17 +112,18 @@ const ServiceCard = ({ service }: ServiceCardProps) => {
               href={service.contactUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex-1 bg-[#25D366] hover:bg-[#128C7E] active:bg-[#075e54] text-white font-semibold tracking-wide py-2 sm:py-2.5 px-2 sm:px-3 rounded-xl border border-white/40 hover:border-white/70 shadow-lg hover:shadow-xl transition-all duration-200 text-2xs sm:text-xs md:text-sm min-h-[36px] sm:min-h-[40px] md:min-h-[44px] flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 hover:-translate-y-0.5"
+              onClick={handleContactClick}
+              className="flex-1 bg-[#25D366] hover:bg-[#128C7E] active:bg-[#075e54] text-white font-semibold tracking-wide py-3 sm:py-3.5 px-3 sm:px-4 rounded-xl border border-white/40 hover:border-white/70 shadow-lg hover:shadow-xl transition-all duration-200 text-xs sm:text-sm md:text-base min-h-[48px] sm:min-h-[52px] md:min-h-[56px] flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 hover:-translate-y-0.5 touch-manipulation"
             >
-              <Phone className="w-3 h-3 sm:w-4 sm:h-4 mr-1 flex-shrink-0 text-white" />
+              <Phone className="w-4 h-4 sm:w-5 sm:h-5 mr-2 flex-shrink-0 text-white" />
               <span>Contacto</span>
             </a>
           ) : (
             <button
-              className="flex-1 bg-[#25D366] text-white font-semibold tracking-wide py-2 sm:py-2.5 px-2 sm:px-3 rounded-xl border border-white/40 shadow-lg opacity-50 cursor-not-allowed text-2xs sm:text-xs md:text-sm min-h-[36px] sm:min-h-[40px] md:min-h-[44px] flex items-center justify-center"
+              className="flex-1 bg-[#25D366] text-white font-semibold tracking-wide py-3 sm:py-3.5 px-3 sm:px-4 rounded-xl border border-white/40 shadow-lg opacity-50 cursor-not-allowed text-xs sm:text-sm md:text-base min-h-[48px] sm:min-h-[52px] md:min-h-[56px] flex items-center justify-center touch-manipulation"
               disabled
             >
-              <Phone className="w-3 h-3 sm:w-4 sm:h-4 mr-1 flex-shrink-0 text-white" />
+              <Phone className="w-4 h-4 sm:w-5 sm:h-5 mr-2 flex-shrink-0 text-white" />
               <span>Contacto</span>
             </button>
           )}
@@ -118,12 +132,12 @@ const ServiceCard = ({ service }: ServiceCardProps) => {
               href={service.detailsUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex-1 bg-[#fb8500] hover:bg-[#e65100] active:bg-[#b45309] text-white font-semibold tracking-wide py-2 sm:py-2.5 px-2 sm:px-3 rounded-xl border border-white/40 hover:border-white/70 shadow-lg hover:shadow-xl transition-all duration-200 text-2xs sm:text-xs md:text-sm min-h-[36px] sm:min-h-[40px] md:min-h-[44px] flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-opacity-50 hover:-translate-y-0.5"
+              className="flex-1 bg-[#fb8500] hover:bg-[#e65100] active:bg-[#b45309] text-white font-semibold tracking-wide py-3 sm:py-3.5 px-3 sm:px-4 rounded-xl border border-white/40 hover:border-white/70 shadow-lg hover:shadow-xl transition-all duration-200 text-xs sm:text-sm md:text-base min-h-[48px] sm:min-h-[52px] md:min-h-[56px] flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-opacity-50 hover:-translate-y-0.5 touch-manipulation"
             >
-              <ExternalLink className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
+              <ExternalLink className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
             </a>
           ) : (
-            <span className="flex-1 text-gray-400 text-xs sm:text-sm font-medium min-h-[36px] sm:min-h-[40px] md:min-h-[44px] flex items-center justify-center bg-gray-100 rounded-xl border border-white/40 shadow-inner">
+            <span className="flex-1 text-gray-400 text-xs sm:text-sm font-medium min-h-[48px] sm:min-h-[52px] md:min-h-[56px] flex items-center justify-center bg-gray-100 rounded-xl border border-white/40 shadow-inner">
               Landing próximamente
             </span>
           )}

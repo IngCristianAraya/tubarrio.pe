@@ -10,7 +10,7 @@ import CategoryChips from '../../components/CategoryChips';
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
 import BusinessBanner from '../../components/BusinessBanner';
-import Image from 'next/image';
+import OptimizedImage from '../../components/OptimizedImage';
 import type { Service } from '../../context/ServicesContext';
 import { useSearchParams } from 'next/navigation';
 
@@ -34,7 +34,12 @@ export default function TodosLosServiciosPageWrapper() {
 
 function TodosLosServiciosPage() {
   const PAGE_SIZE = useResponsivePageSize();
-  const { services } = useServices();
+  const { 
+    services, 
+    loadServicesPaginated, 
+    loading, 
+    currentLoadType 
+  } = useServices();
   const searchParams = useSearchParams();
   const categoriaParam = searchParams.get('categoria');
 
@@ -42,12 +47,28 @@ function TodosLosServiciosPage() {
   // Si no hay parámetro de categoría, mostrar todos por defecto
   const [category, setCategory] = useState(categoriaParam ?? '');
   const [page, setPage] = useState(1);
+  const [hasLoadedInitial, setHasLoadedInitial] = useState(false);
+
+  // Cargar servicios paginados al montar el componente
+  React.useEffect(() => {
+    if (!hasLoadedInitial && currentLoadType !== 'paginated') {
+      loadServicesPaginated(1, PAGE_SIZE);
+      setHasLoadedInitial(true);
+    }
+  }, [loadServicesPaginated, PAGE_SIZE, hasLoadedInitial, currentLoadType]);
 
   // Si cambia el query param, actualizar el filtro
   React.useEffect(() => {
     setCategory(categoriaParam ?? '');
     setPage(1);
   }, [categoriaParam]);
+
+  // Cargar más servicios cuando cambie la página
+  React.useEffect(() => {
+    if (hasLoadedInitial && page > 1) {
+      loadServicesPaginated(page, PAGE_SIZE);
+    }
+  }, [page, PAGE_SIZE, loadServicesPaginated, hasLoadedInitial]);
 
   const categories = getUniqueCategories(services);
 
@@ -74,12 +95,19 @@ function TodosLosServiciosPage() {
       <section className="relative py-10 sm:py-14 md:py-24 mb-14 sm:mb-20 overflow-hidden">
         {/* Imagen de fondo */}
         <div className="absolute inset-0 w-full h-full z-0">
-          <Image 
+          <OptimizedImage 
             src="/images/hero_001.webp" 
             alt="Fondo de servicios" 
-            fill 
-            priority
-            className="object-cover object-center" 
+            className="w-full h-full object-cover object-center"
+            width={1920}
+            height={1080}
+            loading="eager"
+            priority={true}
+            objectFit="cover"
+            fallbackSrc="/images/hero_001.webp"
+            quality={95}
+            isMobile={true}
+            placeholder="blur"
           />
         </div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -129,7 +157,7 @@ function TodosLosServiciosPage() {
           </div>
 
           {/* Skeleton loader */}
-          {services.length === 0 ? (
+          {(loading && services.length === 0) ? (
             <div className="grid gap-4 sm:gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {Array.from({ length: PAGE_SIZE }).map((_, i) => (
                 <div key={i} className="w-full">
@@ -146,6 +174,13 @@ function TodosLosServiciosPage() {
                   <ServiceCard service={service} />
                 </div>
               ))}
+            </div>
+          )}
+          
+          {/* Loading indicator para cargas adicionales */}
+          {loading && services.length > 0 && (
+            <div className="flex justify-center mt-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
             </div>
           )}
 
