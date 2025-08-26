@@ -1,4 +1,5 @@
 /** @type {import('next').NextConfig} */
+// Force redeploy for CSP fix
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
