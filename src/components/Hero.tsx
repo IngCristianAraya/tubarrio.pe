@@ -1,19 +1,17 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Search, Filter, ChevronDown, X, MapPin, Star, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, Filter, ChevronDown } from 'lucide-react';
 import OptimizedImage from './OptimizedImage';
 import Link from 'next/link';
 import { useServices } from '../context/ServicesContext';
 import SEO from '../components/SEO';
 
 const Hero = () => {
-  // Estados locales para búsqueda, categoría y paginación
+  // Estados locales para búsqueda y categoría
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('Todos los servicios');
-  const [currentPage, setCurrentPage] = useState(1);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const resultsPerPage = 8; // Número de resultados por página
 
   // Categorías rápidas para acceso rápido
   const quickCategories = [
@@ -26,7 +24,7 @@ const Hero = () => {
   ];
 
   // Usar el contexto de servicios
-  const { searchServices, filteredServices, isSearching, resetSearch, services } = useServices();
+  const { services } = useServices();
   
   // Obtener categorías únicas de los servicios
   const [categories, setCategories] = useState<string[]>(['Todos los servicios']);
@@ -39,20 +37,25 @@ const Hero = () => {
     }
   }, [services]);
 
-  // Lógica de búsqueda
+  // Lógica de búsqueda - redirigir a todos los servicios
   const handleSearch = () => {
-    if (searchQuery.trim() === '' && selectedCategory === 'Todos los servicios') {
-      resetSearch();
-      return;
+    // Construir la URL con parámetros de búsqueda
+    const params = new URLSearchParams();
+    
+    if (searchQuery.trim()) {
+      params.set('busqueda', searchQuery.trim());
     }
-    searchServices(searchQuery, selectedCategory);
-    setCurrentPage(1); // Resetear a la primera página cuando se hace una nueva búsqueda
+    
+    if (selectedCategory && selectedCategory !== 'Todos los servicios') {
+      params.set('categoria', selectedCategory);
+    }
+    
+    // Redirigir a la página de todos los servicios
+    const url = `/todos-los-servicios${params.toString() ? '?' + params.toString() : ''}`;
+    window.location.href = url;
   };
   
-  // Resetear la página actual cuando cambian los resultados de búsqueda
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [filteredServices.length]);
+
 
   return (
     <>
@@ -179,8 +182,8 @@ const Hero = () => {
         <button
           key={item.name}
           onClick={() => {
-            setSelectedCategory(item.category);
-            handleSearch();
+            // Redirigir directamente a todos los servicios con la categoría seleccionada
+            window.location.href = `/todos-los-servicios?categoria=${encodeURIComponent(item.category)}`;
           }}
           className={`flex items-center gap-2 px-5 py-4 rounded-full shadow-sm hover:shadow-md transition-all duration-200 font-medium min-h-[44px] touch-manipulation active:scale-95 ${
             selectedCategory === item.category
@@ -199,122 +202,7 @@ const Hero = () => {
       {/* Espaciador adicional entre Hero y MapSection, más grande en móviles */}
       <div className="h-12 sm:h-8 md:h-4"></div>
       
-      {/* Sección de resultados de búsqueda */}
-      {isSearching && (
-        <section className="bg-gray-50 py-16 mt-8">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex justify-between items-center mb-8">
-              <h2 className="text-3xl font-bold text-gray-900">Resultados de búsqueda</h2>
-              <button
-                onClick={resetSearch}
-                className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-all duration-200"
-                aria-label="Cerrar búsqueda"
-              >
-                <X className="w-5 h-5" />
-                <span>Cerrar búsqueda</span>
-              </button>
-            </div>
-            
-            {filteredServices.length > 0 ? (
-              <>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                  {filteredServices.slice((currentPage - 1) * resultsPerPage, currentPage * resultsPerPage).map((service) => (
-                    <div key={service.id} className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 transition-all hover:shadow-lg">
-                      <div className="relative h-48 bg-gray-200">
-                        <OptimizedImage 
-                          src={service.image} 
-                          alt={service.name}
-                          width={300}
-                          height={192}
-                          className="w-full h-full"
-                          objectFit="cover"
-                          isMobile={true}
-                          placeholder="blur"
-                          loading="lazy"
-                        />
-                      </div>
-                      <div className="p-4">
-                        <h3 className="font-bold text-lg text-gray-900 mb-1">{service.name}</h3>
-                        <div className="flex items-center text-sm text-gray-500 mb-2">
-                          <MapPin className="w-4 h-4 mr-1" />
-                          <span>{service.location}</span>
-                        </div>
-                        <div className="flex items-center mb-3">
-                          <div className="flex text-yellow-400">
-                            {[...Array(5)].map((_, i) => (
-                              <Star 
-                                key={i} 
-                                className={`w-4 h-4 ${i < Math.floor(service.rating) ? 'fill-current' : ''}`} 
-                              />
-                            ))}
-                          </div>
-                          <span className="text-xs text-gray-500 ml-1">({service.rating})</span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                          <span className="bg-orange-100 text-orange-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
-                            {service.category}
-                          </span>
-                          <Link href={`/servicio/${service.id}`} className="text-orange-500 hover:text-orange-700 text-sm font-medium">
-                            Ver más
-                          </Link>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                
-                {/* Controles de paginación */}
-                {filteredServices.length > resultsPerPage && (
-                  <div className="flex justify-center items-center mt-10 space-x-3">
-                    <button
-                      onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
-                      disabled={currentPage === 1}
-                      className={`p-3 rounded-lg flex items-center justify-center min-h-[44px] min-w-[44px] touch-manipulation transition-all duration-200 ${currentPage === 1 ? 'text-gray-400 cursor-not-allowed bg-gray-100' : 'text-white bg-gradient-to-r from-orange-500 to-yellow-400 hover:shadow-md active:scale-95'}`}
-                      aria-label="Página anterior"
-                    >
-                      <ChevronLeft className="w-5 h-5" />
-                    </button>
-                    
-                    <div className="flex space-x-1">
-                      {Array.from({ length: Math.ceil(filteredServices.length / resultsPerPage) }).map((_, index) => (
-                        <button
-                          key={index}
-                          onClick={() => setCurrentPage(index + 1)}
-                          className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                            currentPage === index + 1
-                              ? 'bg-gradient-to-r from-orange-500 to-yellow-400 text-white font-bold'
-                              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                          }`}
-                        >
-                          {index + 1}
-                        </button>
-                      ))}
-                    </div>
-                    
-                    <button
-                      onClick={() => setCurrentPage((prev) => prev + 1)}
-                      disabled={currentPage >= Math.ceil(filteredServices.length / resultsPerPage)}
-                      className={`p-3 rounded-lg flex items-center justify-center min-h-[44px] min-w-[44px] touch-manipulation transition-all duration-200 ${
-                        currentPage >= Math.ceil(filteredServices.length / resultsPerPage)
-                          ? 'text-gray-400 cursor-not-allowed bg-gray-100'
-                          : 'text-white bg-gradient-to-r from-orange-500 to-yellow-400 hover:shadow-md active:scale-95'
-                      }`}
-                      aria-label="Página siguiente"
-                    >
-                      <ChevronRight className="w-5 h-5" />
-                    </button>
-                  </div>
-                )}
-              </>
-            ) : (
-              <div className="bg-gray-50 rounded-xl p-8 text-center">
-                <p className="text-gray-800 mb-4">No encontramos servicios que coincidan con tu búsqueda.</p>
-                <p className="text-gray-700 text-sm">Intenta con otros términos o categorías diferentes.</p>
-              </div>
-            )}
-          </div>
-        </section>
-      )}
+
     </>
   );
 };

@@ -42,8 +42,9 @@ function TodosLosServiciosPage() {
   } = useServices();
   const searchParams = useSearchParams();
   const categoriaParam = searchParams.get('categoria');
+  const busquedaParam = searchParams.get('busqueda');
 
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState(busquedaParam ?? '');
   // Si no hay parámetro de categoría, mostrar todos por defecto
   const [category, setCategory] = useState(categoriaParam ?? '');
   const [page, setPage] = useState(1);
@@ -57,11 +58,12 @@ function TodosLosServiciosPage() {
     }
   }, [loadServicesPaginated, PAGE_SIZE, hasLoadedInitial, currentLoadType]);
 
-  // Si cambia el query param, actualizar el filtro
+  // Si cambian los query params, actualizar los filtros
   React.useEffect(() => {
     setCategory(categoriaParam ?? '');
+    setSearch(busquedaParam ?? '');
     setPage(1);
-  }, [categoriaParam]);
+  }, [categoriaParam, busquedaParam]);
 
   // Cargar más servicios cuando cambie la página
   React.useEffect(() => {

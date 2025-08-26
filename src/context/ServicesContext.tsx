@@ -44,7 +44,7 @@ interface ServicesContextType {
   softRefresh: () => Promise<void>;
   hardRefresh: () => Promise<void>;
   getServiceBySlug: (slug: string) => Service | undefined;
-  searchServices: (query: string) => void;
+  searchServices: (query: string, category?: string) => void;
   resetSearch: () => void;
   isSearching: boolean;
   retryConnection: () => void;
@@ -595,18 +595,12 @@ export const ServicesProvider: React.FC<{ children: ReactNode }> = ({ children }
     loadServices();
   }, []);
 
-  const searchServices = (query: string, category: string) => {
-    if (usingMockData) {
-      // Para datos de prueba, solo mostrar un mensaje
-      toast('Configura Firebase para habilitar la búsqueda completa', { icon: 'ℹ️' });
-      return;
-    }
-    
+  const searchServices = (query: string, category?: string) => {
     setIsSearching(true);
     let filtered = [...services];
 
     // Filtrar por búsqueda
-    if (query) {
+    if (query && query.trim() !== '') {
       const searchQuery = query.toLowerCase();
       filtered = filtered.filter(service => 
         service.name.toLowerCase().includes(searchQuery) || 
@@ -621,7 +615,7 @@ export const ServicesProvider: React.FC<{ children: ReactNode }> = ({ children }
     }
 
     setFilteredServices(filtered);
-    setIsSearching(false);
+    // No establecer setIsSearching(false) aquí para mantener la sección visible
   };
 
   const resetSearch = () => {
