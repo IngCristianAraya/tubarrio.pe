@@ -73,10 +73,25 @@ const OptimizedImage = ({
   const defaultBlurDataURL = 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q==';
   const finalBlurDataURL = blurDataURL || defaultBlurDataURL;
 
-  // Manejar errores de carga
+  // Manejar errores de carga con múltiples fallbacks
   const handleError = () => {
-    if (fallbackSrc && !hasError) {
+    console.warn('Error loading image:', currentSrc);
+    
+    if (fallbackSrc && currentSrc !== fallbackSrc && !hasError) {
+      console.log('Trying fallback image:', fallbackSrc);
       setCurrentSrc(fallbackSrc);
+      setHasError(true);
+      setIsLoading(false);
+    } else if (currentSrc !== '/images/placeholder.jpg') {
+      // Si el fallback también falla, usar imagen placeholder local
+      console.log('Using local placeholder image');
+      setCurrentSrc('/images/placeholder.jpg');
+      setHasError(true);
+      setIsLoading(false);
+    } else {
+      // Si todo falla, mostrar el div de "No image"
+      console.error('All image sources failed, showing no image placeholder');
+      setCurrentSrc('');
       setHasError(true);
       setIsLoading(false);
     }
