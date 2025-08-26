@@ -25,7 +25,34 @@ const Header = () => {
 
   const NavItem = ({ href, children }: { href: string; children: React.ReactNode }) => {
     // Determinar si el enlace es interno o externo (ancla)
-    const isAnchor = href.startsWith('#');
+    const isAnchor = href.startsWith('#') || href.startsWith('/#');
+    
+    const handleClick = (e: React.MouseEvent) => {
+      playFolderSound();
+      
+      // Si es una ancla, manejar la navegación manualmente
+      if (isAnchor) {
+        e.preventDefault();
+        
+        // Extraer el ID de la ancla
+        const anchorId = href.replace('/#', '').replace('#', '');
+        
+        // Si estamos en una página diferente a la home, navegar primero a home
+        if (window.location.pathname !== '/') {
+          window.location.href = `/#${anchorId}`;
+          return;
+        }
+        
+        // Si ya estamos en home, hacer scroll a la sección
+        const element = document.getElementById(anchorId);
+        if (element) {
+          element.scrollIntoView({ 
+            behavior: 'smooth',
+            block: 'start'
+          });
+        }
+      }
+    };
     
     // Para enlaces internos, usar Link de Next.js
     if (!isAnchor) {
@@ -44,12 +71,12 @@ const Header = () => {
       );
     }
     
-    // Para anclas, mantener el comportamiento normal
+    // Para anclas, usar manejo personalizado
     return (
       <a 
         href={href}
         className="group relative px-3 py-2 font-semibold text-gray-700 hover:text-orange-500 transition-colors duration-200"
-        onClick={() => playFolderSound()}
+        onClick={handleClick}
       >
         <span className="z-10 relative">{children}</span>
         <span 
@@ -97,20 +124,18 @@ const Header = () => {
           {/* Navegación desktop */}
           <nav className="hidden md:flex gap-3 lg:gap-6 items-center mx-4">
             <NavItem href="/">Inicio</NavItem>
-            <NavItem href="#servicios">Destacados</NavItem>
+            <NavItem href="/#servicios">Destacados</NavItem>
             <NavItem href="/todos-los-servicios">Categorías</NavItem>
-            <NavItem href="#cobertura">Cobertura</NavItem>
+            <NavItem href="/#cobertura">Cobertura</NavItem>
           </nav>
 
           {/* Acciones desktop */}
           <div className="hidden md:flex items-center gap-4">
-            <a
-              href="#registro"
-              className="px-4 py-2 rounded-xl font-bold bg-gradient-to-r from-orange-500 to-yellow-400 text-white shadow-md hover:from-orange-600 hover:to-yellow-500 transition-all duration-200 flex items-center"
-              onClick={() => playFolderSound()}
-            >
-              <span className="mr-2">+</span> Registrar Negocio
-            </a>
+            <NavItem href="/#registro">
+              <span className="px-4 py-2 rounded-xl font-bold bg-gradient-to-r from-orange-500 to-yellow-400 text-white shadow-md hover:from-orange-600 hover:to-yellow-500 transition-all duration-200 flex items-center">
+                <span className="mr-2">+</span> Registrar Negocio
+              </span>
+            </NavItem>
           </div>
         </div>
 
@@ -122,24 +147,24 @@ const Header = () => {
                 <NavItem href="/">Inicio</NavItem>
               </div>
               <div className="py-3 px-4 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors duration-150 min-h-[48px] flex items-center">
-                <NavItem href="#servicios">Destacados</NavItem>
+                <NavItem href="/#servicios">Destacados</NavItem>
               </div>
               <div className="py-3 px-4 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors duration-150 min-h-[48px] flex items-center">
                 <NavItem href="/todos-los-servicios">Categorías</NavItem>
               </div>
               <div className="py-3 px-4 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors duration-150 min-h-[48px] flex items-center">
-                <NavItem href="#cobertura">Cobertura</NavItem>
+                <NavItem href="/#cobertura">Cobertura</NavItem>
               </div>
-              <a
-                href="#registro"
-                className="block w-full px-6 py-4 text-center rounded-xl font-bold bg-gradient-to-r from-orange-500 to-yellow-400 text-white shadow-md hover:from-orange-600 hover:to-yellow-500 active:from-orange-700 active:to-yellow-600 transition-all duration-200 mt-6 min-h-[52px] flex items-center justify-center"
-                onClick={() => {
-                  playFolderSound();
-                  setIsMenuOpen(false);
-                }}
-              >
-                + Registrar Negocio
-              </a>
+              <div className="mt-6">
+                <NavItem href="/#registro">
+                  <span 
+                    className="block w-full px-6 py-4 text-center rounded-xl font-bold bg-gradient-to-r from-orange-500 to-yellow-400 text-white shadow-md hover:from-orange-600 hover:to-yellow-500 active:from-orange-700 active:to-yellow-600 transition-all duration-200 min-h-[52px] flex items-center justify-center"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    + Registrar Negocio
+                  </span>
+                </NavItem>
+              </div>
             </nav>
           </div>
         )}

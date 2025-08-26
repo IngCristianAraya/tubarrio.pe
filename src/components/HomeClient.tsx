@@ -75,6 +75,30 @@ const HomeClient = () => {
     setIsMounted(true);
   }, []);
 
+  // Efecto para manejar navegación a anclas desde otras páginas
+  useEffect(() => {
+    if (!isMounted) return;
+
+    const handleAnchorNavigation = () => {
+      const hash = window.location.hash;
+      if (hash) {
+        // Esperar un poco para que los componentes se carguen completamente
+        setTimeout(() => {
+          const anchorId = hash.replace('#', '');
+          const element = document.getElementById(anchorId);
+          if (element) {
+            element.scrollIntoView({ 
+              behavior: 'smooth',
+              block: 'start'
+            });
+          }
+        }, 1000); // Dar tiempo para que los componentes dinámicos se carguen
+      }
+    };
+
+    handleAnchorNavigation();
+  }, [isMounted]);
+
   // Si no está montado, mostrar un loader simple
   if (!isMounted) {
     return (
