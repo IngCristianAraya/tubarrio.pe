@@ -76,59 +76,96 @@ export default function NewServicePage() {
     const files = e.target.files;
     if (!files || files.length === 0) return;
 
+    console.log('Archivos seleccionados:', files.length);
+
     // Validar que no se excedan 5 imágenes en total
     if (formData.images.length + files.length > 5) {
       setError('Máximo 5 imágenes permitidas');
       return;
     }
 
-    const uploadPromises = Array.from(files).map(async (file) => {
-      // Validar tipo de archivo
-      if (!file.type.startsWith('image/')) {
-        throw new Error(`${file.name}: Por favor selecciona un archivo de imagen válido`);
+    setError(null);
+    setLoading(true);
+    const successfulUploads: string[] = [];
+    const failedUploads: string[] = [];
+
+    // Subir imágenes una por una para mejor control de errores
+    for (const file of Array.from(files)) {
+      try {
+        console.log(`Procesando archivo: ${file.name}, tipo: ${file.type}, tamaño: ${file.size}`);
+        
+        // Validar tipo de archivo
+        if (!file.type.startsWith('image/')) {
+          failedUploads.push(`${file.name}: Tipo de archivo no válido`);
+          continue;
+        }
+
+        // Validar tamaño (máximo 5MB)
+        if (file.size > 5 * 1024 * 1024) {
+          failedUploads.push(`${file.name}: Archivo muy grande (máx. 5MB)`);
+          continue;
+        }
+
+        // Crear FormData para enviar la imagen
+        const uploadFormData = new FormData();
+        uploadFormData.append('image', file);
+
+        console.log('Enviando imagen al servidor...');
+        
+        // Subir imagen al endpoint
+        const response = await fetch('/api/upload-image', {
+          method: 'POST',
+          body: uploadFormData
+        });
+
+        console.log('Respuesta del servidor:', response.status);
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({ error: 'Error desconocido' }));
+          failedUploads.push(`${file.name}: ${errorData.error || 'Error al subir'}`);
+          continue;
+        }
+
+        const result = await response.json();
+        console.log('Resultado:', result);
+        
+        if (result.success && result.imageUrl) {
+          successfulUploads.push(result.imageUrl);
+          console.log('Imagen subida exitosamente:', result.imageUrl);
+        } else {
+          failedUploads.push(`${file.name}: Respuesta inválida del servidor`);
+        }
+      } catch (err) {
+        console.error(`Error subiendo ${file.name}:`, err);
+        failedUploads.push(`${file.name}: Error de conexión`);
       }
+    }
 
-      // Validar tamaño (máximo 5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        throw new Error(`${file.name}: La imagen debe ser menor a 5MB`);
-      }
+    console.log('Imágenes exitosas:', successfulUploads);
+    console.log('Imágenes fallidas:', failedUploads);
 
-      // Crear FormData para enviar la imagen
-      const formData = new FormData();
-      formData.append('image', file);
-
-      // Subir imagen al endpoint local
-      const response = await fetch('/api/upload-image', {
-        method: 'POST',
-        body: formData
-      });
-
-      if (!response.ok) {
-        throw new Error(`${file.name}: Error al subir la imagen`);
-      }
-
-      const result = await response.json();
-      return result.url;
-    });
-
-    try {
-      setError(null);
-      const uploadedUrls = await Promise.all(uploadPromises);
-      
-      // Actualizar formulario con las nuevas URLs
+    // Actualizar formulario con las imágenes exitosas
+    if (successfulUploads.length > 0) {
       setFormData(prev => ({ 
         ...prev, 
-        images: [...prev.images, ...uploadedUrls] 
+        images: [...prev.images, ...successfulUploads] 
       }));
-      setImagePreviews(prev => [...prev, ...uploadedUrls]);
-      
-      // Limpiar el input
-      e.target.value = '';
-      
-    } catch (err) {
-      console.error('Error subiendo imágenes:', err);
-      setError(err instanceof Error ? err.message : 'Error al subir las imágenes. Intenta nuevamente.');
+      setImagePreviews(prev => {
+        const newPreviews = [...prev, ...successfulUploads];
+        console.log('Nuevas vistas previas:', newPreviews);
+        return newPreviews;
+      });
     }
+
+    // Mostrar errores si los hay
+    if (failedUploads.length > 0) {
+      setError(`Errores en la subida:\n${failedUploads.join('\n')}`);
+    }
+
+    setLoading(false);
+    
+    // Limpiar el input
+    e.target.value = '';
   };
 
   const removeImage = (indexToRemove: number) => {
@@ -178,8 +215,8 @@ export default function NewServicePage() {
       
       // Preparar datos del servicio
       const serviceData = {
-        ...formData,
         name: formData.name.trim(),
+        category: formData.category,
         description: formData.description.trim(),
         phone: formData.phone.trim(),
         whatsapp: formData.whatsapp.trim(),
@@ -194,6 +231,7 @@ export default function NewServicePage() {
         plan: formData.plan,
         images: formData.images,
         image: formData.images.length > 0 ? formData.images[0] : '', // Primera imagen como imagen principal
+        active: formData.active,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp()
       };
@@ -375,8 +413,14 @@ export default function NewServicePage() {
                 multiple
                 onChange={handleImageUpload}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                disabled={formData.images.length >= 5}
+                disabled={formData.images.length >= 5 || loading}
               />
+              {loading && (
+                <div className="mt-2 text-sm text-blue-600 flex items-center">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mr-2"></div>
+                  Subiendo imágenes...
+                </div>
+              )}
               <p className="text-xs text-gray-500 mt-1">
                 Formatos soportados: JPG, PNG, GIF. Máximo 5MB por imagen. {formData.images.length}/5 imágenes subidas.
               </p>

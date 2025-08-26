@@ -27,6 +27,8 @@ export default function ServicesPage() {
   const [categoryFilter, setCategoryFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const servicesPerPage = 12;
 
   useEffect(() => {
     loadServices();
@@ -110,6 +112,17 @@ export default function ServicesPage() {
     return matchesSearch && matchesCategory && matchesStatus;
   });
 
+  // Calcular paginación
+  const totalPages = Math.ceil(filteredServices.length / servicesPerPage);
+  const startIndex = (currentPage - 1) * servicesPerPage;
+  const endIndex = startIndex + servicesPerPage;
+  const currentServices = filteredServices.slice(startIndex, endIndex);
+
+  // Resetear página cuando cambian los filtros
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, categoryFilter, statusFilter]);
+
   // Obtener categorías únicas
   const categories = Array.from(new Set(services.map(service => service.category).filter(Boolean)));
 
@@ -143,7 +156,14 @@ export default function ServicesPage() {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Gestión de Servicios</h1>
-          <p className="text-gray-600 mt-1">{services.length} servicios registrados</p>
+          <p className="text-gray-600 mt-1">
+            {filteredServices.length} de {services.length} servicios
+            {filteredServices.length > 0 && (
+              <span className="ml-2 text-sm">
+                (Página {currentPage} de {totalPages})
+              </span>
+            )}
+          </p>
         </div>
         <Link
           href="/admin/servicios/nuevo"
@@ -257,7 +277,7 @@ export default function ServicesPage() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {filteredServices.map((service) => (
+                {currentServices.map((service) => (
                   <tr key={service.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
@@ -331,6 +351,69 @@ export default function ServicesPage() {
                 ))}
               </tbody>
             </table>
+          </div>
+        )}
+        
+        {/* Paginación */}
+        {filteredServices.length > servicesPerPage && (
+          <div className="bg-gray-50 px-6 py-3 border-t border-gray-200">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center text-sm text-gray-700">
+                <span>
+                  Mostrando {startIndex + 1} a {Math.min(endIndex, filteredServices.length)} de {filteredServices.length} servicios
+                </span>
+              </div>
+              
+              <div className="flex items-center space-x-2">
+                {/* Botón Anterior */}
+                <button
+                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}
+                  className="px-3 py-1 text-sm border border-gray-300 rounded-md bg-white text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  Anterior
+                </button>
+                
+                {/* Números de página */}
+                <div className="flex items-center space-x-1">
+                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                    let pageNum;
+                    if (totalPages <= 5) {
+                      pageNum = i + 1;
+                    } else if (currentPage <= 3) {
+                      pageNum = i + 1;
+                    } else if (currentPage >= totalPages - 2) {
+                      pageNum = totalPages - 4 + i;
+                    } else {
+                      pageNum = currentPage - 2 + i;
+                    }
+                    
+                    return (
+                      <button
+                        key={pageNum}
+                        onClick={() => setCurrentPage(pageNum)}
+                        className={`px-3 py-1 text-sm border rounded-md transition-colors ${
+                          currentPage === pageNum
+                            ? 'bg-blue-600 text-white border-blue-600'
+                            : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                        }`}
+                      >
+                        {pageNum}
+                      </button>
+                    );
+                  })}
+                </div>
+                
+                {/* Botón Siguiente */}
+                <button
+                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                  disabled={currentPage === totalPages}
+                  className="px-3 py-1 text-sm border border-gray-300 rounded-md bg-white text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  Siguiente
+                </button>
+              </div>
+            </div>
           </div>
         )}
       </div>

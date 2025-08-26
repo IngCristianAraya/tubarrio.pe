@@ -103,11 +103,6 @@ export default function RootLayout({ children }: RootLayoutProps) {
               -webkit-font-smoothing: antialiased;
               -moz-osx-font-smoothing: grayscale;
             }
-            /* Prevenir inyección de estilos por extensiones */
-            [data-windsurf-page-id],
-            [data-windsurf-extension-id] {
-              all: unset !important;
-            }
           `
         }} />
       </head>

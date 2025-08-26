@@ -173,7 +173,7 @@ export default function EditServicePage({ params }: EditServicePageProps) {
       }
 
       const result = await response.json();
-      return result.url;
+      return result.imageUrl;
     });
 
     try {
@@ -181,11 +181,12 @@ export default function EditServicePage({ params }: EditServicePageProps) {
       const uploadedUrls = await Promise.all(uploadPromises);
       
       // Actualizar formulario con las nuevas URLs
+      const newImages = [...formData.images, ...uploadedUrls];
       setFormData(prev => ({ 
         ...prev, 
-        images: [...prev.images, ...uploadedUrls] 
+        images: newImages
       }));
-      setImagePreviews(prev => [...prev, ...uploadedUrls]);
+      setImagePreviews(newImages);
       
       // Limpiar el input
       e.target.value = '';
@@ -197,11 +198,12 @@ export default function EditServicePage({ params }: EditServicePageProps) {
   };
 
   const removeImage = (indexToRemove: number) => {
+    const newImages = formData.images.filter((_, index) => index !== indexToRemove);
     setFormData(prev => ({
       ...prev,
-      images: prev.images.filter((_, index) => index !== indexToRemove)
+      images: newImages
     }));
-    setImagePreviews(prev => prev.filter((_, index) => index !== indexToRemove));
+    setImagePreviews(newImages);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -232,25 +234,37 @@ export default function EditServicePage({ params }: EditServicePageProps) {
       }
 
       // Preparar datos del servicio
-      const serviceData = {
-        ...formData,
+      const serviceData: any = {
         name: formData.name.trim(),
+        category: formData.category || '',
         description: formData.description.trim(),
-        phone: formData.phone.trim(),
-        whatsapp: formData.whatsapp.trim(),
-        address: formData.address.trim(),
-        reference: formData.reference.trim(),
-        contactUrl: formData.contactUrl.trim(),
-        detailsUrl: formData.detailsUrl.trim(),
-        horario: formData.horario.trim(),
-        location: formData.location.trim(),
+        phone: formData.phone.trim() || '',
+        whatsapp: formData.whatsapp.trim() || '',
+        address: formData.address.trim() || '',
+        reference: formData.reference.trim() || '',
+        contactUrl: formData.contactUrl.trim() || '',
+        detailsUrl: formData.detailsUrl.trim() || '',
+        horario: formData.horario.trim() || '',
+        location: formData.location.trim() || '',
         tags: formData.tags.trim().split(',').map(tag => tag.trim()).filter(tag => tag.length > 0),
-        rating: Number(formData.rating),
-        plan: formData.plan,
-        images: formData.images,
-        image: formData.images.length > 0 ? formData.images[0] : '',
+        rating: Number(formData.rating) || 0,
+        plan: formData.plan || 'básico',
+        images: formData.images || [],
+        image: formData.images && formData.images.length > 0 ? formData.images[0] : '',
+        active: Boolean(formData.active),
         updatedAt: serverTimestamp()
       };
+
+      // Filtrar campos undefined, null y valores inválidos para evitar errores en Firestore
+      Object.keys(serviceData).forEach(key => {
+        const value = serviceData[key];
+        if (value === undefined || value === null) {
+          delete serviceData[key];
+        } else if (Array.isArray(value)) {
+          // Filtrar elementos undefined/null de arrays
+          serviceData[key] = value.filter(item => item !== undefined && item !== null);
+        }
+      });
 
       // Verificar si el nombre ha cambiado
       const nameChanged = formData.name.trim() !== originalName;

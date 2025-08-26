@@ -35,11 +35,27 @@ const ServiceHeader: React.FC<ServiceHeaderProps> = ({ service }): ReactElement 
   const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
   const [isFavorite, setIsFavorite] = useState(false);
   const [showShareTooltip, setShowShareTooltip] = useState(false);
-  const images: string[] = service.images && service.images.length > 0 
-    ? service.images 
-    : service.image 
-      ? [service.image] 
-      : ['/images/placeholder-service.jpg'];
+  // Función para validar si una imagen es válida
+  const isValidImage = (imageUrl: string): boolean => {
+    return imageUrl && 
+           imageUrl !== 'none' && 
+           imageUrl !== '' && 
+           imageUrl !== 'null' && 
+           imageUrl !== 'undefined' &&
+           !imageUrl.includes('invalid') &&
+           (imageUrl.startsWith('http') || imageUrl.startsWith('/'));
+  };
+
+  // Filtrar y validar imágenes
+  const validImages = service.images && service.images.length > 0 
+    ? service.images.filter(isValidImage)
+    : service.image && isValidImage(service.image)
+      ? [service.image]
+      : [];
+      
+  const images: string[] = validImages.length > 0 
+    ? validImages 
+    : ['/images/placeholder-service.jpg'];
 
   // Función para manejar favoritos
   const handleFavoriteToggle = useCallback(() => {
@@ -330,18 +346,54 @@ const ServiceHeader: React.FC<ServiceHeaderProps> = ({ service }): ReactElement 
                     <div className="flex-1">
                       <h4 className="font-semibold text-blue-900 mb-1">Ubicación</h4>
                       <div className="space-y-1">
-                        {service.address && service.address.trim() !== '' ? (
-                          <p className="text-gray-700 text-sm font-medium">
-                            {service.address}
-                            {service.location && service.location.trim() !== '' && (
-                              <span>, ref {service.location}</span>
-                            )}
-                          </p>
-                        ) : (
-                          service.location && (
-                            <p className="text-gray-700 text-sm">{service.location}</p>
-                          )
-                        )}
+                        {(() => {
+                          const address = service.address?.trim();
+                          const reference = service.reference?.trim();
+                          const location = service.location?.trim();
+                          
+                          // Si address y reference son iguales, solo mostrar address
+                          if (address && reference && address === reference) {
+                            return (
+                              <p className="text-gray-700 text-sm font-medium">
+                                {address}
+                              </p>
+                            );
+                          }
+                          
+                          // Si hay address y reference diferentes, mostrar ambos
+                          if (address && reference && address !== reference) {
+                            return (
+                              <div className="space-y-1">
+                                <p className="text-gray-700 text-sm font-medium">
+                                  {address}
+                                </p>
+                                <p className="text-gray-600 text-sm">
+                                  <span className="font-medium">Referencia:</span> {reference}
+                                </p>
+                              </div>
+                            );
+                          }
+                          
+                          // Si solo hay address, mostrarlo
+                          if (address) {
+                            return (
+                              <p className="text-gray-700 text-sm font-medium">
+                                {address}
+                              </p>
+                            );
+                          }
+                          
+                          // Si solo hay location, mostrarlo
+                          if (location) {
+                            return (
+                              <p className="text-gray-700 text-sm">
+                                {location}
+                              </p>
+                            );
+                          }
+                          
+                          return null;
+                        })()}
                       </div>
                     </div>
                   </div>
