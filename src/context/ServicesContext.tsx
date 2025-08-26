@@ -445,45 +445,85 @@ export const ServicesProvider: React.FC<{ children: ReactNode }> = ({ children }
        setError(null);
        setCurrentLoadType('all');
        
-       if (!db) {
-         throw new Error('Firebase no está disponible');
-       }
-       
        // Verificar cache para evitar consultas innecesarias
        if (!forceRefresh && lastFetchTime && services.length > 0) {
          const timeSinceLastFetch = Date.now() - lastFetchTime.getTime();
          if (timeSinceLastFetch < cacheExpiry) {
-           console.log('Usando datos en cache, evitando consulta a Firebase');
+           console.log('Usando datos en cache, evitando consulta');
            setLoading(false);
            return;
          }
        }
        
-       console.log('Realizando consulta optimizada a Firebase...');
+       // Intentar Firebase primero, luego fallback a API
+       if (db) {
+         try {
+           console.log('Realizando consulta optimizada a Firebase...');
+           
+           // Optimizar consulta con límite para reducir uso de cuota
+           const servicesQuery = query(
+             collection(db, 'services'),
+             orderBy('name'),
+             limit(50)
+           );
+           const servicesSnapshot = await getDocs(servicesQuery);
+           
+           const servicesData = servicesSnapshot.docs.map(doc => {
+             const data = doc.data();
+             return {
+               id: doc.id,
+               ...data,
+               location: data.address || data.location || 'Lima, Perú',
+               createdAt: data.createdAt?.toDate?.() || new Date(),
+               updatedAt: data.updatedAt?.toDate?.() || new Date()
+             } as Service;
+           });
+           
+           if (servicesData.length > 0) {
+             console.log(`✅ Firebase: Cargados ${servicesData.length} servicios`);
+             setServices(servicesData);
+             setLastFetchTime(new Date());
+             setLoading(false);
+             return;
+           }
+         } catch (firebaseError) {
+           console.warn('⚠️ Firebase falló, intentando API fallback:', firebaseError);
+         }
+       }
        
-       // Optimizar consulta con límite para reducir uso de cuota
-       const servicesQuery = query(
-         collection(db, 'services'), // Corregido: usar 'services' en lugar de 'servicios'
-         orderBy('name'),
-         limit(50) // Limitar a 50 servicios para reducir cuota
-       );
-       const servicesSnapshot = await getDocs(servicesQuery);
+       // Fallback: usar API route
+       console.log('🔄 Usando API fallback para cargar servicios...');
+       const response = await fetch('/api/services-fallback');
        
-       const servicesData = servicesSnapshot.docs.map(doc => {
-         const data = doc.data();
-         return {
-           id: doc.id,
-           ...data,
-           createdAt: data.createdAt?.toDate?.() || new Date(),
-           updatedAt: data.updatedAt?.toDate?.() || new Date()
-         } as Service;
-       });
+       if (!response.ok) {
+         throw new Error(`Error en API fallback: ${response.status}`);
+       }
        
-       const activeServices = servicesData.filter(service => service.active !== false);
-       setServices(activeServices);
-       setFilteredServices(activeServices);
-       setUsingMockData(false);
-       setLastFetchTime(new Date()); // Actualizar timestamp del cache
+       const data = await response.json();
+       
+       if (data.success && data.services) {
+         console.log(`✅ API Fallback: Cargados ${data.services.length} servicios`);
+         
+         // Convertir formato de API a formato de Service
+         const servicesData = data.services.map((service: any) => ({
+           id: service.id,
+           name: service.name,
+           category: service.category,
+           image: service.image,
+           rating: service.rating,
+           location: service.address || 'Lima, Perú',
+           description: service.description,
+           hours: service.openingHours ? Object.entries(service.openingHours).map(([day, hours]) => `${day}: ${hours}`).join(', ') : undefined,
+           whatsapp: service.whatsapp,
+           active: service.active,
+           tags: [service.category.toLowerCase()]
+         })) as Service[];
+         
+         setServices(servicesData);
+         setLastFetchTime(new Date());
+       } else {
+         throw new Error('No se pudieron cargar servicios desde ninguna fuente');
+       }
        
        // Limpiar estado de reintento si fue exitoso
        if (retryTimer) {
@@ -494,8 +534,8 @@ export const ServicesProvider: React.FC<{ children: ReactNode }> = ({ children }
        setNextRetryTime(null);
        setIsRetrying(false);
        
-       console.log(`✅ Reconexión exitosa: ${activeServices.length} servicios cargados desde Firebase`);
-       toast.success('Conexión restablecida con la base de datos');
+       console.log(`✅ Servicios cargados exitosamente`);
+       toast.success('Servicios cargados correctamente');
        
      } catch (error: any) {
        console.error('Error en reintento:', error);
