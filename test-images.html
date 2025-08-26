@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test de Imágenes</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        .image-test {
+            margin: 20px 0;
+            border: 1px solid #ccc;
+            padding: 10px;
+        }
+        img {
+            max-width: 400px;
+            height: 200px;
+            object-fit: cover;
+            border: 1px solid #ddd;
+        }
+        .status {
+            margin-top: 10px;
+            padding: 5px;
+            border-radius: 3px;
+        }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    <h1>Test de Carga de Imágenes</h1>
+    
+    <div class="image-test">
+        <h3>Imagen de Pexels (Pizza)</h3>
+        <img id="img1" src="https://images.pexels.com/photos/315755/pexels-photo-315755.jpeg?auto=compress&cs=tinysrgb&w=400" alt="Pizza">
+        <div id="status1" class="status">Cargando...</div>
+    </div>
+    
+    <div class="image-test">
+        <h3>Imagen de Pexels (Shawarma)</h3>
+        <img id="img2" src="https://images.pexels.com/photos/4958792/pexels-photo-4958792.jpeg?auto=compress&cs=tinysrgb&w=400" alt="Shawarma">
+        <div id="status2" class="status">Cargando...</div>
+    </div>
+    
+    <div class="image-test">
+        <h3>Imagen Local (Fallback)</h3>
+        <img id="img3" src="/images/hero_001.webp" alt="Hero local">
+        <div id="status3" class="status">Cargando...</div>
+    </div>
+
+    <script>
+        function testImage(imgId, statusId) {
+            const img = document.getElementById(imgId);
+            const status = document.getElementById(statusId);
+            
+            img.onload = function() {
+                status.textContent = '✅ Imagen cargada correctamente';
+                status.className = 'status success';
+            };
+            
+            img.onerror = function() {
+                status.textContent = '❌ Error al cargar la imagen';
+                status.className = 'status error';
+            };
+        }
+        
+        testImage('img1', 'status1');
+        testImage('img2', 'status2');
+        testImage('img3', 'status3');
+    </script>
+</body>
+</html>
