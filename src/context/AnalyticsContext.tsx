@@ -99,6 +99,12 @@ export function AnalyticsProvider({ children }: { children: React.ReactNode }) {
         referrer: typeof window !== 'undefined' ? document.referrer : ''
       };
 
+      // Verificar si Firebase está disponible
+      if (!db) {
+        console.warn('Firebase not available, skipping analytics tracking');
+        return;
+      }
+
       // Guardar en Firestore
       await addDoc(collection(db, 'analytics'), fullEvent);
       
@@ -134,6 +140,13 @@ export function AnalyticsProvider({ children }: { children: React.ReactNode }) {
   const getMetrics = useCallback(async (days: number = 30) => {
     try {
       dispatch({ type: 'SET_LOADING', payload: true });
+      
+      // Verificar si Firebase está disponible
+      if (!db) {
+        console.warn('Firebase not available, using empty metrics');
+        dispatch({ type: 'SET_METRICS', payload: initialState.metrics });
+        return;
+      }
       
       const startDate = new Date();
       startDate.setDate(startDate.getDate() - days);
