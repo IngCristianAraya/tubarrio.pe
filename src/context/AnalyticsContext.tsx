@@ -100,7 +100,7 @@ export function AnalyticsProvider({ children }: { children: React.ReactNode }) {
       };
 
       // Verificar si Firebase está disponible
-      if (!db) {
+      if (!db || typeof db !== 'object') {
         console.warn('Firebase not available, skipping analytics tracking');
         return;
       }
@@ -142,7 +142,7 @@ export function AnalyticsProvider({ children }: { children: React.ReactNode }) {
       dispatch({ type: 'SET_LOADING', payload: true });
       
       // Verificar si Firebase está disponible
-      if (!db) {
+      if (!db || typeof db !== 'object') {
         console.warn('Firebase not available, using empty metrics');
         dispatch({ type: 'SET_METRICS', payload: initialState.metrics });
         return;
