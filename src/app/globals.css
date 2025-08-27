@@ -6,13 +6,13 @@
   :root {
   --background: #ffffff;
   --foreground: #171717;
-  --primary: #2563eb;  /* blue-600 for better contrast */
+  --primary: #ea580c;  /* orange-600 for better contrast */
   --primary-foreground: #ffffff;
   --muted: #f3f4f6;    /* gray-100 */
   --muted-foreground: #4b5563; /* gray-600 */
   --border: #e5e7eb;   /* gray-200 */
   --input: #9ca3af;    /* gray-400 */
-  --ring: #3b82f6;     /* blue-500 */
+  --ring: #f97316;     /* orange-500 */
   --destructive: #ef4444; /* red-500 */
   --success: #10b981;   /* emerald-500 */
     --radius: 0.5rem;    /* 8px - for border radius */
@@ -34,13 +34,13 @@
   :root {
     --background: #0f172a; /* slate-900 */
     --foreground: #f8fafc; /* slate-50 */
-    --primary: #60a5fa;    /* blue-400 for better contrast in dark mode */
+    --primary: #fb923c;    /* orange-400 for better contrast in dark mode */
     --primary-foreground: #1e293b; /* slate-800 */
     --muted: #1e293b;     /* slate-800 */
     --muted-foreground: #94a3b8; /* slate-400 */
     --border: #334155;    /* slate-700 */
     --input: #64748b;     /* slate-500 */
-    --ring: #60a5fa;      /* blue-400 */
+    --ring: #fb923c;      /* orange-400 */
     --destructive: #f87171; /* red-400 */
     --success: #34d399;    /* emerald-400 */
   }

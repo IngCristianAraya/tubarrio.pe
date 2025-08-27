@@ -51,7 +51,7 @@ interface ServicesContextType {
   // Nuevas funciones optimizadas
   loadFeaturedServices: (forceRefresh?: boolean) => Promise<void>;
   loadSingleService: (serviceId: string) => Promise<Service | null>;
-  loadServicesPaginated: (page: number, limit: number) => Promise<Service[]>;
+  loadServicesPaginated: (page: number, limitCount: number) => Promise<Service[]>;
 }
 
 // Firebase
@@ -398,19 +398,19 @@ export const ServicesProvider: React.FC<{ children: ReactNode }> = ({ children }
    }, [db, singleServiceCache, cacheExpiry]);
    
    // Función para carga paginada
-   const loadServicesPaginated = useCallback(async (page: number, limit: number = 12): Promise<Service[]> => {
+   const loadServicesPaginated = useCallback(async (page: number, limitCount: number = 12): Promise<Service[]> => {
      try {
        if (!db) {
          throw new Error('Firebase no está disponible');
        }
        
-       console.log(`Cargando página ${page} con ${limit} servicios`);
+       console.log(`Cargando página ${page} con ${limitCount} servicios`);
        
-       const offset = (page - 1) * limit;
+       const offset = (page - 1) * limitCount;
        const paginatedQuery = query(
          collection(db, 'services'),
          orderBy('name'),
-         limit(limit)
+         limit(limitCount)
          // TODO: Implementar offset real con startAfter para paginación eficiente
        );
        
@@ -434,8 +434,8 @@ export const ServicesProvider: React.FC<{ children: ReactNode }> = ({ children }
      } catch (error: any) {
        console.error(`Error cargando página ${page}:`, error);
        // Fallback a datos mock paginados
-       const offset = (page - 1) * limit;
-       return mockServices.slice(offset, offset + limit);
+       const offset = (page - 1) * limitCount;
+       return mockServices.slice(offset, offset + limitCount);
      }
    }, [db]);
 

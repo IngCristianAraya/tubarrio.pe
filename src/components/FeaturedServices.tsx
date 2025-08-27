@@ -111,6 +111,10 @@ const FeaturedServices = () => {
   const [servicesPerPage, setServicesPerPage] = useState(3);
   const [isMounted, setIsMounted] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
+  const [touchStart, setTouchStart] = useState(0);
+  const [touchEnd, setTouchEnd] = useState(0);
 
   // Efecto para cargar servicios destacados al montar el componente
   useEffect(() => {
@@ -123,7 +127,9 @@ const FeaturedServices = () => {
     
     const updateServicesPerPage = () => {
       if (typeof window === 'undefined') return;
-      setServicesPerPage(window.innerWidth < 640 ? 1 : window.innerWidth < 1024 ? 2 : 3);
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
+      setServicesPerPage(window.innerWidth < 640 ? 2 : window.innerWidth < 1024 ? 2 : 3);
     };
 
     // Establecer valor inicial
@@ -181,7 +187,51 @@ const FeaturedServices = () => {
   const handleCategoryChange = useCallback((category: string) => {
     setSelectedCategory(category);
     setCurrentPage(1); // Resetear a la primera página al cambiar de categoría
+    setCurrentSlide(0); // Resetear carrusel al cambiar categoría
   }, []);
+
+  // Funciones para el carrusel móvil
+  const nextSlide = useCallback(() => {
+    setCurrentSlide((prev) => {
+      const maxSlide = Math.max(0, filteredByCategory.length - 1);
+      return prev >= maxSlide ? 0 : prev + 1;
+    });
+  }, [filteredByCategory.length]);
+
+  const prevSlide = useCallback(() => {
+    setCurrentSlide((prev) => {
+      const maxSlide = Math.max(0, filteredByCategory.length - 1);
+      return prev <= 0 ? maxSlide : prev - 1;
+    });
+  }, [filteredByCategory.length]);
+
+  const goToSlide = useCallback((index: number) => {
+    setCurrentSlide(index);
+  }, []);
+
+  // Funciones para navegación táctil
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    setTouchEnd(0); // Reset touchEnd
+    setTouchStart(e.targetTouches[0].clientX);
+  }, []);
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  }, []);
+
+  const handleTouchEnd = useCallback(() => {
+    if (!touchStart || !touchEnd) return;
+    
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > 50;
+    const isRightSwipe = distance < -50;
+
+    if (isLeftSwipe) {
+      nextSlide();
+    } else if (isRightSwipe) {
+      prevSlide();
+    }
+  }, [touchStart, touchEnd, nextSlide, prevSlide]);
 
   // Efecto para manejar la carga inicial
   useEffect(() => {
@@ -275,63 +325,121 @@ const FeaturedServices = () => {
           </div>
         </div>
 
-        {/* Lista de servicios */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {currentServices.map((service) => (
-            <ServiceCard key={service.id} service={service} />
-          ))}
-        </div>
-
-        {/* Paginación */}
-        {totalPages > 1 && (
-          <div className="flex justify-center mt-10">
-            <nav className="flex items-center space-x-2">
-              <button
-                onClick={() => changePage(currentPage - 1)}
-                disabled={currentPage === 1}
-                className="w-10 h-10 flex items-center justify-center rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                aria-label="Página anterior"
+        {/* Lista de servicios - Carrusel en móvil, Grid en desktop */}
+        {isMobile ? (
+          <div className="relative">
+            {/* Carrusel móvil */}
+            <div className="overflow-hidden">
+              <div 
+                className="flex transition-transform duration-300 ease-in-out"
+                style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+                onTouchStart={handleTouchStart}
+                onTouchMove={handleTouchMove}
+                onTouchEnd={handleTouchEnd}
               >
-                <ChevronLeft className="w-5 h-5" />
-              </button>
-
-              {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                let pageNum;
-                if (totalPages <= 5) {
-                  pageNum = i + 1;
-                } else if (currentPage <= 3) {
-                  pageNum = i + 1;
-                } else if (currentPage >= totalPages - 2) {
-                  pageNum = totalPages - 4 + i;
-                } else {
-                  pageNum = currentPage - 2 + i;
-                }
-
-                return (
-                  <button
-                    key={pageNum}
-                    onClick={() => changePage(pageNum)}
-                    className={`w-10 h-10 flex items-center justify-center rounded-lg ${
-                      currentPage === pageNum
-                        ? 'bg-orange-500 text-white'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                    }`}
-                  >
-                    {pageNum}
-                  </button>
-                );
-              })}
-
-              <button
-                onClick={() => changePage(currentPage + 1)}
-                disabled={currentPage === totalPages}
-                className="w-10 h-10 flex items-center justify-center rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                aria-label="Página siguiente"
-              >
-                <ChevronRight className="w-5 h-5" />
-              </button>
-            </nav>
+                {filteredByCategory.map((service, index) => (
+                  <div key={service.id} className="w-full flex-shrink-0 px-2">
+                    <ServiceCard service={service} />
+                  </div>
+                ))}
+              </div>
+            </div>
+            
+            {/* Controles del carrusel */}
+            {filteredByCategory.length > 1 && (
+              <>
+                <button
+                  onClick={prevSlide}
+                  className="absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full shadow-lg flex items-center justify-center text-gray-700 hover:bg-white transition-colors z-10"
+                  aria-label="Servicio anterior"
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                </button>
+                <button
+                  onClick={nextSlide}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full shadow-lg flex items-center justify-center text-gray-700 hover:bg-white transition-colors z-10"
+                  aria-label="Siguiente servicio"
+                >
+                  <ChevronRight className="w-5 h-5" />
+                </button>
+                
+                {/* Indicadores */}
+                <div className="flex justify-center mt-4 space-x-2">
+                  {filteredByCategory.map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => goToSlide(index)}
+                      className={`w-2 h-2 rounded-full transition-colors ${
+                        index === currentSlide ? 'bg-orange-500' : 'bg-gray-300'
+                      }`}
+                      aria-label={`Ir al servicio ${index + 1}`}
+                    />
+                  ))}
+                </div>
+              </>
+            )}
           </div>
+        ) : (
+          <>
+            {/* Grid para desktop */}
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+              {currentServices.map((service) => (
+                <ServiceCard key={service.id} service={service} />
+              ))}
+            </div>
+
+            {/* Paginación solo para desktop */}
+            {totalPages > 1 && (
+              <div className="flex justify-center mt-10">
+                <nav className="flex items-center space-x-2">
+                  <button
+                    onClick={() => changePage(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className="w-10 h-10 flex items-center justify-center rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    aria-label="Página anterior"
+                  >
+                    <ChevronLeft className="w-5 h-5" />
+                  </button>
+
+                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                    let pageNum;
+                    if (totalPages <= 5) {
+                      pageNum = i + 1;
+                    } else if (currentPage <= 3) {
+                      pageNum = i + 1;
+                    } else if (currentPage >= totalPages - 2) {
+                      pageNum = totalPages - 4 + i;
+                    } else {
+                      pageNum = currentPage - 2 + i;
+                    }
+
+                    return (
+                      <button
+                        key={pageNum}
+                        onClick={() => changePage(pageNum)}
+                        className={`w-10 h-10 flex items-center justify-center rounded-lg ${
+                          currentPage === pageNum
+                            ? 'bg-orange-500 text-white'
+                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        }`}
+                      >
+                        {pageNum}
+                      </button>
+                    );
+                  })}
+
+                  <button
+                    onClick={() => changePage(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    className="w-10 h-10 flex items-center justify-center rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    aria-label="Página siguiente"
+                  >
+                    <ChevronRight className="w-5 h-5" />
+                  </button>
+                </nav>
+              </div>
+            )}
+          </>
         )}
       </div>
     </section>

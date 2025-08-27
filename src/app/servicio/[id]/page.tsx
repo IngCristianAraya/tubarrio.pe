@@ -123,12 +123,12 @@ export default function ServicioDetallePage() {
       <Header />
       
       {/* Main Content */}
-      <main className="flex-1 w-full py-10 px-2 sm:px-4">
+      <main className="flex-1 w-full py-2 px-1 sm:py-10 sm:px-4">
         <div className="max-w-7xl mx-auto">
-          {/* Main Content Container */}
-          <div className="bg-white rounded-3xl shadow-xl overflow-hidden">
+          {/* Main Content Container - Optimizado para móvil */}
+          <div className="bg-white sm:rounded-3xl sm:shadow-xl overflow-hidden">
             {/* Service Header Component (now includes all service details and actions) */}
-            <div className="p-4 sm:p-6 md:p-8">
+            <div className="p-2 sm:p-6 md:p-8">
               <ServiceHeader service={service} />
             </div>
             
@@ -136,8 +136,7 @@ export default function ServicioDetallePage() {
             <div className="border-t border-gray-200" />
             
             {/* Recommended Services Section */}
-            <div className="p-6 md:p-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">Servicios relacionados</h2>
+            <div className="p-3 sm:p-6 md:p-8">
               <RecommendedServices 
                 services={allServices}
                 currentServiceId={service.id}

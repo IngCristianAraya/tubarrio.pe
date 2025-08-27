@@ -193,7 +193,7 @@ export default function WebDesignBanner() {
                       <div className="bg-amber-50 p-5 rounded-xl border border-amber-100">
                         <div className="flex items-end gap-2">
                           <span className="text-4xl font-bold text-gray-900">Consúltanos</span>
-                          <span className="text-amber-700 text-sm font-medium mb-1">para tu proyecto</span>
+                          <span className="text-amber-700 text-sm font-medium mb-1 hidden sm:inline">para tu proyecto</span>
                         </div>
                         <div className="text-amber-700 text-sm mt-1">Presupuesto personalizado y sin compromiso</div>
                       </div>

@@ -91,10 +91,10 @@ const Header = () => {
     <header className="bg-white/95 backdrop-blur-lg shadow-sm sticky top-0 z-50 border-b border-gray-200" ref={menuRef}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 sm:h-18">
-          {/* Logo y menú móvil */}
-          <div className="flex items-center">
+          {/* Botón menú móvil */}
+          <div className="md:hidden">
             <button 
-              className="md:hidden mr-2 p-3 rounded-lg !bg-transparent !text-gray-700 hover:!text-orange-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-orange-400 active:bg-gray-200 transition-all duration-150 min-h-[44px] min-w-[44px] flex items-center justify-center"
+              className="p-3 rounded-lg !bg-transparent !text-gray-700 hover:!text-orange-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-orange-400 active:bg-gray-200 transition-all duration-150 min-h-[44px] min-w-[44px] flex items-center justify-center"
               onClick={() => {
                 playFolderSound();
                 setIsMenuOpen(!isMenuOpen);
@@ -104,22 +104,26 @@ const Header = () => {
             >
               {isMenuOpen ? <X className="w-6 h-6 !text-gray-700 hover:!text-orange-500" /> : <Menu className="w-6 h-6 !text-gray-700 hover:!text-orange-500" />}
             </button>
-
-            <div className="flex-shrink-0 flex items-center">
-              <Link href="/" className="flex items-center select-none" aria-label="Ir a inicio">
-                <div className="relative h-[50px] sm:h-[60px] w-auto aspect-[4/1] min-w-[100px] sm:min-w-[120px]">
-                  <Image
-                    src="/images/tubarriope_logo_penegro2.webp"
-                    alt="Logo TuBarrio.pe"
-                    fill
-                    sizes="(max-width: 768px) 100vw, 200px"
-                    className="object-contain"
-                    priority
-                  />
-                </div>
-              </Link>
-            </div>
           </div>
+
+          {/* Logo centrado en móvil, a la izquierda en desktop */}
+          <div className="flex-shrink-0 flex items-center md:mr-auto absolute left-1/2 transform -translate-x-1/2 md:relative md:left-auto md:transform-none">
+            <Link href="/" className="flex items-center select-none" aria-label="Ir a inicio">
+              <div className="relative h-[60px] md:h-[50px] lg:h-[60px] w-auto aspect-[4/1] min-w-[140px] md:min-w-[100px] lg:min-w-[120px]">
+                <Image
+                  src="/images/tubarriope_logo_penegro2.webp"
+                  alt="Logo TuBarrio.pe"
+                  fill
+                  sizes="(max-width: 768px) 140px, 200px"
+                  className="object-contain"
+                  priority
+                />
+              </div>
+            </Link>
+          </div>
+
+          {/* Espaciador invisible en móvil para balancear el centrado */}
+          <div className="md:hidden w-[44px]"></div>
 
           {/* Navegación desktop */}
           <nav className="hidden md:flex gap-3 lg:gap-6 items-center mx-4">

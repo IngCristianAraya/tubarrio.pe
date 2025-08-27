@@ -113,16 +113,45 @@ function TodosLosServiciosPage() {
           />
         </div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 md:p-12 shadow-xl">
-            <h1 className="relative text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-6 text-center tracking-tight drop-shadow-[0_2px_8px_rgba(0,0,0,0.45)]">
-              <span className="inline-block px-4">
-                Todos los <span className="text-yellow-300">servicios</span> de la zona
-              </span>
-              <span className="block mx-auto mt-3 h-2 w-32 md:w-48 rounded-full bg-gradient-to-r from-orange-400 via-yellow-300 to-orange-400 animate-pulse opacity-80"></span>
-            </h1>
-            <p className="text-white/90 text-center text-lg md:text-xl max-w-2xl mx-auto drop-shadow-[0_1.5px_6px_rgba(0,0,0,0.36)]">
-              Explora todos los servicios disponibles en tu comunidad y encuentra exactamente lo que necesitas.
-            </p>
+          <div className="relative">
+            {/* Contenedor principal con fondo claro */}
+            <div className="relative bg-white/95 backdrop-blur-sm rounded-3xl p-8 md:p-12 lg:p-16 shadow-xl border border-gray-200">
+              {/* Efectos decorativos sutiles */}
+              <div className="absolute inset-0 bg-gradient-to-br from-orange-100/30 via-transparent to-yellow-100/30 rounded-3xl"></div>
+              
+              {/* Contenido principal */}
+              <div className="relative z-10 text-center">
+                {/* Badge superior */}
+                <div className="inline-flex items-center gap-2 px-4 py-2 bg-orange-600 rounded-full mb-6 shadow-lg">
+                  <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                  <span className="text-white text-sm font-semibold tracking-wide">DIRECTORIO LOCAL</span>
+                </div>
+                
+                {/* Título principal */}
+                <h1 className="relative mb-8">
+                  <div className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black text-gray-900 leading-tight tracking-tight mb-2">
+                    Todos los
+                  </div>
+                  <div className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black text-orange-600 leading-tight tracking-tight mb-2">
+                    servicios
+                  </div>
+                  <div className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold text-gray-700 leading-tight tracking-wide">
+                    de la zona
+                  </div>
+                </h1>
+                
+                {/* Línea decorativa simple */}
+                <div className="flex justify-center mb-8">
+                  <div className="h-1 w-32 md:w-48 bg-gradient-to-r from-orange-500 to-yellow-500 rounded-full"></div>
+                </div>
+                
+                {/* Descripción */}
+                <p className="text-gray-700 text-lg md:text-xl lg:text-2xl max-w-3xl mx-auto leading-relaxed mb-10">
+                  Explora todos los servicios disponibles en tu comunidad y{' '}
+                  <span className="text-orange-600 font-semibold">encuentra exactamente</span> lo que necesitas.
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -160,7 +189,7 @@ function TodosLosServiciosPage() {
 
           {/* Skeleton loader */}
           {(loading && services.length === 0) ? (
-            <div className="grid gap-4 sm:gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            <div className="grid gap-4 sm:gap-5 grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {Array.from({ length: PAGE_SIZE }).map((_, i) => (
                 <div key={i} className="w-full">
                   <ServiceCardSkeleton />
@@ -170,7 +199,7 @@ function TodosLosServiciosPage() {
           ) : filtered.length === 0 ? (
             <EmptyState message={search || category ? "No se encontraron servicios para tu búsqueda o categoría seleccionada." : "No hay servicios disponibles por el momento."} />
           ) : (
-            <div className="grid gap-4 sm:gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            <div className="grid gap-4 sm:gap-5 grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {paginated.map((service) => (
                 <div key={service.id + service.name} className="w-full transform transition-all hover:scale-[1.02] hover:shadow-lg">
                   <ServiceCard service={service} />
@@ -189,48 +218,155 @@ function TodosLosServiciosPage() {
           <GoToTopButton />
 
           {/* Paginación */}
-          <div className="flex flex-col sm:flex-row justify-center items-center gap-4 mt-12 mb-8 bg-white/70 backdrop-blur-md p-4 rounded-xl shadow-md border border-gray-100 transition-all">
-
-            {/* Botón Anterior */}
-            <button
-              onClick={() => setPage((p) => Math.max(1, p - 1))}
-              disabled={page === 1}
-              className={`flex items-center gap-2 px-6 py-2.5 rounded-xl font-semibold transition-transform transform hover:scale-105 w-full sm:w-auto text-center
-      ${
-        page === 1
-          ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-          : "bg-gradient-to-r from-orange-400 to-orange-500 text-white hover:shadow-md"
-      }`}
-            >
-              <span className="mr-1"></span> Anterior
-            </button>
-
-            <div className="flex gap-2 mt-4 sm:mt-0">
-              {[...Array(totalPages)].map((_, i) => (
-                <div
-                  key={i}
-                  className={`h-2 w-2 rounded-full transition-all duration-300 ${
-                    i + 1 === page ? "bg-orange-500 scale-110" : "bg-gray-300"
+          {totalPages > 1 && (
+            <div className="flex flex-col items-center gap-6 mt-12 mb-8">
+              {/* Información de página */}
+              <div className="text-sm text-gray-600 font-medium">
+                Página {page} de {totalPages} • {filtered.length} servicios encontrados
+              </div>
+              
+              {/* Controles de paginación */}
+              <div className="flex items-center gap-2 bg-white rounded-2xl shadow-lg border border-gray-100 p-2">
+                {/* Botón Primera página */}
+                <button
+                  onClick={() => setPage(1)}
+                  disabled={page === 1}
+                  className={`p-2 rounded-xl transition-all duration-200 ${
+                    page === 1
+                      ? "text-gray-400 cursor-not-allowed"
+                      : "text-gray-600 hover:bg-orange-50 hover:text-orange-600"
                   }`}
-                />
-              ))}
+                  title="Primera página"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
+                  </svg>
+                </button>
+
+                {/* Botón Anterior */}
+                <button
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  disabled={page === 1}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all duration-200 ${
+                    page === 1
+                      ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                      : "bg-gray-50 text-gray-700 hover:bg-orange-50 hover:text-orange-600 hover:shadow-md"
+                  }`}
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
+                  <span className="hidden sm:inline">Anterior</span>
+                </button>
+
+                {/* Números de página */}
+                <div className="flex items-center gap-1">
+                  {(() => {
+                    const getPageNumbers = () => {
+                      const delta = 2;
+                      const range = [];
+                      const rangeWithDots = [];
+                      
+                      for (let i = Math.max(2, page - delta); i <= Math.min(totalPages - 1, page + delta); i++) {
+                        range.push(i);
+                      }
+                      
+                      if (page - delta > 2) {
+                        rangeWithDots.push(1, '...');
+                      } else {
+                        rangeWithDots.push(1);
+                      }
+                      
+                      rangeWithDots.push(...range);
+                      
+                      if (page + delta < totalPages - 1) {
+                        rangeWithDots.push('...', totalPages);
+                      } else if (totalPages > 1) {
+                        rangeWithDots.push(totalPages);
+                      }
+                      
+                      return rangeWithDots;
+                    };
+                    
+                    return getPageNumbers().map((pageNum, index) => {
+                      if (pageNum === '...') {
+                        return (
+                          <span key={`dots-${index}`} className="px-2 py-1 text-gray-400">
+                            •••
+                          </span>
+                        );
+                      }
+                      
+                      const isActive = pageNum === page;
+                      return (
+                        <button
+                          key={pageNum}
+                          onClick={() => setPage(pageNum as number)}
+                          className={`min-w-[40px] h-10 rounded-xl font-medium transition-all duration-200 ${
+                            isActive
+                              ? "bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-lg scale-105"
+                              : "text-gray-600 hover:bg-orange-50 hover:text-orange-600 hover:scale-105"
+                          }`}
+                        >
+                          {pageNum}
+                        </button>
+                      );
+                    });
+                  })()}
+                </div>
+
+                {/* Botón Siguiente */}
+                <button
+                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={page === totalPages}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all duration-200 ${
+                    page === totalPages
+                      ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                      : "bg-gray-50 text-gray-700 hover:bg-orange-50 hover:text-orange-600 hover:shadow-md"
+                  }`}
+                >
+                  <span className="hidden sm:inline">Siguiente</span>
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+
+                {/* Botón Última página */}
+                <button
+                  onClick={() => setPage(totalPages)}
+                  disabled={page === totalPages}
+                  className={`p-2 rounded-xl transition-all duration-200 ${
+                    page === totalPages
+                      ? "text-gray-400 cursor-not-allowed"
+                      : "text-gray-600 hover:bg-orange-50 hover:text-orange-600"
+                  }`}
+                  title="Última página"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+                  </svg>
+                </button>
+              </div>
+              
+              {/* Selector de elementos por página */}
+              <div className="flex items-center gap-3 text-sm text-gray-600">
+                <span>Mostrar:</span>
+                <select
+                  value={PAGE_SIZE}
+                  onChange={(e) => {
+                    // Esta funcionalidad se puede implementar si se hace dinámico el PAGE_SIZE
+                    console.log('Cambiar elementos por página:', e.target.value);
+                  }}
+                  className="px-3 py-1 border border-gray-200 rounded-lg bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                >
+                  <option value={8}>8 por página</option>
+                  <option value={12}>12 por página</option>
+                  <option value={16}>16 por página</option>
+                  <option value={24}>24 por página</option>
+                </select>
+              </div>
             </div>
-
-            {/* Botón Siguiente */}
-            <button
-              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-              disabled={page === totalPages}
-              className={`flex items-center gap-2 px-6 py-2.5 rounded-xl font-semibold transition-transform transform hover:scale-105 w-full sm:w-auto text-center
-      ${
-        page === totalPages
-          ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-          : "bg-gradient-to-r from-orange-400 to-orange-500 text-white hover:shadow-md"
-      }`}
-            >
-              Siguiente <span className="ml-1"></span>
-            </button>
-
-          </div>
+          )}
         </div>
       </main>
       <BusinessBanner />

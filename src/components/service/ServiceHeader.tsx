@@ -137,43 +137,273 @@ const ServiceHeader: React.FC<ServiceHeaderProps> = ({ service }): ReactElement 
   };
 
   return (
-    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      {/* Header con gradiente sutil */}
-      <div className="bg-gradient-to-br from-orange-50 via-white to-orange-50 rounded-3xl p-8 lg:p-12 shadow-xl border border-orange-100">
+    <div className="w-full max-w-7xl mx-auto px-1 sm:px-6 lg:px-8 py-2 sm:py-12">
+      {/* Header con gradiente sutil - Optimizado para móvil */}
+      <div className="bg-gradient-to-br from-orange-50 via-white to-orange-50 rounded-xl sm:rounded-3xl p-3 sm:p-8 lg:p-12 shadow-lg sm:shadow-xl border border-orange-100">
         
-        {/* Layout para móvil: Título primero */}
-        <div className="block lg:hidden mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 leading-tight mb-4">
+        {/* Layout reorganizado para móvil */}
+        <div className="block lg:hidden space-y-4">
+          {/* 1. Título */}
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 leading-tight">
             {service.name}
           </h1>
           
-          {/* Categoría y Rating para móvil */}
-          <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-6">
-            <span className="inline-flex items-center px-3 py-2 bg-gradient-to-r from-orange-100 to-orange-200 text-orange-800 text-sm font-semibold rounded-full border border-orange-300">
+          {/* 2. Categoría */}
+          <div>
+            <span className="inline-flex items-center px-2.5 py-1.5 sm:px-3 sm:py-2 bg-gradient-to-r from-orange-100 to-orange-200 text-orange-800 text-xs sm:text-sm font-semibold rounded-full border border-orange-300">
               📂 {service.category}
             </span>
+          </div>
+          
+          {/* 3. Rating */}
+          {service.rating && service.rating > 0 && (
+            <div className="flex items-center gap-2">
+              {renderRating(service.rating)}
+            </div>
+          )}
+          
+          {/* 4. Imagen del servicio */}
+          <div className="relative aspect-square w-full bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl overflow-hidden shadow-lg border border-gray-200">
+            <Image
+              src={images[currentImageIndex]}
+              alt={`${service.name} - Imagen ${currentImageIndex + 1}`}
+              fill
+              className="object-cover"
+              priority
+            />
             
-            {service.rating && service.rating > 0 && (
-              <div className="flex items-center gap-2">
-                {renderRating(service.rating)}
-              </div>
+            {/* Controles de navegación */}
+            {images.length > 1 && (
+              <>
+                <button
+                  onClick={prevImage}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 p-3 bg-white/90 hover:bg-white rounded-full shadow-lg transition-all duration-200 hover:scale-110"
+                  aria-label="Imagen anterior"
+                >
+                  <ChevronLeft className="w-5 h-5 text-gray-700" />
+                </button>
+                <button
+                  onClick={nextImage}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 p-3 bg-white/90 hover:bg-white rounded-full shadow-lg transition-all duration-200 hover:scale-110"
+                  aria-label="Siguiente imagen"
+                >
+                  <ChevronRight className="w-5 h-5 text-gray-700" />
+                </button>
+              </>
             )}
           </div>
           
-          {/* Descripción para móvil */}
+          {/* Miniaturas para móvil */}
+          {images.length > 1 && (
+            <div className="flex gap-3 overflow-x-auto pb-2">
+              {images.map((image, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCurrentImageIndex(index)}
+                  className={`flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden border-2 transition-all bg-transparent hover:bg-transparent focus:bg-transparent ${
+                    index === currentImageIndex 
+                      ? 'border-orange-500 ring-2 ring-orange-200 shadow-md' 
+                      : 'border-transparent hover:border-gray-300'
+                  }`}
+                  style={{ background: 'transparent' }}
+                  aria-label={`Ver imagen ${index + 1}`}
+                >
+                  <Image
+                    src={image}
+                    alt={`${service.name} - Miniatura ${index + 1}`}
+                    width={80}
+                    height={80}
+                    className="w-full h-full object-cover"
+                  />
+                </button>
+              ))}
+            </div>
+          )}
+          
+          {/* 5. Descripción del servicio */}
           {service.description && (
-            <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm mb-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">Descripción</h3>
-              <p className="text-gray-700 leading-relaxed text-base">
+            <div className="bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-gray-100 shadow-sm">
+              <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2 sm:mb-3">Descripción</h3>
+              <p className="text-gray-700 leading-relaxed text-sm sm:text-base">
                 {service.description}
               </p>
             </div>
           )}
+          
+          {/* 6. Información del servicio */}
+          <div className="bg-white p-3 sm:p-6 rounded-xl sm:rounded-2xl border border-gray-100 shadow-sm">
+            <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">Información del Servicio</h3>
+            <div className="space-y-3 sm:space-y-4">
+              {/* Ubicación */}
+              {(service.location || service.address) && (
+                <div className="flex items-start gap-4 p-4 bg-blue-50 rounded-xl border border-blue-100">
+                  <div className="p-2 bg-blue-500 rounded-lg">
+                    <MapPin className="w-5 h-5 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-semibold text-blue-900 mb-1">Ubicación</h4>
+                    <div className="space-y-1">
+                      {(() => {
+                        const address = service.address?.trim();
+                        const reference = service.reference?.trim();
+                        const location = service.location?.trim();
+                        
+                        // Si address y reference son iguales, solo mostrar address
+                        if (address && reference && address === reference) {
+                          return (
+                            <p className="text-gray-700 text-sm font-medium">
+                              {address}
+                            </p>
+                          );
+                        }
+                        
+                        // Si hay address y reference diferentes, mostrar ambos
+                        if (address && reference && address !== reference) {
+                          return (
+                            <div className="space-y-1">
+                              <p className="text-gray-700 text-sm font-medium">
+                                {address}
+                              </p>
+                              <p className="text-gray-600 text-sm">
+                                <span className="font-medium">Referencia:</span> {reference}
+                              </p>
+                            </div>
+                          );
+                        }
+                        
+                        // Si solo hay address, mostrarlo
+                        if (address) {
+                          return (
+                            <p className="text-gray-700 text-sm font-medium">
+                              {address}
+                            </p>
+                          );
+                        }
+                        
+                        // Si solo hay location, mostrarlo
+                        if (location) {
+                          return (
+                            <p className="text-gray-700 text-sm">
+                              {location}
+                            </p>
+                          );
+                        }
+                        
+                        return null;
+                      })()}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Horario */}
+              {service.horario && (
+                <div className="flex items-start gap-4 p-4 bg-green-50 rounded-xl border border-green-100">
+                  <div className="p-2 bg-green-500 rounded-lg">
+                    <Clock className="w-5 h-5 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-semibold text-green-900 mb-1">Horario</h4>
+                    <p className="text-gray-700 text-sm">{formatSchedule()}</p>
+                  </div>
+                </div>
+              )}
+
+              {/* Contacto */}
+              <div className="flex items-start gap-4 p-4 bg-orange-50 rounded-xl border border-orange-100">
+                <div className="p-2 bg-orange-500 rounded-lg">
+                  <Phone className="w-5 h-5 text-white" />
+                </div>
+                <div className="flex-1">
+                  <h4 className="font-semibold text-orange-900 mb-1">Contacto</h4>
+                  <div className="space-y-2">
+                    {(service.whatsapp || (service.contactUrl && (service.contactUrl.includes('wa.me') || service.contactUrl.includes('whatsapp') || service.contactUrl.includes('wa.link')))) && (
+                      <div className="text-gray-700 text-sm">
+                        💬 {
+                          service.contactUrl && (service.contactUrl.includes('wa.me') || service.contactUrl.includes('whatsapp') || service.contactUrl.includes('wa.link'))
+                            ? (service.whatsapp || 'WhatsApp')
+                            : service.whatsapp
+                        }
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          {/* 7. Botones de contacto */}
+          <div className="bg-white p-3 sm:p-6 rounded-xl sm:rounded-2xl border border-gray-100 shadow-sm">
+            <h3 className="text-base font-semibold text-gray-900 mb-3 text-center">Contactar</h3>
+            
+            <div className="space-y-3">
+              {/* Botón WhatsApp */}
+              {(service.whatsapp || (service.contactUrl && (service.contactUrl.includes('wa.me') || service.contactUrl.includes('whatsapp') || service.contactUrl.includes('wa.link')))) && (
+                <a 
+                  href={
+                    service.contactUrl && (service.contactUrl.includes('wa.me') || service.contactUrl.includes('whatsapp') || service.contactUrl.includes('wa.link'))
+                      ? service.contactUrl
+                      : `https://wa.me/${service.whatsapp}`
+                  }
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-4 rounded-xl transition-colors duration-200 flex items-center justify-center gap-2 text-sm sm:text-base"
+                >
+                  <span>💬</span>
+                  <span>Chatear por WhatsApp</span>
+                </a>
+              )}
+              
+              {/* Botón Ver Página Web */}
+              {service.detailsUrl && (
+                <a 
+                  href={service.detailsUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-4 rounded-xl transition-colors duration-200 flex items-center justify-center gap-2 text-sm sm:text-base"
+                >
+                  <span>🌐</span>
+                  <span>Visitar Página Web</span>
+                </a>
+              )}
+              
+              {/* Botones secundarios */}
+              <div className="flex gap-2 sm:gap-3 pt-2">
+                <button 
+                  onClick={handleFavoriteToggle}
+                  className={`flex-1 font-medium py-2 px-2 sm:px-3 rounded-lg transition-all duration-200 flex items-center justify-center gap-1 sm:gap-2 text-xs sm:text-sm ${
+                    isFavorite 
+                      ? 'bg-red-100 hover:bg-red-200 text-red-700' 
+                      : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                  }`}
+                >
+                  <Heart className={`w-4 h-4 ${isFavorite ? 'fill-current' : ''}`} />
+                  <span className="hidden xs:inline">{isFavorite ? 'Guardado' : 'Guardar'}</span>
+                  <span className="xs:hidden">{isFavorite ? '❤️' : '♥'}</span>
+                </button>
+                <div className="relative flex-1">
+                  <button 
+                    onClick={handleShare}
+                    className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2 px-2 sm:px-3 rounded-lg transition-colors duration-200 flex items-center justify-center gap-1 sm:gap-2 text-xs sm:text-sm"
+                  >
+                    <Share2 className="w-4 h-4" />
+                    <span className="hidden xs:inline">Compartir</span>
+                    <span className="xs:hidden">📤</span>
+                  </button>
+                  {showShareTooltip && (
+                    <div className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded whitespace-nowrap">
+                      ¡Enlace copiado!
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
         
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.2fr] gap-8 lg:gap-16 items-start">
-          {/* Columna de la Imagen */}
-          <div className="space-y-6 order-1 lg:order-1">
+        <div className="hidden lg:grid lg:grid-cols-[1fr_1.2fr] gap-4 sm:gap-8 lg:gap-16 items-start">
+          {/* Columna de la Imagen - Solo Desktop */}
+          <div className="space-y-3 sm:space-y-6 order-1 lg:order-1">
             <div className="relative aspect-square w-full bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl overflow-hidden shadow-lg border border-gray-200">
               <Image
                 src={images[currentImageIndex]}
@@ -232,7 +462,7 @@ const ServiceHeader: React.FC<ServiceHeaderProps> = ({ service }): ReactElement 
             )}
             
             {/* Botones de Acción */}
-            <div className="bg-white p-4 sm:p-6 rounded-2xl border border-gray-100 shadow-sm">
+            <div className="bg-white p-3 sm:p-6 rounded-xl sm:rounded-2xl border border-gray-100 shadow-sm">
               <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4 text-center lg:block hidden">¿Te interesa este servicio?</h3>
               <h3 className="text-base font-semibold text-gray-900 mb-3 text-center lg:hidden">Contactar</h3>
               
@@ -301,8 +531,8 @@ const ServiceHeader: React.FC<ServiceHeaderProps> = ({ service }): ReactElement 
             </div>
           </div>
 
-          {/* Columna de Información */}
-          <div className="space-y-6 order-2 lg:order-2">
+          {/* Columna de Información - Solo Desktop */}
+          <div className="space-y-3 sm:space-y-6 order-2 lg:order-2">
             {/* Información básica del servicio - Solo visible en desktop */}
             <div className="hidden lg:block space-y-4">
               <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 leading-tight">
@@ -325,18 +555,18 @@ const ServiceHeader: React.FC<ServiceHeaderProps> = ({ service }): ReactElement 
 
             {/* Descripción - Solo visible en desktop */}
             {service.description && (
-              <div className="hidden lg:block bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
-                <h3 className="text-lg font-semibold text-gray-900 mb-3">Descripción</h3>
-                <p className="text-gray-700 leading-relaxed text-base">
+              <div className="hidden lg:block bg-white p-4 sm:p-6 rounded-xl sm:rounded-2xl border border-gray-100 shadow-sm">
+                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2 sm:mb-3">Descripción</h3>
+                <p className="text-gray-700 leading-relaxed text-sm sm:text-base">
                   {service.description}
                 </p>
               </div>
             )}
 
-            {/* Información del Servicio */}
-            <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Información del Servicio</h3>
-              <div className="space-y-4">
+            {/* Información del Servicio - Solo visible en desktop */}
+            <div className="hidden lg:block bg-white p-3 sm:p-6 rounded-xl sm:rounded-2xl border border-gray-100 shadow-sm">
+              <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">Información del Servicio</h3>
+              <div className="space-y-3 sm:space-y-4">
                 {/* Ubicación */}
                 {(service.location || service.address) && (
                   <div className="flex items-start gap-4 p-4 bg-blue-50 rounded-xl border border-blue-100">
