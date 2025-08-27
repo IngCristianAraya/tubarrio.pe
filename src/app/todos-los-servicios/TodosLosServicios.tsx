@@ -35,10 +35,12 @@ export default function TodosLosServiciosPageWrapper() {
 function TodosLosServiciosPage() {
   const PAGE_SIZE = useResponsivePageSize();
   const { 
-    services, 
+    paginatedServices, 
     loadServicesPaginated, 
     loading, 
-    currentLoadType 
+    currentLoadType,
+    hasMorePages,
+    resetPagination
   } = useServices();
   const searchParams = useSearchParams();
   const categoriaParam = searchParams.get('categoria');
@@ -47,35 +49,47 @@ function TodosLosServiciosPage() {
   const [search, setSearch] = useState(busquedaParam ?? '');
   // Si no hay parámetro de categoría, mostrar todos por defecto
   const [category, setCategory] = useState(categoriaParam ?? '');
-  const [page, setPage] = useState(1);
   const [hasLoadedInitial, setHasLoadedInitial] = useState(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
 
   // Cargar servicios paginados al montar el componente
   React.useEffect(() => {
-    if (!hasLoadedInitial && currentLoadType !== 'paginated') {
+    if (!hasLoadedInitial) {
+      resetPagination();
       loadServicesPaginated(1, PAGE_SIZE);
       setHasLoadedInitial(true);
     }
-  }, [loadServicesPaginated, PAGE_SIZE, hasLoadedInitial, currentLoadType]);
+  }, [loadServicesPaginated, PAGE_SIZE, hasLoadedInitial, resetPagination]);
 
-  // Si cambian los query params, actualizar los filtros
+  // Si cambian los query params, actualizar los filtros y resetear paginación
   React.useEffect(() => {
     setCategory(categoriaParam ?? '');
     setSearch(busquedaParam ?? '');
-    setPage(1);
-  }, [categoriaParam, busquedaParam]);
-
-  // Cargar más servicios cuando cambie la página
-  React.useEffect(() => {
-    if (hasLoadedInitial && page > 1) {
-      loadServicesPaginated(page, PAGE_SIZE);
+    if (hasLoadedInitial) {
+      resetPagination();
+      loadServicesPaginated(1, PAGE_SIZE, true);
     }
-  }, [page, PAGE_SIZE, loadServicesPaginated, hasLoadedInitial]);
+  }, [categoriaParam, busquedaParam, resetPagination, loadServicesPaginated, PAGE_SIZE, hasLoadedInitial]);
 
-  const categories = getUniqueCategories(services);
+  // Función para cargar más servicios
+  const loadMoreServices = async () => {
+    if (hasMorePages && !isLoadingMore) {
+      setIsLoadingMore(true);
+      try {
+        const currentPage = Math.floor(paginatedServices.length / PAGE_SIZE) + 1;
+        await loadServicesPaginated(currentPage, PAGE_SIZE);
+      } catch (error) {
+        console.error('Error cargando más servicios:', error);
+      } finally {
+        setIsLoadingMore(false);
+      }
+    }
+  };
 
-  // Filtrado
-  const filtered = services.filter((s) => {
+  const categories = getUniqueCategories(paginatedServices);
+
+  // Filtrado de servicios paginados
+  const filtered = paginatedServices.filter((s) => {
     const searchLower = search.toLowerCase();
     const matchesName = s.name.toLowerCase().includes(searchLower);
     const matchesDescription = s.description.toLowerCase().includes(searchLower);
@@ -84,10 +98,6 @@ function TodosLosServiciosPage() {
     const matchesCategory = category ? s.category === category : true;
     return matchesSearch && matchesCategory;
   });
-
-  // Paginación
-  const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
-  const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   return (
     <div className="min-h-screen bg-white">
@@ -174,7 +184,7 @@ function TodosLosServiciosPage() {
               type="text"
               placeholder="Buscar por nombre o descripción..."
               value={search}
-              onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+              onChange={(e) => { setSearch(e.target.value); }}
               className="w-full max-w-2xl border-2 border-gray-200 rounded-xl px-5 py-3 text-base focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent transition-all"
             />
             {/* chips de categorías */}
@@ -182,13 +192,13 @@ function TodosLosServiciosPage() {
               <CategoryChips
                 categories={categories}
                 selected={category}
-                onSelect={(cat) => { setCategory(cat); setPage(1); }}
+                onSelect={(cat) => { setCategory(cat); }}
               />
             </div>
           </div>
 
           {/* Skeleton loader */}
-          {(loading && services.length === 0) ? (
+          {(loading && paginatedServices.length === 0) ? (
             <div className="grid gap-4 sm:gap-5 grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {Array.from({ length: PAGE_SIZE }).map((_, i) => (
                 <div key={i} className="w-full">
@@ -200,7 +210,7 @@ function TodosLosServiciosPage() {
             <EmptyState message={search || category ? "No se encontraron servicios para tu búsqueda o categoría seleccionada." : "No hay servicios disponibles por el momento."} />
           ) : (
             <div className="grid gap-4 sm:gap-5 grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {paginated.map((service) => (
+              {filtered.map((service) => (
                 <div key={service.id + service.name} className="w-full transform transition-all hover:scale-[1.02] hover:shadow-lg">
                   <ServiceCard service={service} />
                 </div>
@@ -208,165 +218,49 @@ function TodosLosServiciosPage() {
             </div>
           )}
           
+          {/* Botón Cargar Más */}
+          {hasMorePages && filtered.length > 0 && (
+            <div className="flex justify-center mt-12 mb-8">
+              <button
+                onClick={loadMoreServices}
+                disabled={isLoadingMore}
+                className="bg-orange-600 hover:bg-orange-700 disabled:bg-orange-400 text-white font-semibold py-4 px-8 rounded-xl transition-all duration-200 transform hover:scale-105 disabled:scale-100 shadow-lg hover:shadow-xl disabled:shadow-md flex items-center gap-3"
+              >
+                {isLoadingMore ? (
+                  <>
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                    <span>Cargando más servicios...</span>
+                  </>
+                ) : (
+                  <>
+                    <span>Cargar más servicios</span>
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                    </svg>
+                  </>
+                )}
+              </button>
+            </div>
+          )}
+          
           {/* Loading indicator para cargas adicionales */}
-          {loading && services.length > 0 && (
+          {(loading || isLoadingMore) && paginatedServices.length > 0 && (
             <div className="flex justify-center mt-8">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
             </div>
           )}
 
-          <GoToTopButton />
-
-          {/* Paginación */}
-          {totalPages > 1 && (
-            <div className="flex flex-col items-center gap-6 mt-12 mb-8">
-              {/* Información de página */}
+          {/* Información de servicios cargados */}
+          {filtered.length > 0 && (
+            <div className="text-center mt-8 mb-4">
               <div className="text-sm text-gray-600 font-medium">
-                Página {page} de {totalPages} • {filtered.length} servicios encontrados
-              </div>
-              
-              {/* Controles de paginación */}
-              <div className="flex items-center gap-2 bg-white rounded-2xl shadow-lg border border-gray-100 p-2">
-                {/* Botón Primera página */}
-                <button
-                  onClick={() => setPage(1)}
-                  disabled={page === 1}
-                  className={`p-2 rounded-xl transition-all duration-200 ${
-                    page === 1
-                      ? "text-gray-400 cursor-not-allowed"
-                      : "text-gray-600 hover:bg-orange-50 hover:text-orange-600"
-                  }`}
-                  title="Primera página"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
-                  </svg>
-                </button>
-
-                {/* Botón Anterior */}
-                <button
-                  onClick={() => setPage((p) => Math.max(1, p - 1))}
-                  disabled={page === 1}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all duration-200 ${
-                    page === 1
-                      ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                      : "bg-gray-50 text-gray-700 hover:bg-orange-50 hover:text-orange-600 hover:shadow-md"
-                  }`}
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                  </svg>
-                  <span className="hidden sm:inline">Anterior</span>
-                </button>
-
-                {/* Números de página */}
-                <div className="flex items-center gap-1">
-                  {(() => {
-                    const getPageNumbers = () => {
-                      const delta = 2;
-                      const range = [];
-                      const rangeWithDots = [];
-                      
-                      for (let i = Math.max(2, page - delta); i <= Math.min(totalPages - 1, page + delta); i++) {
-                        range.push(i);
-                      }
-                      
-                      if (page - delta > 2) {
-                        rangeWithDots.push(1, '...');
-                      } else {
-                        rangeWithDots.push(1);
-                      }
-                      
-                      rangeWithDots.push(...range);
-                      
-                      if (page + delta < totalPages - 1) {
-                        rangeWithDots.push('...', totalPages);
-                      } else if (totalPages > 1) {
-                        rangeWithDots.push(totalPages);
-                      }
-                      
-                      return rangeWithDots;
-                    };
-                    
-                    return getPageNumbers().map((pageNum, index) => {
-                      if (pageNum === '...') {
-                        return (
-                          <span key={`dots-${index}`} className="px-2 py-1 text-gray-400">
-                            •••
-                          </span>
-                        );
-                      }
-                      
-                      const isActive = pageNum === page;
-                      return (
-                        <button
-                          key={pageNum}
-                          onClick={() => setPage(pageNum as number)}
-                          className={`min-w-[40px] h-10 rounded-xl font-medium transition-all duration-200 ${
-                            isActive
-                              ? "bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-lg scale-105"
-                              : "text-gray-600 hover:bg-orange-50 hover:text-orange-600 hover:scale-105"
-                          }`}
-                        >
-                          {pageNum}
-                        </button>
-                      );
-                    });
-                  })()}
-                </div>
-
-                {/* Botón Siguiente */}
-                <button
-                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                  disabled={page === totalPages}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all duration-200 ${
-                    page === totalPages
-                      ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                      : "bg-gray-50 text-gray-700 hover:bg-orange-50 hover:text-orange-600 hover:shadow-md"
-                  }`}
-                >
-                  <span className="hidden sm:inline">Siguiente</span>
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </button>
-
-                {/* Botón Última página */}
-                <button
-                  onClick={() => setPage(totalPages)}
-                  disabled={page === totalPages}
-                  className={`p-2 rounded-xl transition-all duration-200 ${
-                    page === totalPages
-                      ? "text-gray-400 cursor-not-allowed"
-                      : "text-gray-600 hover:bg-orange-50 hover:text-orange-600"
-                  }`}
-                  title="Última página"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5l7 7-7 7M5 5l7 7-7 7" />
-                  </svg>
-                </button>
-              </div>
-              
-              {/* Selector de elementos por página */}
-              <div className="flex items-center gap-3 text-sm text-gray-600">
-                <span>Mostrar:</span>
-                <select
-                  value={PAGE_SIZE}
-                  onChange={(e) => {
-                    // Esta funcionalidad se puede implementar si se hace dinámico el PAGE_SIZE
-                    console.log('Cambiar elementos por página:', e.target.value);
-                  }}
-                  className="px-3 py-1 border border-gray-200 rounded-lg bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                >
-                  <option value={8}>8 por página</option>
-                  <option value={12}>12 por página</option>
-                  <option value={16}>16 por página</option>
-                  <option value={24}>24 por página</option>
-                </select>
+                {filtered.length} servicios {search || category ? 'encontrados' : 'cargados'}
+                {hasMorePages && ' • Hay más servicios disponibles'}
               </div>
             </div>
           )}
+
+          <GoToTopButton />
         </div>
       </main>
       <BusinessBanner />

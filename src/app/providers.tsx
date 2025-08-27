@@ -5,6 +5,7 @@ import { Toaster } from 'react-hot-toast';
 import { ReactNode, Suspense } from 'react';
 import { ServicesProvider } from '@/context/ServicesContext';
 import { AnalyticsProvider } from '@/context/AnalyticsContext';
+import { AuthProvider } from '@/context/AuthContext';
 
 type ProvidersProps = {
   children: ReactNode;
@@ -22,12 +23,14 @@ export function Providers({ children }: ProvidersProps) {
   return (
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
       <Suspense fallback={<LoadingFallback />}>
-        <AnalyticsProvider>
-          <ServicesProvider>
-            {children}
-            <Toaster position="bottom-right" />
-          </ServicesProvider>
-        </AnalyticsProvider>
+        <AuthProvider>
+          <AnalyticsProvider>
+            <ServicesProvider>
+              {children}
+              <Toaster position="bottom-right" />
+            </ServicesProvider>
+          </AnalyticsProvider>
+        </AuthProvider>
       </Suspense>
     </ThemeProvider>
   );

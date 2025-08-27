@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import { collection, getDocs, deleteDoc, doc, updateDoc } from '@firebase/firestore';
 import { db } from '@/lib/firebase/config';
 import Link from 'next/link';
+import { useServices } from '@/context/ServicesContext';
+import { useServiceCache } from '@/hooks/useServiceCache';
 
 interface Service {
   id: string;
@@ -20,7 +22,7 @@ interface Service {
 }
 
 export default function ServicesPage() {
-  const [services, setServices] = useState<Service[]>([]);
+  const [localServices, setLocalServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -29,6 +31,10 @@ export default function ServicesPage() {
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const servicesPerPage = 12;
+  
+  // 🚀 OPTIMIZACIÓN: Usar contexto de servicios y cache
+  const { services: contextServices, loadServicesFromFirestore } = useServices();
+  const { getAllServicesFromCache, clearAllCache } = useServiceCache();
 
   useEffect(() => {
     loadServices();
@@ -39,25 +45,33 @@ export default function ServicesPage() {
       setLoading(true);
       setError(null);
 
-      if (!db) {
-        throw new Error('Firebase no está configurado');
+      let servicesData: Service[] = [];
+      
+      // 🚀 OPTIMIZACIÓN: Intentar obtener servicios desde cache primero
+      const cachedServices = getAllServicesFromCache();
+      if (cachedServices && cachedServices.length > 0) {
+        servicesData = cachedServices as Service[];
+        console.log(`⚡ Admin servicios desde localStorage: ${cachedServices.length} servicios (0 lecturas Firebase)`);
+      } else if (contextServices && contextServices.length > 0) {
+        // Usar servicios del contexto si están disponibles
+        servicesData = contextServices as Service[];
+        console.log(`📋 Admin servicios desde contexto: ${contextServices.length} servicios (0 lecturas Firebase)`);
+      } else {
+        // Solo como último recurso, cargar desde Firebase
+        console.log('🔥 Admin servicios cargando desde Firebase...');
+        await loadServicesFromFirestore();
+        servicesData = contextServices as Service[];
       }
-
-      const servicesRef = collection(db, 'services');
-      const snapshot = await getDocs(servicesRef);
-      const servicesData = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      })) as Service[];
 
       // Ordenar por fecha de creación (más recientes primero)
       servicesData.sort((a, b) => {
         const dateA = a.createdAt?.toDate?.() || new Date(0);
         const dateB = b.createdAt?.toDate?.() || new Date(0);
-        return dateB - dateA;
+        return dateB.getTime() - dateA.getTime();
       });
 
-      setServices(servicesData);
+      setLocalServices(servicesData);
+      console.log(`✅ Admin servicios cargados: ${servicesData.length} servicios`);
     } catch (err) {
       console.error('Error cargando servicios:', err);
       setError(err instanceof Error ? err.message : 'Error desconocido');
@@ -73,12 +87,15 @@ export default function ServicesPage() {
       const serviceRef = doc(db, 'services', serviceId);
       await updateDoc(serviceRef, { active: !currentStatus });
       
-      // Actualizar estado local
-      setServices(prev => prev.map(service => 
+      // Actualizar estado local y limpiar cache
+      setLocalServices(prev => prev.map(service => 
         service.id === serviceId 
           ? { ...service, active: !currentStatus }
           : service
       ));
+      
+      // Limpiar cache para forzar recarga en próxima consulta
+      clearAllCache();
     } catch (err) {
       console.error('Error actualizando estado:', err);
       alert('Error al actualizar el estado del servicio');
@@ -91,9 +108,12 @@ export default function ServicesPage() {
       
       await deleteDoc(doc(db, 'services', serviceId));
       
-      // Actualizar estado local
-      setServices(prev => prev.filter(service => service.id !== serviceId));
+      // Actualizar estado local y limpiar cache
+      setLocalServices(prev => prev.filter(service => service.id !== serviceId));
       setDeleteConfirm(null);
+      
+      // Limpiar cache para forzar recarga en próxima consulta
+      clearAllCache();
     } catch (err) {
       console.error('Error eliminando servicio:', err);
       alert('Error al eliminar el servicio');
@@ -101,7 +121,7 @@ export default function ServicesPage() {
   };
 
   // Filtrar servicios
-  const filteredServices = services.filter(service => {
+  const filteredServices = localServices.filter(service => {
     const matchesSearch = service.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          service.description.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = !categoryFilter || service.category === categoryFilter;
@@ -124,7 +144,7 @@ export default function ServicesPage() {
   }, [searchTerm, categoryFilter, statusFilter]);
 
   // Obtener categorías únicas
-  const categories = Array.from(new Set(services.map(service => service.category).filter(Boolean)));
+  const categories = Array.from(new Set(localServices.map(service => service.category).filter(Boolean)));
 
   if (loading) {
     return (
@@ -157,7 +177,7 @@ export default function ServicesPage() {
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Gestión de Servicios</h1>
           <p className="text-gray-600 mt-1">
-            {filteredServices.length} de {services.length} servicios
+            {filteredServices.length} de {localServices.length} servicios
             {filteredServices.length > 0 && (
               <span className="ml-2 text-sm">
                 (Página {currentPage} de {totalPages})

@@ -4,6 +4,7 @@ import React, { useState, useEffect, useMemo, useCallback, memo } from 'react';
 import { Star, MapPin, Clock, ChevronLeft, ChevronRight } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { useServices } from '@/context/ServicesContext';
+import { useServiceCache } from '@/hooks/useServiceCache';
 
 // Importación dinámica para OptimizedImage con carga perezosa
 const OptimizedImage = dynamic(() => import('./OptimizedImage'), {
@@ -106,6 +107,10 @@ const FeaturedServices = () => {
     loadFeaturedServices, 
     currentLoadType 
   } = useServices();
+  
+  // 🚀 OPTIMIZACIÓN: Usar cache de localStorage
+  const { getFeaturedServicesFromCache } = useServiceCache();
+  
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedCategory, setSelectedCategory] = useState('Todos');
   const [servicesPerPage, setServicesPerPage] = useState(3);
@@ -115,15 +120,38 @@ const FeaturedServices = () => {
   const [isMobile, setIsMobile] = useState(false);
   const [touchStart, setTouchStart] = useState(0);
   const [touchEnd, setTouchEnd] = useState(0);
+  const [cachedFeaturedServices, setCachedFeaturedServices] = useState<any[]>([]);
 
-  // Efecto para cargar servicios destacados al montar el componente
+  // 🚀 OPTIMIZACIÓN: Cargar servicios destacados con cache localStorage
   useEffect(() => {
     setIsMounted(true);
     
-    // Cargar servicios destacados solo si no están cargados o si no es el tipo correcto
-    if (currentLoadType !== 'featured' || featuredServices.length === 0) {
-      loadFeaturedServices();
-    }
+    const loadOptimizedFeaturedServices = async () => {
+      // Intentar obtener desde cache localStorage primero
+      const cachedServices = getFeaturedServicesFromCache();
+      if (cachedServices && cachedServices.length > 0) {
+        setCachedFeaturedServices(cachedServices);
+        setIsLoading(false);
+        console.log(`⚡ FeaturedServices desde localStorage: ${cachedServices.length} servicios (0 lecturas Firebase)`);
+        return;
+      }
+      
+      // Si no hay cache, usar servicios del contexto si están disponibles
+      if (featuredServices.length > 0) {
+        setCachedFeaturedServices(featuredServices);
+        setIsLoading(false);
+        console.log(`📋 FeaturedServices desde contexto: ${featuredServices.length} servicios`);
+        return;
+      }
+      
+      // Solo como último recurso, cargar desde Firebase
+      if (currentLoadType !== 'featured' || featuredServices.length === 0) {
+        console.log('🔥 FeaturedServices cargando desde Firebase...');
+        await loadFeaturedServices();
+      }
+    };
+    
+    loadOptimizedFeaturedServices();
     
     const updateServicesPerPage = () => {
       if (typeof window === 'undefined') return;
@@ -147,20 +175,25 @@ const FeaturedServices = () => {
       window.removeEventListener('resize', handleResize);
       clearTimeout(timeoutId);
     };
-  }, [loadFeaturedServices, currentLoadType, featuredServices.length]);
+  }, [loadFeaturedServices, currentLoadType, featuredServices.length, getFeaturedServicesFromCache]);
 
+  // 🚀 OPTIMIZACIÓN: Usar servicios desde cache o contexto
+  const activeServices = useMemo(() => {
+    return cachedFeaturedServices.length > 0 ? cachedFeaturedServices : featuredServices;
+  }, [cachedFeaturedServices, featuredServices]);
+  
   // Obtener categorías únicas de los servicios destacados
   const categories = useMemo(() => {
-    if (!featuredServices || featuredServices.length === 0) return ['Todos'];
-    const cats = new Set(featuredServices.map(service => service.category));
+    if (!activeServices || activeServices.length === 0) return ['Todos'];
+    const cats = new Set(activeServices.map(service => service.category));
     return ['Todos', ...Array.from(cats)].sort();
-  }, [featuredServices]);
+  }, [activeServices]);
 
   // Filtrar servicios destacados por categoría
   const filteredByCategory = useMemo(() => {
-    if (selectedCategory === 'Todos') return featuredServices;
-    return featuredServices.filter(service => service.category === selectedCategory);
-  }, [featuredServices, selectedCategory]);
+    if (selectedCategory === 'Todos') return activeServices;
+    return activeServices.filter(service => service.category === selectedCategory);
+  }, [activeServices, selectedCategory]);
 
   // Calcular servicios paginados
   const currentServices = useMemo(() => {
@@ -233,12 +266,12 @@ const FeaturedServices = () => {
     }
   }, [touchStart, touchEnd, nextSlide, prevSlide]);
 
-  // Efecto para manejar la carga inicial
+  // Efecto para manejar la carga inicial optimizada
   useEffect(() => {
-    if (featuredServices.length > 0 || !loading) {
+    if (activeServices.length > 0 || !loading) {
       setIsLoading(false);
     }
-  }, [featuredServices, loading]);
+  }, [activeServices, loading]);
 
   // Si no está montado o está cargando, mostrar un loader simple
   if (!isMounted || (loading && featuredServices.length === 0)) {

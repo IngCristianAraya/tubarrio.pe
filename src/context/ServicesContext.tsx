@@ -1,6 +1,9 @@
 'use client';
 
 import React, { createContext, useContext, useState, ReactNode, useCallback } from 'react';
+import { useServiceCache } from '@/hooks/useServiceCache';
+import { useServiceAnalytics } from '@/hooks/useServiceAnalytics';
+import { useServicePreloader } from '@/hooks/useServicePreloader';
 
 // Definición de tipos
 export interface Service {
@@ -48,15 +51,25 @@ interface ServicesContextType {
   resetSearch: () => void;
   isSearching: boolean;
   retryConnection: () => void;
+  usingMockData: boolean;
   // Nuevas funciones optimizadas
   loadFeaturedServices: (forceRefresh?: boolean) => Promise<void>;
   loadSingleService: (serviceId: string) => Promise<Service | null>;
-  loadServicesPaginated: (page: number, limitCount: number) => Promise<Service[]>;
+  loadServicesPaginated: (page: number, limitCount: number, forceRefresh?: boolean) => Promise<any>;
+  paginatedServices: Service[];
+  hasMorePages: boolean;
+  resetPagination: () => void;
+  // Funciones de analytics y precarga
+  trackServiceVisit: (serviceId: string, category?: string) => void;
+  getAnalyticsStats: () => any;
+  preloadPopularServices: () => Promise<void>;
+  forcePreload: () => Promise<void>;
+  isPreloading: boolean;
 }
 
 // Firebase
 import { db } from '../lib/firebase/config';
-import { collection, getDocs, QueryDocumentSnapshot, query, orderBy, where, limit } from 'firebase/firestore';
+import { collection, getDocs, getDoc, doc, QueryDocumentSnapshot, query, orderBy, where, limit, startAfter, DocumentSnapshot } from 'firebase/firestore';
 import { toast } from 'react-hot-toast';
 import localServicesData from '../../services.json';
 
@@ -222,7 +235,40 @@ export const ServicesProvider: React.FC<{ children: ReactNode }> = ({ children }
   
   // Cache para diferentes tipos de datos
   const [featuredCache, setFeaturedCache] = useState<{ data: Service[], timestamp: Date } | null>(null);
-  const [singleServiceCache, setSingleServiceCache] = useState<Map<string, { data: Service, timestamp: Date }>>(new Map());
+  const [singleServiceCache, setLocalSingleServiceCache] = useState<Map<string, { data: Service, timestamp: Date }>>(new Map());
+  
+  // 🚀 Integrar sistema de cache optimizado
+   const {
+     getFeaturedServicesFromCache,
+     setFeaturedServicesCache,
+     getSingleServiceFromCache,
+     setSingleServiceCache: setServiceToLocalStorage,
+     getAllServicesFromCache,
+     setAllServicesCache,
+     clearAllCache
+   } = useServiceCache();
+
+  // 📊 Integrar sistema de analytics y precarga
+  const {
+    trackServiceVisit,
+    getAnalyticsStats
+  } = useServiceAnalytics();
+
+  const {
+    preloadPopularServices,
+    forcePreload,
+    isPreloading
+  } = useServicePreloader();
+
+  // 🚀 Inicializar precarga automática al montar el componente
+  React.useEffect(() => {
+    // Esperar un poco antes de iniciar la precarga para no interferir con la carga inicial
+    const timer = setTimeout(() => {
+      preloadPopularServices();
+    }, 3000); // 3 segundos después del montaje
+
+    return () => clearTimeout(timer);
+  }, [preloadPopularServices]);
 
   const loadLocalServices = () => {
      try {
@@ -287,22 +333,33 @@ export const ServicesProvider: React.FC<{ children: ReactNode }> = ({ children }
        setError(null);
        setCurrentLoadType('featured');
        
+       // 🚀 OPTIMIZACIÓN: Verificar cache localStorage primero
+       if (!forceRefresh) {
+         const cachedServices = getFeaturedServicesFromCache();
+         if (cachedServices && cachedServices.length > 0) {
+           setFeaturedServices(cachedServices);
+           setLoading(false);
+           console.log(`⚡ Servicios destacados desde localStorage: ${cachedServices.length} servicios (0 lecturas Firebase)`);
+           return;
+         }
+         
+         // Verificar cache en memoria como fallback
+         if (featuredCache) {
+           const timeSinceLastFetch = Date.now() - featuredCache.timestamp.getTime();
+           if (timeSinceLastFetch < cacheExpiry) {
+             console.log('Usando servicios destacados en cache memoria');
+             setFeaturedServices(featuredCache.data);
+             setLoading(false);
+             return;
+           }
+         }
+       }
+       
        if (!db) {
          throw new Error('Firebase no está disponible');
        }
        
-       // Verificar cache de servicios destacados
-       if (!forceRefresh && featuredCache) {
-         const timeSinceLastFetch = Date.now() - featuredCache.timestamp.getTime();
-         if (timeSinceLastFetch < cacheExpiry) {
-           console.log('Usando servicios destacados en cache');
-           setFeaturedServices(featuredCache.data);
-           setLoading(false);
-           return;
-         }
-       }
-       
-       console.log('Cargando servicios destacados desde Firebase...');
+       console.log('🔥 Cargando servicios destacados desde Firebase...');
        
        // Consulta optimizada para servicios destacados (solo 8 servicios)
        const featuredQuery = query(
@@ -324,10 +381,13 @@ export const ServicesProvider: React.FC<{ children: ReactNode }> = ({ children }
        
        const activeFeatured = featuredData.filter(service => service.active !== false);
        setFeaturedServices(activeFeatured);
+       
+       // 💾 Actualizar ambos caches
        setFeaturedCache({ data: activeFeatured, timestamp: new Date() });
+       setFeaturedServicesCache(activeFeatured);
        setUsingMockData(false);
        
-       console.log(`✅ ${activeFeatured.length} servicios destacados cargados (${featuredSnapshot.docs.length} lecturas)`);
+       console.log(`✅ ${activeFeatured.length} servicios destacados cargados (${featuredSnapshot.docs.length} lecturas Firebase)`);
        
      } catch (error: any) {
        console.error('Error cargando servicios destacados:', error);
@@ -338,55 +398,62 @@ export const ServicesProvider: React.FC<{ children: ReactNode }> = ({ children }
      } finally {
        setLoading(false);
      }
-   }, [db, featuredCache, cacheExpiry]);
+   }, [db, featuredCache, cacheExpiry, getFeaturedServicesFromCache, setFeaturedServicesCache]);
    
    // Función para cargar un servicio específico
    const loadSingleService = useCallback(async (serviceId: string): Promise<Service | null> => {
      try {
-       if (!db) {
-         throw new Error('Firebase no está disponible');
-       }
+       // 🚀 OPTIMIZACIÓN: Verificar cache localStorage primero
+        const cachedService = getSingleServiceFromCache(serviceId);
+        if (cachedService) {
+          console.log(`⚡ Servicio ${serviceId} desde localStorage (0 lecturas Firebase)`);
+          return cachedService;
+        }
        
-       // Verificar cache de servicio individual
+       // Verificar cache en memoria como fallback
        const cached = singleServiceCache.get(serviceId);
        if (cached) {
          const timeSinceLastFetch = Date.now() - cached.timestamp.getTime();
          if (timeSinceLastFetch < cacheExpiry) {
-           console.log(`Usando servicio ${serviceId} en cache`);
+           console.log(`Usando servicio ${serviceId} en cache memoria`);
            return cached.data;
          }
        }
        
-       console.log(`Cargando servicio individual: ${serviceId}`);
+       if (!db) {
+         throw new Error('Firebase no está disponible');
+       }
        
-       // Consulta específica para un solo servicio (1 lectura)
-       const serviceQuery = query(
-         collection(db, 'services'),
-         where('__name__', '==', serviceId),
-         limit(1)
-       );
-       const serviceSnapshot = await getDocs(serviceQuery);
+       console.log(`🔥 Cargando servicio individual: ${serviceId}`);
        
-       if (serviceSnapshot.empty) {
+       // 🚀 OPTIMIZACIÓN: Usar getDoc en lugar de getDocs para mayor eficiencia
+       const serviceDocRef = doc(db, 'services', serviceId);
+       const serviceDoc = await getDoc(serviceDocRef);
+       
+       if (!serviceDoc.exists()) {
          console.log(`Servicio ${serviceId} no encontrado`);
          return null;
        }
        
-       const doc = serviceSnapshot.docs[0];
-       const data = doc.data();
+       const data = serviceDoc.data();
        const service: Service = {
-         id: doc.id,
+         id: serviceDoc.id,
          ...data,
          createdAt: data.createdAt?.toDate?.() || new Date(),
          updatedAt: data.updatedAt?.toDate?.() || new Date()
        } as Service;
        
-       // Guardar en cache
+       // 💾 Guardar en ambos caches
        const newCache = new Map(singleServiceCache);
        newCache.set(serviceId, { data: service, timestamp: new Date() });
-       setSingleServiceCache(newCache);
+       setLocalSingleServiceCache(newCache);
+       // Guardar en localStorage
+       setServiceToLocalStorage(serviceId, service);
        
-       console.log(`✅ Servicio ${serviceId} cargado (1 lectura)`);
+       // 📊 Registrar visita para analytics
+       trackServiceVisit(serviceId);
+       
+       console.log(`✅ Servicio ${serviceId} cargado con getDoc (1 lectura Firebase optimizada)`);
        return service;
        
      } catch (error: any) {
@@ -395,49 +462,144 @@ export const ServicesProvider: React.FC<{ children: ReactNode }> = ({ children }
        const mockService = mockServices.find(s => s.id === serviceId);
        return mockService || null;
      }
-   }, [db, singleServiceCache, cacheExpiry]);
+   }, [db, singleServiceCache, cacheExpiry, getSingleServiceFromCache, setLocalSingleServiceCache]);
    
-   // Función para carga paginada
-   const loadServicesPaginated = useCallback(async (page: number, limitCount: number = 12): Promise<Service[]> => {
+   // Estado para paginación real con Firestore
+   const [lastDocumentSnapshot, setLastDocumentSnapshot] = useState<DocumentSnapshot | null>(null);
+   const [paginatedServices, setPaginatedServices] = useState<Service[]>([]);
+   const [hasMorePages, setHasMorePages] = useState(true);
+   
+   // Función para carga paginada real con Firestore startAfter
+   const loadServicesPaginated = useCallback(async (page: number = 1, pageSize: number = 12, forceRefresh = false) => {
      try {
-       if (!db) {
-         throw new Error('Firebase no está disponible');
+       setLoading(true);
+       setError(null);
+       setCurrentLoadType('paginated');
+       
+       // 🚀 OPTIMIZACIÓN: Para la primera página, verificar cache localStorage primero
+       if (page === 1 && !forceRefresh) {
+         const cachedServices = getAllServicesFromCache();
+         if (cachedServices && cachedServices.length > 0) {
+           const firstPageServices = cachedServices.slice(0, pageSize);
+           setPaginatedServices(firstPageServices);
+           setFilteredServices(firstPageServices);
+           setHasMorePages(cachedServices.length > pageSize);
+           console.log(`⚡ Primera página desde localStorage: ${firstPageServices.length} servicios (0 lecturas Firebase)`);
+           return {
+             services: firstPageServices,
+             totalPages: Math.ceil(cachedServices.length / pageSize),
+             currentPage: page,
+             totalServices: cachedServices.length,
+             hasMore: cachedServices.length > pageSize
+           };
+         }
        }
        
-       console.log(`Cargando página ${page} con ${limitCount} servicios`);
-       
-       const offset = (page - 1) * limitCount;
-       const paginatedQuery = query(
-         collection(db, 'services'),
-         orderBy('name'),
-         limit(limitCount)
-         // TODO: Implementar offset real con startAfter para paginación eficiente
+       // Construir query de Firestore con paginación real
+       const servicesRef = collection(db, 'services');
+       let firestoreQuery = query(
+         servicesRef,
+         where('active', '!=', false),
+         orderBy('active'),
+         orderBy('createdAt', 'desc'),
+         limit(pageSize)
        );
        
-       const paginatedSnapshot = await getDocs(paginatedQuery);
+       // Para páginas posteriores a la primera, usar startAfter
+       if (page > 1 && lastDocumentSnapshot) {
+         firestoreQuery = query(
+           servicesRef,
+           where('active', '!=', false),
+           orderBy('active'),
+           orderBy('createdAt', 'desc'),
+           startAfter(lastDocumentSnapshot),
+           limit(pageSize)
+         );
+       }
        
-       const paginatedData = paginatedSnapshot.docs.map(doc => {
+       const querySnapshot = await getDocs(firestoreQuery);
+       const newServices: Service[] = [];
+       let lastDoc: DocumentSnapshot | null = null;
+       
+       querySnapshot.forEach((doc: QueryDocumentSnapshot) => {
          const data = doc.data();
-         return {
+         const service: Service = {
            id: doc.id,
-           ...data,
+           name: data.name || 'Sin nombre',
+           category: data.category || 'Sin categoría',
+           image: data.image || '/images/hero_001.webp',
+           images: data.images || [data.image || '/images/hero_001.webp'],
+           rating: data.rating || 0,
+           location: data.location || 'Ubicación no especificada',
+           description: data.description || 'Sin descripción',
+           contactUrl: data.contactUrl,
+           detailsUrl: data.detailsUrl || `/servicio/${doc.id}`,
+           hours: data.hours || data.horario,
+           whatsapp: data.whatsapp,
+           tags: data.tags || [],
+           active: data.active !== false,
            createdAt: data.createdAt?.toDate?.() || new Date(),
            updatedAt: data.updatedAt?.toDate?.() || new Date()
-         } as Service;
+         };
+         newServices.push(service);
+         lastDoc = doc;
        });
        
-       const activeServices = paginatedData.filter(service => service.active !== false);
-       console.log(`✅ Página ${page} cargada: ${activeServices.length} servicios (${paginatedSnapshot.docs.length} lecturas)`);
+       // Actualizar estado de paginación
+       if (page === 1) {
+         setPaginatedServices(newServices);
+         setFilteredServices(newServices);
+       } else {
+         const updatedServices = [...paginatedServices, ...newServices];
+         setPaginatedServices(updatedServices);
+         setFilteredServices(updatedServices);
+       }
        
-       return activeServices;
+       setLastDocumentSnapshot(lastDoc);
+       setHasMorePages(newServices.length === pageSize);
+       
+       // 💾 Guardar en cache localStorage solo la primera página
+       if (page === 1 && newServices.length > 0) {
+         setAllServicesCache(newServices);
+       }
+       
+       const result = {
+         services: newServices,
+         totalPages: -1, // No podemos calcular total con paginación real
+         currentPage: page,
+         totalServices: -1, // No podemos calcular total sin cargar todo
+         hasMore: newServices.length === pageSize
+       };
+       
+       console.log(`✅ Página ${page} cargada desde Firebase: ${newServices.length} servicios (${newServices.length} lecturas Firebase)`);
+       return result;
        
      } catch (error: any) {
-       console.error(`Error cargando página ${page}:`, error);
-       // Fallback a datos mock paginados
-       const offset = (page - 1) * limitCount;
-       return mockServices.slice(offset, offset + limitCount);
+       console.error('Error al cargar servicios paginados:', error);
+       setError(error.message);
+       
+       // Fallback a datos mock
+       const startIndex = (page - 1) * pageSize;
+       const endIndex = startIndex + pageSize;
+       const paginatedMockServices = mockServices.slice(startIndex, endIndex);
+       
+       if (page === 1) {
+         setPaginatedServices(paginatedMockServices);
+         setFilteredServices(paginatedMockServices);
+       }
+       setUsingMockData(true);
+       
+       return {
+         services: paginatedMockServices,
+         totalPages: Math.ceil(mockServices.length / pageSize),
+         currentPage: page,
+         totalServices: mockServices.length,
+         hasMore: endIndex < mockServices.length
+       };
+     } finally {
+       setLoading(false);
      }
-   }, [db]);
+   }, [db, getAllServicesFromCache, setAllServicesCache, lastDocumentSnapshot, paginatedServices]);
 
    const loadServicesFromFirestore = async (forceRefresh = false) => {
      try {
@@ -445,26 +607,38 @@ export const ServicesProvider: React.FC<{ children: ReactNode }> = ({ children }
        setError(null);
        setCurrentLoadType('all');
        
-       // Verificar cache para evitar consultas innecesarias
-       if (!forceRefresh && lastFetchTime && services.length > 0) {
-         const timeSinceLastFetch = Date.now() - lastFetchTime.getTime();
-         if (timeSinceLastFetch < cacheExpiry) {
-           console.log('Usando datos en cache, evitando consulta');
+       // 🚀 OPTIMIZACIÓN: Verificar cache localStorage primero
+       if (!forceRefresh) {
+         const cachedServices = getAllServicesFromCache();
+         if (cachedServices && cachedServices.length > 0) {
+           setServices(cachedServices);
+           setFilteredServices(cachedServices);
            setLoading(false);
+           console.log(`⚡ Todos los servicios desde localStorage: ${cachedServices.length} servicios (0 lecturas Firebase)`);
            return;
+         }
+         
+         // Verificar cache en memoria como fallback
+         if (lastFetchTime && services.length > 0) {
+           const timeSinceLastFetch = Date.now() - lastFetchTime.getTime();
+           if (timeSinceLastFetch < cacheExpiry) {
+             console.log('Usando datos en cache memoria, evitando consulta');
+             setLoading(false);
+             return;
+           }
          }
        }
        
        // Intentar Firebase primero, luego fallback a API
        if (db) {
          try {
-           console.log('Realizando consulta optimizada a Firebase...');
+           console.log('🔥 Realizando consulta optimizada a Firebase...');
            
            // Optimizar consulta con límite para reducir uso de cuota
            const servicesQuery = query(
              collection(db, 'services'),
              orderBy('name'),
-             limit(50)
+             limit(50) // Mantener límite para evitar lecturas masivas
            );
            const servicesSnapshot = await getDocs(servicesQuery);
            
@@ -479,50 +653,25 @@ export const ServicesProvider: React.FC<{ children: ReactNode }> = ({ children }
              } as Service;
            });
            
-           if (servicesData.length > 0) {
-             console.log(`✅ Firebase: Cargados ${servicesData.length} servicios`);
-             setServices(servicesData);
-             setLastFetchTime(new Date());
-             setLoading(false);
-             return;
-           }
-         } catch (firebaseError) {
-           console.warn('⚠️ Firebase falló, intentando API fallback:', firebaseError);
+           // Filtrar solo servicios activos
+           const activeServices = servicesData.filter(service => service.active !== false);
+           
+           setServices(activeServices);
+           setFilteredServices(activeServices);
+           setLastFetchTime(new Date());
+           setUsingMockData(false);
+           
+           // 💾 Guardar en cache localStorage
+           setAllServicesCache(activeServices);
+           
+           console.log(`✅ ${activeServices.length} servicios cargados desde Firebase (${servicesSnapshot.docs.length} lecturas Firebase)`);
+           
+         } catch (firebaseError: any) {
+           console.error('Error de Firebase:', firebaseError);
+           throw firebaseError;
          }
-       }
-       
-       // Fallback: usar API route
-       console.log('🔄 Usando API fallback para cargar servicios...');
-       const response = await fetch('/api/services-fallback');
-       
-       if (!response.ok) {
-         throw new Error(`Error en API fallback: ${response.status}`);
-       }
-       
-       const data = await response.json();
-       
-       if (data.success && data.services) {
-         console.log(`✅ API Fallback: Cargados ${data.services.length} servicios`);
-         
-         // Convertir formato de API a formato de Service
-         const servicesData = data.services.map((service: any) => ({
-           id: service.id,
-           name: service.name,
-           category: service.category,
-           image: service.image,
-           rating: service.rating,
-           location: service.address || 'Lima, Perú',
-           description: service.description,
-           hours: service.openingHours ? Object.entries(service.openingHours).map(([day, hours]) => `${day}: ${hours}`).join(', ') : undefined,
-           whatsapp: service.whatsapp,
-           active: service.active,
-           tags: [service.category.toLowerCase()]
-         })) as Service[];
-         
-         setServices(servicesData);
-         setLastFetchTime(new Date());
        } else {
-         throw new Error('No se pudieron cargar servicios desde ninguna fuente');
+         throw new Error('Firebase no está disponible');
        }
        
        // Limpiar estado de reintento si fue exitoso
@@ -538,15 +687,24 @@ export const ServicesProvider: React.FC<{ children: ReactNode }> = ({ children }
        toast.success('Servicios cargados correctamente');
        
      } catch (error: any) {
-       console.error('Error en reintento:', error);
-       setIsRetrying(false);
+       console.error('Error al cargar servicios:', error);
+       setError(error.message);
        
-       // Si sigue siendo error de cuota, programar otro reintento
-       if (error?.code === 'resource-exhausted' || 
-           error?.message?.includes('Quota exceeded') ||
-           error?.message?.includes('429')) {
-         scheduleRetry();
-       }
+       // Verificar si es un error de cuota excedida
+        if (error?.code === 'resource-exhausted' || 
+            error?.message?.includes('Quota exceeded') ||
+            error?.message?.includes('429')) {
+          console.warn('Cuota de Firebase excedida, usando datos locales como fallback');
+          toast('Conectando con datos locales debido a límites temporales del servidor', { icon: 'ℹ️' });
+          loadLocalServices();
+          setUsingMockData(true);
+          scheduleRetry();
+        } else {
+          console.log('Fallback a datos mock');
+          setServices(mockServices);
+          setFilteredServices(mockServices);
+          setUsingMockData(true);
+        }
      } finally {
        setLoading(false);
      }
@@ -676,6 +834,12 @@ export const ServicesProvider: React.FC<{ children: ReactNode }> = ({ children }
    // Función para forzar actualización (ignora cache)
    const hardRefresh = useCallback(() => refreshServices(true), [refreshServices]);
 
+  const resetPagination = useCallback(() => {
+    setLastDocumentSnapshot(null);
+    setPaginatedServices([]);
+    setHasMorePages(true);
+  }, []);
+
   const value = {
      services,
      filteredServices,
@@ -689,6 +853,7 @@ export const ServicesProvider: React.FC<{ children: ReactNode }> = ({ children }
      retryCount,
      nextRetryTime,
      currentLoadType,
+     usingMockData,
      setSearchTerm,
      setSelectedCategory,
      refreshServices,
@@ -702,7 +867,16 @@ export const ServicesProvider: React.FC<{ children: ReactNode }> = ({ children }
      // Nuevas funciones optimizadas
      loadFeaturedServices,
      loadSingleService,
-     loadServicesPaginated
+     loadServicesPaginated,
+     paginatedServices,
+     hasMorePages,
+     resetPagination,
+     // Funciones de analytics y precarga
+     trackServiceVisit,
+     getAnalyticsStats,
+     preloadPopularServices,
+     forcePreload,
+     isPreloading
    };
 
   return (

@@ -5,6 +5,8 @@ import { collection, getDocs, query, where } from '@firebase/firestore';
 import { db } from '@/lib/firebase/config';
 import Link from 'next/link';
 import { AnalyticsDashboard } from '@/components/analytics/AnalyticsDashboard';
+import { useServices } from '@/context/ServicesContext';
+import { useServiceCache } from '@/hooks/useServiceCache';
 
 interface Stats {
   totalServices: number;
@@ -22,6 +24,10 @@ export default function AdminDashboard() {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
+  // 🚀 OPTIMIZACIÓN: Usar contexto de servicios y cache
+  const { services, loadServicesFromFirestore } = useServices();
+  const { getAllServicesFromCache } = useServiceCache();
 
   useEffect(() => {
     loadStats();
@@ -32,23 +38,29 @@ export default function AdminDashboard() {
       setLoading(true);
       setError(null);
 
-      if (!db) {
-        throw new Error('Firebase no está configurado');
+      let servicesData: any[] = [];
+      
+      // 🚀 OPTIMIZACIÓN: Intentar obtener servicios desde cache primero
+      const cachedServices = getAllServicesFromCache();
+      if (cachedServices && cachedServices.length > 0) {
+        servicesData = cachedServices;
+        console.log(`⚡ Dashboard stats desde localStorage: ${cachedServices.length} servicios (0 lecturas Firebase)`);
+      } else if (services && services.length > 0) {
+        // Usar servicios del contexto si están disponibles
+        servicesData = services;
+        console.log(`📊 Dashboard stats desde contexto: ${services.length} servicios (0 lecturas Firebase)`);
+      } else {
+        // Solo como último recurso, cargar desde Firebase
+        console.log('🔥 Dashboard cargando servicios desde Firebase...');
+        await loadServicesFromFirestore();
+        servicesData = services;
       }
 
-      // Obtener todos los servicios
-      const servicesRef = collection(db, 'services');
-      const servicesSnapshot = await getDocs(servicesRef);
-      const services = servicesSnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
-
       // Calcular estadísticas
-      const totalServices = services.length;
-      const activeServices = services.filter(service => (service as { active?: boolean }).active !== false).length;
-      const categories = [...new Set(services.map(service => service.category).filter(Boolean))];
-      const recentServices = services
+      const totalServices = servicesData.length;
+      const activeServices = servicesData.filter(service => (service as { active?: boolean }).active !== false).length;
+      const categories = [...new Set(servicesData.map(service => service.category).filter(Boolean))];
+      const recentServices = servicesData
         .sort((a: any, b: any) => ((b.createdAt?.toDate?.() || new Date()).getTime() - (a.createdAt?.toDate?.() || new Date()).getTime()))
         .slice(0, 5);
 
@@ -58,6 +70,8 @@ export default function AdminDashboard() {
         categories,
         recentServices
       });
+      
+      console.log(`✅ Dashboard stats calculadas: ${totalServices} total, ${activeServices} activos`);
     } catch (err) {
       console.error('Error cargando estadísticas:', err);
       setError(err instanceof Error ? err.message : 'Error desconocido');

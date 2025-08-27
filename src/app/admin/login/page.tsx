@@ -1,117 +1,134 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-
-const ADMIN_PASSWORD = 'tubarrio2024'; // En producción, esto debería estar en variables de entorno
+import React, { useEffect } from 'react';
+import { useAuth } from '@/context/AuthContext';
+import { useRouter, useSearchParams } from 'next/navigation';
+import LoginForm from '@/components/auth/LoginForm';
+import { ArrowLeft, Shield, Lock } from 'lucide-react';
+import Link from 'next/link';
+import toast from 'react-hot-toast';
 
 export default function AdminLoginPage() {
+  const { user, loading, isAdmin } = useAuth();
   const router = useRouter();
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+  const searchParams = useSearchParams();
+  
+  const redirectTo = searchParams.get('redirect') || '/admin';
+  const error = searchParams.get('error');
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
-
-    // Simular un pequeño delay para la autenticación
-    await new Promise(resolve => setTimeout(resolve, 500));
-
-    if (password === ADMIN_PASSWORD) {
-      // Guardar token de autenticación en localStorage
-      localStorage.setItem('admin_authenticated', 'true');
-      localStorage.setItem('admin_login_time', Date.now().toString());
-      
-      // Redirigir al dashboard
-      router.push('/admin');
-    } else {
-      setError('Contraseña incorrecta');
+  useEffect(() => {
+    // Si ya está autenticado y es admin, redirigir
+    if (user && isAdmin && !loading) {
+      router.push(redirectTo);
     }
-    
-    setLoading(false);
-  };
+
+    // Si está autenticado pero no es admin
+    if (user && !isAdmin && !loading) {
+      toast.error('No tienes permisos de administrador');
+      router.push('/');
+    }
+
+    // Mostrar error si existe
+    if (error === 'unauthorized') {
+      toast.error('Sesión expirada. Por favor inicia sesión nuevamente');
+    }
+  }, [user, isAdmin, loading, router, redirectTo, error]);
+
+  // Mostrar loading mientras se verifica la autenticación
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+        <div className="text-center">
+          <div className="flex justify-center mb-4">
+            <div className="relative">
+              <Shield className="w-12 h-12 text-blue-600 dark:text-blue-400" />
+              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+              </div>
+            </div>
+          </div>
+          <p className="text-gray-600 dark:text-gray-400">Verificando credenciales...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Si ya está autenticado como admin, no mostrar nada (se redirigirá)
+  if (user && isAdmin) {
+    return null;
+  }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="text-center">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            TuBarrio.pe
-          </h1>
-          <h2 className="text-xl text-gray-600">
-            Panel de Administración
-          </h2>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex flex-col">
+      {/* Header */}
+      <div className="p-4">
+        <Link 
+          href="/"
+          className="inline-flex items-center text-gray-300 hover:text-white transition-colors"
+        >
+          <ArrowLeft className="w-5 h-5 mr-2" />
+          Volver al sitio
+        </Link>
+      </div>
+
+      {/* Main Content */}
+      <div className="flex-1 flex items-center justify-center p-4">
+        <div className="w-full max-w-md">
+          {/* Admin Brand */}
+          <div className="text-center mb-8">
+            <div className="flex justify-center mb-4">
+              <div className="relative">
+                <Shield className="w-16 h-16 text-blue-400" />
+                <Lock className="w-6 h-6 text-white absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" />
+              </div>
+            </div>
+            <h1 className="text-3xl font-bold text-white mb-2">
+              Panel de Administración
+            </h1>
+            <p className="text-gray-300">
+              TuBarrio.pe - Acceso Restringido
+            </p>
+          </div>
+
+          {/* Security Notice */}
+          <div className="bg-yellow-900/20 border border-yellow-700/50 rounded-lg p-4 mb-6">
+            <div className="flex items-start">
+              <Shield className="w-5 h-5 text-yellow-400 mt-0.5 mr-3 flex-shrink-0" />
+              <div>
+                <h3 className="text-yellow-400 font-medium text-sm mb-1">
+                  Área Segura
+                </h3>
+                <p className="text-yellow-200 text-xs">
+                  Solo personal autorizado puede acceder a esta sección. 
+                  Todas las actividades son monitoreadas y registradas.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Login Form */}
+          <LoginForm redirectTo={redirectTo} />
+
+          {/* Help */}
+          <div className="mt-8 text-center">
+            <p className="text-gray-400 text-sm mb-2">
+              ¿Problemas para acceder?
+            </p>
+            <button
+              onClick={() => toast.info('Contacta al administrador del sistema para obtener ayuda')}
+              className="text-blue-400 hover:text-blue-300 text-sm font-medium"
+            >
+              Contactar soporte técnico
+            </button>
+          </div>
         </div>
       </div>
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-          <form className="space-y-6" onSubmit={handleSubmit}>
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                Contraseña de Administrador
-              </label>
-              <div className="mt-1">
-                <input
-                  id="password"
-                  name="password"
-                  type="password"
-                  autoComplete="current-password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                  placeholder="Ingresa la contraseña"
-                />
-              </div>
-            </div>
-
-            {error && (
-              <div className="bg-red-50 border border-red-200 rounded-md p-3">
-                <p className="text-sm text-red-600">{error}</p>
-              </div>
-            )}
-
-            <div>
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {loading ? (
-                  <div className="flex items-center">
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                    Verificando...
-                  </div>
-                ) : (
-                  'Ingresar al Panel'
-                )}
-              </button>
-            </div>
-          </form>
-
-          <div className="mt-6">
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300" />
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">Información</span>
-              </div>
-            </div>
-
-            <div className="mt-4 text-center">
-              <p className="text-xs text-gray-500">
-                Panel administrativo para gestionar servicios de TuBarrio.pe
-              </p>
-              <p className="text-xs text-gray-400 mt-2">
-                Solo para administradores autorizados
-              </p>
-            </div>
-          </div>
-        </div>
+      {/* Footer */}
+      <div className="p-4 text-center">
+        <p className="text-xs text-gray-500">
+          Sistema protegido por autenticación Firebase
+        </p>
       </div>
     </div>
   );

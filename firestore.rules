@@ -1,28 +1,83 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Permitir lectura a todos
-    match /{document=**} {
-      allow read: if true;
+    
+    // Función para verificar si el usuario es admin
+    function isAdmin() {
+      return request.auth != null && 
+             request.auth.token.email != null &&
+             (request.auth.token.email == 'admin@revistadigital.com' ||
+              request.auth.token.email.matches('.*@revistadigital\\.com$'));
     }
     
-    // Permitir escritura en las colecciones services y servicios
-    // NOTA: Esto es para desarrollo/demo. En producción deberías usar autenticación adecuada
+    // Función para verificar autenticación básica
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // === SERVICIOS - Lectura pública, escritura solo admin ===
     match /services/{serviceId} {
-      allow write: if true;
+      // Lectura: permitida para todos (necesaria para la app pública)
+      allow read: if true;
+      
+      // Escritura: solo administradores autenticados
+      allow create, update, delete: if isAdmin();
     }
     
     match /servicios/{serviceId} {
-      allow write: if true;
+      // Lectura: permitida para todos
+      allow read: if true;
+      
+      // Escritura: solo administradores autenticados
+      allow create, update, delete: if isAdmin();
     }
     
-    // Permitir escritura en otras colecciones que pueda necesitar el admin
+    // === CATEGORÍAS - Lectura pública, escritura solo admin ===
     match /categories/{categoryId} {
-      allow write: if true;
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+    
+    // === ANALYTICS Y ESTADÍSTICAS - Solo admin ===
+    match /analytics/{document=**} {
+      allow read, write: if isAdmin();
     }
     
     match /stats/{statId} {
-      allow write: if true;
+      allow read, write: if isAdmin();
+    }
+    
+    // === CONFIGURACIÓN DEL SISTEMA - Solo admin ===
+    match /config/{configId} {
+      allow read, write: if isAdmin();
+    }
+    
+    // === LOGS Y AUDITORÍA - Solo admin ===
+    match /logs/{logId} {
+      allow read, write: if isAdmin();
+    }
+    
+    // === CACHE METADATA - Solo admin para gestión ===
+    match /cache/{cacheId} {
+      allow read, write: if isAdmin();
+    }
+    
+    // === USUARIOS Y SESIONES - Acceso controlado ===
+    match /users/{userId} {
+      // Los usuarios pueden leer/escribir solo sus propios datos
+      allow read, write: if isAuthenticated() && request.auth.uid == userId;
+      // Los admins pueden leer todos los usuarios
+      allow read: if isAdmin();
+    }
+    
+    match /sessions/{sessionId} {
+      allow read, write: if isAdmin();
+    }
+    
+    // === BLOQUEAR TODO LO DEMÁS ===
+    // Cualquier otra colección requiere autenticación de admin
+    match /{document=**} {
+      allow read, write: if isAdmin();
     }
   }
 }
