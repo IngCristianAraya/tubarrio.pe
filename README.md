@@ -7,7 +7,13 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 1. Create a new Firebase project at [Firebase Console](https://console.firebase.google.com/)
 2. Add a new web app to your Firebase project
 3. Copy the Firebase configuration object from the console
-4. Create a `.env.local` file in the root of the project with the following variables:
+4. Copy `.env.example` to `.env.local` and fill in your Firebase credentials:
+
+```bash
+cp .env.example .env.local
+```
+
+5. Edit `.env.local` with your Firebase configuration:
 
 ```env
 NEXT_PUBLIC_FIREBASE_API_KEY=your-api-key
@@ -16,7 +22,6 @@ NEXT_PUBLIC_FIREBASE_PROJECT_ID=your-project-id
 NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your-project-id.appspot.com
 NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your-messaging-sender-id
 NEXT_PUBLIC_FIREBASE_APP_ID=your-app-id
-NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=your-measurement-id
 ```
 
 ### Development Setup
@@ -46,6 +51,42 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+
+## Deployment on Vercel
+
+### ⚠️ IMPORTANTE: Configuración de Variables de Entorno
+
+Para que la aplicación funcione correctamente en producción, **DEBES configurar las variables de entorno en Vercel**:
+
+1. Ve a [Vercel Dashboard](https://vercel.com/dashboard)
+2. Selecciona tu proyecto
+3. Ve a **Settings** > **Environment Variables**
+4. Agrega todas las variables de `.env.local` (especialmente las `NEXT_PUBLIC_FIREBASE_*`)
+5. Haz un **redeploy** después de agregar las variables
+
+### Verificar Despliegue
+
+Puedes verificar que todo esté configurado correctamente:
+
+```bash
+# Verificar variables de entorno en producción
+node check-vercel-deployment.js
+
+# O visita directamente:
+# https://tu-app.vercel.app/api/debug-env
+```
+
+### Variables Críticas para Firestore
+
+Estas variables son **OBLIGATORIAS** en Vercel:
+- `NEXT_PUBLIC_FIREBASE_API_KEY`
+- `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`
+- `NEXT_PUBLIC_FIREBASE_PROJECT_ID`
+- `NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET`
+- `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID`
+- `NEXT_PUBLIC_FIREBASE_APP_ID`
+
+📖 **Guía completa**: Ver `VERCEL-DEPLOYMENT-GUIDE.md`
 
 ## Learn More
 
