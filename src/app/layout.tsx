@@ -7,7 +7,7 @@ import { Skeleton } from '@/components/ui/Skeleton';
 import { SITE_URL } from '@/lib/constants';
 import { generateMetadata } from "@/lib/seo";
 import { ReactNode } from 'react';
-import FirebaseStatusWrapper from '@/components/FirebaseStatusWrapper';
+
 
 // Loading component for the main layout
 function GlobalLoading() {
@@ -109,13 +109,11 @@ export default function RootLayout({ children }: RootLayoutProps) {
       </head>
       <body className={`${GeistSans.className} antialiased bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-200`}>
         <Providers>
-          <FirebaseStatusWrapper>
-            <Suspense fallback={<GlobalLoading />}>
-              <div className="min-h-screen flex flex-col">
-                {children}
-              </div>
-            </Suspense>
-          </FirebaseStatusWrapper>
+          <Suspense fallback={<GlobalLoading />}>
+            <div className="min-h-screen flex flex-col">
+              {children}
+            </div>
+          </Suspense>
         </Providers>
       </body>
     </html>

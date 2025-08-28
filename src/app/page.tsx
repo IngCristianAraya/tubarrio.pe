@@ -20,11 +20,7 @@ const Footer = dynamic(() => import('@/components/Footer'), {
   ssr: true
 });
 
-// Monitor avanzado de lecturas Firestore (solo para desarrollo)
-const AdvancedFirestoreMonitor = dynamic(() => import('@/components/AdvancedFirestoreMonitor'), {
-  loading: () => null,
-  ssr: false
-});
+
 
 // Importamos directamente el componente cliente
 import ClientComponents from '../components/ClientComponents';
@@ -94,13 +90,7 @@ export default function Home() {
 
       <Footer />
       
-      {/* Monitor avanzado de lecturas Firestore solo en desarrollo */}
-      {isDevelopment && (
-        <AdvancedFirestoreMonitor 
-          enabled={true} 
-          autoShow={false} 
-        />
-      )}
+
     </div>
   );
 }
