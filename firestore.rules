@@ -38,9 +38,12 @@ service cloud.firestore {
       allow create, update, delete: if isAdmin();
     }
     
-    // === ANALYTICS Y ESTADÍSTICAS - Solo admin ===
+    // === ANALYTICS Y ESTADÍSTICAS - Escritura pública, lectura solo admin ===
     match /analytics/{document=**} {
-      allow read, write: if isAdmin();
+      // Permitir escritura pública para tracking de eventos
+      allow create: if true;
+      // Lectura solo para administradores
+      allow read, update, delete: if isAdmin();
     }
     
     match /stats/{statId} {

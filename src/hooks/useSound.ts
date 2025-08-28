@@ -20,12 +20,29 @@ const soundFiles: Record<SoundType, string> = {
 const useSound = (type: SoundType = 'click', options: SoundOptions = {}) => {
   const { volume = 0.5, enabled = true } = options;
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const isValidRef = useRef<boolean>(false);
 
   useEffect(() => {
     // Asegurarse de que estamos en el navegador antes de crear el elemento Audio
     if (typeof window !== 'undefined') {
-      audioRef.current = new Audio(soundFiles[type]);
-      audioRef.current.volume = volume;
+      const audio = new Audio();
+      
+      // Verificar si el archivo existe antes de asignarlo
+      audio.addEventListener('canplaythrough', () => {
+        isValidRef.current = true;
+        audio.volume = volume;
+        audioRef.current = audio;
+      });
+      
+      audio.addEventListener('error', () => {
+        console.warn(`Sound file not found: ${soundFiles[type]}`);
+        isValidRef.current = false;
+        audioRef.current = null;
+      });
+      
+      // Intentar cargar el archivo
+      audio.src = soundFiles[type];
+      audio.load();
     }
 
     return () => {
@@ -33,16 +50,17 @@ const useSound = (type: SoundType = 'click', options: SoundOptions = {}) => {
         audioRef.current.pause();
         audioRef.current = null;
       }
+      isValidRef.current = false;
     };
   }, [type, volume]);
 
   const play = useCallback(() => {
-    if (enabled && audioRef.current) {
+    if (enabled && audioRef.current && isValidRef.current) {
       // Reset the audio to the beginning if it's already playing
       audioRef.current.currentTime = 0;
       audioRef.current.play().catch(error => {
         // Handle any autoplay restrictions or other errors silently
-        console.error('Error playing sound:', error);
+        console.warn('Error playing sound:', error);
       });
     }
   }, [enabled]);

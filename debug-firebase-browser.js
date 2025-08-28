@@ -1,0 +1,1 @@
+console.log('🔍 Diagnóstico Firebase en navegador:'); console.log('Variables de entorno:'); console.log('API_KEY:', process.env.NEXT_PUBLIC_FIREBASE_API_KEY); console.log('PROJECT_ID:', process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID); console.log('AUTH_DOMAIN:', process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN); console.log('APP_ID:', process.env.NEXT_PUBLIC_FIREBASE_APP_ID);

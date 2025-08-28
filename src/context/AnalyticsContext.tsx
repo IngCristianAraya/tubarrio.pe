@@ -1,8 +1,30 @@
 'use client';
 
 import React, { createContext, useContext, useReducer, useEffect, useCallback, useMemo } from 'react';
-import { collection, addDoc, query, where, getDocs, orderBy, limit } from 'firebase/firestore';
 import { db } from '../lib/firebase/config';
+
+// Función para obtener funciones de Firebase dinámicamente
+const getFirestoreFunctions = async () => {
+  if (!db) {
+    return null;
+  }
+  
+  try {
+    const firestore = await import('firebase/firestore');
+    return {
+      collection: firestore.collection,
+      addDoc: firestore.addDoc,
+      query: firestore.query,
+      where: firestore.where,
+      getDocs: firestore.getDocs,
+      orderBy: firestore.orderBy,
+      limit: firestore.limit
+    };
+  } catch (error) {
+    console.warn('Firebase/firestore no disponible:', error);
+    return null;
+  }
+};
 
 interface AnalyticsEvent {
   id?: string;
@@ -99,14 +121,15 @@ export function AnalyticsProvider({ children }: { children: React.ReactNode }) {
         referrer: typeof window !== 'undefined' ? document.referrer : ''
       };
 
-      // Verificar si Firebase está disponible
-      if (!db || typeof db !== 'object') {
+      // Get Firebase functions dynamically
+      const firestore = await getFirestoreFunctions();
+      if (!db || !firestore) {
         console.warn('Firebase not available, skipping analytics tracking');
         return;
       }
 
       // Guardar en Firestore
-      await addDoc(collection(db, 'analytics'), fullEvent);
+      await firestore.addDoc(firestore.collection(db, 'analytics'), fullEvent);
       
       // Actualizar estado local
       dispatch({ type: 'ADD_EVENT', payload: fullEvent });
@@ -141,24 +164,26 @@ export function AnalyticsProvider({ children }: { children: React.ReactNode }) {
     try {
       dispatch({ type: 'SET_LOADING', payload: true });
       
-      // Verificar si Firebase está disponible
-      if (!db || typeof db !== 'object') {
+      // Get Firebase functions dynamically
+      const firestore = await getFirestoreFunctions();
+      if (!db || !firestore) {
         console.warn('Firebase not available, using empty metrics');
         dispatch({ type: 'SET_METRICS', payload: initialState.metrics });
+        dispatch({ type: 'SET_LOADING', payload: false });
         return;
       }
       
       const startDate = new Date();
       startDate.setDate(startDate.getDate() - days);
       
-      const analyticsRef = collection(db, 'analytics');
-      const q = query(
+      const analyticsRef = firestore.collection(db, 'analytics');
+      const q = firestore.query(
         analyticsRef,
-        where('timestamp', '>=', startDate),
-        orderBy('timestamp', 'desc')
+        firestore.where('timestamp', '>=', startDate),
+        firestore.orderBy('timestamp', 'desc')
       );
       
-      const querySnapshot = await getDocs(q);
+      const querySnapshot = await firestore.getDocs(q);
       const events = querySnapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data(),
@@ -181,6 +206,8 @@ export function AnalyticsProvider({ children }: { children: React.ReactNode }) {
       dispatch({ type: 'SET_METRICS', payload: metrics });
     } catch (error) {
       console.error('Error getting metrics:', error);
+      // En caso de error de permisos, usar métricas vacías
+      dispatch({ type: 'SET_METRICS', payload: initialState.metrics });
     } finally {
       dispatch({ type: 'SET_LOADING', payload: false });
     }
@@ -232,10 +259,23 @@ export function AnalyticsProvider({ children }: { children: React.ReactNode }) {
       .sort((a, b) => a.date.localeCompare(b.date));
   };
 
-  // Cargar métricas al inicializar
-  useEffect(() => {
-    getMetrics();
-  }, [getMetrics]);
+  // TEMPORALMENTE DESHABILITADO: Cargar métricas al inicializar (solo una vez)
+  // Este useEffect estaba causando lecturas automáticas de Firestore al cargar la app
+  // useEffect(() => {
+  //   let isMounted = true;
+  //   
+  //   const loadInitialMetrics = async () => {
+  //     if (isMounted) {
+  //       await getMetrics();
+  //     }
+  //   };
+  //   
+  //   loadInitialMetrics();
+  //   
+  //   return () => {
+  //     isMounted = false;
+  //   };
+  // }, []); // Sin dependencias para ejecutar solo una vez
 
   const value: AnalyticsContextType = useMemo(() => ({
     state,

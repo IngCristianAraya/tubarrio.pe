@@ -1,0 +1,38 @@
+{
+  "traditional": {
+    "scenario": "traditional",
+    "time": 2326,
+    "reads": 115,
+    "cost": 0.0414
+  },
+  "optimized": {
+    "scenario": "optimized",
+    "time": 1289,
+    "reads": 34,
+    "cost": 0.0122,
+    "cacheHitRate": 35.7,
+    "cacheItems": 10
+  },
+  "savings": {
+    "reads": 81,
+    "cost": 0.029199999999999997,
+    "time": 1037,
+    "readsPercentage": 70.4,
+    "costPercentage": 70.5,
+    "timePercentage": 44.6
+  },
+  "projections": {
+    "daily": {
+      "reads": 81000,
+      "cost": "29.20"
+    },
+    "monthly": {
+      "reads": 2430000,
+      "cost": "876.00"
+    },
+    "yearly": {
+      "reads": 29565000,
+      "cost": "10658.00"
+    }
+  }
+}

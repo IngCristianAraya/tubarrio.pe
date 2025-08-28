@@ -33,19 +33,8 @@ function makeRequest(url) {
   });
 }
 
-async function checkDeployment() {
+async function checkDeployment(vercelUrl) {
   console.log('🔍 Verificador de Despliegue en Vercel\n');
-  
-  // Solicitar URL de Vercel
-  const vercelUrl = await new Promise((resolve) => {
-    rl.question('Ingresa la URL de tu aplicación en Vercel (ej: https://tu-app.vercel.app): ', resolve);
-  });
-  
-  if (!vercelUrl.startsWith('http')) {
-    console.log('❌ URL inválida. Debe comenzar con https://');
-    rl.close();
-    return;
-  }
   
   console.log(`\n🌐 Verificando: ${vercelUrl}\n`);
   
@@ -116,7 +105,29 @@ async function checkDeployment() {
     console.log('- Problemas de red');
   }
   
-  rl.close();
 }
 
-checkDeployment().catch(console.error);
+// Obtener URL de argumentos de línea de comandos o solicitar entrada
+const args = process.argv.slice(2);
+const url = args[0];
+
+if (url) {
+  // URL proporcionada como argumento
+  if (!url.startsWith('https://')) {
+    console.log('❌ URL inválida. Debe comenzar con https://');
+    process.exit(1);
+  }
+  checkDeployment(url).catch(console.error);
+} else {
+  // Solicitar URL interactivamente
+  rl.question('Ingresa la URL de tu aplicación en Vercel (ej: https://tu-app.vercel.app): ', async (vercelUrl) => {
+    if (!vercelUrl.startsWith('http')) {
+      console.log('❌ URL inválida. Debe comenzar con https://');
+      rl.close();
+      return;
+    }
+
+    await checkDeployment(vercelUrl);
+    rl.close();
+  });
+}

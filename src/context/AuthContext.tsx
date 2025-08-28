@@ -7,8 +7,8 @@ import {
   signOut,
   onAuthStateChanged,
   sendPasswordResetEmail
-} from '@firebase/auth';
-import { auth } from '@/firebaseConfig';
+} from 'firebase/auth';
+import { auth } from '@/lib/firebase/config';
 import toast from 'react-hot-toast';
 
 interface AuthContextType {

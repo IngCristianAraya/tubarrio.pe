@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, Suspense } from 'react';
+import React, { useState, Suspense, useCallback, useEffect } from 'react';
 import { useServices } from '../../context/ServicesContext';
 import ServiceCard from '../../components/ServiceCard';
 import ServiceCardSkeleton from '../../components/ServiceCardSkeleton';
@@ -14,10 +14,9 @@ import OptimizedImage from '../../components/OptimizedImage';
 import type { Service } from '../../context/ServicesContext';
 import { useSearchParams } from 'next/navigation';
 
-function useResponsivePageSize() {
-  // Always return 8 items per page for all screen sizes
-  return 8;
-}
+
+// Constante para evitar re-renders innecesarios
+const PAGE_SIZE = 12;
 
 const getUniqueCategories = (services: Service[]): string[] => {
   const set = new Set(services.map((s) => s.category));
@@ -26,14 +25,17 @@ const getUniqueCategories = (services: Service[]): string[] => {
 
 export default function TodosLosServiciosPageWrapper() {
   return (
-    <Suspense fallback={<div className="text-center py-10">Cargando servicios...</div>}>
+    <Suspense fallback={<div>Cargando...</div>}>
       <TodosLosServiciosPage />
     </Suspense>
   );
 }
 
 function TodosLosServiciosPage() {
-  const PAGE_SIZE = useResponsivePageSize();
+  const searchParams = useSearchParams();
+  const categoriaParam = searchParams.get('categoria');
+  const busquedaParam = searchParams.get('busqueda');
+
   const { 
     paginatedServices, 
     loadServicesPaginated, 
@@ -42,9 +44,6 @@ function TodosLosServiciosPage() {
     hasMorePages,
     resetPagination
   } = useServices();
-  const searchParams = useSearchParams();
-  const categoriaParam = searchParams.get('categoria');
-  const busquedaParam = searchParams.get('busqueda');
 
   const [search, setSearch] = useState(busquedaParam ?? '');
   // Si no hay parámetro de categoría, mostrar todos por defecto
@@ -52,28 +51,45 @@ function TodosLosServiciosPage() {
   const [hasLoadedInitial, setHasLoadedInitial] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
 
-  // Cargar servicios paginados al montar el componente
-  React.useEffect(() => {
-    if (!hasLoadedInitial) {
+  // 🔥 SOLUCIÓN: useCallback para funciones estables
+  const loadInitialServices = useCallback(async () => {
+    if (loadServicesPaginated && resetPagination && !hasLoadedInitial) {
+      console.log('🔄 Cargando servicios iniciales...');
       resetPagination();
-      loadServicesPaginated(1, PAGE_SIZE);
+      await loadServicesPaginated(1, PAGE_SIZE);
       setHasLoadedInitial(true);
     }
-  }, [loadServicesPaginated, PAGE_SIZE, hasLoadedInitial, resetPagination]);
+  }, [loadServicesPaginated, resetPagination, hasLoadedInitial]);
 
-  // Si cambian los query params, actualizar los filtros y resetear paginación
-  React.useEffect(() => {
+  // 🔥 SOLUCIÓN: useEffect simplificado
+  useEffect(() => {
+    loadInitialServices();
+  }, [loadInitialServices]); // ✅ Dependencia estable
+
+  // 🔥 SOLUCIÓN: Separar la actualización de estado de la carga de datos
+  useEffect(() => {
     setCategory(categoriaParam ?? '');
     setSearch(busquedaParam ?? '');
-    if (hasLoadedInitial) {
-      resetPagination();
-      loadServicesPaginated(1, PAGE_SIZE, true);
+  }, [categoriaParam, busquedaParam]);
+
+  // 🔥 SOLUCIÓN: useEffect separado para recargar cuando cambian los filtros
+  useEffect(() => {
+    if (hasLoadedInitial && resetPagination && loadServicesPaginated) {
+      const reloadWithFilters = async () => {
+        console.log('🔄 Recargando con nuevos filtros...');
+        resetPagination();
+        await loadServicesPaginated(1, PAGE_SIZE, true);
+      };
+      
+      // Debounce para evitar múltiples llamadas
+      const timeoutId = setTimeout(reloadWithFilters, 300);
+      return () => clearTimeout(timeoutId);
     }
-  }, [categoriaParam, busquedaParam, resetPagination, loadServicesPaginated, PAGE_SIZE, hasLoadedInitial]);
+  }, [categoriaParam, busquedaParam, hasLoadedInitial]); // ✅ Solo dependencias necesarias
 
   // Función para cargar más servicios
   const loadMoreServices = async () => {
-    if (hasMorePages && !isLoadingMore) {
+    if (hasMorePages && !isLoadingMore && loadServicesPaginated) {
       setIsLoadingMore(true);
       try {
         const currentPage = Math.floor(paginatedServices.length / PAGE_SIZE) + 1;
