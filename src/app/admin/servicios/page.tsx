@@ -1,10 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 // Removed Firebase Client SDK imports - now using API endpoints
 import Link from 'next/link';
 import { useServices } from '@/context/ServicesContext';
 import { useServiceCache } from '@/hooks/useServiceCache';
+import { useDebounce } from '@/hooks/useDebounce';
+import ServicesTable from '@/components/admin/ServicesTable';
+import VirtualizedServicesTable from '@/components/admin/VirtualizedServicesTable';
 
 interface Service {
   id: string;
@@ -28,8 +31,12 @@ export default function ServicesPage() {
   const [categoryFilter, setCategoryFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+  const [useVirtualization, setUseVirtualization] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const servicesPerPage = 12;
+  
+  // 🚀 OPTIMIZACIÓN: Debounce para búsqueda
+  const debouncedSearchTerm = useDebounce(searchTerm, 300);
   
   // 🚀 OPTIMIZACIÓN: Usar contexto de servicios y cache
   const { services: contextServices, hardRefresh, softRefresh } = useServices();
@@ -99,7 +106,8 @@ export default function ServicesPage() {
     }
   };
 
-  const toggleServiceStatus = async (serviceId: string, currentStatus: boolean) => {
+  // 🚀 OPTIMIZACIÓN: useCallback para evitar re-renders innecesarios
+  const toggleServiceStatus = useCallback(async (serviceId: string, currentStatus: boolean) => {
     try {
       const response = await fetch(`/api/services/${serviceId}`, {
         method: 'PUT',
@@ -119,9 +127,10 @@ export default function ServicesPage() {
       console.error('Error actualizando estado:', err);
       alert('Error al actualizar el estado del servicio');
     }
-  };
+  }, []);
 
-  const deleteService = async (serviceId: string) => {
+  // 🚀 OPTIMIZACIÓN: useCallback para evitar re-renders innecesarios
+  const deleteService = useCallback(async (serviceId: string) => {
     try {
       const response = await fetch(`/api/services/${serviceId}`, {
         method: 'DELETE',
@@ -139,33 +148,43 @@ export default function ServicesPage() {
       console.error('Error eliminando servicio:', err);
       alert('Error al eliminar el servicio');
     }
-  };
+  }, []);
 
-  // Filtrar servicios
-  const filteredServices = localServices.filter(service => {
-    const matchesSearch = service.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         service.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = !categoryFilter || service.category === categoryFilter;
-    const matchesStatus = statusFilter === '' || 
-                         (statusFilter === 'active' && service.active !== false) ||
-                         (statusFilter === 'inactive' && service.active === false);
+  // 🚀 OPTIMIZACIÓN: Memoización de filtros costosos
+  const filteredServices = useMemo(() => {
+    return localServices.filter(service => {
+      const matchesSearch = service.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+                           service.description.toLowerCase().includes(debouncedSearchTerm.toLowerCase());
+      const matchesCategory = !categoryFilter || service.category === categoryFilter;
+      const matchesStatus = statusFilter === '' || 
+                           (statusFilter === 'active' && service.active !== false) ||
+                           (statusFilter === 'inactive' && service.active === false);
+      
+      return matchesSearch && matchesCategory && matchesStatus;
+    });
+  }, [localServices, debouncedSearchTerm, categoryFilter, statusFilter]);
+
+  // 🚀 OPTIMIZACIÓN: Memoización de cálculos de paginación
+  const paginationData = useMemo(() => {
+    const totalPages = Math.ceil(filteredServices.length / servicesPerPage);
+    const startIndex = (currentPage - 1) * servicesPerPage;
+    const endIndex = startIndex + servicesPerPage;
+    const currentServices = filteredServices.slice(startIndex, endIndex);
     
-    return matchesSearch && matchesCategory && matchesStatus;
-  });
+    return { totalPages, startIndex, endIndex, currentServices };
+  }, [filteredServices, currentPage, servicesPerPage]);
+  
+  const { totalPages, startIndex, endIndex, currentServices } = paginationData;
 
-  // Calcular paginación
-  const totalPages = Math.ceil(filteredServices.length / servicesPerPage);
-  const startIndex = (currentPage - 1) * servicesPerPage;
-  const endIndex = startIndex + servicesPerPage;
-  const currentServices = filteredServices.slice(startIndex, endIndex);
-
-  // Resetear página cuando cambian los filtros
+  // Resetear página cuando cambian los filtros (usando debouncedSearchTerm)
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, categoryFilter, statusFilter]);
+  }, [debouncedSearchTerm, categoryFilter, statusFilter]);
 
-  // Obtener categorías únicas
-  const categories = Array.from(new Set(localServices.map(service => service.category).filter(Boolean)));
+  // 🚀 OPTIMIZACIÓN: Memoización de categorías únicas
+  const categories = useMemo(() => {
+    return Array.from(new Set(localServices.map(service => service.category).filter(Boolean)));
+  }, [localServices]);
 
   if (loading) {
     return (
@@ -311,102 +330,40 @@ export default function ServicesPage() {
             )}
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Servicio
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Categoría
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Contacto
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Estado
-                  </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Acciones
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {currentServices.map((service) => (
-                  <tr key={service.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <div className="flex-shrink-0 h-10 w-10">
-                          {(service.images && service.images.length > 0 ? service.images[0] : service.image) ? (
-                            <img
-                              className="h-10 w-10 rounded-lg object-cover"
-                              src={service.images && service.images.length > 0 ? service.images[0] : service.image}
-                              alt={service.name}
-                            />
-                          ) : (
-                            <div className="h-10 w-10 rounded-lg bg-gray-200 flex items-center justify-center">
-                              <span className="text-gray-500 text-xs">🏪</span>
-                            </div>
-                          )}
-                        </div>
-                        <div className="ml-4">
-                          <div className="text-sm font-medium text-gray-900">
-                            {service.name}
-                          </div>
-                          <div className="text-sm text-gray-500 truncate max-w-xs">
-                            {service.description}
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                        {service.category || 'Sin categoría'}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      <div>
-                        {service.phone && (
-                          <div>📞 {service.phone}</div>
-                        )}
-                        {service.whatsapp && (
-                          <div>💬 {service.whatsapp}</div>
-                        )}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <button
-                        onClick={() => toggleServiceStatus(service.id, service.active !== false)}
-                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          service.active !== false
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-red-100 text-red-800'
-                        }`}
-                      >
-                        {service.active !== false ? '✅ Activo' : '❌ Inactivo'}
-                      </button>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <div className="flex items-center justify-end space-x-2">
-                        <Link
-                          href={`/admin/servicios/${service.id}`}
-                          className="text-blue-600 hover:text-blue-900"
-                        >
-                          ✏️
-                        </Link>
-                        <button
-                          onClick={() => setDeleteConfirm(service.id)}
-                          className="text-red-600 hover:text-red-900"
-                        >
-                          🗑️
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div>
+            {/* Toggle para virtualización */}
+            {filteredServices.length > 50 && (
+              <div className="mb-4 flex items-center justify-between">
+                <div className="text-sm text-gray-600">
+                  {filteredServices.length} servicios encontrados
+                </div>
+                <label className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    checked={useVirtualization}
+                    onChange={(e) => setUseVirtualization(e.target.checked)}
+                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  />
+                  <span className="text-sm text-gray-700">
+                    Usar virtualización (recomendado para +50 servicios)
+                  </span>
+                </label>
+              </div>
+            )}
+            
+            {useVirtualization && filteredServices.length > 50 ? (
+              <VirtualizedServicesTable
+                services={currentServices}
+                onToggleStatus={toggleServiceStatus}
+                onDelete={setDeleteConfirm}
+              />
+            ) : (
+              <ServicesTable
+                services={currentServices}
+                onToggleStatus={toggleServiceStatus}
+                onDelete={setDeleteConfirm}
+              />
+            )}
           </div>
         )}
         

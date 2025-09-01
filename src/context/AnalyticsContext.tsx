@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useReducer, useEffect, useCallback, useMemo } from 'react';
 import { db } from '../lib/firebase/config';
+import { useAuth } from './AuthContext';
 
 // Función para obtener funciones de Firebase dinámicamente
 const getFirestoreFunctions = async () => {
@@ -111,6 +112,7 @@ const AnalyticsContext = createContext<AnalyticsContextType | undefined>(undefin
 
 export function AnalyticsProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(analyticsReducer, initialState);
+  const { user, isAdmin } = useAuth();
 
   const trackEvent = useCallback(async (event: Omit<AnalyticsEvent, 'timestamp'>) => {
     try {
@@ -164,6 +166,14 @@ export function AnalyticsProvider({ children }: { children: React.ReactNode }) {
     try {
       dispatch({ type: 'SET_LOADING', payload: true });
       
+      // Verificar si el usuario es administrador
+      if (!user || !isAdmin) {
+        console.warn('⚠️ Analytics: Solo administradores pueden acceder a las métricas');
+        dispatch({ type: 'SET_METRICS', payload: initialState.metrics });
+        dispatch({ type: 'SET_LOADING', payload: false });
+        return;
+      }
+      
       // Get Firebase functions dynamically
       const firestore = await getFirestoreFunctions();
       if (!db || !firestore) {
@@ -204,14 +214,20 @@ export function AnalyticsProvider({ children }: { children: React.ReactNode }) {
       };
 
       dispatch({ type: 'SET_METRICS', payload: metrics });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error getting metrics:', error);
-      // En caso de error de permisos, usar métricas vacías
+      
+      // Si es un error de permisos, mostrar mensaje específico
+      if (error.code === 'permission-denied') {
+        console.warn('⚠️ Analytics: Acceso denegado a colección analytics. Solo administradores pueden ver métricas.');
+      }
+      
+      // En caso de error, usar métricas vacías
       dispatch({ type: 'SET_METRICS', payload: initialState.metrics });
     } finally {
       dispatch({ type: 'SET_LOADING', payload: false });
     }
-  }, []);
+  }, [user, isAdmin]);
 
   const calculateTopServices = (events: AnalyticsEvent[]) => {
     const serviceClicks = events.filter(e => e.type === 'service_click' && e.serviceId);
