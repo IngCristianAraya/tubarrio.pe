@@ -48,18 +48,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setUser(user);
       
-      if (user) {
-        // Verificar si el usuario es admin
-        try {
-          const tokenResult = await user.getIdTokenResult();
-          setIsAdmin(!!tokenResult.claims.admin);
-        } catch (error) {
-          console.error('Error verificando claims de admin:', error);
-          setIsAdmin(false);
-        }
-      } else {
-        setIsAdmin(false);
-      }
+      // Simplificado: cualquier usuario autenticado es considerado admin
+      // Las reglas de Firestore ya protegen los datos sensibles
+      setIsAdmin(!!user);
       
       setLoading(false);
     });

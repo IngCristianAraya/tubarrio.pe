@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
+import { useAuth } from '@/context/AuthContext';
 import AdminAuthGuard from '@/components/AdminAuthGuard';
 
 interface AdminLayoutProps {
@@ -13,11 +14,16 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
+  const { logout } = useAuth();
 
-  const handleLogout = () => {
-    localStorage.removeItem('admin_authenticated');
-    localStorage.removeItem('admin_login_time');
-    router.push('/admin/login');
+  const handleLogout = async () => {
+    try {
+      await logout();
+      router.push('/admin/login');
+    } catch (error) {
+      console.error('Error al cerrar sesión:', error);
+      router.push('/admin/login');
+    }
   };
 
   const navigation = [
@@ -36,7 +42,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
   return (
     <AdminAuthGuard>
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Header */}
       <header className="bg-white shadow-sm border-b border-gray-200">
         <div className="flex items-center justify-between px-4 py-3">
@@ -120,7 +126,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           </div>
         </main>
       </div>
-    </div>
+      </div>
     </AdminAuthGuard>
   );
 }

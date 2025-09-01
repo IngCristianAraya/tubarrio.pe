@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 // Force redeploy for CSP fix
 const nextConfig = {
-  reactStrictMode: true,
+  reactStrictMode: false, // Desactivado para evitar duplicación de mensajes en desarrollo
   swcMinify: true,
   
   async headers() {

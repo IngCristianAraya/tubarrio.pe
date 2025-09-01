@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Service } from '@/types/service';
 
 // Tipos para analytics
@@ -28,14 +28,16 @@ const ANALYTICS_KEYS = {
 };
 
 const ANALYTICS_CONFIG = {
-  MAX_VISITS_STORED: 1000, // Máximo número de visitas a almacenar
-  CLEANUP_INTERVAL: 7 * 24 * 60 * 60 * 1000, // 7 días en ms
-  RECENT_VISIT_WEIGHT: 2, // Peso para visitas recientes
-  PRELOAD_COUNT: 10 // Número de servicios populares a precargar
+  MAX_VISITS_STORED: 500, // Reducido de 1000 a 500
+  CLEANUP_INTERVAL: 3 * 24 * 60 * 60 * 1000, // Reducido a 3 días
+  RECENT_VISIT_WEIGHT: 1.5, // Reducido peso de visitas recientes
+  PRELOAD_COUNT: 8, // Reducido de 10 a 8 servicios a precargar
+  MIN_TIME_BETWEEN_UPDATES: 30000 // 30 segundos entre actualizaciones de populares
 };
 
 export const useServiceAnalytics = () => {
   const isClient = typeof window !== 'undefined';
+  const [lastUpdate, setLastUpdate] = useState<number>(0);
 
   // Función para limpiar datos antiguos
   const cleanupOldData = useCallback(() => {
@@ -73,36 +75,6 @@ export const useServiceAnalytics = () => {
       return [];
     }
   }, [isClient]);
-
-  // Función para registrar una visita a un servicio
-  const trackServiceVisit = useCallback((serviceId: string, category?: string) => {
-    if (!isClient || !serviceId) return;
-
-    try {
-      const visits = getStoredVisits();
-      const newVisit: ServiceVisit = {
-        serviceId,
-        timestamp: Date.now(),
-        category
-      };
-
-      visits.push(newVisit);
-
-      // Mantener solo las últimas visitas para evitar que crezca demasiado
-      if (visits.length > ANALYTICS_CONFIG.MAX_VISITS_STORED) {
-        visits.splice(0, visits.length - ANALYTICS_CONFIG.MAX_VISITS_STORED);
-      }
-
-      localStorage.setItem(ANALYTICS_KEYS.SERVICE_VISITS, JSON.stringify(visits));
-      
-      // Actualizar servicios populares
-      updatePopularServices();
-      
-      console.log(`📊 Visita registrada: ${serviceId}`);
-    } catch (error) {
-      console.warn('Error registrando visita:', error);
-    }
-  }, [isClient, getStoredVisits]);
 
   // Función para calcular servicios populares
   const calculatePopularServices = useCallback((): PopularService[] => {
@@ -144,10 +116,18 @@ export const useServiceAnalytics = () => {
     return popularServices.sort((a, b) => b.score - a.score);
   }, [getStoredVisits]);
 
-  // Función para actualizar servicios populares en localStorage
+  // Función optimizada para actualizar servicios populares
   const updatePopularServices = useCallback(() => {
     if (!isClient) return;
 
+    const now = Date.now();
+    // Evitar actualizaciones demasiado frecuentes
+    if (now - lastUpdate < ANALYTICS_CONFIG.MIN_TIME_BETWEEN_UPDATES) {
+      return;
+    }
+
+    setLastUpdate(now);
+    
     try {
       const popularServices = calculatePopularServices();
       const topServices = popularServices.slice(0, ANALYTICS_CONFIG.PRELOAD_COUNT);
@@ -156,7 +136,37 @@ export const useServiceAnalytics = () => {
     } catch (error) {
       console.warn('Error actualizando servicios populares:', error);
     }
-  }, [isClient, calculatePopularServices]);
+  }, [isClient, calculatePopularServices, lastUpdate]);
+
+  // trackServiceVisit optimizado
+  const trackServiceVisit = useCallback((serviceId: string, category?: string) => {
+    if (!isClient || !serviceId) return;
+
+    try {
+      const visits = getStoredVisits();
+      const newVisit: ServiceVisit = {
+        serviceId,
+        timestamp: Date.now(),
+        category
+      };
+
+      visits.push(newVisit);
+
+      // Mantener solo las últimas visitas
+      if (visits.length > ANALYTICS_CONFIG.MAX_VISITS_STORED) {
+        visits.splice(0, visits.length - ANALYTICS_CONFIG.MAX_VISITS_STORED);
+      }
+
+      localStorage.setItem(ANALYTICS_KEYS.SERVICE_VISITS, JSON.stringify(visits));
+      
+      // Actualizar servicios populares (con throttling)
+      setTimeout(updatePopularServices, 1000); // Delay de 1 segundo
+      
+      console.log(`📊 Visita registrada: ${serviceId}`);
+    } catch (error) {
+      console.warn('Error registrando visita:', error);
+    }
+  }, [isClient, getStoredVisits, updatePopularServices]);
 
   // Función para obtener servicios populares
   const getPopularServices = useCallback((): PopularService[] => {

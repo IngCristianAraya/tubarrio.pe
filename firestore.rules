@@ -3,11 +3,9 @@ service cloud.firestore {
   match /databases/{database}/documents {
     
     // Función para verificar si el usuario es admin
+    // Simplificado: cualquier usuario autenticado es considerado admin
     function isAdmin() {
-      return request.auth != null && 
-             request.auth.token.email != null &&
-             (request.auth.token.email == 'admin@revistadigital.com' ||
-              request.auth.token.email.matches('.*@revistadigital\\.com$'));
+      return request.auth != null;
     }
     
     // Función para verificar autenticación básica

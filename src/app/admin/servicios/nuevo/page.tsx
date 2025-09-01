@@ -1,11 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { collection, addDoc, setDoc, doc, getDocs, query, serverTimestamp } from '@firebase/firestore';
-import { db } from '@/lib/firebase/config';
+// Removed Firebase Client SDK imports - now using API endpoints
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { generateSlug, generateUniqueSlug } from '@/lib/utils';
+import { useAuth } from '@/context/AuthContext';
 
 interface ServiceForm {
   name: string;
@@ -42,6 +42,7 @@ const CATEGORIES = [
 
 export default function NewServicePage() {
   const router = useRouter();
+  const { user, loading: authLoading, isAdmin } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
@@ -199,16 +200,16 @@ export default function NewServicePage() {
       setLoading(true);
       setError(null);
 
-      if (!db) {
-        throw new Error('Firebase no está configurado');
-      }
-
       // Generar slug único basado en el nombre
       const baseSlug = generateSlug(formData.name);
       
       // Obtener todos los servicios existentes para verificar slugs únicos
-      const servicesSnapshot = await getDocs(collection(db, 'services'));
-      const existingSlugs = servicesSnapshot.docs.map(doc => doc.id);
+      const servicesResponse = await fetch('/api/services');
+      if (!servicesResponse.ok) {
+        throw new Error('Error al obtener servicios existentes');
+      }
+      const existingServices = await servicesResponse.json();
+      const existingSlugs = existingServices.map((service: any) => service.id);
       
       // Generar slug único
       const uniqueSlug = generateUniqueSlug(baseSlug, existingSlugs);
@@ -232,12 +233,21 @@ export default function NewServicePage() {
         images: formData.images,
         image: formData.images.length > 0 ? formData.images[0] : '', // Primera imagen como imagen principal
         active: formData.active,
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp()
+        id: uniqueSlug
       };
 
-      // Guardar en Firestore con ID personalizado
-      await setDoc(doc(db, 'services', uniqueSlug), serviceData);
+      // Crear servicio usando la API
+      const createResponse = await fetch('/api/services', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(serviceData),
+      });
+      
+      if (!createResponse.ok) {
+        throw new Error('Error al crear el servicio');
+      }
       
       console.log('Servicio creado con ID:', uniqueSlug);
       
@@ -251,6 +261,35 @@ export default function NewServicePage() {
       setLoading(false);
     }
   };
+
+  // Verificar autenticación
+  if (authLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <span className="ml-2 text-gray-600">Verificando permisos...</span>
+      </div>
+    );
+  }
+
+  if (!user || !isAdmin) {
+    return (
+      <div className="max-w-2xl mx-auto">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <h3 className="text-red-800 font-medium">Acceso Denegado</h3>
+          <p className="text-red-600 text-sm mt-1">No tienes permisos para crear servicios. Debes ser administrador.</p>
+          <div className="mt-4">
+            <Link
+              href="/admin/login"
+              className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-700"
+            >
+              Iniciar Sesión como Admin
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-2xl mx-auto">

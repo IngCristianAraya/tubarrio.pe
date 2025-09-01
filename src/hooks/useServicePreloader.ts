@@ -13,15 +13,18 @@ interface PreloadStatus {
 }
 
 const PRELOAD_CONFIG = {
-  PRELOAD_INTERVAL: 30 * 60 * 1000, // 30 minutos
-  MAX_CONCURRENT_PRELOADS: 3, // Máximo 3 servicios precargando simultáneamente
-  PRELOAD_DELAY: 2000, // Delay entre precargas para no sobrecargar
-  ENABLE_BACKGROUND_PRELOAD: true
+  PRELOAD_INTERVAL: 120 * 60 * 1000, // 2 HORAS entre precargas
+  MAX_CONCURRENT_PRELOADS: 1, // SOLO 1 precarga a la vez
+  PRELOAD_DELAY: 5000, // 5 segundos entre precargas
+  ENABLE_BACKGROUND_PRELOAD: false, // DESACTIVADO por defecto
+  MIN_TIME_BETWEEN_PRELOADS: 10 * 60 * 1000 // 10 minutos mínimo
 };
+
+// Optimización final aplicada
 
 export const useServicePreloader = () => {
   const { getServicesToPreload, getAnalyticsStats } = useServiceAnalytics();
-  const { getSingleServiceFromCache, setSingleServiceCache } = useServiceCache();
+  const { getSingleServiceFromCache, setSingleServiceCache, getAllServicesFromCache } = useServiceCache();
   
   const [preloadStatus, setPreloadStatus] = useState<PreloadStatus>({
     isPreloading: false,
@@ -30,6 +33,7 @@ export const useServicePreloader = () => {
     lastPreloadTime: null
   });
 
+  const [lastPreloadAttempt, setLastPreloadAttempt] = useState<number>(0);
   const isClient = typeof window !== 'undefined';
 
   // Función para precargar un servicio individual
@@ -77,73 +81,91 @@ export const useServicePreloader = () => {
     }
   }, [getSingleServiceFromCache, setSingleServiceCache]);
 
-  // Función para precargar servicios populares
+  // NUEVA FUNCIÓN: Precarga ultra-conservadora
+  const conservativePreload = useCallback(async (serviceIds: string[]): Promise<void> => {
+    if (!isClient || serviceIds.length === 0) return;
+
+    console.log(`🔄 Precarga conservadora iniciada para ${serviceIds.length} servicios`);
+    
+    let successCount = 0;
+    for (const serviceId of serviceIds) {
+      // Verificar DOBLE cache antes de precargar
+      const cached = getSingleServiceFromCache(serviceId);
+      if (cached) {
+        console.log(`⚡ Servicio ${serviceId} ya en cache, omitiendo`);
+        continue;
+      }
+      
+      // Precarga ultra-lenta con delays
+      await new Promise(resolve => setTimeout(resolve, PRELOAD_CONFIG.PRELOAD_DELAY));
+      
+      try {
+        const success = await preloadSingleService(serviceId);
+        if (success) successCount++;
+      } catch (error) {
+        console.warn(`Error precargando ${serviceId}:`, error);
+      }
+    }
+    
+    console.log(`✅ Precarga conservadora completada: ${successCount}/${serviceIds.length} éxitos`);
+  }, [isClient, preloadSingleService, getSingleServiceFromCache]);
+
+  // REEMPLAZAR preloadPopularServices con versión ultra-optimizada
   const preloadPopularServices = useCallback(async (force = false): Promise<void> => {
-    if (!isClient || !PRELOAD_CONFIG.ENABLE_BACKGROUND_PRELOAD) return;
+    if (!isClient || !PRELOAD_CONFIG.ENABLE_BACKGROUND_PRELOAD) {
+      console.log('⏸️ Precarga automática desactivada');
+      return;
+    }
 
     const now = Date.now();
-    const lastPreload = preloadStatus.lastPreloadTime;
     
-    // Verificar si es necesario precargar
-    if (!force && lastPreload && (now - lastPreload) < PRELOAD_CONFIG.PRELOAD_INTERVAL) {
-      console.log('⏰ Precarga no necesaria aún, esperando intervalo');
-      return;
+    // Verificación EXTRA estricta
+    if (!force) {
+      if (preloadStatus.lastPreloadTime && 
+          (now - preloadStatus.lastPreloadTime) < PRELOAD_CONFIG.PRELOAD_INTERVAL) {
+        return;
+      }
+      
+      if (now - lastPreloadAttempt < PRELOAD_CONFIG.MIN_TIME_BETWEEN_PRELOADS) {
+        return;
+      }
     }
 
+    setLastPreloadAttempt(now);
+    
+    // Obtener servicios para precargar
     const servicesToPreload = getServicesToPreload();
-    
-    if (servicesToPreload.length === 0) {
-      console.log('📊 No hay servicios populares para precargar');
-      return;
-    }
+    if (servicesToPreload.length === 0) return;
 
-    console.log(`🚀 Iniciando precarga de ${servicesToPreload.length} servicios populares`);
+    // FILTRAR MÁS AGRESIVAMENTE - solo 3 servicios máximo
+    const servicesToActuallyPreload = [];
+    for (const serviceId of servicesToPreload.slice(0, 3)) { // SOLO 3 servicios
+      const cached = getSingleServiceFromCache(serviceId);
+      if (!cached) {
+        servicesToActuallyPreload.push(serviceId);
+      }
+    }
+    
+    if (servicesToActuallyPreload.length === 0) return;
+
+    console.log(`🚀 Precarga ultra-conservadora de ${servicesToActuallyPreload.length} servicios`);
     
     setPreloadStatus(prev => ({
       ...prev,
       isPreloading: true,
       preloadedCount: 0,
-      totalToPreload: servicesToPreload.length,
+      totalToPreload: servicesToActuallyPreload.length,
       lastPreloadTime: now
     }));
 
-    let preloadedCount = 0;
-    const maxConcurrent = PRELOAD_CONFIG.MAX_CONCURRENT_PRELOADS;
-    
-    // Precargar en lotes para no sobrecargar
-    for (let i = 0; i < servicesToPreload.length; i += maxConcurrent) {
-      const batch = servicesToPreload.slice(i, i + maxConcurrent);
-      
-      // Precargar lote actual
-      const promises = batch.map(serviceId => preloadSingleService(serviceId));
-      const results = await Promise.allSettled(promises);
-      
-      // Contar exitosos
-      results.forEach((result, index) => {
-        if (result.status === 'fulfilled' && result.value) {
-          preloadedCount++;
-        }
-      });
-      
-      // Actualizar estado
-      setPreloadStatus(prev => ({
-        ...prev,
-        preloadedCount
-      }));
-      
-      // Delay entre lotes para no sobrecargar
-      if (i + maxConcurrent < servicesToPreload.length) {
-        await new Promise(resolve => setTimeout(resolve, PRELOAD_CONFIG.PRELOAD_DELAY));
-      }
-    }
+    // Usar precarga conservadora
+    await conservativePreload(servicesToActuallyPreload);
     
     setPreloadStatus(prev => ({
       ...prev,
       isPreloading: false
     }));
-    
-    console.log(`✅ Precarga completada: ${preloadedCount}/${servicesToPreload.length} servicios`);
-  }, [isClient, preloadStatus.lastPreloadTime, getServicesToPreload, preloadSingleService]);
+  }, [isClient, preloadStatus.lastPreloadTime, getServicesToPreload, lastPreloadAttempt, conservativePreload, getSingleServiceFromCache]);
 
   // Función para precargar servicios de una categoría específica
   const preloadCategoryServices = useCallback(async (category: string, limit = 5): Promise<void> => {
@@ -199,23 +221,27 @@ export const useServicePreloader = () => {
     console.log(`🔧 Precarga automática ${enabled ? 'habilitada' : 'deshabilitada'}`);
   }, []);
 
-  // Efecto para iniciar precarga automática
+  // Efecto INICIAL desactivado - precarga manual solamente
   useEffect(() => {
-    if (!isClient || !PRELOAD_CONFIG.ENABLE_BACKGROUND_PRELOAD) return;
-
-    // Delay inicial para no interferir con la carga inicial de la página
-    const initialDelay = setTimeout(() => {
-      preloadPopularServices();
-    }, 5000); // 5 segundos después de montar el componente
-
-    // Intervalo para precarga periódica
-    const interval = setInterval(() => {
-      preloadPopularServices();
-    }, PRELOAD_CONFIG.PRELOAD_INTERVAL);
-
+    if (!isClient) return;
+    
+    console.log('⏸️ Precarga automática desactivada por optimización');
+    
+    // Solo precargar después de interacción del usuario
+    const handleFirstInteraction = () => {
+      setTimeout(() => {
+        if (PRELOAD_CONFIG.ENABLE_BACKGROUND_PRELOAD) {
+          preloadPopularServices();
+        }
+      }, 30000); // 30 segundos después de la primera interacción
+    };
+    
+    window.addEventListener('click', handleFirstInteraction, { once: true });
+    window.addEventListener('keydown', handleFirstInteraction, { once: true });
+    
     return () => {
-      clearTimeout(initialDelay);
-      clearInterval(interval);
+      window.removeEventListener('click', handleFirstInteraction);
+      window.removeEventListener('keydown', handleFirstInteraction);
     };
   }, [isClient, preloadPopularServices]);
 

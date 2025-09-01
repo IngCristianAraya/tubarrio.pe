@@ -1,11 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { doc, getDoc, updateDoc, serverTimestamp, setDoc, getDocs, collection, query, deleteDoc } from '@firebase/firestore';
-import { db } from '@/lib/firebase/config';
+// Removed Firebase Client SDK imports - now using API endpoints
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { generateSlug, generateUniqueSlug } from '@/lib/utils';
+import { useAuth } from '@/context/AuthContext';
 
 interface ServiceForm {
   name: string;
@@ -48,6 +48,7 @@ interface EditServicePageProps {
 
 export default function EditServicePage({ params }: EditServicePageProps) {
   const router = useRouter();
+  const { user, loading: authLoading, isAdmin } = useAuth();
   const [loading, setLoading] = useState(false);
   const [loadingData, setLoadingData] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -73,26 +74,28 @@ export default function EditServicePage({ params }: EditServicePageProps) {
   });
 
   useEffect(() => {
-    loadService();
-  }, [params.id]);
+    if (!authLoading && user && isAdmin) {
+      loadService();
+    } else if (!authLoading && (!user || !isAdmin)) {
+      router.push('/admin/login');
+    }
+  }, [params.id, authLoading, user, isAdmin]);
 
   const loadService = async () => {
     try {
       setLoadingData(true);
       setError(null);
 
-      if (!db) {
-        throw new Error('Firebase no está configurado');
+      const response = await fetch(`/api/services/${params.id}`);
+      
+      if (!response.ok) {
+        if (response.status === 404) {
+          throw new Error('Servicio no encontrado');
+        }
+        throw new Error('Error al cargar el servicio');
       }
 
-      const serviceRef = doc(db, 'services', params.id);
-      const serviceSnap = await getDoc(serviceRef);
-
-      if (!serviceSnap.exists()) {
-        throw new Error('Servicio no encontrado');
-      }
-
-      const serviceData = serviceSnap.data();
+      const serviceData = await response.json();
       
       // Guardar el nombre original para detectar cambios
       setOriginalName(serviceData.name || '');
@@ -229,10 +232,6 @@ export default function EditServicePage({ params }: EditServicePageProps) {
       setLoading(true);
       setError(null);
 
-      if (!db) {
-        throw new Error('Firebase no está configurado');
-      }
-
       // Preparar datos del servicio
       const serviceData: any = {
         name: formData.name.trim(),
@@ -251,8 +250,7 @@ export default function EditServicePage({ params }: EditServicePageProps) {
         plan: formData.plan || 'básico',
         images: formData.images || [],
         image: formData.images && formData.images.length > 0 ? formData.images[0] : '',
-        active: Boolean(formData.active),
-        updatedAt: serverTimestamp()
+        active: Boolean(formData.active)
       };
 
       // Filtrar campos undefined, null y valores inválidos para evitar errores en Firestore
@@ -266,42 +264,72 @@ export default function EditServicePage({ params }: EditServicePageProps) {
         }
       });
 
-      // Verificar si el nombre ha cambiado
-      const nameChanged = formData.name.trim() !== originalName;
+      // Verificar si el nombre realmente cambió
+      const currentName = formData.name.trim();
+      const originalNameTrimmed = originalName.trim();
+      const nameChanged = currentName !== originalNameTrimmed;
       
-      if (nameChanged) {
-        // Generar nuevo slug basado en el nuevo nombre
-        const baseSlug = generateSlug(formData.name.trim());
-        
+      // Solo generar nuevo slug si el nombre cambió
+      const newSlug = nameChanged ? generateSlug(currentName) : params.id;
+      const slugChanged = nameChanged && newSlug !== params.id;
+      
+      if (slugChanged) {
         // Obtener todos los servicios existentes para verificar unicidad
-        const servicesSnapshot = await getDocs(collection(db, 'services'));
-        const existingIds = servicesSnapshot.docs.map(doc => doc.id).filter(id => id !== params.id);
+        const servicesResponse = await fetch('/api/services');
+        if (!servicesResponse.ok) {
+          throw new Error('Error al obtener servicios existentes');
+        }
+        const existingServices = await servicesResponse.json();
+        const existingIds = existingServices.map((service: any) => service.id).filter((id: string) => id !== params.id);
         
         // Generar slug único
-        const newSlug = generateUniqueSlug(baseSlug, existingIds);
+        const uniqueSlug = generateUniqueSlug(newSlug, existingIds);
         
-        // Crear nuevo documento con el nuevo slug
-        const newServiceRef = doc(db, 'services', newSlug);
-        await setDoc(newServiceRef, serviceData);
+        // Crear nuevo servicio con el nuevo slug
+        const createResponse = await fetch('/api/services', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ ...serviceData, id: uniqueSlug }),
+        });
         
-        // Eliminar el documento anterior
-         const oldServiceRef = doc(db, 'services', params.id);
-         await deleteDoc(oldServiceRef);
+        if (!createResponse.ok) {
+          throw new Error('Error al crear el servicio con nuevo slug');
+        }
         
-        console.log('Servicio movido de', params.id, 'a', newSlug);
+        // Eliminar el servicio anterior
+        const deleteResponse = await fetch(`/api/services/${params.id}`, {
+          method: 'DELETE',
+        });
+        
+        if (!deleteResponse.ok) {
+          throw new Error('Error al eliminar el servicio anterior');
+        }
+        
+        console.log('Servicio movido de', params.id, 'a', uniqueSlug);
         
         // Redirigir a la nueva URL
         router.push('/admin/servicios');
       } else {
-        // Solo actualizar el documento existente
-        const serviceRef = doc(db, 'services', params.id);
-        await updateDoc(serviceRef, serviceData);
+        // Solo actualizar el servicio existente (el slug no cambió)
+        const updateResponse = await fetch(`/api/services/${params.id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(serviceData),
+        });
+        
+        if (!updateResponse.ok) {
+          throw new Error('Error al actualizar el servicio');
+        }
         
         console.log('Servicio actualizado:', params.id);
         
         // Redirigir a la lista de servicios
-         router.push('/admin/servicios');
-       }
+        router.push('/admin/servicios');
+      }
       
     } catch (err) {
       console.error('Error actualizando servicio:', err);
@@ -310,6 +338,35 @@ export default function EditServicePage({ params }: EditServicePageProps) {
       setLoading(false);
     }
   };
+
+  // Verificar autenticación
+  if (authLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <span className="ml-2 text-gray-600">Verificando permisos...</span>
+      </div>
+    );
+  }
+
+  if (!user || !isAdmin) {
+    return (
+      <div className="max-w-2xl mx-auto">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <h3 className="text-red-800 font-medium">Acceso Denegado</h3>
+          <p className="text-red-600 text-sm mt-1">No tienes permisos para editar servicios. Debes ser administrador.</p>
+          <div className="mt-4">
+            <Link
+              href="/admin/login"
+              className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-700"
+            >
+              Iniciar Sesión como Admin
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (loadingData) {
     return (

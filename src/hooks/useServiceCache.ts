@@ -17,10 +17,11 @@ interface SingleServiceCache {
 }
 
 const CACHE_VERSION = '1.0.0';
+// Cache MUY conservador
 const CACHE_EXPIRY = {
-  FEATURED: 30 * 60 * 1000, // 30 minutos para servicios destacados
-  ALL_SERVICES: 60 * 60 * 1000, // 1 hora para todos los servicios
-  SINGLE_SERVICE: 24 * 60 * 60 * 1000, // 24 horas para servicios individuales
+  FEATURED: 24 * 60 * 60 * 1000, // 24 horas
+  ALL_SERVICES: 48 * 60 * 60 * 1000, // 48 horas
+  SINGLE_SERVICE: 7 * 24 * 60 * 60 * 1000, // 7 días
 };
 
 const CACHE_KEYS = {
@@ -30,6 +31,11 @@ const CACHE_KEYS = {
   LAST_FETCH_TIME: 'tubarrio_last_fetch_time',
 };
 
+// NUEVO: Cache persistente entre sesiones
+const PERSISTENT_CACHE_KEYS = {
+  CORE_SERVICES: 'tubarrio_core_services_v2'
+};
+
 export const useServiceCache = () => {
   const [isClient, setIsClient] = useState(false);
 
@@ -37,9 +43,10 @@ export const useServiceCache = () => {
     setIsClient(true);
   }, []);
 
-  // Función para verificar si el cache es válido
+  // Función optimizada para verificar cache
   const isCacheValid = useCallback((timestamp: number, expiryTime: number): boolean => {
-    return Date.now() - timestamp < expiryTime;
+    // Agregar margen de 5 minutos para evitar recargas innecesarias
+    return Date.now() - timestamp < (expiryTime - 300000);
   }, []);
 
   // Función para limpiar cache expirado
@@ -66,6 +73,48 @@ export const useServiceCache = () => {
       console.warn('Error limpiando cache:', error);
     }
   }, [isClient, isCacheValid]);
+
+  // NUEVA FUNCIÓN: Cargar datos iniciales desde cache persistente
+  const loadPersistentCache = useCallback((): Service[] | null => {
+    if (!isClient) return null;
+
+    try {
+      const cached = localStorage.getItem(PERSISTENT_CACHE_KEYS.CORE_SERVICES);
+      if (!cached) return null;
+
+      const cacheData: CacheData = JSON.parse(cached);
+      
+      // Cache persistente nunca expira completamente
+      // pero verificamos versión
+      if (cacheData.version !== CACHE_VERSION) {
+        localStorage.removeItem(PERSISTENT_CACHE_KEYS.CORE_SERVICES);
+        return null;
+      }
+
+      console.log('📦 Usando cache persistente de servicios');
+      return cacheData.data;
+    } catch (error) {
+      console.warn('Error leyendo cache persistente:', error);
+      return null;
+    }
+  }, [isClient]);
+
+  // NUEVA FUNCIÓN: Guardar datos en cache persistente
+  const saveToPersistentCache = useCallback((services: Service[]) => {
+    if (!isClient) return;
+
+    try {
+      const cacheData: CacheData = {
+        data: services,
+        timestamp: Date.now(),
+        version: CACHE_VERSION,
+      };
+      localStorage.setItem(PERSISTENT_CACHE_KEYS.CORE_SERVICES, JSON.stringify(cacheData));
+      console.log(`💾 Servicios guardados en cache persistente (${services.length} servicios)`);
+    } catch (error) {
+      console.warn('Error guardando cache persistente:', error);
+    }
+  }, [isClient]);
 
   // Servicios destacados
   const getFeaturedServicesFromCache = useCallback((): Service[] | null => {
@@ -139,6 +188,7 @@ export const useServiceCache = () => {
     }
   }, [isClient, isCacheValid]);
 
+  // MODIFICAR setAllServicesCache para guardar también en persistente
   const setAllServicesCache = useCallback((services: Service[]) => {
     if (!isClient) return;
 
@@ -149,11 +199,15 @@ export const useServiceCache = () => {
         version: CACHE_VERSION,
       };
       localStorage.setItem(CACHE_KEYS.ALL_SERVICES, JSON.stringify(cacheData));
+      
+      // GUARDAR TAMBIÉN EN CACHE PERSISTENTE
+      saveToPersistentCache(services);
+      
       console.log(`💾 Todos los servicios guardados en cache (${services.length} servicios)`);
     } catch (error) {
       console.warn('Error guardando cache de todos los servicios:', error);
     }
-  }, [isClient]);
+  }, [isClient, saveToPersistentCache]);
 
   // Servicios individuales
   const getSingleServiceFromCache = useCallback((serviceId: string): Service | null => {
@@ -259,6 +313,27 @@ export const useServiceCache = () => {
     }
   }, [isClient]);
 
+  // Nueva función para verificar rápidamente si un servicio está en cache
+  const isServiceInCache = useCallback((serviceId: string): boolean => {
+    if (!isClient) return false;
+    return getSingleServiceFromCache(serviceId) !== null;
+  }, [isClient, getSingleServiceFromCache]);
+
+  // Función para obtener múltiples servicios del cache a la vez
+  const getMultipleServicesFromCache = useCallback((serviceIds: string[]): Service[] => {
+    if (!isClient) return [];
+    
+    const services: Service[] = [];
+    serviceIds.forEach(serviceId => {
+      const cachedService = getSingleServiceFromCache(serviceId);
+      if (cachedService) {
+        services.push(cachedService);
+      }
+    });
+    
+    return services;
+  }, [isClient, getSingleServiceFromCache]);
+
   // Limpiar cache expirado al inicializar
   useEffect(() => {
     if (isClient) {
@@ -279,10 +354,16 @@ export const useServiceCache = () => {
     getSingleServiceFromCache,
     setSingleServiceCache,
     
+    // Cache persistente
+    loadPersistentCache,
+    saveToPersistentCache,
+    
     // Utilidades
     clearAllCache,
     cleanExpiredCache,
     getCacheStats,
+    isServiceInCache,
+    getMultipleServicesFromCache,
     isClient,
   };
 };

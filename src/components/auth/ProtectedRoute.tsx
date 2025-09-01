@@ -30,17 +30,35 @@ export default function ProtectedRoute({
         
         // Agregar el redirect como query parameter
         const redirectUrl = `${loginPath}?redirect=${encodeURIComponent(currentPath)}`;
-        router.push(redirectUrl);
+        
+        // Usar router para redirección
+        router.replace(redirectUrl);
         return;
       }
 
       // Si requiere admin pero el usuario no es admin
       if (requireAdmin && !isAdmin) {
-        router.push('/login?error=unauthorized');
+        router.replace('/admin/login?error=unauthorized');
         return;
       }
     }
   }, [user, loading, isAdmin, requireAdmin, router, redirectTo]);
+
+  // Si no está cargando y no hay usuario, no mostrar contenido
+  if (!loading && !user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+        <div className="text-center">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+            Acceso no autorizado
+          </h2>
+          <p className="text-gray-600 dark:text-gray-400">
+            Redirigiendo al login...
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   // Mostrar loading mientras se verifica la autenticación
   if (loading) {

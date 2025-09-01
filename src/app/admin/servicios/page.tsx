@@ -1,8 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { collection, getDocs, deleteDoc, doc, updateDoc } from '@firebase/firestore';
-import { db } from '@/lib/firebase/config';
+// Removed Firebase Client SDK imports - now using API endpoints
 import Link from 'next/link';
 import { useServices } from '@/context/ServicesContext';
 import { useServiceCache } from '@/hooks/useServiceCache';
@@ -33,34 +32,54 @@ export default function ServicesPage() {
   const servicesPerPage = 12;
   
   // 🚀 OPTIMIZACIÓN: Usar contexto de servicios y cache
-  const { services: contextServices, loadServicesFromFirestore } = useServices();
+  const { services: contextServices, hardRefresh, softRefresh } = useServices();
   const { getAllServicesFromCache, clearAllCache } = useServiceCache();
 
   useEffect(() => {
     loadServices();
   }, []);
 
-  const loadServices = async () => {
+  // Refrescar datos cuando la página se vuelve visible
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        // Forzar recarga completa cuando la página se vuelve visible
+        loadServices(true);
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, []);
+
+  const loadServices = async (forceRefresh = false) => {
     try {
       setLoading(true);
       setError(null);
 
       let servicesData: Service[] = [];
       
-      // 🚀 OPTIMIZACIÓN: Intentar obtener servicios desde cache primero
-      const cachedServices = getAllServicesFromCache();
-      if (cachedServices && cachedServices.length > 0) {
-        servicesData = cachedServices as Service[];
-        console.log(`⚡ Admin servicios desde localStorage: ${cachedServices.length} servicios (0 lecturas Firebase)`);
-      } else if (contextServices && contextServices.length > 0) {
-        // Usar servicios del contexto si están disponibles
+      if (forceRefresh) {
+        // Forzar recarga completa desde Firebase
+        console.log('🔄 Forzando recarga completa desde Firebase...');
+        await hardRefresh();
         servicesData = contextServices as Service[];
-        console.log(`📋 Admin servicios desde contexto: ${contextServices.length} servicios (0 lecturas Firebase)`);
       } else {
-        // Solo como último recurso, cargar desde Firebase
-        console.log('🔥 Admin servicios cargando desde Firebase...');
-        await loadServicesFromFirestore();
-        servicesData = contextServices as Service[];
+        // 🚀 OPTIMIZACIÓN: Intentar obtener servicios desde cache primero
+        const cachedServices = getAllServicesFromCache();
+        if (cachedServices && cachedServices.length > 0) {
+          servicesData = cachedServices as Service[];
+          console.log(`⚡ Admin servicios desde localStorage: ${cachedServices.length} servicios (0 lecturas Firebase)`);
+        } else if (contextServices && contextServices.length > 0) {
+          // Usar servicios del contexto si están disponibles
+          servicesData = contextServices as Service[];
+          console.log(`📋 Admin servicios desde contexto: ${contextServices.length} servicios (0 lecturas Firebase)`);
+        } else {
+          // Solo como último recurso, usar soft refresh
+          console.log('🔥 Admin servicios cargando con soft refresh...');
+          await softRefresh();
+          servicesData = contextServices as Service[];
+        }
       }
 
       // Ordenar por fecha de creación (más recientes primero)
@@ -82,20 +101,20 @@ export default function ServicesPage() {
 
   const toggleServiceStatus = async (serviceId: string, currentStatus: boolean) => {
     try {
-      if (!db) throw new Error('Firebase no está configurado');
+      const response = await fetch(`/api/services/${serviceId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ active: !currentStatus }),
+      });
       
-      const serviceRef = doc(db, 'services', serviceId);
-      await updateDoc(serviceRef, { active: !currentStatus });
+      if (!response.ok) {
+        throw new Error('Error al actualizar el estado del servicio');
+      }
       
-      // Actualizar estado local y limpiar cache
-      setLocalServices(prev => prev.map(service => 
-        service.id === serviceId 
-          ? { ...service, active: !currentStatus }
-          : service
-      ));
-      
-      // Limpiar cache para forzar recarga en próxima consulta
-      clearAllCache();
+      // Forzar recarga completa después de cambiar estado
+      await loadServices(true);
     } catch (err) {
       console.error('Error actualizando estado:', err);
       alert('Error al actualizar el estado del servicio');
@@ -104,16 +123,18 @@ export default function ServicesPage() {
 
   const deleteService = async (serviceId: string) => {
     try {
-      if (!db) throw new Error('Firebase no está configurado');
+      const response = await fetch(`/api/services/${serviceId}`, {
+        method: 'DELETE',
+      });
       
-      await deleteDoc(doc(db, 'services', serviceId));
+      if (!response.ok) {
+        throw new Error('Error al eliminar el servicio');
+      }
       
-      // Actualizar estado local y limpiar cache
-      setLocalServices(prev => prev.filter(service => service.id !== serviceId));
       setDeleteConfirm(null);
       
-      // Limpiar cache para forzar recarga en próxima consulta
-      clearAllCache();
+      // Forzar recarga completa después de eliminar
+      await loadServices(true);
     } catch (err) {
       console.error('Error eliminando servicio:', err);
       alert('Error al eliminar el servicio');
@@ -185,12 +206,27 @@ export default function ServicesPage() {
             )}
           </p>
         </div>
-        <Link
-          href="/admin/servicios/nuevo"
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-        >
-          ➕ Agregar Servicio
-        </Link>
+        <div className="flex gap-2">
+          <button
+            onClick={() => {
+              clearAllCache();
+              loadServices();
+            }}
+            className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors flex items-center gap-2"
+            disabled={loading}
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            {loading ? 'Actualizando...' : 'Refrescar'}
+          </button>
+          <Link
+            href="/admin/servicios/nuevo"
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            ➕ Agregar Servicio
+          </Link>
+        </div>
       </div>
 
       {/* Filters */}
@@ -242,7 +278,7 @@ export default function ServicesPage() {
           
           <div className="flex items-end">
             <button
-              onClick={loadServices}
+              onClick={() => loadServices(true)}
               className="w-full bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition-colors"
             >
               🔄 Actualizar
@@ -257,15 +293,15 @@ export default function ServicesPage() {
           <div className="p-8 text-center">
             <span className="text-4xl mb-4 block">🏪</span>
             <h3 className="text-lg font-medium text-gray-900 mb-2">
-              {services.length === 0 ? 'No hay servicios registrados' : 'No se encontraron servicios'}
+              {localServices.length === 0 ? 'No hay servicios registrados' : 'No se encontraron servicios'}
             </h3>
             <p className="text-gray-600 mb-4">
-              {services.length === 0 
+              {localServices.length === 0 
                 ? 'Comienza agregando tu primer servicio'
                 : 'Intenta ajustar los filtros de búsqueda'
               }
             </p>
-            {services.length === 0 && (
+            {localServices.length === 0 && (
               <Link
                 href="/admin/servicios/nuevo"
                 className="inline-block bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"

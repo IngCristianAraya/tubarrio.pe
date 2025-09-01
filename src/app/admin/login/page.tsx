@@ -17,9 +17,21 @@ export default function AdminLoginPage() {
   const error = searchParams.get('error');
 
   useEffect(() => {
-    // Si ya está autenticado y es admin, redirigir
+    // Mostrar error si existe
+    if (error === 'unauthorized') {
+      toast.error('Sesión expirada. Por favor inicia sesión nuevamente');
+    }
+  }, [error]);
+
+  // Efecto separado para manejar redirecciones después del login
+  useEffect(() => {
+    // Solo redirigir si el usuario acaba de autenticarse (no en carga inicial)
     if (user && isAdmin && !loading) {
-      router.push(redirectTo);
+      // Verificar si venimos de un redirect o si es acceso directo
+      const hasRedirectParam = searchParams.get('redirect');
+      if (hasRedirectParam) {
+        router.push(redirectTo);
+      }
     }
 
     // Si está autenticado pero no es admin
@@ -27,12 +39,7 @@ export default function AdminLoginPage() {
       toast.error('No tienes permisos de administrador');
       router.push('/');
     }
-
-    // Mostrar error si existe
-    if (error === 'unauthorized') {
-      toast.error('Sesión expirada. Por favor inicia sesión nuevamente');
-    }
-  }, [user, isAdmin, loading, router, redirectTo, error]);
+  }, [user, isAdmin, loading, router, redirectTo, searchParams]);
 
   // Mostrar loading mientras se verifica la autenticación
   if (loading) {
