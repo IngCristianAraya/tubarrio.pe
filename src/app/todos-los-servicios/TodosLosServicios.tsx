@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, Suspense, useCallback, useEffect } from 'react';
+import React, { useState, Suspense, useCallback, useEffect, useMemo } from 'react';
 import { useServices } from '../../context/ServicesContext';
 import ServiceCard from '../../components/ServiceCard';
 import ServiceCardSkeleton from '../../components/ServiceCardSkeleton';
@@ -42,54 +42,63 @@ function TodosLosServiciosPage() {
     loading, 
     currentLoadType,
     hasMorePages,
-    resetPagination
+    resetPagination,
+    initializeServices
   } = useServices();
 
   const [search, setSearch] = useState(busquedaParam ?? '');
-  // Si no hay parámetro de categoría, mostrar todos por defecto
   const [category, setCategory] = useState(categoriaParam ?? '');
   const [hasLoadedInitial, setHasLoadedInitial] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
 
-  // 🔥 SOLUCIÓN: useCallback para funciones estables
-  const loadInitialServices = useCallback(async () => {
-    if (loadServicesPaginated && resetPagination && !hasLoadedInitial) {
-      console.log('🔄 Cargando servicios iniciales...');
-      resetPagination();
-      await loadServicesPaginated(1, PAGE_SIZE);
-      setHasLoadedInitial(true);
-    }
-  }, [loadServicesPaginated, resetPagination, hasLoadedInitial]);
-
-  // 🔥 SOLUCIÓN: useEffect simplificado
+  // ✅ SOLUCIÓN: useEffect simplificado para carga inicial
   useEffect(() => {
-    loadInitialServices();
-  }, [loadInitialServices]); // ✅ Dependencia estable
-
-  // 🔥 SOLUCIÓN: Separar la actualización de estado de la carga de datos
-  useEffect(() => {
-    setCategory(categoriaParam ?? '');
-    setSearch(busquedaParam ?? '');
-  }, [categoriaParam, busquedaParam]);
-
-  // 🔥 SOLUCIÓN: useEffect separado para recargar cuando cambian los filtros
-  useEffect(() => {
-    if (hasLoadedInitial && resetPagination && loadServicesPaginated) {
-      const reloadWithFilters = async () => {
-        console.log('🔄 Recargando con nuevos filtros...');
+    let isMounted = true;
+    
+    const loadInitial = async () => {
+      if (!hasLoadedInitial && loadServicesPaginated && resetPagination && initializeServices) {
+        console.log('🔄 Inicializando servicios bajo demanda...');
+        // Primero inicializar servicios (solo cache/mock, sin Firebase)
+        await initializeServices();
+        
+        console.log('🔄 Cargando servicios paginados...');
         resetPagination();
-        await loadServicesPaginated(1, PAGE_SIZE, true);
-      };
-      
-      // Debounce para evitar múltiples llamadas
-      const timeoutId = setTimeout(reloadWithFilters, 300);
-      return () => clearTimeout(timeoutId);
-    }
-  }, [categoriaParam, busquedaParam, hasLoadedInitial]); // ✅ Solo dependencias necesarias
+        await loadServicesPaginated(1, PAGE_SIZE);
+        if (isMounted) {
+          setHasLoadedInitial(true);
+        }
+      }
+    };
+    
+    loadInitial();
+    
+    return () => {
+      isMounted = false;
+    };
+  }, []); // ✅ Array VACÍO - se ejecuta SOLO una vez
 
-  // Función para cargar más servicios
+  // ✅ SOLUCIÓN: useEffect separado para parámetros de URL
+  useEffect(() => {
+    setSearch(busquedaParam ?? '');
+    setCategory(categoriaParam ?? '');
+  }, [busquedaParam, categoriaParam]);
+
+  // ✅ SOLUCIÓN: useEffect DEBOUNDED para recarga con filtros
+  useEffect(() => {
+    if (!hasLoadedInitial) return; // No recargar hasta que la carga inicial termine
+    
+    const timeoutId = setTimeout(() => {
+      console.log('🔄 Recargando con filtros...');
+      resetPagination();
+      loadServicesPaginated(1, PAGE_SIZE, false); // ✅ forceRefresh: FALSE
+    }, 500); // ✅ Aumentar debounce a 500ms
+    
+    return () => clearTimeout(timeoutId);
+  }, [search, category, hasLoadedInitial]); // ✅ Solo estas dependencias
+
+  // ✅ SOLUCIÓN: Función estable para cargar más
   const loadMoreServices = async () => {
-    if (hasMorePages && !isLoadingMore && loadServicesPaginated) {
+    if (hasMorePages && !isLoadingMore) {
       setIsLoadingMore(true);
       try {
         const currentPage = Math.floor(paginatedServices.length / PAGE_SIZE) + 1;
@@ -104,16 +113,18 @@ function TodosLosServiciosPage() {
 
   const categories = getUniqueCategories(paginatedServices);
 
-  // Filtrado de servicios paginados
-  const filtered = paginatedServices.filter((s) => {
-    const searchLower = search.toLowerCase();
-    const matchesName = s.name.toLowerCase().includes(searchLower);
-    const matchesDescription = s.description.toLowerCase().includes(searchLower);
-    const matchesTags = s.tags ? s.tags.some(tag => tag.toLowerCase().includes(searchLower)) : false;
-    const matchesSearch = matchesName || matchesDescription || matchesTags;
-    const matchesCategory = category ? s.category === category : true;
-    return matchesSearch && matchesCategory;
-  });
+  // ✅ SOLUCIÓN: useMemo para filtrado eficiente
+  const filtered = useMemo(() => {
+    return paginatedServices.filter((s) => {
+      const searchLower = search.toLowerCase();
+      const matchesName = s.name.toLowerCase().includes(searchLower);
+      const matchesDescription = s.description.toLowerCase().includes(searchLower);
+      const matchesTags = s.tags ? s.tags.some(tag => tag.toLowerCase().includes(searchLower)) : false;
+      const matchesSearch = matchesName || matchesDescription || matchesTags;
+      const matchesCategory = category ? s.category === category : true;
+      return matchesSearch && matchesCategory;
+    });
+  }, [paginatedServices, search, category]); // ✅ Dependencias correctas
 
   return (
     <div className="min-h-screen bg-white">

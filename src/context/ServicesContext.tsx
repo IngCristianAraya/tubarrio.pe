@@ -53,6 +53,7 @@
     retryConnection: () => void;
     usingMockData: boolean;
     // Nuevas funciones optimizadas
+    initializeServices: () => Promise<void>;
     loadFeaturedServices: (forceRefresh?: boolean) => Promise<void>;
     loadSingleService: (serviceId: string) => Promise<Service | null>;
     loadServicesPaginated: (page: number, limitCount: number, forceRefresh?: boolean) => Promise<any>;
@@ -1033,38 +1034,41 @@
       }
     };
 
-    // Cargar servicios desde Firestore o usar datos mock
-    React.useEffect(() => {
-      const loadServices = async () => {
-        setLoading(true);
-        try {
+    // 🚀 OPTIMIZACIÓN: Eliminar carga automática de servicios
+    // Los servicios ahora se cargan bajo demanda cuando se necesiten
+    // Esto evita las 42 lecturas de Firebase al montar el contexto
+    
+    // Función para inicializar servicios solo cuando sea necesario
+    const initializeServices = useCallback(async () => {
+      if (allServices.length > 0) {
+        console.log('⚡ Servicios ya inicializados, evitando carga duplicada');
+        return;
+      }
       
-          await loadServicesFromFirestore();
-          
-        } catch (error: any) {
-          console.error('Error al cargar servicios:', error);
-          
-          // Verificar si es un error de cuota excedida
-          if (error?.code === 'resource-exhausted' || 
-              error?.message?.includes('Quota exceeded') ||
-              error?.message?.includes('429')) {
-            console.warn('Cuota de Firebase excedida, usando datos locales como fallback');
-            toast('Conectando con datos locales debido a límites temporales del servidor', { icon: 'ℹ️' });
-            loadLocalServices();
-            setUsingMockData(true);
-            scheduleRetry();
-          } else {
-            console.log('Fallback a datos mock');
-            setAllServices(mockServices);
-            setUsingMockData(true);
-          }
-        } finally {
-          setLoading(false);
+      setLoading(true);
+      try {
+        // Intentar cargar desde cache primero
+        const cachedServices = getAllServicesFromCache();
+        if (cachedServices && cachedServices.length > 0) {
+          setAllServices(cachedServices);
+          setUsingMockData(false);
+          console.log(`⚡ Servicios inicializados desde localStorage: ${cachedServices.length} servicios (0 lecturas Firebase)`);
+          return;
         }
-      };
-      
-      loadServices();
-    }, []);
+        
+        // Solo si no hay cache, usar datos mock como fallback inmediato
+        console.log('📋 Inicializando con datos mock para evitar lecturas Firebase');
+        setAllServices(mockServices);
+        setUsingMockData(true);
+        
+      } catch (error: any) {
+        console.error('Error al inicializar servicios:', error);
+        setAllServices(mockServices);
+        setUsingMockData(true);
+      } finally {
+        setLoading(false);
+      }
+    }, [allServices.length, getAllServicesFromCache]);
 
     const searchServices = useCallback((query: string, category?: string) => {
       setIsSearching(true);
@@ -1144,6 +1148,7 @@
       isSearching,
       retryConnection,
       // Nuevas funciones optimizadas
+      initializeServices,
       loadFeaturedServices,
       loadSingleService,
       loadServicesPaginated,
@@ -1166,7 +1171,7 @@
       isRetrying, retryCount, nextRetryTime, currentLoadType, isSearching,
       setSearchTerm, setSelectedCategory, refreshServices, softRefresh, hardRefresh,
       getServiceBySlug, searchServices, resetSearch, retryConnection,
-      loadFeaturedServices, loadSingleService, loadServicesPaginated,
+      initializeServices, loadFeaturedServices, loadSingleService, loadServicesPaginated,
       paginatedServices, hasMorePages, resetPagination,
       trackServiceVisit, getAnalyticsStats, preloadPopularServices,
       forcePreload, isPreloading, loadServicesFromFirestore,

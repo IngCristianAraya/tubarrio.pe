@@ -5,6 +5,7 @@ import { Star, MapPin, Clock, ChevronLeft, ChevronRight } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { useServices } from '@/context/ServicesContext';
 import { useServiceCache } from '@/hooks/useServiceCache';
+import ServiceCard from './ServiceCard';
 
 // Importación dinámica para OptimizedImage con carga perezosa
 const OptimizedImage = dynamic(() => import('./OptimizedImage'), {
@@ -12,6 +13,8 @@ const OptimizedImage = dynamic(() => import('./OptimizedImage'), {
   ssr: false
 });
 
+// 🚨 COMENTAR TODO EL COMPONENTE TEMPORALMENTE
+/*
 interface ServiceCardProps {
   service: {
     id: string;
@@ -25,7 +28,7 @@ interface ServiceCardProps {
     horario?: string;
     whatsapp?: string;
     contactUrl?: string;
-    detailsUrl?: string; // Añadido para corregir el error de TypeScript
+    detailsUrl?: string;
   };
 }
 
@@ -99,6 +102,7 @@ const ServiceCard = memo(({ service }: ServiceCardProps) => {
 });
 
 ServiceCard.displayName = 'ServiceCard';
+*/
 
 const FeaturedServices = () => {
   const { 
@@ -108,7 +112,6 @@ const FeaturedServices = () => {
     currentLoadType 
   } = useServices();
   
-  // 🚀 OPTIMIZACIÓN: Usar cache de localStorage
   const { getFeaturedServicesFromCache } = useServiceCache();
   
   const [currentPage, setCurrentPage] = useState(1);
@@ -122,12 +125,10 @@ const FeaturedServices = () => {
   const [touchEnd, setTouchEnd] = useState(0);
   const [cachedFeaturedServices, setCachedFeaturedServices] = useState<any[]>([]);
 
-  // 🚀 OPTIMIZACIÓN: Cargar servicios destacados con cache localStorage
   useEffect(() => {
     setIsMounted(true);
     
     const loadOptimizedFeaturedServices = async () => {
-      // Intentar obtener desde cache localStorage primero
       const cachedServices = getFeaturedServicesFromCache();
       if (cachedServices && cachedServices.length > 0) {
         setCachedFeaturedServices(cachedServices);
@@ -136,7 +137,6 @@ const FeaturedServices = () => {
         return;
       }
       
-      // Si no hay cache, usar servicios del contexto si están disponibles
       if (featuredServices.length > 0) {
         setCachedFeaturedServices(featuredServices);
         setIsLoading(false);
@@ -144,7 +144,6 @@ const FeaturedServices = () => {
         return;
       }
       
-      // Solo como último recurso, cargar desde Firebase
       if (currentLoadType !== 'featured' || featuredServices.length === 0) {
         console.log('🔥 FeaturedServices cargando desde Firebase...');
         await loadFeaturedServices();
@@ -160,10 +159,8 @@ const FeaturedServices = () => {
       setServicesPerPage(window.innerWidth < 640 ? 2 : window.innerWidth < 1024 ? 2 : 3);
     };
 
-    // Establecer valor inicial
     updateServicesPerPage();
 
-    // Usar debounce para evitar demasiadas actualizaciones durante el redimensionamiento
     let timeoutId: NodeJS.Timeout;
     const handleResize = () => {
       clearTimeout(timeoutId);
@@ -177,53 +174,44 @@ const FeaturedServices = () => {
     };
   }, [loadFeaturedServices, currentLoadType, featuredServices.length, getFeaturedServicesFromCache]);
 
-  // 🚀 OPTIMIZACIÓN: Usar servicios desde cache o contexto
   const activeServices = useMemo(() => {
     return cachedFeaturedServices.length > 0 ? cachedFeaturedServices : featuredServices;
   }, [cachedFeaturedServices, featuredServices]);
   
-  // Obtener categorías únicas de los servicios destacados
   const categories = useMemo(() => {
     if (!activeServices || activeServices.length === 0) return ['Todos'];
     const cats = new Set(activeServices.map(service => service.category));
     return ['Todos', ...Array.from(cats)].sort();
   }, [activeServices]);
 
-  // Filtrar servicios destacados por categoría
   const filteredByCategory = useMemo(() => {
     if (selectedCategory === 'Todos') return activeServices;
     return activeServices.filter(service => service.category === selectedCategory);
   }, [activeServices, selectedCategory]);
 
-  // Calcular servicios paginados
   const currentServices = useMemo(() => {
     const startIndex = (currentPage - 1) * servicesPerPage;
     return filteredByCategory.slice(startIndex, startIndex + servicesPerPage);
   }, [filteredByCategory, currentPage, servicesPerPage]);
 
-  // Calcular total de páginas
   const totalPages = useMemo(() => {
     return Math.ceil(filteredByCategory.length / servicesPerPage);
   }, [filteredByCategory.length, servicesPerPage]);
 
-  // Cambiar de página
   const changePage = useCallback((page: number) => {
     setCurrentPage(page);
-    // Desplazarse suavemente al inicio de la sección
     const element = document.getElementById('servicios');
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
     }
   }, []);
 
-  // Manejar cambio de categoría
   const handleCategoryChange = useCallback((category: string) => {
     setSelectedCategory(category);
-    setCurrentPage(1); // Resetear a la primera página al cambiar de categoría
-    setCurrentSlide(0); // Resetear carrusel al cambiar categoría
+    setCurrentPage(1);
+    setCurrentSlide(0);
   }, []);
 
-  // Funciones para el carrusel móvil
   const nextSlide = useCallback(() => {
     setCurrentSlide((prev) => {
       const maxSlide = Math.max(0, filteredByCategory.length - 1);
@@ -242,9 +230,8 @@ const FeaturedServices = () => {
     setCurrentSlide(index);
   }, []);
 
-  // Funciones para navegación táctil
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
-    setTouchEnd(0); // Reset touchEnd
+    setTouchEnd(0);
     setTouchStart(e.targetTouches[0].clientX);
   }, []);
 
@@ -266,14 +253,12 @@ const FeaturedServices = () => {
     }
   }, [touchStart, touchEnd, nextSlide, prevSlide]);
 
-  // Efecto para manejar la carga inicial optimizada
   useEffect(() => {
     if (activeServices.length > 0 || !loading) {
       setIsLoading(false);
     }
   }, [activeServices, loading]);
 
-  // Si no está montado o está cargando, mostrar un loader simple
   if (!isMounted || (loading && featuredServices.length === 0)) {
     return (
       <section id="servicios" className="py-10 sm:py-12 md:py-16 bg-white">
@@ -291,7 +276,6 @@ const FeaturedServices = () => {
     );
   }
 
-  // Mostrar loading si los servicios están cargando
   if (isLoading) {
     return (
       <section id="servicios" className="py-10 sm:py-12 md:py-16 bg-white">
@@ -307,7 +291,6 @@ const FeaturedServices = () => {
     );
   }
 
-  // Si no hay servicios, mostrar mensaje
   if (!isLoading && currentServices.length === 0) {
     return (
       <section id="servicios" className="py-10 sm:py-12 md:py-16 bg-white">
@@ -339,7 +322,6 @@ const FeaturedServices = () => {
           </p>
         </div>
 
-        {/* Filtro de categorías */}
         <div className="flex justify-center mb-8 overflow-x-auto pb-2">
           <div className="inline-flex space-x-2">
             {categories.map((category) => (
@@ -358,10 +340,8 @@ const FeaturedServices = () => {
           </div>
         </div>
 
-        {/* Lista de servicios - Carrusel en móvil, Grid en desktop */}
         {isMobile ? (
           <div className="relative">
-            {/* Carrusel móvil */}
             <div className="overflow-hidden">
               <div 
                 className="flex transition-transform duration-300 ease-in-out"
@@ -378,7 +358,6 @@ const FeaturedServices = () => {
               </div>
             </div>
             
-            {/* Controles del carrusel */}
             {filteredByCategory.length > 1 && (
               <>
                 <button
@@ -396,7 +375,6 @@ const FeaturedServices = () => {
                   <ChevronRight className="w-5 h-5" />
                 </button>
                 
-                {/* Indicadores */}
                 <div className="flex justify-center mt-4 space-x-2">
                   {filteredByCategory.map((_, index) => (
                     <button
@@ -414,14 +392,12 @@ const FeaturedServices = () => {
           </div>
         ) : (
           <>
-            {/* Grid para desktop */}
             <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {currentServices.map((service) => (
                 <ServiceCard key={service.id} service={service} />
               ))}
             </div>
 
-            {/* Paginación solo para desktop */}
             {totalPages > 1 && (
               <div className="flex justify-center mt-10">
                 <nav className="flex items-center space-x-2">
@@ -479,4 +455,7 @@ const FeaturedServices = () => {
   );
 };
 
-export default React.memo(FeaturedServices);
+
+
+
+export default FeaturedServices;
