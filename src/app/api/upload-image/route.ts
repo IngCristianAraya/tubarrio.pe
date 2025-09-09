@@ -145,10 +145,6 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// Configuración para permitir archivos grandes
-export const dynamic = 'force-dynamic';
-export const maxDuration = 300; // 5 minutos de tiempo máximo de ejecución
-
-// Deshabilitar bodyParser para manejar la carga de archivos manualmente
-export const fetchCache = 'force-no-store';
-export const revalidate = 0;
+// ✅ CONFIGURACIÓN CORRECTA para Next.js 14:
+export const runtime = 'nodejs'; // Necesario para APIs con buffers
+export const maxDuration = 300; // 5 minutos máximo
