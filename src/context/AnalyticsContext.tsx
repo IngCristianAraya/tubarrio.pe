@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useReducer, useEffect, useCallback, useMemo } from 'react';
 import { db } from '../lib/firebase/config';
-import { useAuth } from './AuthContext';
+import { AuthContext } from './AuthContext';
 
 // Función para obtener funciones de Firebase dinámicamente
 const getFirestoreFunctions = async () => {
@@ -110,9 +110,12 @@ interface AnalyticsContextType {
 
 const AnalyticsContext = createContext<AnalyticsContextType | undefined>(undefined);
 
-export function AnalyticsProvider({ children }: { children: React.ReactNode }) {
+function AnalyticsProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(analyticsReducer, initialState);
-  const { user, isAdmin } = useAuth();
+  // Get user from AuthContext without using useAuth hook
+  const authContext = useContext(AuthContext);
+  const user = authContext?.user || null;
+  const isAdmin = user?.uid === process.env.NEXT_PUBLIC_ADMIN_UID;
 
   const trackEvent = useCallback(async (event: Omit<AnalyticsEvent, 'timestamp'>) => {
     try {
@@ -309,7 +312,7 @@ export function AnalyticsProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
-export function useAnalytics() {
+function useAnalytics() {
   const context = useContext(AnalyticsContext);
   if (context === undefined) {
     throw new Error('useAnalytics must be used within an AnalyticsProvider');
@@ -317,4 +320,8 @@ export function useAnalytics() {
   return context;
 }
 
+// Export the provider and hook
+export { useAnalytics };
 export type { AnalyticsEvent, AnalyticsMetrics };
+
+export default AnalyticsProvider;

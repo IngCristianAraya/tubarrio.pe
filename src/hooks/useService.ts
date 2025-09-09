@@ -3,7 +3,7 @@ import useSWR from 'swr';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase/config';
 import { Service } from '@/types/service';
-import { getFallbackServiceById } from '@/lib/firebase/fallback';
+import { getFallbackServiceById } from '../lib/firebase/fallback';
 
 interface UseServiceResult {
   service: Service | null;

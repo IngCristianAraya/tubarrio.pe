@@ -2,7 +2,6 @@
 // Force redeploy for CSP fix
 const nextConfig = {
   reactStrictMode: false, // Desactivado para evitar duplicación de mensajes en desarrollo
-  swcMinify: true,
   
   async headers() {
     const csp = [
@@ -107,6 +106,16 @@ const nextConfig = {
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
   webpack: (config, { isServer, dev }) => {
+    // Configuración de alias para rutas absolutas
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      '@': require('path').resolve(__dirname, 'src'),
+      '@/lib': require('path').resolve(__dirname, 'src/lib'),
+      '@/components': require('path').resolve(__dirname, 'src/components'),
+      '@/hooks': require('path').resolve(__dirname, 'src/hooks'),
+      '@/types': require('path').resolve(__dirname, 'src/types'),
+    };
+
     // Fixes npm packages that depend on `fs` module
     if (!isServer) {
       config.resolve.fallback = {

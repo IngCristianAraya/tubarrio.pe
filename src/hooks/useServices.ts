@@ -16,7 +16,7 @@ import {
 } from 'firebase/firestore';
 import { db, initializeFirebase } from '@/lib/firebase/config';
 import { Service } from '@/types/service';
-import { fallbackServices, filterFallbackServices, getFallbackServiceById } from '@/lib/firebase/fallback';
+import { fallbackServices, filterFallbackServices, getFallbackServiceById } from '../lib/firebase/fallback';
 
 // Tipos para el hook
 interface UseServicesOptions {

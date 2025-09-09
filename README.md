@@ -1,52 +1,77 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Tubarrio.pe - Directorio de Servicios
 
-## Getting Started
+Este es un directorio de servicios locales construido con Next.js 14 y Firebase. La aplicación está optimizada para lectura, con un panel de administración separado en Python.
 
-### Firebase Configuration
+## Características Principales
 
-1. Create a new Firebase project at [Firebase Console](https://console.firebase.google.com/)
-2. Add a new web app to your Firebase project
-3. Copy the Firebase configuration object from the console
-4. Copy `.env.example` to `.env.local` and fill in your Firebase credentials:
+- 🚀 **Rendimiento optimizado** con carga perezosa y caché de datos
+- 🔒 **Seguridad mejorada** con autenticación simplificada
+- 📱 **Diseño responsive** que funciona en todos los dispositivos
+- 🔄 **Sistema de caché** para reducir las lecturas de Firestore
+- 🔍 **Búsqueda y filtrado** de servicios por categoría y palabras clave
+
+## Configuración del Proyecto
+
+### Requisitos Previos
+
+- Node.js 18+
+- npm o yarn
+- Cuenta de Firebase
+
+### Configuración de Firebase
+
+1. Crea un nuevo proyecto en [Firebase Console](https://console.firebase.google.com/)
+2. Añade una nueva aplicación web a tu proyecto de Firebase
+3. Copia el objeto de configuración de Firebase
+4. Copia `.env.example` a `.env.local` y completa con tus credenciales:
 
 ```bash
 cp .env.example .env.local
 ```
 
-5. Edit `.env.local` with your Firebase configuration:
+5. Edita `.env.local` con tu configuración de Firebase:
 
 ```env
-NEXT_PUBLIC_FIREBASE_API_KEY=your-api-key
-NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your-project-id.firebaseapp.com
-NEXT_PUBLIC_FIREBASE_PROJECT_ID=your-project-id
-NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your-project-id.appspot.com
-NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your-messaging-sender-id
-NEXT_PUBLIC_FIREBASE_APP_ID=your-app-id
+NEXT_PUBLIC_FIREBASE_API_KEY=tu-api-key
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=tu-proyecto-id.firebaseapp.com
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=tu-proyecto-id
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=tu-proyecto-id.appspot.com
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=tu-messaging-sender-id
+NEXT_PUBLIC_FIREBASE_APP_ID=tu-app-id
 ```
 
-### Development Setup
+### Instalación
 
-First, install the dependencies:
+1. Clona el repositorio
+2. Instala las dependencias:
 
 ```bash
 npm install
-# or
+# o
 yarn install
 ```
 
-Then, run the development server:
+3. Inicia el servidor de desarrollo:
 
 ```bash
 npm run dev
-# or
+# o
 yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Abre [http://localhost:3000](http://localhost:3000) en tu navegador para ver el resultado.
+
+## Estructura del Proyecto
+
+- `/src/app` - Rutas y páginas de la aplicación
+- `/src/components` - Componentes reutilizables
+- `/src/context` - Contextos de React para gestión de estado global
+- `/src/lib` - Utilidades y configuraciones
+- `/public` - Archivos estáticos
+
+## Despliegue
+
+Puedes desplegar esta aplicación en Vercel, Netlify o cualquier otro servicio de hosting compatible con Next.js.
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 

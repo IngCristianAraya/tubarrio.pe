@@ -1,118 +1,15 @@
 'use client';
 
-import React, { useState, useEffect, useMemo, useCallback, memo } from 'react';
-import { Star, MapPin, Clock, ChevronLeft, ChevronRight } from 'lucide-react';
-import dynamic from 'next/dynamic';
-import { useServices } from '@/context/ServicesContext';
-import { useServiceCache } from '@/hooks/useServiceCache';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { useFeaturedServices } from '../hooks/useServices';
 import ServiceCard from './ServiceCard';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
-// Importación dinámica para OptimizedImage con carga perezosa
-const OptimizedImage = dynamic(() => import('./OptimizedImage'), {
-  loading: () => <div className="w-full h-full bg-gray-200 animate-pulse" />,
-  ssr: false
-});
-
-// 🚨 COMENTAR TODO EL COMPONENTE TEMPORALMENTE
-/*
-interface ServiceCardProps {
-  service: {
-    id: string;
-    name: string;
-    category: string;
-    image: string;
-    images?: string[];
-    rating: number;
-    description: string;
-    location: string;
-    horario?: string;
-    whatsapp?: string;
-    contactUrl?: string;
-    detailsUrl?: string;
-  };
-}
-
-// Componente de tarjeta de servicio memoizado
-const ServiceCard = memo(({ service }: ServiceCardProps) => {
-  return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden flex flex-col h-full transition-all duration-300 hover:shadow-lg">
-      <div className="relative h-48 overflow-hidden">
-        <OptimizedImage
-          src={service.images && service.images.length > 0 ? service.images[0] : service.image}
-          alt={service.name}
-          className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-          width={400}
-          height={300}
-          loading="lazy"
-          objectFit="cover"
-          fallbackSrc="/images/hero_001.webp"
-          isMobile={true}
-          placeholder="blur"
-          quality={75}
-        />
-        {service.rating >= 4.5 && (
-          <span className="absolute top-3 right-3 bg-orange-500 text-white text-xs font-semibold px-2.5 py-1 rounded-full">
-            ⭐ {service.rating.toFixed(1)}
-          </span>
-        )}
-      </div>
-      <div className="p-5 flex flex-col flex-grow">
-        <div className="flex justify-between items-start mb-2">
-          <h3 className="text-lg sm:text-xl font-bold text-gray-900">{service.name}</h3>
-          <div className="flex items-center bg-orange-50 text-orange-600 text-xs font-semibold px-2.5 py-0.5 rounded-full">
-            <Star className="w-3.5 h-3.5 mr-1" fill="currentColor" />
-            {service.rating?.toFixed(1) || 'Nuevo'}
-          </div>
-        </div>
-        <p className="text-sm text-gray-500 mb-3 line-clamp-2">
-          {service.description || 'Sin descripción disponible'}
-        </p>
-        
-        {service.location && (
-          <div className="flex items-center text-sm text-gray-500 mb-3">
-            <MapPin className="w-4 h-4 mr-1.5 text-gray-400 flex-shrink-0" />
-            <span className="truncate">{service.location}</span>
-          </div>
-        )}
-        
-        {service.horario && (
-          <div className="flex items-center text-sm text-gray-500 mb-4">
-            <Clock className="w-4 h-4 mr-1.5 text-gray-400 flex-shrink-0" />
-            <span>{service.horario}</span>
-          </div>
-        )}
-        
-        <div className="mt-auto pt-4 border-t border-gray-100">
-          <a
-            href={service.detailsUrl || `#`}
-            className={`block w-full text-center px-4 py-2 rounded-md font-medium ${
-              service.detailsUrl
-                ? 'bg-orange-500 text-white hover:bg-orange-600 transition-colors'
-                : 'bg-gray-200 text-gray-500 cursor-not-allowed'
-            }`}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            {service.detailsUrl ? 'Ver detalles' : 'Próximamente'}
-          </a>
-        </div>
-      </div>
-    </div>
-  );
-});
-
-ServiceCard.displayName = 'ServiceCard';
-*/
+// Componente optimizado con SWR para servicios destacados
 
 const FeaturedServices = () => {
-  const { 
-    featuredServices, 
-    loading, 
-    loadFeaturedServices, 
-    currentLoadType 
-  } = useServices();
-  
-  const { getFeaturedServicesFromCache } = useServiceCache();
+  // Hook optimizado con SWR - solo 1 consulta Firebase con caché inteligente
+  const { services: featuredServices, loading, error } = useFeaturedServices();
   
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedCategory, setSelectedCategory] = useState('Todos');
@@ -123,35 +20,19 @@ const FeaturedServices = () => {
   const [isMobile, setIsMobile] = useState(false);
   const [touchStart, setTouchStart] = useState(0);
   const [touchEnd, setTouchEnd] = useState(0);
-  const [cachedFeaturedServices, setCachedFeaturedServices] = useState<any[]>([]);
-
+  // Effect para inicialización
   useEffect(() => {
     setIsMounted(true);
-    
-    const loadOptimizedFeaturedServices = async () => {
-      const cachedServices = getFeaturedServicesFromCache();
-      if (cachedServices && cachedServices.length > 0) {
-        setCachedFeaturedServices(cachedServices);
-        setIsLoading(false);
-        console.log(`⚡ FeaturedServices desde localStorage: ${cachedServices.length} servicios (0 lecturas Firebase)`);
-        return;
-      }
-      
-      if (featuredServices.length > 0) {
-        setCachedFeaturedServices(featuredServices);
-        setIsLoading(false);
-        console.log(`📋 FeaturedServices desde contexto: ${featuredServices.length} servicios`);
-        return;
-      }
-      
-      if (currentLoadType !== 'featured' || featuredServices.length === 0) {
-        console.log('🔥 FeaturedServices cargando desde Firebase...');
-        await loadFeaturedServices();
-      }
-    };
-    
-    loadOptimizedFeaturedServices();
-    
+    setIsLoading(loading);
+  }, [loading]);
+  
+  // Actualizar estado de carga cuando cambie el loading del hook
+  useEffect(() => {
+    setIsLoading(loading);
+  }, [loading]);
+  
+  // Effect separado para responsive
+  useEffect(() => {
     const updateServicesPerPage = () => {
       if (typeof window === 'undefined') return;
       const mobile = window.innerWidth < 768;
@@ -172,11 +53,11 @@ const FeaturedServices = () => {
       window.removeEventListener('resize', handleResize);
       clearTimeout(timeoutId);
     };
-  }, [loadFeaturedServices, currentLoadType, featuredServices.length, getFeaturedServicesFromCache]);
+  }, []);
 
   const activeServices = useMemo(() => {
-    return cachedFeaturedServices.length > 0 ? cachedFeaturedServices : featuredServices;
-  }, [cachedFeaturedServices, featuredServices]);
+    return featuredServices || [];
+  }, [featuredServices]);
   
   const categories = useMemo(() => {
     if (!activeServices || activeServices.length === 0) return ['Todos'];

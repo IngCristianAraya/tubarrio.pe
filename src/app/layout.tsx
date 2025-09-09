@@ -4,6 +4,7 @@ import "./globals.css";
 import { Providers } from '@/app/providers';
 import { JsonLd } from '@/components/seo/JsonLd';
 import { Skeleton } from '@/components/ui/Skeleton';
+import { AnalyticsInitializer } from '@/components/analytics/AnalyticsInitializer';
 import { SITE_URL } from '@/lib/constants';
 import { generateMetadata } from "@/lib/seo";
 import { ReactNode } from 'react';
@@ -111,6 +112,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
         <Providers>
           <Suspense fallback={<GlobalLoading />}>
             <div className="min-h-screen flex flex-col">
+              <AnalyticsInitializer />
               {children}
             </div>
           </Suspense>

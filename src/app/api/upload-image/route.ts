@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { v2 as cloudinary } from 'cloudinary';
+import { checkUploadRateLimit } from '@/lib/rateLimit';
 
 // Configurar Cloudinary
 cloudinary.config({
@@ -8,8 +9,41 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
+// MIME types permitidos (más específicos)
+const ALLOWED_MIME_TYPES = [
+  'image/jpeg',
+  'image/png',
+  'image/webp',
+  'image/gif'
+] as const;
+
+// Función para sanitizar nombres de archivo
+function sanitizeFileName(fileName: string): string {
+  return fileName
+    .replace(/[^a-zA-Z0-9._-]/g, '_') // Reemplazar caracteres especiales
+    .replace(/_{2,}/g, '_') // Evitar múltiples guiones bajos consecutivos
+    .replace(/^_+|_+$/g, '') // Remover guiones bajos al inicio y final
+    .substring(0, 100); // Limitar longitud
+}
+
 export async function POST(request: NextRequest) {
   try {
+    // Rate limiting
+    const rateLimitResult = await checkUploadRateLimit(request);
+    if (rateLimitResult.isRateLimited) {
+      return NextResponse.json(
+        { 
+          error: 'Demasiadas solicitudes. Intente nuevamente más tarde.',
+          retryAfter: rateLimitResult.retryAfter 
+        },
+        { 
+          status: 429,
+          headers: {
+            'Retry-After': rateLimitResult.retryAfter?.toString() || '60'
+          }
+        }
+      );
+    }
     const formData = await request.formData();
     const file = formData.get('image') as File;
 
@@ -20,16 +54,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validar tipo de archivo
-    if (!file.type.startsWith('image/')) {
+    // Validación más estricta de MIME types
+    if (!ALLOWED_MIME_TYPES.includes(file.type as any)) {
       return NextResponse.json(
-        { error: 'El archivo debe ser una imagen' },
+        { error: 'Tipo de archivo no permitido. Use JPEG, PNG, WebP o GIF' },
         { status: 400 }
       );
     }
 
     // Validar tamaño (máximo 5MB)
-    const maxSize = 5 * 1024 * 1024; // 5MB
+    const maxSize = 5 * 1024 * 1024;
     if (file.size > maxSize) {
       return NextResponse.json(
         { error: 'La imagen es demasiado grande. Máximo 5MB' },
@@ -37,51 +71,83 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Generar nombre único
+    // Generar nombre único con sanitización
     const timestamp = Date.now();
     const randomString = Math.random().toString(36).substring(2, 15);
-    const fileName = `${timestamp}-${randomString}`;
+    const sanitizedOriginalName = sanitizeFileName(file.name.split('.')[0]);
+    const fileName = `${timestamp}-${randomString}-${sanitizedOriginalName}`;
 
-    // Convertir archivo a buffer
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
-
-    // Subir a Cloudinary
+    // Subir a Cloudinary usando stream directo
     const uploadResult = await new Promise((resolve, reject) => {
-      cloudinary.uploader.upload_stream(
+      const uploadStream = cloudinary.uploader.upload_stream(
         {
           resource_type: 'image',
           public_id: `services/${fileName}`,
           folder: 'tubarrio/services',
           transformation: [
-            { width: 800, height: 600, crop: 'limit' },
-            { quality: 'auto' },
-            { format: 'webp' }
-          ]
+            { width: 1200, crop: 'limit' }, // Más flexible que width/height fijos
+            { quality: 'auto:good' },       // Mejor balance calidad/tamaño
+            { format: 'auto' }              // Auto-detectar mejor formato
+          ],
+          context: {
+            upload_source: 'tubarrio_admin',
+            original_filename: file.name,
+            upload_timestamp: timestamp.toString()
+          },
+          tags: ['service', 'tubarrio', 'user_upload']
         },
         (error, result) => {
           if (error) reject(error);
           else resolve(result);
         }
-      ).end(buffer);
+      );
+
+      // Stream directo desde el file
+      const reader = file.stream().getReader();
+      
+      const pushChunk = async () => {
+        const { done, value } = await reader.read();
+        if (done) {
+          uploadStream.end();
+          return;
+        }
+        uploadStream.write(value);
+        pushChunk();
+      };
+      
+      pushChunk();
     });
 
     // Retornar URL pública de Cloudinary
-    const imageUrl = (uploadResult as any).secure_url;
-
+    const result = uploadResult as any;
+    
     return NextResponse.json({
       success: true,
-      imageUrl: imageUrl,
-      fileName: fileName
+      imageUrl: result.secure_url,
+      thumbnailUrl: result.secure_url.replace('/upload/', '/upload/w_300,h_200,c_fill/'),
+      fileName: fileName,
+      fileSize: result.bytes,
+      format: result.format
     });
 
   } catch (error) {
     console.error('Error al subir imagen:', error);
+    
+    // Error más específico
+    const errorMessage = error instanceof Error 
+      ? error.message 
+      : 'Error interno del servidor';
+    
     return NextResponse.json(
-      { error: 'Error interno del servidor' },
+      { error: errorMessage },
       { status: 500 }
     );
   }
 }
 
 // Configuración para permitir archivos grandes
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};

@@ -1,12 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { collection, getDocs, query, where } from '@firebase/firestore';
-import { db } from '@/lib/firebase/config';
+import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { AnalyticsDashboard } from '@/components/analytics/AnalyticsDashboard';
-import { useServices } from '@/context/ServicesContext';
-import { useServiceCache } from '@/hooks/useServiceCache';
+import { useServices } from '@/hooks/useServices';
 
 interface Stats {
   totalServices: number;
@@ -16,71 +13,37 @@ interface Stats {
 }
 
 export default function AdminDashboard() {
-  const [stats, setStats] = useState<Stats>({
-    totalServices: 0,
-    activeServices: 0,
-    categories: [],
-    recentServices: []
-  });
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   
-  // 🚀 OPTIMIZACIÓN: Usar contexto de servicios y cache
-  const { services, loadServicesFromFirestore } = useServices();
-  const { getAllServicesFromCache } = useServiceCache();
+  // 🚀 OPTIMIZACIÓN: Usar hook optimizado de servicios
+  const { services, loading: servicesLoading, error: servicesError } = useServices({ limit: 1000 });
 
-  useEffect(() => {
-    loadStats();
-  }, []);
-
-  const loadStats = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      let servicesData: any[] = [];
-      
-      // 🚀 OPTIMIZACIÓN: Intentar obtener servicios desde cache primero
-      const cachedServices = getAllServicesFromCache();
-      if (cachedServices && cachedServices.length > 0) {
-        servicesData = cachedServices;
-        console.log(`⚡ Dashboard stats desde localStorage: ${cachedServices.length} servicios (0 lecturas Firebase)`);
-      } else if (services && services.length > 0) {
-        // Usar servicios del contexto si están disponibles
-        servicesData = services;
-        console.log(`📊 Dashboard stats desde contexto: ${services.length} servicios (0 lecturas Firebase)`);
-      } else {
-        // Solo como último recurso, cargar desde Firebase
-        console.log('🔥 Dashboard cargando servicios desde Firebase...');
-        await loadServicesFromFirestore();
-        servicesData = services;
-      }
-
-      // Calcular estadísticas
-      const totalServices = servicesData.length;
-      const activeServices = servicesData.filter(service => (service as { active?: boolean }).active !== false).length;
-      const categories = [...new Set(servicesData.map(service => service.category).filter(Boolean))];
-      const recentServices = servicesData
-        .sort((a: any, b: any) => ((b.createdAt?.toDate?.() || new Date()).getTime() - (a.createdAt?.toDate?.() || new Date()).getTime()))
-        .slice(0, 5);
-
-      setStats({
-        totalServices,
-        activeServices,
-        categories,
-        recentServices
-      });
-      
-      console.log(`✅ Dashboard stats calculadas: ${totalServices} total, ${activeServices} activos`);
-    } catch (err) {
-      console.error('Error cargando estadísticas:', err);
-      setError(err instanceof Error ? err.message : 'Error desconocido');
-    } finally {
-      setLoading(false);
+  // 🚀 OPTIMIZACIÓN: Calcular estadísticas directamente de los servicios
+  const stats = useMemo(() => {
+    if (!services) {
+      return {
+        totalServices: 0,
+        activeServices: 0,
+        categories: [],
+        recentServices: []
+      };
     }
-  };
 
-  if (loading) {
+    const totalServices = services.length;
+    const activeServices = services.filter(service => service.active !== false).length;
+    const categories = [...new Set(services.map(service => service.category).filter(Boolean))];
+    const recentServices = [...services]
+      .sort((a, b) => ((b.createdAt?.toDate?.() || new Date()).getTime() - (a.createdAt?.toDate?.() || new Date()).getTime()))
+      .slice(0, 5);
+
+    return {
+      totalServices,
+      activeServices,
+      categories,
+      recentServices
+    };
+  }, [services]);
+
+  if (servicesLoading && !services) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
@@ -89,13 +52,13 @@ export default function AdminDashboard() {
     );
   }
 
-  if (error) {
+  if (servicesError) {
     return (
       <div className="bg-red-50 border border-red-200 rounded-lg p-4">
         <h3 className="text-red-800 font-medium">Error al cargar el dashboard</h3>
-        <p className="text-red-600 text-sm mt-1">{error}</p>
+        <p className="text-red-600 text-sm mt-1">{servicesError.message || 'Error desconocido'}</p>
         <button
-          onClick={loadStats}
+          onClick={() => window.location.reload()}
           className="mt-3 bg-red-600 text-white px-4 py-2 rounded-md text-sm hover:bg-red-700"
         >
           Reintentar

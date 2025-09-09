@@ -5,6 +5,8 @@ import { useAnalytics } from '@/context/AnalyticsContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { AlertCircle } from 'lucide-react';
 
 interface AnalyticsDashboardProps {
   days?: number;
@@ -12,14 +14,52 @@ interface AnalyticsDashboardProps {
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
 
+// Default metrics to prevent errors when analytics is not available
+const defaultMetrics = {
+  totalPageViews: 0,
+  totalServiceClicks: 0,
+  totalContactClicks: 0,
+  topServices: [],
+  dailyViews: [],
+  contactMethods: {
+    whatsapp: 0,
+    phone: 0,
+  },
+};
+
 export function AnalyticsDashboard({ days = 30 }: AnalyticsDashboardProps) {
-  const { state, getMetrics } = useAnalytics();
-  const { metrics, isLoading } = state;
+  const [isAnalyticsAvailable, setIsAnalyticsAvailable] = useState(true);
   const [selectedPeriod, setSelectedPeriod] = useState(days);
+  
+  // Safely get analytics context
+  let analytics = null;
+  try {
+    analytics = useAnalytics();
+  } catch (error) {
+    console.warn('Analytics context not available:', error);
+    setIsAnalyticsAvailable(false);
+  }
+
+  const { state = { metrics: defaultMetrics, isLoading: false }, getMetrics } = analytics || {};
+  const { metrics = defaultMetrics, isLoading = false } = state;
 
   useEffect(() => {
-    getMetrics(selectedPeriod);
+    if (getMetrics) {
+      getMetrics(selectedPeriod);
+    }
   }, [selectedPeriod, getMetrics]);
+
+  if (!isAnalyticsAvailable) {
+    return (
+      <Alert variant="destructive" className="max-w-2xl mx-auto">
+        <AlertCircle className="h-4 w-4" />
+        <AlertTitle>Analytics no disponible</AlertTitle>
+        <AlertDescription>
+          El panel de análisis no está disponible en este momento. Por favor, intente recargar la página o contacte al soporte.
+        </AlertDescription>
+      </Alert>
+    );
+  }
 
   const handlePeriodChange = (newPeriod: number) => {
     setSelectedPeriod(newPeriod);

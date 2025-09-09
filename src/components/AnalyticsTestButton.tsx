@@ -1,12 +1,43 @@
 'use client';
 
 import { useState } from 'react';
-import { useAnalytics } from '@/context/AnalyticsContext';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { AlertCircle } from 'lucide-react';
+
+// Default state to prevent errors when analytics is not available
+const defaultState = {
+  events: [],
+  metrics: {
+    totalPageViews: 0,
+    totalServiceClicks: 0,
+    totalContactClicks: 0,
+    topServices: [],
+    dailyViews: [],
+    contactMethods: {
+      whatsapp: 0,
+      phone: 0,
+    },
+  },
+  isLoading: false,
+};
 
 export function AnalyticsTestButton() {
   const [isLoading, setIsLoading] = useState(false);
   const [lastResult, setLastResult] = useState<string>('');
-  const { trackPageView, trackEvent, state } = useAnalytics();
+  const [error, setError] = useState<string | null>(null);
+  
+  // Safely get analytics context
+  let analytics = null;
+  try {
+    // Use dynamic import to avoid build-time errors
+    const { useAnalytics } = require('@/context/AnalyticsContext');
+    analytics = useAnalytics();
+  } catch (error) {
+    console.warn('Analytics context not available:', error);
+    setError('Analytics no está disponible en este momento');
+  }
+
+  const { trackPageView = () => Promise.resolve(), trackEvent = () => Promise.resolve(), state = defaultState } = analytics || {};
 
   const testPageView = async () => {
     setIsLoading(true);
@@ -50,8 +81,26 @@ export function AnalyticsTestButton() {
     setLastResult(`📊 State logged to console. Events: ${state.events.length}`);
   };
 
+  if (error) {
+    return (
+      <div className="fixed bottom-4 right-4 max-w-xs">
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Error</AlertTitle>
+          <AlertDescription>
+            {error}
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
+
   return (
-    <div className="fixed bottom-4 right-4 bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg border z-50">
+    <div className="fixed bottom-4 right-4 bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 max-w-xs">
+      <h3 className="font-semibold mb-2">Analytics Tester</h3>
+      <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
+        Solo visible en desarrollo
+      </p>
       <h3 className="text-sm font-semibold mb-3 text-gray-900 dark:text-white">
         🧪 Analytics Test Panel
       </h3>

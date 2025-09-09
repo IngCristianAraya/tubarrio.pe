@@ -3,8 +3,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 // Removed Firebase Client SDK imports - now using API endpoints
 import Link from 'next/link';
-import { useServices } from '@/context/ServicesContext';
-import { useServiceCache } from '@/hooks/useServiceCache';
+import { useServices } from '@/hooks/useServices';
 import { useDebounce } from '@/hooks/useDebounce';
 import ServicesTable from '@/components/admin/ServicesTable';
 import VirtualizedServicesTable from '@/components/admin/VirtualizedServicesTable';
@@ -25,8 +24,6 @@ interface Service {
 
 export default function ServicesPage() {
   const [localServices, setLocalServices] = useState<Service[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
@@ -38,73 +35,23 @@ export default function ServicesPage() {
   // 🚀 OPTIMIZACIÓN: Debounce para búsqueda
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
   
-  // 🚀 OPTIMIZACIÓN: Usar contexto de servicios y cache
-  const { services: contextServices, hardRefresh, softRefresh } = useServices();
-  const { getAllServicesFromCache, clearAllCache } = useServiceCache();
+  // 🚀 OPTIMIZACIÓN: Usar hook optimizado de servicios
+  const { services, loading: servicesLoading, error: servicesError, mutate } = useServices({ limit: 1000 });
 
+  // Actualizar servicios locales cuando cambien los datos del hook
   useEffect(() => {
-    loadServices();
-  }, []);
-
-  // Refrescar datos cuando la página se vuelve visible
-  useEffect(() => {
-    const handleVisibilityChange = () => {
-      if (!document.hidden) {
-        // Forzar recarga completa cuando la página se vuelve visible
-        loadServices(true);
-      }
-    };
-
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
-  }, []);
-
-  const loadServices = async (forceRefresh = false) => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      let servicesData: Service[] = [];
-      
-      if (forceRefresh) {
-        // Forzar recarga completa desde Firebase
-        console.log('🔄 Forzando recarga completa desde Firebase...');
-        await hardRefresh();
-        servicesData = contextServices as Service[];
-      } else {
-        // 🚀 OPTIMIZACIÓN: Intentar obtener servicios desde cache primero
-        const cachedServices = getAllServicesFromCache();
-        if (cachedServices && cachedServices.length > 0) {
-          servicesData = cachedServices as Service[];
-          console.log(`⚡ Admin servicios desde localStorage: ${cachedServices.length} servicios (0 lecturas Firebase)`);
-        } else if (contextServices && contextServices.length > 0) {
-          // Usar servicios del contexto si están disponibles
-          servicesData = contextServices as Service[];
-          console.log(`📋 Admin servicios desde contexto: ${contextServices.length} servicios (0 lecturas Firebase)`);
-        } else {
-          // Solo como último recurso, usar soft refresh
-          console.log('🔥 Admin servicios cargando con soft refresh...');
-          await softRefresh();
-          servicesData = contextServices as Service[];
-        }
-      }
-
+    if (services) {
       // Ordenar por fecha de creación (más recientes primero)
-      servicesData.sort((a, b) => {
+      const sortedServices = [...services].sort((a, b) => {
         const dateA = a.createdAt?.toDate?.() || new Date(0);
         const dateB = b.createdAt?.toDate?.() || new Date(0);
         return dateB.getTime() - dateA.getTime();
       });
-
-      setLocalServices(servicesData);
-      console.log(`✅ Admin servicios cargados: ${servicesData.length} servicios`);
-    } catch (err) {
-      console.error('Error cargando servicios:', err);
-      setError(err instanceof Error ? err.message : 'Error desconocido');
-    } finally {
-      setLoading(false);
+      setLocalServices(sortedServices);
     }
-  };
+  }, [services]);
+
+
 
   // 🚀 OPTIMIZACIÓN: useCallback para evitar re-renders innecesarios
   const toggleServiceStatus = useCallback(async (serviceId: string, currentStatus: boolean) => {
@@ -121,8 +68,8 @@ export default function ServicesPage() {
         throw new Error('Error al actualizar el estado del servicio');
       }
       
-      // Forzar recarga completa después de cambiar estado
-      await loadServices(true);
+      // Revalidar datos después de cambiar estado
+      mutate();
     } catch (err) {
       console.error('Error actualizando estado:', err);
       alert('Error al actualizar el estado del servicio');
@@ -142,8 +89,8 @@ export default function ServicesPage() {
       
       setDeleteConfirm(null);
       
-      // Forzar recarga completa después de eliminar
-      await loadServices(true);
+      // Revalidar datos después de eliminar
+      mutate();
     } catch (err) {
       console.error('Error eliminando servicio:', err);
       alert('Error al eliminar el servicio');
@@ -186,7 +133,7 @@ export default function ServicesPage() {
     return Array.from(new Set(localServices.map(service => service.category).filter(Boolean)));
   }, [localServices]);
 
-  if (loading) {
+  if (servicesLoading && !services) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
@@ -195,13 +142,13 @@ export default function ServicesPage() {
     );
   }
 
-  if (error) {
+  if (servicesError) {
     return (
       <div className="bg-red-50 border border-red-200 rounded-lg p-4">
         <h3 className="text-red-800 font-medium">Error al cargar servicios</h3>
-        <p className="text-red-600 text-sm mt-1">{error}</p>
+        <p className="text-red-600 text-sm mt-1">{servicesError.message || 'Error desconocido'}</p>
         <button
-          onClick={loadServices}
+          onClick={() => mutate()}
           className="mt-3 bg-red-600 text-white px-4 py-2 rounded-md text-sm hover:bg-red-700"
         >
           Reintentar
@@ -227,17 +174,14 @@ export default function ServicesPage() {
         </div>
         <div className="flex gap-2">
           <button
-            onClick={() => {
-              clearAllCache();
-              loadServices();
-            }}
+            onClick={() => mutate()}
             className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors flex items-center gap-2"
-            disabled={loading}
+            disabled={servicesLoading}
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
             </svg>
-            {loading ? 'Actualizando...' : 'Refrescar'}
+            {servicesLoading ? 'Actualizando...' : 'Refrescar'}
           </button>
           <Link
             href="/admin/servicios/nuevo"
@@ -297,10 +241,11 @@ export default function ServicesPage() {
           
           <div className="flex items-end">
             <button
-              onClick={() => loadServices(true)}
-              className="w-full bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition-colors"
+              onClick={() => mutate()}
+              disabled={servicesLoading}
+              className="w-full bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition-colors disabled:opacity-50"
             >
-              🔄 Actualizar
+              {servicesLoading ? '⏳ Cargando...' : '🔄 Actualizar'}
             </button>
           </div>
         </div>

@@ -49,7 +49,7 @@ import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 
 interface RecommendedServicesProps {
-  services: Service[];
+  services?: Service[];
   currentServiceId: string;
   category: string;
 }
@@ -60,9 +60,9 @@ const RecommendedServices: React.FC<RecommendedServicesProps> = ({
   category 
 }) => {
   // Filter services by the same category, excluding the current service
-  const recommendedServices = services.filter(
+  const recommendedServices = services?.filter(
     service => service.category === category && service.id !== currentServiceId
-  );
+  ) || [];
 
   // If there are no recommended services, don't render anything
   if (recommendedServices.length === 0) return null;
