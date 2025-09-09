@@ -146,8 +146,9 @@ export async function POST(request: NextRequest) {
 }
 
 // Configuración para permitir archivos grandes
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
+export const dynamic = 'force-dynamic';
+export const maxDuration = 300; // 5 minutos de tiempo máximo de ejecución
+
+// Deshabilitar bodyParser para manejar la carga de archivos manualmente
+export const fetchCache = 'force-no-store';
+export const revalidate = 0;
