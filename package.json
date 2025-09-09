@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "analyze": "ANALYZE=true next build"
+    "analyze": "ANALYZE=true next build",
+    "vercel-build": "npm install --force && next build",
+    "install:ci": "npm install --legacy-peer-deps --force"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.1.0",
@@ -68,6 +70,6 @@
     "workerize": "^0.1.8"
   },
   "engines": {
-    "node": ">=16.0.0"
+    "node": "18.x"
   }
 }
