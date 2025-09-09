@@ -1,8 +1,8 @@
 'use client';
 
 import { notFound, useParams } from 'next/navigation';
-import { useServices } from '@/context/ServicesContext';
-import React, { useEffect } from 'react';
+import { useServiceById } from '@/hooks/useServices';
+import React from 'react';
 import Head from 'next/head';
 import { usePathname } from 'next/navigation';
 import { LocalBusinessJsonLd, BreadcrumbJsonLd } from '@/components/seo/JsonLd';
@@ -27,25 +27,23 @@ export default function ServicioDetallePage() {
   // Obtener el id dinámico de la URL
   const { id } = useParams() as { id: string };
 
-  // Obtener servicios del contexto global
-  const { 
-    services: allServices, 
-    loadSingleService, 
-    loading 
-  } = useServices();
   const pathname = usePathname();
   
-  // Cargar el servicio específico
-  useEffect(() => {
-    if (id) {
-      loadSingleService(id);
-    }
-  }, [id, loadSingleService]);
-  
-  const service = allServices.find(s => s.id === id);
+  // Obtener el servicio específico usando el hook optimizado
+  const { service, loading, error } = useServiceById(id);
+
+  // Mostrar 404 si el ID no es válido o hay un error de carga
+  if (!id) {
+    notFound();
+  }
+
+  // Mostrar 404 si el servicio no existe
+  if (error && error.message?.includes('No se encontró el servicio')) {
+    notFound();
+  }
 
   // Mostrar loading mientras se carga el servicio
-  if (loading && !service) {
+  if (loading || !service) {
     return (
       <div className="min-h-screen bg-orange-50 flex flex-col">
         <Header />
@@ -63,6 +61,35 @@ export default function ServicioDetallePage() {
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+  
+  // Mostrar 404 si el servicio no existe
+  if (error?.code === 'not-found' || (!loading && !service)) {
+    notFound();
+  }
+
+  // Mostrar error si hay problemas cargando el servicio
+  if (error) {
+    return (
+      <div className="min-h-screen bg-orange-50 flex flex-col">
+        <Header />
+        <main className="flex-1 w-full py-10 px-2 sm:px-4">
+          <div className="max-w-7xl mx-auto">
+            <div className="bg-white rounded-3xl shadow-xl overflow-hidden p-8 text-center">
+              <h1 className="text-2xl font-bold text-gray-900 mb-4">Error al cargar el servicio</h1>
+              <p className="text-gray-600 mb-6">No pudimos cargar la información del servicio. Por favor, intenta de nuevo.</p>
+              <button 
+                onClick={() => window.location.reload()} 
+                className="bg-orange-600 text-white px-6 py-2 rounded-lg hover:bg-orange-700"
+              >
+                Reintentar
+              </button>
             </div>
           </div>
         </main>
@@ -138,7 +165,6 @@ export default function ServicioDetallePage() {
             {/* Recommended Services Section */}
             <div className="p-3 sm:p-6 md:p-8">
               <RecommendedServices 
-                services={allServices}
                 currentServiceId={service.id}
                 category={service.category}
               />
