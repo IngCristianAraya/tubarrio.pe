@@ -130,12 +130,12 @@ const Header = () => {
             <NavItem href="/">Inicio</NavItem>
             <NavItem href="/#servicios">Destacados</NavItem>
             <NavItem href="/todos-los-servicios">Categorías</NavItem>
-            <NavItem href="/#cobertura">Cobertura</NavItem>
+            <NavItem href="/cobertura">Cobertura</NavItem>
           </nav>
 
           {/* Acciones desktop */}
           <div className="hidden md:flex items-center gap-4">
-            <NavItem href="/#registro">
+            <NavItem href="/registro-negocio">
               <span className="px-4 py-2 rounded-xl font-bold bg-gradient-to-r from-orange-500 to-yellow-400 text-white shadow-md hover:from-orange-600 hover:to-yellow-500 transition-all duration-200 flex items-center">
                 <span className="mr-2">+</span> Registrar Negocio
               </span>
@@ -157,10 +157,10 @@ const Header = () => {
                 <NavItem href="/todos-los-servicios">Categorías</NavItem>
               </div>
               <div className="py-3 px-4 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors duration-150 min-h-[48px] flex items-center">
-                <NavItem href="/#cobertura">Cobertura</NavItem>
+                <NavItem href="/cobertura">Cobertura</NavItem>
               </div>
               <div className="mt-6">
-                <NavItem href="/#registro">
+                <NavItem href="/registro-negocio">
                   <span 
                     className="block w-full px-6 py-4 text-center rounded-xl font-bold bg-gradient-to-r from-orange-500 to-yellow-400 text-white shadow-md hover:from-orange-600 hover:to-yellow-500 active:from-orange-700 active:to-yellow-600 transition-all duration-200 min-h-[52px] flex items-center justify-center"
                     onClick={() => setIsMenuOpen(false)}

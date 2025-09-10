@@ -8,6 +8,11 @@ import { FeatureCollection } from "geojson";
 
 interface MapSectionProps {
   className?: string;
+  showTitle?: boolean;
+  interactive?: boolean;
+  zoom?: number;
+  height?: string | number;
+  showInfoPanels?: boolean;
 }
 
 // 🔧 Fix: iconos por defecto de Leaflet en Next.js
@@ -49,7 +54,14 @@ const defaultCenter: [number, number] = [
 ];
 const defaultZoom = 15;
 
-const MapSection = ({ className = "" }: MapSectionProps) => {
+const MapSection = ({
+  className = "",
+  showTitle = true,
+  interactive = true,
+  zoom = 15,
+  height = '500px',
+  showInfoPanels = true
+}: MapSectionProps) => {
   useEffect(() => {
     // Asegurar que los iconos de Leaflet se configuren correctamente
     delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -61,96 +73,94 @@ const MapSection = ({ className = "" }: MapSectionProps) => {
   }, []);
 
   return (
-    <section id="cobertura" className={`w-full py-8 md:py-12 ${className}`}>
+    <section className={`w-full ${className}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-6 md:mb-10">
-          <h2 className="text-2xl md:text-4xl font-bold mb-2 md:mb-3 text-gray-900">
-            🗺️ <span className="text-gray-800">Zona de</span>{" "}
-            <span className="text-orange-500">Cobertura</span>
-          </h2>
-          <p className="text-base md:text-lg text-gray-600 max-w-2xl mx-auto">
-            Nuestro mapa muestra el área donde TuBarrio.pe ofrece sus servicios
-            y cobertura.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-x-16 items-center relative">
-          {/* Columna izquierda: info */}
-          <div className="flex flex-col gap-4 items-stretch w-full">
-            <div className="flex items-center w-full bg-orange-50 border-l-4 border-orange-400 rounded-xl shadow-sm p-4 gap-3">
-              <span className="text-orange-500 text-2xl">📍</span>
-              <div>
-                <div className="font-semibold text-gray-800">Cobertura local</div>
-                <div className="text-gray-500 text-sm">
-                  TuBarrio.pe llega a Pando y zonas aledañas, conectando a la
-                  comunidad.
-                </div>
-              </div>
-            </div>
-
-            <div className="flex items-center w-full bg-blue-50 border-l-4 border-blue-400 rounded-xl shadow-sm p-4 gap-3">
-              <span className="text-blue-500 text-2xl">🏘️</span>
-              <div>
-                <div className="font-semibold text-gray-800">
-                  +20 barrios y urbanizaciones
-                </div>
-                <div className="text-gray-500 text-sm">
-                  Incluye barrios tradicionales, urbanizaciones y zonas
-                  emergentes de Lima Este.
-                </div>
-              </div>
-            </div>
-
-            <div className="flex items-center w-full bg-green-50 border-l-4 border-green-400 rounded-xl shadow-sm p-4 gap-3">
-              <span className="text-green-500 text-2xl">🌐</span>
-              <div>
-                <div className="font-semibold text-gray-800">
-                  Miles de lectores y negocios
-                </div>
-                <div className="text-gray-500 text-sm">
-                  Una red activa de emprendedores, vecinos y comercios
-                  conectados cada mes.
-                </div>
-              </div>
-            </div>
-
-            <div className="flex items-center w-full bg-yellow-50 border-l-4 border-yellow-400 rounded-xl shadow-sm p-4 gap-3">
-              <span className="text-yellow-500 text-2xl">📣</span>
-              <div>
-                <div className="font-semibold text-gray-800">
-                  Promoción local
-                </div>
-                <div className="text-gray-500 text-sm">
-                  Difusión de negocios, eventos, cultura y oportunidades de la
-                  zona.
-                </div>
-              </div>
-            </div>
+        {showTitle && (
+          <div className="text-center mb-6 md:mb-10">
           </div>
+        )}
+
+        <div className={`grid ${showInfoPanels ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1'} gap-8 md:gap-x-16 items-center relative`}>
+          {/* Columna izquierda: info */}
+          {showInfoPanels && (
+            <div className="flex flex-col gap-4 items-stretch w-full">
+              <div className="flex items-center w-full bg-orange-50 border-l-4 border-orange-400 rounded-xl shadow-sm p-4 gap-3">
+                <span className="text-orange-500 text-2xl">📍</span>
+                <div>
+                  <div className="font-semibold text-gray-800">Cobertura local</div>
+                  <div className="text-gray-500 text-sm">
+                    TuBarrio.pe llega a Pando y zonas aledañas, conectando a la
+                    comunidad.
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center w-full bg-blue-50 border-l-4 border-blue-400 rounded-xl shadow-sm p-4 gap-3">
+                <span className="text-blue-500 text-2xl">🏘️</span>
+                <div>
+                  <div className="font-semibold text-gray-800">
+                    +20 barrios y urbanizaciones
+                  </div>
+                  <div className="text-gray-500 text-sm">
+                    Incluye barrios tradicionales, urbanizaciones y zonas
+                    emergentes de Lima Este.
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center w-full bg-green-50 border-l-4 border-green-400 rounded-xl shadow-sm p-4 gap-3">
+                <span className="text-green-500 text-2xl">🌐</span>
+                <div>
+                  <div className="font-semibold text-gray-800">
+                    Miles de lectores y negocios
+                  </div>
+                  <div className="text-gray-500 text-sm">
+                    Comunidad en crecimiento de usuarios y emprendedores locales.
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center w-full bg-yellow-50 border-l-4 border-yellow-400 rounded-xl shadow-sm p-4 gap-3">
+                <span className="text-yellow-500 text-2xl">📣</span>
+                <div>
+                  <div className="font-semibold text-gray-800">
+                    Promoción local
+                  </div>
+                  <div className="text-gray-500 text-sm">
+                    Difusión de negocios, eventos, cultura y oportunidades de la
+                    zona.
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Separador vertical */}
-          <div
-            className="hidden md:block absolute left-1/2 top-0 h-full w-0 pointer-events-none"
-            aria-hidden="true"
-          >
-            <div className="mx-auto h-full w-[2px] bg-gray-200 opacity-70 rounded-full" />
-          </div>
+          {showInfoPanels && (
+            <div
+              className="hidden md:block absolute left-1/2 top-0 h-full w-0 pointer-events-none"
+              aria-hidden="true"
+            >
+              <div className="mx-auto h-full w-[2px] bg-gray-200 opacity-70 rounded-full" />
+            </div>
+          )}
 
-          {/* Columna derecha: mapa */}
-          <div className="flex flex-col w-full items-end justify-end">
+          {/* Columna derecha: Mapa */}
+          <div 
+            className={`w-full rounded-xl overflow-hidden shadow-lg border border-gray-200 ${!interactive ? 'pointer-events-none' : ''}`}
+            style={{ height: typeof height === 'number' ? `${height}px` : height }}
+          >
             <MapContainer
               center={defaultCenter}
-              zoom={defaultZoom}
-              scrollWheelZoom={false}
-              zoomControl={true}
-              doubleClickZoom={true}
-              closePopupOnClick={true}
-              dragging={true}
-              zoomSnap={1}
-              zoomDelta={1}
-              trackResize={true}
-              touchZoom={true}
-              className="w-full min-h-[260px] h-[340px] md:h-[420px] lg:h-[500px] rounded-xl border border-orange-400 shadow-xl"
+              zoom={zoom}
+              style={{ height: "100%", width: "100%" }}
+              zoomControl={interactive}
+              dragging={interactive}
+              scrollWheelZoom={interactive}
+              touchZoom={interactive}
+              doubleClickZoom={interactive}
+              boxZoom={interactive}
+              keyboard={interactive}
             >
               <TileLayer
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

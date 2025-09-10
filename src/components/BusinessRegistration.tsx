@@ -1,31 +1,76 @@
 'use client';
 
-import { useState } from 'react';
-import { Plus, Star, Users, TrendingUp, CheckCircle, Loader2 } from 'lucide-react';
+import React, { useState, useEffect, FormEvent, ChangeEvent } from 'react';
+import { CheckCircle, Loader2, XCircle, Users, TrendingUp, Star } from 'lucide-react';
 import useSound from '../hooks/useSound';
 
-const BusinessRegistration = () => {
+interface FormData {
+  businessName: string;
+  category: string;
+  phone: string;
+  email: string;
+  description: string;
+}
+
+interface FormStatus {
+  submitting: boolean;
+  success: boolean;
+  error: boolean;
+  message: string;
+}
+
+interface BusinessRegistrationProps {
+  className?: string;
+  showTitle?: boolean;
+  onSuccess?: () => void;
+}
+
+const BusinessRegistration: React.FC<BusinessRegistrationProps> = ({
+  className = '',
+  showTitle = true,
+  onSuccess
+}) => {
   const { play: playClickSound } = useSound('click', { volume: 0.5 });
   
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     businessName: '',
     category: '',
     phone: '',
-    email: ''
+    email: '',
+    description: ''
   });
   
-  const [status, setStatus] = useState({
+  const [status, setStatus] = useState<FormStatus>({
     submitting: false,
     success: false,
     error: false,
     message: ''
   });
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  // Reset form when component unmounts
+  useEffect(() => {
+    return () => {
+      setFormData({
+        businessName: '',
+        category: '',
+        phone: '',
+        email: '',
+        description: ''
+      });
+      setStatus({
+        submitting: false,
+        success: false,
+        error: false,
+        message: ''
+      });
+    };
+  }, []);
+
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    playClickSound(); // Reproducir sonido al enviar el formulario
+    playClickSound();
     
-    // Validar formulario
+    // Form validation
     if (!formData.businessName || !formData.category || !formData.phone) {
       setStatus({
         submitting: false,
@@ -36,73 +81,105 @@ const BusinessRegistration = () => {
       return;
     }
     
-    setStatus({
-      submitting: true,
-      success: false,
-      error: false,
-      message: 'Enviando información...'
-    });
+    // Phone number validation (only numbers, 9-15 digits)
+    const phoneRegex = /^[0-9]{9,15}$/;
+    const cleanPhone = formData.phone.replace(/\D/g, '');
     
-    try {
-      // URL del script de Google Apps Script desplegado como web app
-      // NOTA: Reemplazar con la URL real del script desplegado
-      const scriptURL = 'https://script.google.com/macros/s/AKfycbwy-zxjRZ-jwCb-EIT8ujXXKC6ALDbdQVFTJZuvQFoA3iM8pwI72Kr6sWqvQU_pHeXQ/exec';
-      // Crear objeto con los datos para enviar como URL params (más compatible con Apps Script)
-      const params = new URLSearchParams();
-      params.append('businessName', formData.businessName);
-      params.append('category', formData.category);
-      params.append('phone', formData.phone);
-      params.append('email', formData.email || 'No proporcionado');
-      params.append('timestamp', new Date().toISOString());
-      
-      // Construir URL con parámetros
-      const urlWithParams = `${scriptURL}?${params.toString()}`;
-      
-      console.log('Enviando datos a:', urlWithParams);
-      
-      // Enviar datos a Google Sheets usando GET (más compatible con Apps Script)
-      const response = await fetch(urlWithParams, {
-        method: 'GET',
-        mode: 'no-cors', // Importante para evitar errores CORS
-        cache: 'no-cache'
-      });
-      
-      // Limpiar formulario y mostrar mensaje de éxito
-      setFormData({
-        businessName: '',
-        category: '',
-        phone: '',
-        email: ''
-      });
-      
+    if (!phoneRegex.test(cleanPhone)) {
       setStatus({
         submitting: false,
-        success: true,
-        error: false,
-        message: '¡Gracias! Tu negocio ha sido registrado exitosamente.'
+        success: false,
+        error: true,
+        message: 'Por favor ingresa un número de teléfono válido (mínimo 9 dígitos).'
+      });
+      return;
+    }
+    
+    // Email validation if provided
+    if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      setStatus({
+        submitting: false,
+        success: false,
+        error: true,
+        message: 'Por favor ingresa un correo electrónico válido.'
+      });
+      return;
+    }
+    
+    setStatus(prev => ({ ...prev, submitting: true, error: false }));
+    
+    try {
+      const response = await fetch('/api/business-registration', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          businessName: formData.businessName.trim(),
+          category: formData.category.trim(),
+          phone: cleanPhone,
+          email: formData.email ? formData.email.trim().toLowerCase() : '',
+          description: formData.description ? formData.description.trim() : '',
+          source: 'business-registration-page'
+        }),
       });
       
-      // Resetear mensaje de éxito después de 5 segundos
-      setTimeout(() => {
-        setStatus(prev => ({ ...prev, success: false, message: '' }));
-      }, 5000);
+      const data = await response.json();
       
-    } catch (error) {
+      if (!response.ok) {
+        throw new Error(data.message || 'Error en la respuesta del servidor');
+      }
+      
+      if (data.success) {
+        setStatus({
+          submitting: false,
+          success: true,
+          error: false,
+          message: '¡Gracias por registrarte! Nos pondremos en contacto contigo a la brevedad.'
+        });
+        
+        // Reset form
+        setFormData({
+          businessName: '',
+          category: '',
+          phone: '',
+          email: '',
+          description: ''
+        });
+        
+        // Call success callback if provided
+        if (onSuccess) onSuccess();
+        
+      } else {
+        throw new Error(data.message || 'Error al procesar el registro');
+      }
+      
+    } catch (error: any) {
       console.error('Error al enviar el formulario:', error);
       setStatus({
         submitting: false,
         success: false,
         error: true,
-        message: 'Hubo un error al registrar tu negocio. Por favor intenta nuevamente.'
+        message: error.message || 'Ocurrió un error al enviar el formulario. Por favor, inténtalo de nuevo más tarde.'
       });
+      
+      // Reset error status after 5 seconds
+      setTimeout(() => {
+        setStatus(prev => ({
+          ...prev,
+          error: false,
+          message: ''
+        }));
+      }, 5000);
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
+  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
   };
 
   const benefits = [
@@ -135,161 +212,203 @@ const BusinessRegistration = () => {
     'Otro'
   ];
 
-  return (
-    <section id="registro" className="py-8 md:py-12 lg:py-16 bg-gradient-to-br from-orange-50 via-yellow-50 to-blue-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-6 sm:mb-8 md:mb-10">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-3 sm:mb-4">
-            <span className="text-orange-500">Registra tu negocio</span> en nuestra plataforma
-          </h2>
-          <p className="text-sm sm:text-base md:text-lg text-gray-600 max-w-3xl mx-auto px-1">
-            Únete a nuestra comunidad de emprendedores y haz crecer tu negocio con nosotros. 
-            Completa el formulario y nos pondremos en contacto contigo.
-          </p>
+  // Show success message if form was submitted successfully
+  if (status.success) {
+    return (
+      <div className="text-center p-8">
+        <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-4">
+          <CheckCircle className="h-8 w-8 text-green-600" />
         </div>
+        <h3 className="text-lg font-medium text-gray-900 mb-2">¡Registro exitoso!</h3>
+        <p className="text-gray-600 mb-6">
+          Hemos recibido tu información. Nos pondremos en contacto contigo a la brevedad.
+        </p>
+        <button
+          onClick={() => {
+            setStatus(prev => ({ ...prev, success: false }));
+            setFormData({
+              businessName: '',
+              category: '',
+              phone: '',
+              email: '',
+              description: ''
+            });
+          }}
+          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500"
+        >
+          Registrar otro negocio
+        </button>
+      </div>
+    );
+  }
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6 md:gap-8 items-start">
-          {/* Columna izquierda: Beneficios */}
-          <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg p-5 sm:p-6 md:p-8 order-2 md:order-1">
-            <h3 className="text-lg sm:text-xl font-bold mb-4 sm:mb-5 md:mb-6 text-gray-800 text-center md:text-left">¿Por qué registrar tu negocio?</h3>
-            
-            <div className="space-y-3 sm:space-y-4 md:space-y-6">
-              {benefits.map((benefit, index) => (
-                <div key={index} className="flex items-start gap-3 md:gap-4">
-                  <div className="flex-shrink-0 w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 bg-orange-100 rounded-full flex items-center justify-center text-orange-500">
-                    {benefit.icon}
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-gray-800 text-sm sm:text-base">{benefit.title}</h4>
-                    <p className="text-xs sm:text-sm md:text-base text-gray-600">{benefit.description}</p>
+  return (
+    <div className={`w-full max-w-4xl mx-auto p-4 sm:p-6 md:p-8 ${className}`}>
+      <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+        <div className="p-6 sm:p-8">
+          {showTitle && (
+            <>
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2 text-center">
+                Registra tu negocio
+              </h2>
+              <p className="text-gray-600 text-center mb-6">
+                Llega a más clientes en tu zona con TuBarrio.pe
+              </p>
+            </>
+          )}
+          
+          {status.error && (
+            <div className="rounded-md bg-red-50 p-4 mb-6">
+              <div className="flex">
+                <div className="flex-shrink-0">
+                  <XCircle className="h-5 w-5 text-red-400" />
+                </div>
+                <div className="ml-3">
+                  <h3 className="text-sm font-medium text-red-800">Error al enviar el formulario</h3>
+                  <div className="mt-2 text-sm text-red-700">
+                    <p>{status.message || 'Por favor, inténtalo de nuevo más tarde.'}</p>
                   </div>
                 </div>
-              ))}
-            </div>
-            
-            {/* Estadísticas */}
-            <div className="mt-5 sm:mt-6 md:mt-8 grid grid-cols-2 gap-3 sm:gap-4 md:gap-6">
-              <div className="bg-orange-50 rounded-lg sm:rounded-xl p-3 sm:p-4 md:p-6 shadow-sm">
-                <div className="text-xl sm:text-2xl md:text-3xl font-bold text-orange-500 mb-0.5 sm:mb-1 md:mb-2">500+</div>
-                <div className="text-xs sm:text-sm md:text-base text-gray-600">Negocios registrados</div>
-              </div>
-              <div className="bg-orange-50 rounded-lg sm:rounded-xl p-3 sm:p-4 md:p-6 shadow-sm">
-                <div className="text-xl sm:text-2xl md:text-3xl font-bold text-orange-500 mb-0.5 sm:mb-1 md:mb-2">15k+</div>
-                <div className="text-xs sm:text-sm md:text-base text-gray-600">Clientes mensuales</div>
               </div>
             </div>
-          </div>
+          )}
           
-          {/* Columna derecha: Formulario */}
-          <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg p-5 sm:p-6 md:p-8 order-1 md:order-2">
-            <h3 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4 md:mb-6 text-gray-800 text-center md:text-left">Registra tu negocio</h3>
-            <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4 md:space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+              {/* Business Name */}
               <div>
-                <label htmlFor="businessName" className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-1.5 md:mb-2">
-                  Nombre del Negocio *
+                <label htmlFor="businessName" className="block text-sm font-medium text-gray-700">
+                  Nombre del negocio <span className="text-red-500">*</span>
                 </label>
-                <input
-                  type="text"
-                  id="businessName"
-                  name="businessName"
-                  required
-                  value={formData.businessName}
-                  onChange={handleChange}
-                  className="w-full px-3 sm:px-3.5 md:px-4 py-2.5 sm:py-2.5 md:py-3 border border-gray-300 rounded-lg sm:rounded-xl text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-gray-800 placeholder-gray-500"
-                  placeholder="Ej: Hamburguesas El Rey"
-                />
+                <div className="mt-1">
+                  <input
+                    type="text"
+                    id="businessName"
+                    name="businessName"
+                    value={formData.businessName}
+                    onChange={handleChange}
+                    required
+                    className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm"
+                    placeholder="Ej: Panadería El Molino"
+                    disabled={status.submitting}
+                  />
+                </div>
               </div>
 
+              {/* Category */}
               <div>
-                <label htmlFor="category" className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-1.5 md:mb-2">
-                  Categoría *
+                <label htmlFor="category" className="block text-sm font-medium text-gray-700">
+                  Categoría <span className="text-red-500">*</span>
                 </label>
-                <select
-                  id="category"
-                  name="category"
-                  required
-                  value={formData.category}
-                  onChange={handleChange}
-                  className="w-full px-3 sm:px-3.5 md:px-4 py-2.5 sm:py-2.5 md:py-3 border border-gray-300 rounded-lg sm:rounded-xl text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-gray-800"
-                >
-                  <option value="">Selecciona una categoría</option>
-                  {categories.map((cat) => (
-                    <option key={cat} value={cat}>{cat}</option>
-                  ))}
-                </select>
+                <div className="mt-1">
+                  <select
+                    id="category"
+                    name="category"
+                    value={formData.category}
+                    onChange={handleChange}
+                    required
+                    className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm"
+                    disabled={status.submitting}
+                  >
+                    <option value="">Selecciona una categoría</option>
+                    <option value="alimentos">Alimentos y Bebidas</option>
+                    <option value="servicios">Servicios</option>
+                    <option value="comercio">Comercio</option>
+                    <option value="salud">Salud y Belleza</option>
+                    <option value="educacion">Educación</option>
+                    <option value="otro">Otro</option>
+                  </select>
+                </div>
               </div>
 
+              {/* Phone */}
               <div>
-                <label htmlFor="phone" className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-1.5 md:mb-2">
-                  Teléfono WhatsApp *
+                <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
+                  Teléfono / WhatsApp <span className="text-red-500">*</span>
                 </label>
-                <input
-                  type="tel"
-                  id="phone"
-                  name="phone"
-                  required
-                  value={formData.phone}
-                  onChange={handleChange}
-                  className="w-full px-3 sm:px-3.5 md:px-4 py-2.5 sm:py-2.5 md:py-3 border border-gray-300 rounded-lg sm:rounded-xl text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-gray-800 placeholder-gray-500"
-                  placeholder="+51 906 684 284"
-                />
+                <div className="mt-1">
+                  <input
+                    type="tel"
+                    id="phone"
+                    name="phone"
+                    required
+                    value={formData.phone}
+                    onChange={handleChange}
+                    className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm"
+                    placeholder="+51 906 684 284"
+                    disabled={status.submitting}
+                  />
+                </div>
               </div>
 
+              {/* Email */}
               <div>
-                <label htmlFor="email" className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-1.5 md:mb-2">
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                   Correo electrónico
                 </label>
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  className="w-full px-3 sm:px-3.5 md:px-4 py-2.5 sm:py-2.5 md:py-3 border border-gray-300 rounded-lg sm:rounded-xl text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white text-gray-800 placeholder-gray-500"
-                  placeholder="tu@email.com"
-                />
+                <div className="mt-1">
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm"
+                    placeholder="tu@email.com"
+                    disabled={status.submitting}
+                  />
+                </div>
               </div>
 
+              {/* Description */}
+              <div className="sm:col-span-2">
+                <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+                  Descripción
+                </label>
+                <div className="mt-1">
+                  <textarea
+                    id="description"
+                    name="description"
+                    rows={3}
+                    value={formData.description}
+                    onChange={handleChange}
+                    className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm"
+                    placeholder="Cuéntanos sobre tu negocio..."
+                    disabled={status.submitting}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Submit Button */}
+            <div className="pt-2">
               <button
                 type="submit"
                 disabled={status.submitting}
-                className={`w-full bg-gradient-to-r ${status.submitting ? 'from-gray-400 to-gray-500 cursor-not-allowed' : 'from-orange-500 to-yellow-400 hover:from-orange-600 hover:to-yellow-500'} text-white font-bold py-2.5 sm:py-3 md:py-4 px-3 sm:px-4 md:px-6 rounded-lg sm:rounded-xl transition-all duration-200 transform ${!status.submitting && 'hover:scale-102 sm:hover:scale-105'} shadow-md sm:shadow-lg mt-2 text-sm sm:text-base`}
-                onClick={() => !status.submitting && playClickSound()}
+                className={`w-full flex justify-center items-center px-4 py-3 border border-transparent rounded-md shadow-sm text-sm font-medium text-white ${
+                  status.submitting 
+                    ? 'bg-gray-500 cursor-not-allowed' 
+                    : 'bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500'
+                }`}
               >
                 {status.submitting ? (
                   <>
-                    <Loader2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5 inline-block mr-1.5 sm:mr-2 animate-spin" />
-                    Enviando...
+                    <Loader2 className="animate-spin -ml-1 mr-2 h-4 w-4" />
+                    Procesando...
                   </>
                 ) : (
-                  <>
-                    <CheckCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5 inline-block mr-1.5 sm:mr-2" />
-                    Registrar mi Negocio
-                  </>
+                  'Registrar mi negocio'
                 )}
               </button>
-            </form>
-
-            <p className="text-xs sm:text-sm text-gray-500 text-center mt-3 sm:mt-4">
-              * Sin compromisos a largo plazo
-            </p>
-            
-            {/* Mensajes de estado */}
-            {status.success && (
-              <div className="mt-3 sm:mt-4 p-2.5 sm:p-3 bg-green-100 border border-green-200 text-green-700 rounded-md sm:rounded-lg text-center text-xs sm:text-sm animate-fadeIn">
-                {status.message}
-              </div>
-            )}
-            
-            {status.error && (
-              <div className="mt-3 sm:mt-4 p-2.5 sm:p-3 bg-red-100 border border-red-200 text-red-700 rounded-md sm:rounded-lg text-center text-xs sm:text-sm animate-fadeIn">
-                {status.message}
-              </div>
-            )}
-          </div>
+              
+              <p className="mt-3 text-xs text-center text-gray-500">
+                * Sin compromisos a largo plazo
+              </p>
+            </div>
+          </form>
         </div>
       </div>
-    </section>
+    </div>
   );
 };
 

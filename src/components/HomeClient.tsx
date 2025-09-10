@@ -24,12 +24,12 @@ const WhatsAppButton = dynamic(
   }
 );
 
-const LazyMapSection = dynamic(
-  () => import('./LazyMapSection'), 
+const MapSection = dynamic(
+  () => import('./MapSection'),
   { 
     loading: () => (
-      <div className="h-96 bg-gray-100 flex items-center justify-center">
-        <p>Cargando mapa...</p>
+      <div className="h-96 bg-gray-100 flex items-center justify-center rounded-xl">
+        <p>Cargando mapa de cobertura...</p>
       </div>
     ),
     ssr: false 
@@ -119,11 +119,9 @@ const HomeClient = () => {
       {/* Servicios Destacados */}
       <FeaturedServices />
       
-      {/* Sección de Cobertura */}
-      <LazyMapSection />
+     
       
-      {/* Registro de Negocios */}
-      <BusinessRegistration />
+    
       
       {/* Botón flotante de WhatsApp */}
       <WhatsAppButton phoneNumber="+51901426737" />
