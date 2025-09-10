@@ -85,11 +85,6 @@ export async function POST(request: Request) {
   }
 }
 
-// Configuración de la ruta
-export const config = {
-  api: {
-    bodyParser: {
-      sizeLimit: '1mb',
-    },
-  },
-};
+// Next.js 14+ Route Segment Config
+export const maxDuration = 30; // seconds
+// Body size limit is now handled by the runtime
