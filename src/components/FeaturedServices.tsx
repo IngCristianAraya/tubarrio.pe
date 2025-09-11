@@ -1,342 +1,271 @@
 'use client';
 
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { useFeaturedServices } from '../hooks/useServices';
-import ServiceCard from './ServiceCard';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import React, { useState, useEffect, useMemo } from 'react';
+import dynamic from 'next/dynamic';
 
-// Componente optimizado con SWR para servicios destacados
+// Mock data for services
+const MOCK_SERVICES = [
+  {
+    id: '1',
+    name: 'Creciendo Digital Cursos',
+    description: 'Cursos de programación para principiantes y avanzados.',
+    category: 'Tecnología',
+    image: '/images/cursos_de_programacion.png',
+    rating: 4.8,
+    location: 'Pando 3ra Etapa',
+    contactUrl: '#',
+    detailsUrl: '#',
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    active: true
+  },
+  {
+    id: '2',
+    name: 'Clases de Guitarra',
+    description: 'Aprende a tocar guitarra desde cero o mejora tu técnica.',
+    category: 'Educación',
+    image: '/images/placeholder-service.jpg',
+    rating: 4.9,
+    location: 'Centro',
+    contactUrl: 'https://tubarrio.pe/',
+    detailsUrl: 'https://tubarrio.pe/',
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    active: true
+  },
+  {
+    id: '3',
+    name: 'Reparación de Computadoras',
+    description: 'Solución rápida a problemas de hardware y software.',
+    category: 'Tecnología',
+    image: '/images/placeholder-service.jpg',
+    rating: 4.7,
+    location: 'Zona Sur',
+    contactUrl: '#',
+    detailsUrl: '#',
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    active: true
+  },
+  {
+    id: '4',
+    name: 'Diseño Gráfico',
+    description: 'Diseños profesionales para tu marca o negocio.',
+    category: 'Diseño',
+    image: '/images/placeholder-service.jpg',
+    rating: 4.9,
+    location: 'Zona Este',
+    contactUrl: '#',
+    detailsUrl: '#',
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    active: true
+  }
+];
 
-const FeaturedServices = () => {
-  // Hook optimizado con SWR - solo 1 consulta Firebase con caché inteligente
-  const { services: featuredServices, loading, error } = useFeaturedServices();
-  
-  const [currentPage, setCurrentPage] = useState(1);
-  const [selectedCategory, setSelectedCategory] = useState('Todos');
-  const [servicesPerPage, setServicesPerPage] = useState(3);
-  const [isMounted, setIsMounted] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [currentSlide, setCurrentSlide] = useState(0);
-  const [isMobile, setIsMobile] = useState(false);
-  const [touchStart, setTouchStart] = useState(0);
-  const [touchEnd, setTouchEnd] = useState(0);
-  // Effect para inicialización
+// Lazy load components
+const ServiceCard = dynamic(() => import('./ServiceCard'), { ssr: false });
+const ChevronLeft = dynamic(
+  () => import('lucide-react').then(mod => mod.ChevronLeft),
+  { ssr: false }
+);
+const ChevronRight = dynamic(
+  () => import('lucide-react').then(mod => mod.ChevronRight),
+  { ssr: false }
+);
+
+interface Service {
+  id: string;
+  name: string;
+  description: string;
+  category: string;
+  image: string;
+  rating: number;
+  location: string;
+  contactUrl: string;
+  detailsUrl: string;
+  createdAt: Date;
+  updatedAt: Date;
+  active: boolean;
+}
+
+const FeaturedServices: React.FC = () => {
+  const [state, setState] = useState({
+    currentPage: 1,
+    selectedCategory: 'Todas',
+    isMobile: false,
+    servicesPerPage: 3
+  });
+
+  // Handle window resize
   useEffect(() => {
-    setIsMounted(true);
-    setIsLoading(loading);
-  }, [loading]);
-  
-  // Actualizar estado de carga cuando cambie el loading del hook
-  useEffect(() => {
-    setIsLoading(loading);
-  }, [loading]);
-  
-  // Effect separado para responsive
-  useEffect(() => {
-    const updateServicesPerPage = () => {
-      if (typeof window === 'undefined') return;
-      const mobile = window.innerWidth < 768;
-      setIsMobile(mobile);
-      setServicesPerPage(window.innerWidth < 640 ? 2 : window.innerWidth < 1024 ? 2 : 3);
-    };
-
-    updateServicesPerPage();
-
-    let timeoutId: NodeJS.Timeout;
     const handleResize = () => {
-      clearTimeout(timeoutId);
-      timeoutId = setTimeout(updateServicesPerPage, 100);
+      const isMobileView = window.innerWidth < 768;
+      setState(prev => ({
+        ...prev,
+        isMobile: isMobileView,
+        servicesPerPage: isMobileView ? 1 : 3
+      }));
     };
 
+    // Initial check
+    handleResize();
+    
+    // Add event listener
     window.addEventListener('resize', handleResize);
+    
+    // Cleanup
     return () => {
       window.removeEventListener('resize', handleResize);
-      clearTimeout(timeoutId);
     };
   }, []);
 
-  const activeServices = useMemo(() => {
-    return featuredServices || [];
-  }, [featuredServices]);
-  
-  const categories = useMemo(() => {
-    if (!activeServices || activeServices.length === 0) return ['Todos'];
-    const cats = new Set(activeServices.map(service => service.category));
-    return ['Todos', ...Array.from(cats)].sort();
-  }, [activeServices]);
+  // Filter services by selected category
+  const filteredServices = useMemo(() => {
+    if (state.selectedCategory === 'Todas') {
+      return MOCK_SERVICES;
+    }
+    return MOCK_SERVICES.filter(service => 
+      service.category === state.selectedCategory && service.active
+    );
+  }, [state.selectedCategory]);
 
-  const filteredByCategory = useMemo(() => {
-    if (selectedCategory === 'Todos') return activeServices;
-    return activeServices.filter(service => service.category === selectedCategory);
-  }, [activeServices, selectedCategory]);
-
+  // Calculate pagination
+  const totalPages = Math.ceil(filteredServices.length / state.servicesPerPage);
   const currentServices = useMemo(() => {
-    const startIndex = (currentPage - 1) * servicesPerPage;
-    return filteredByCategory.slice(startIndex, startIndex + servicesPerPage);
-  }, [filteredByCategory, currentPage, servicesPerPage]);
+    const startIndex = (state.currentPage - 1) * state.servicesPerPage;
+    return filteredServices.slice(startIndex, startIndex + state.servicesPerPage);
+  }, [filteredServices, state.currentPage, state.servicesPerPage]);
 
-  const totalPages = useMemo(() => {
-    return Math.ceil(filteredByCategory.length / servicesPerPage);
-  }, [filteredByCategory.length, servicesPerPage]);
+  // Extract unique categories for the filter dropdown
+  const categories = useMemo(() => {
+    const uniqueCategories = Array.from(new Set(MOCK_SERVICES.map(service => service.category)));
+    return ['Todas', ...uniqueCategories];
+  }, []);
 
-  const changePage = useCallback((page: number) => {
-    setCurrentPage(page);
-    const element = document.getElementById('servicios');
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
+  // Navigation handlers
+  const goToPage = (page: number) => {
+    setState(prev => ({
+      ...prev,
+      currentPage: Math.max(1, Math.min(page, totalPages))
+    }));
+  };
+
+  const nextPage = () => {
+    if (state.currentPage < totalPages) {
+      setState(prev => ({
+        ...prev,
+        currentPage: prev.currentPage + 1
+      }));
     }
-  }, []);
+  };
 
-  const handleCategoryChange = useCallback((category: string) => {
-    setSelectedCategory(category);
-    setCurrentPage(1);
-    setCurrentSlide(0);
-  }, []);
-
-  const nextSlide = useCallback(() => {
-    setCurrentSlide((prev) => {
-      const maxSlide = Math.max(0, filteredByCategory.length - 1);
-      return prev >= maxSlide ? 0 : prev + 1;
-    });
-  }, [filteredByCategory.length]);
-
-  const prevSlide = useCallback(() => {
-    setCurrentSlide((prev) => {
-      const maxSlide = Math.max(0, filteredByCategory.length - 1);
-      return prev <= 0 ? maxSlide : prev - 1;
-    });
-  }, [filteredByCategory.length]);
-
-  const goToSlide = useCallback((index: number) => {
-    setCurrentSlide(index);
-  }, []);
-
-  const handleTouchStart = useCallback((e: React.TouchEvent) => {
-    setTouchEnd(0);
-    setTouchStart(e.targetTouches[0].clientX);
-  }, []);
-
-  const handleTouchMove = useCallback((e: React.TouchEvent) => {
-    setTouchEnd(e.targetTouches[0].clientX);
-  }, []);
-
-  const handleTouchEnd = useCallback(() => {
-    if (!touchStart || !touchEnd) return;
-    
-    const distance = touchStart - touchEnd;
-    const isLeftSwipe = distance > 50;
-    const isRightSwipe = distance < -50;
-
-    if (isLeftSwipe) {
-      nextSlide();
-    } else if (isRightSwipe) {
-      prevSlide();
+  const prevPage = () => {
+    if (state.currentPage > 1) {
+      setState(prev => ({
+        ...prev,
+        currentPage: prev.currentPage - 1
+      }));
     }
-  }, [touchStart, touchEnd, nextSlide, prevSlide]);
+  };
 
-  useEffect(() => {
-    if (activeServices.length > 0 || !loading) {
-      setIsLoading(false);
-    }
-  }, [activeServices, loading]);
-
-  if (!isMounted || (loading && featuredServices.length === 0)) {
-    return (
-      <section id="servicios" className="py-10 sm:py-12 md:py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="animate-pulse space-y-8">
-            <div className="h-12 bg-gray-200 rounded w-1/3 mx-auto"></div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[1, 2, 3, 4, 5, 6].map((i) => (
-                <div key={i} className="h-96 bg-gray-100 rounded-lg"></div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-    );
-  }
-
-  if (isLoading) {
-    return (
-      <section id="servicios" className="py-10 sm:py-12 md:py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center py-12">
-            <div className="animate-pulse">
-              <div className="h-8 bg-gray-200 rounded w-1/3 mx-auto mb-4"></div>
-              <div className="h-4 bg-gray-200 rounded w-1/2 mx-auto"></div>
-            </div>
-          </div>
-        </div>
-      </section>
-    );
-  }
-
-  if (!isLoading && currentServices.length === 0) {
-    return (
-      <section id="servicios" className="py-10 sm:py-12 md:py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-3 sm:mb-4">
-              🔥 <span className="text-orange-500">Servicios</span> Destacados
-            </h2>
-            <p className="text-gray-500 mb-6">
-              {selectedCategory === 'Todos' 
-                ? 'No hay servicios disponibles en este momento.'
-                : `No hay servicios en la categoría "${selectedCategory}".`}
-            </p>
-          </div>
-        </div>
-      </section>
-    );
-  }
+  // Handle category change
+  const handleCategoryChange = (category: string) => {
+    setState(prev => ({
+      ...prev,
+      selectedCategory: category,
+      currentPage: 1
+    }));
+  };
 
   return (
-    <section id="servicios" className="py-10 sm:py-12 md:py-16 bg-white">
+    <section className="py-12 bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-8">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-2">
-            🔥 <span className="text-orange-500">Servicios</span> Destacados
-          </h2>
-          <p className="text-gray-600 max-w-2xl mx-auto">
-            Los servicios más populares y mejor calificados por nuestra comunidad
-          </p>
-        </div>
-
-        <div className="flex justify-center mb-8 overflow-x-auto pb-2">
-          <div className="inline-flex space-x-2">
-            {categories.map((category) => (
-              <button
-                key={category}
-                onClick={() => handleCategoryChange(category)}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                  selectedCategory === category
-                    ? 'bg-orange-500 text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
-              >
-                {category}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {isMobile ? (
-          <div className="relative">
-            <div className="overflow-hidden">
-              <div 
-                className="flex transition-transform duration-300 ease-in-out"
-                style={{ transform: `translateX(-${currentSlide * 100}%)` }}
-                onTouchStart={handleTouchStart}
-                onTouchMove={handleTouchMove}
-                onTouchEnd={handleTouchEnd}
-              >
-                {filteredByCategory.map((service, index) => (
-                  <div key={service.id} className="w-full flex-shrink-0 px-2">
-                    <ServiceCard service={service} />
-                  </div>
-                ))}
-              </div>
-            </div>
-            
-            {filteredByCategory.length > 1 && (
-              <>
-                <button
-                  onClick={prevSlide}
-                  className="absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full shadow-lg flex items-center justify-center text-gray-700 hover:bg-white transition-colors z-10"
-                  aria-label="Servicio anterior"
-                >
-                  <ChevronLeft className="w-5 h-5" />
-                </button>
-                <button
-                  onClick={nextSlide}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full shadow-lg flex items-center justify-center text-gray-700 hover:bg-white transition-colors z-10"
-                  aria-label="Siguiente servicio"
-                >
-                  <ChevronRight className="w-5 h-5" />
-                </button>
-                
-                <div className="flex justify-center mt-4 space-x-2">
-                  {filteredByCategory.map((_, index) => (
-                    <button
-                      key={index}
-                      onClick={() => goToSlide(index)}
-                      className={`w-2 h-2 rounded-full transition-colors ${
-                        index === currentSlide ? 'bg-orange-500' : 'bg-gray-300'
-                      }`}
-                      aria-label={`Ir al servicio ${index + 1}`}
-                    />
-                  ))}
-                </div>
-              </>
-            )}
-          </div>
-        ) : (
-          <>
-            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-              {currentServices.map((service) => (
-                <ServiceCard key={service.id} service={service} />
+          <h2 className="text-3xl font-bold text-gray-900">Servicios Destacados</h2>
+          
+          {/* Category Filter */}
+          <div className="mt-4">
+            <select
+              value={state.selectedCategory}
+              onChange={(e) => handleCategoryChange(e.target.value)}
+              className="block w-full max-w-xs mx-auto rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            >
+              {categories.map((category) => (
+                <option key={category} value={category}>
+                  {category}
+                </option>
               ))}
-            </div>
-
-            {totalPages > 1 && (
-              <div className="flex justify-center mt-10">
-                <nav className="flex items-center space-x-2">
-                  <button
-                    onClick={() => changePage(currentPage - 1)}
-                    disabled={currentPage === 1}
-                    className="w-10 h-10 flex items-center justify-center rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                    aria-label="Página anterior"
-                  >
-                    <ChevronLeft className="w-5 h-5" />
-                  </button>
-
-                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                    let pageNum;
-                    if (totalPages <= 5) {
-                      pageNum = i + 1;
-                    } else if (currentPage <= 3) {
-                      pageNum = i + 1;
-                    } else if (currentPage >= totalPages - 2) {
-                      pageNum = totalPages - 4 + i;
-                    } else {
-                      pageNum = currentPage - 2 + i;
-                    }
-
-                    return (
-                      <button
-                        key={pageNum}
-                        onClick={() => changePage(pageNum)}
-                        className={`w-10 h-10 flex items-center justify-center rounded-lg ${
-                          currentPage === pageNum
-                            ? 'bg-orange-500 text-white'
-                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                        }`}
-                      >
-                        {pageNum}
-                      </button>
-                    );
-                  })}
-
-                  <button
-                    onClick={() => changePage(currentPage + 1)}
-                    disabled={currentPage === totalPages}
-                    className="w-10 h-10 flex items-center justify-center rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                    aria-label="Página siguiente"
-                  >
-                    <ChevronRight className="w-5 h-5" />
-                  </button>
-                </nav>
+            </select>
+          </div>
+        </div>
+        
+        {/* Services Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {currentServices.map((service) => (
+            <div key={service.id} className="bg-white rounded-lg shadow-md overflow-hidden">
+              <div className="h-48 bg-gray-200 flex items-center justify-center">
+                {service.image ? (
+                  <img 
+                    src={service.image} 
+                    alt={service.name} 
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <span className="text-gray-400">Imagen no disponible</span>
+                )}
               </div>
-            )}
-          </>
+              <div className="p-4">
+                <h3 className="text-lg font-semibold text-gray-900">{service.name}</h3>
+                <p className="mt-2 text-gray-600">{service.description}</p>
+                <div className="mt-3 flex items-center">
+                  <span className="text-yellow-400">★</span>
+                  <span className="ml-1 text-gray-700">{service.rating}</span>
+                  <span className="mx-2 text-gray-300">•</span>
+                  <span className="text-gray-500">{service.location}</span>
+                </div>
+                <div className="mt-4">
+                  <a 
+                    href={service.detailsUrl} 
+                    className="inline-block px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 transition-colors"
+                  >
+                    Ver detalles
+                  </a>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+        
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="mt-8 flex justify-center items-center space-x-4">
+            <button
+              onClick={prevPage}
+              disabled={state.currentPage === 1}
+              className="px-4 py-2 rounded-md border border-gray-300 bg-white text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              aria-label="Página anterior"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+            
+            <span className="text-gray-700">
+              Página {state.currentPage} de {totalPages}
+            </span>
+            
+            <button
+              onClick={nextPage}
+              disabled={state.currentPage >= totalPages}
+              className="px-4 py-2 rounded-md border border-gray-300 bg-white text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              aria-label="Siguiente página"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </button>
+          </div>
         )}
       </div>
     </section>
   );
 };
-
-
-
 
 export default FeaturedServices;

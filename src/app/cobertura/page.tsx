@@ -5,16 +5,50 @@ import { useCallback, useEffect, useState } from 'react';
 import { FaMapMarkerAlt, FaStore, FaTruck, FaInfoCircle, FaWhatsapp, FaArrowUp } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
 import SEO from '@/components/SEO';
-import HeroCobertura from '@/app/cobertura/HeroCobertura';
 
-// Cargar el mapa de forma dinámica para evitar problemas con SSR
+// Cargar el componente Hero de forma dinámica
+const UnifiedHero = dynamic(() => import('@/components/UnifiedHero'), {
+  loading: () => <div className="h-[60vh] bg-gray-100 animate-pulse"></div>,
+  ssr: true
+});
+
+// Cargar el mapa de forma dinámica con manejo de errores
 const DynamicMapSection = dynamic(
-  () => import('@/components/MapSection'),
+  () => import('@/components/MapSection').then(mod => {
+    // Add error boundary to the component
+    const MapWithErrorBoundary = (props: any) => {
+      try {
+        return <mod.default {...props} />;
+      } catch (error) {
+        console.error('Error loading map:', error);
+        return (
+          <div className="w-full h-[500px] bg-red-50 border border-red-200 rounded-xl flex items-center justify-center p-6 text-center">
+            <div>
+              <div className="text-red-500 text-4xl mb-4">⚠️</div>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">Error al cargar el mapa</h3>
+              <p className="text-gray-600 mb-4">No se pudo cargar el mapa de cobertura. Por favor, inténtalo de nuevo más tarde.</p>
+              <button 
+                onClick={() => window.location.reload()}
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+              >
+                Recargar página
+              </button>
+            </div>
+          </div>
+        );
+      }
+    };
+    return MapWithErrorBoundary;
+  }),
   { 
     ssr: false,
     loading: () => (
-      <div className="w-full h-96 bg-gray-100 flex items-center justify-center rounded-xl">
-        <div className="animate-pulse text-gray-500">Cargando mapa de cobertura...</div>
+      <div className="w-full h-[500px] bg-gray-50 flex flex-col items-center justify-center rounded-xl">
+        <div className="animate-pulse flex flex-col items-center">
+          <div className="w-12 h-12 bg-gray-200 rounded-full mb-4"></div>
+          <div className="h-4 bg-gray-200 rounded w-48 mb-2"></div>
+          <div className="h-3 bg-gray-100 rounded w-64"></div>
+        </div>
       </div>
     )
   }
@@ -61,114 +95,117 @@ const CoberturaPage = () => {
   }
 
   return (
-    <>
-      <HeroCobertura
-        title="Nuestra <span className='text-orange-500'>Cobertura</span>"
-        subtitle="Conectando negocios y clientes en toda la zona de Pando y alrededores"
-        imageUrl="/images/casa_frontal.png"
-        imageAlt="Cobertura TuBarrio.pe"
-      />
+    <div className="min-h-screen bg-white">
       <SEO 
         title="Zona de Cobertura | TuBarrio.pe"
         description="Descubre las zonas donde ofrecemos cobertura y conectamos negocios locales con su comunidad en TuBarrio.pe"
         keywords="cobertura, zonas de entrega, áreas de servicio, barrios cubiertos, TuBarrio.pe"
       />
-
-
+      
+      <UnifiedHero 
+        variant="coverage"
+        title={
+          <>
+            <span className="text-gray-800">Nuestra </span>
+            <span className="text-orange-500">Cobertura</span>
+          </>
+        }
+        subtitle="Conectando negocios y clientes en toda la zona de Pando y alrededores"
+        backgroundImage="/images/coverage-bg.jpg"
+        showSearch={false}
+      />
 
       {/* Mapa de Cobertura */}
       <section className="py-12 md:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-10">
-        
+            <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
+              Nuestras Zonas de Cobertura
+            </h2>
+            <p className="mt-4 text-xl text-gray-600">
+              Actualmente cubrimos las siguientes zonas y seguimos expandiéndonos
+            </p>
           </div>
           
           <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-200">
-            <DynamicMapSection />
+            <DynamicMapSection 
+              height={600}
+              interactive={true}
+              showInfoPanels={true}
+              onError={(error: Error) => {
+                console.error('Map error:', error);
+                // You could also track this error in your error tracking system
+                // trackError('MapSectionError', error);
+              }}
+            />
           </div>
         </div>
       </section>
 
-      {/* Sección de Barrios Cubiertos */}
-      <section className="py-12 bg-white">
+      {/* Sección de información */}
+      <section className="py-12 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-10">
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-3">
-              Barrios y Urbanizaciones
-            </h2>
-            <p className="text-gray-600 max-w-3xl mx-auto mb-8">
-              Actualmente ofrecemos cobertura en los siguientes barrios y urbanizaciones de Pando y zonas aledañas:
-            </p>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-              {[
-                'Pando 3ra estapa', 'Santa Emma', 'Urb Palomino', 
-                'Urb la luz', 'Barrio las Brisas', 
-              ].map((barrio, index) => (
-                <motion.div
-                  key={barrio}
-                  className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow flex items-center gap-3"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3, delay: 0.1 + (index * 0.05) }}
-                >
-                  <div className="bg-orange-100 p-2 rounded-full text-orange-500">
-                    <FaMapMarkerAlt className="text-lg" />
-                  </div>
-                  <span className="font-medium text-gray-800">{barrio}</span>
-                </motion.div>
-              ))}
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="bg-white p-6 rounded-xl shadow-md">
+              <div className="flex items-center mb-4">
+                <div className="p-3 bg-orange-100 rounded-full mr-4">
+                  <FaMapMarkerAlt className="text-orange-500 text-xl" />
+                </div>
+                <h3 className="text-lg font-semibold">Área de Cobertura</h3>
+              </div>
+              <p className="text-gray-600">
+                Actualmente cubrimos la zona de Pando y alrededores. Estamos trabajando para expandir nuestra cobertura a más áreas próximamente.
+              </p>
+            </div>
+
+            <div className="bg-white p-6 rounded-xl shadow-md">
+              <div className="flex items-center mb-4">
+                <div className="p-3 bg-orange-100 rounded-full mr-4">
+                  <FaStore className="text-orange-500 text-xl" />
+                </div>
+                <h3 className="text-lg font-semibold">¿Tienes un negocio?</h3>
+              </div>
+              <p className="text-gray-600">
+                Si tienes un negocio en nuestra zona de cobertura, regístralo para llegar a más clientes y aumentar tus ventas.
+              </p>
+            </div>
+
+            <div className="bg-white p-6 rounded-xl shadow-md">
+              <div className="flex items-center mb-4">
+                <div className="p-3 bg-orange-100 rounded-full mr-4">
+                  <FaTruck className="text-orange-500 text-xl" />
+                </div>
+                <h3 className="text-lg font-semibold">Entregas a Domicilio</h3>
+              </div>
+              <p className="text-gray-600">
+                Muchos de nuestros negocios asociados ofrecen servicio de delivery. Verifica la disponibilidad en tu zona.
+              </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Sección de Beneficios */}
-      <section className="py-16 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-3">
-              Beneficios de Nuestra Cobertura
-            </h2>
-            <p className="text-gray-600 max-w-3xl mx-auto">
-              Ofrecemos una solución integral para conectar negocios locales con su comunidad
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            {[
-              {
-                icon: <FaStore className="text-3xl text-orange-500" />,
-                title: "Para Negocios",
-                description: "Mayor visibilidad, nuevos clientes y ventas incrementadas en tu zona de influencia.",
-                color: "bg-orange-50"
-              },
-              {
-                icon: <FaTruck className="text-3xl text-blue-500" />,
-                title: "Para Clientes",
-                description: "Acceso rápido y sencillo a los mejores negocios locales con servicio a domicilio.",
-                color: "bg-blue-50"
-              },
-              {
-                icon: <FaInfoCircle className="text-3xl text-green-500" />,
-                title: "Información Actualizada",
-                description: "Datos precisos sobre horarios, productos y promociones de cada negocio.",
-                color: "bg-green-50"
-              }
-            ].map((item, index) => (
-              <motion.div 
-                key={item.title}
-                className={`${item.color} p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow`}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
+      {/* Sección de contacto */}
+      <section className="py-12 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <div className="bg-orange-50 rounded-2xl p-8 md:p-12">
+            <div className="max-w-3xl mx-auto">
+              <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl mb-6">
+                ¿No encuentras tu zona?
+              </h2>
+              <p className="text-xl text-gray-600 mb-8">
+                Estamos en constante expansión. Déjanos saber tu ubicación y te notificaremos cuando lleguemos a tu zona.
+              </p>
+              <a
+                href="https://wa.me/51999999999?text=Hola%20TuBarrio.pe%2C%20me%20gustar%C3%ADa%20saber%20cu%C3%A1ndo%20llegar%C3%A1n%20a%20mi%20zona"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-orange-500 hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-colors"
               >
-                <div className="mb-4">{item.icon}</div>
-                <h3 className="text-xl font-semibold text-gray-800 mb-2">{item.title}</h3>
-                <p className="text-gray-600">{item.description}</p>
-              </motion.div>
-            ))}
+                <FaWhatsapp className="mr-2" />
+                Consultar por WhatsApp
+              </a>
+            </div>
           </div>
         </div>
       </section>
@@ -252,8 +289,7 @@ const CoberturaPage = () => {
           <FaWhatsapp className="w-6 h-6" />
         </motion.a>
       </AnimatePresence>
-      
-    </>
+    </div>
   );
 };
 

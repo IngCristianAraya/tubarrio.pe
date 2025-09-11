@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 
-interface OptimizedImageProps {
+interface OptimizedImageProps extends React.HTMLAttributes<HTMLImageElement> {
   src: string;
   alt: string;
   className?: string;
@@ -11,6 +11,7 @@ interface OptimizedImageProps {
   height?: number;
   loading?: 'lazy' | 'eager';
   objectFit?: 'cover' | 'contain' | 'fill' | 'none' | 'scale-down';
+  objectPosition?: string;
   onLoad?: () => void;
   fallbackSrc?: string;
   priority?: boolean;
@@ -19,6 +20,7 @@ interface OptimizedImageProps {
   placeholder?: 'blur' | 'empty';
   blurDataURL?: string;
   isMobile?: boolean;
+  style?: React.CSSProperties;
 }
 
 /**
@@ -36,6 +38,7 @@ const OptimizedImage = ({
   height = 300, // Default height if not provided
   loading = 'lazy',
   objectFit = 'cover',
+  objectPosition = 'center',
   onLoad,
   fallbackSrc = '/images/hero_001.webp',
   priority = false,
@@ -44,16 +47,23 @@ const OptimizedImage = ({
   placeholder = 'blur',
   blurDataURL,
   isMobile = false,
+  style,
 }: OptimizedImageProps) => {
   const [isClient, setIsClient] = useState(false);
   const [currentSrc, setCurrentSrc] = useState(fallbackSrc);
   const [hasError, setHasError] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [currentBlurDataURL, setCurrentBlurDataURL] = useState<string | undefined>(blurDataURL);
 
   // Establecer isClient a true después de la hidratación
   useEffect(() => {
     setIsClient(true);
   }, []);
+
+  // Actualizar el blurDataURL cuando cambie la fuente
+  useEffect(() => {
+    setCurrentBlurDataURL(blurDataURL);
+  }, [blurDataURL]);
 
   // Detectar si es móvil para optimizar calidad
   const [isMobileDevice, setIsMobileDevice] = useState(false);
@@ -103,6 +113,16 @@ const OptimizedImage = ({
     onLoad?.();
   };
 
+  // Cargar la imagen de respaldo si hay un error
+  useEffect(() => {
+    if (hasError && fallbackSrc && currentSrc !== fallbackSrc) {
+      setCurrentSrc(fallbackSrc);
+      setHasError(false);
+      // No usar blur para la imagen de respaldo
+      setCurrentBlurDataURL(undefined);
+    }
+  }, [hasError, fallbackSrc, currentSrc]);
+
   // Actualizar la fuente cuando cambie la prop src
   useEffect(() => {
     if (src) {
@@ -142,6 +162,7 @@ const OptimizedImage = ({
     );
   }
 
+
   return (
     <div 
       className={`relative ${className}`}
@@ -151,7 +172,7 @@ const OptimizedImage = ({
       }}
       suppressHydrationWarning
     >
-      {isLoading && placeholder === 'blur' && (
+      {isLoading && placeholder === 'blur' && !currentBlurDataURL && (
         <div 
           className="absolute inset-0 bg-gray-200 animate-pulse rounded-lg"
           aria-hidden="true"
@@ -162,20 +183,21 @@ const OptimizedImage = ({
         alt={alt}
         width={width}
         height={height}
+        className={`${className} transition-opacity duration-300 ${isLoading ? 'opacity-0' : 'opacity-100'}`}
         loading={loading}
-        className={`w-full h-full transition-opacity duration-300 ${isLoading ? 'opacity-0' : 'opacity-100'}`}
-        style={{
-          objectFit,
-          objectPosition: 'center',
-        }}
-        onLoad={handleLoad}
-        onError={handleError}
         priority={priority}
         sizes={sizes}
-        quality={optimizedQuality}
-        placeholder={placeholder}
-        blurDataURL={placeholder === 'blur' ? finalBlurDataURL : undefined}
-        unoptimized={false}
+        quality={quality}
+        placeholder={currentBlurDataURL ? 'blur' : 'empty'}
+        blurDataURL={currentBlurDataURL}
+        onLoad={handleLoad}
+        onError={handleError}
+        style={{
+          objectFit: objectFit,
+          objectPosition: objectPosition || 'center',
+          width: '100%',
+          height: '100%',
+        }}
       />
     </div>
   );

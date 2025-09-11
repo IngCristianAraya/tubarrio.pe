@@ -1,0 +1,57 @@
+/* Fix for Leaflet map tiles */
+.leaflet-container {
+  width: 100%;
+  height: 100%;
+  min-height: 300px;
+  border-radius: 0.75rem;
+  z-index: 0;
+}
+
+/* Fix for Leaflet controls */
+.leaflet-control {
+  z-index: 1000;
+}
+
+/* Fix for popup close button */
+.leaflet-popup-close-button {
+  font-size: 20px !important;
+  padding: 2px 6px !important;
+  line-height: 1 !important;
+}
+
+/* Fix for popup content */
+.leaflet-popup-content {
+  margin: 10px 14px;
+  line-height: 1.4;
+}
+
+/* Fix for zoom controls */
+.leaflet-bar {
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.leaflet-bar a {
+  width: 30px;
+  height: 30px;
+  line-height: 30px;
+  font-size: 18px;
+  color: #333;
+  background-color: #fff;
+  border-bottom: 1px solid #ccc;
+  transition: background-color 0.2s;
+}
+
+.leaflet-bar a:hover {
+  background-color: #f4f4f4;
+}
+
+/* Fix for attribution */
+.leaflet-container .leaflet-control-attribution {
+  background: rgba(255, 255, 255, 0.8);
+  margin: 0;
+  padding: 0 5px;
+  color: #333;
+  font-size: 11px;
+}

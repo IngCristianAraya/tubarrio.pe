@@ -3,6 +3,7 @@ import { generateMetadata as generateSeoMetadata } from '@/lib/seo';
 import { LocalBusinessJsonLd } from '@/components/seo/JsonLd';
 import { SocialMeta } from '@/components/seo/SocialMeta';
 import { SITE_URL } from '@/lib/constants';
+import { MapPin } from 'lucide-react';
 
 // Importaciones dinámicas con carga perezosa para componentes que pueden ser renderizados en el servidor
 const Header = dynamic(() => import('@/components/Header'), {
@@ -10,8 +11,8 @@ const Header = dynamic(() => import('@/components/Header'), {
   ssr: true
 });
 
-const Hero = dynamic(() => import('@/components/Hero'), {
-  loading: () => <div className="h-[60vh] bg-gray-100 animate-pulse"></div>,
+const UnifiedHero = dynamic(() => import('@/components/UnifiedHero'), {
+  loading: () => <div className="h-[70vh] bg-gray-100 animate-pulse"></div>,
   ssr: true
 });
 
@@ -82,7 +83,26 @@ export default function Home() {
 
       <main className="flex flex-col">
         {/* Hero Section */}
-        <Hero />
+        <UnifiedHero 
+          variant="home"
+          title={
+            <>
+              <span className="text-gray-800">Explora los negocios de </span>
+              <span className="text-orange-500">tu barrio</span>
+            </>
+          }
+          subtitle="Encuentra los mejores servicios locales cerca de ti"
+          backgroundImage="/images/prueba_yasmin_hd.webp"
+        >
+          <div className="mt-6">
+            <p className="text-sm text-gray-600 mb-3">
+              <span className="inline-flex items-center">
+                <MapPin className="h-4 w-4 mr-1 text-orange-500" />
+                Actualmente cubriendo: Pando y alrededores
+              </span>
+            </p>
+          </div>
+        </UnifiedHero>
         
         {/* Componentes del cliente que necesitan interactividad del navegador */}
         <ClientComponents />

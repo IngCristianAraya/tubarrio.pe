@@ -1,7 +1,6 @@
 import useSWR from 'swr';
 import { useState, useCallback, useMemo, useEffect } from 'react';
 import { useService } from './useService';
-import { useServiceCache } from './useServiceCache';
 import { 
   collection, 
   query, 
@@ -16,7 +15,7 @@ import {
   Firestore
 } from 'firebase/firestore';
 import { db, initializeFirebase } from '@/lib/firebase/config';
-import { Service } from '@/context/ServicesContext';
+import { Service } from '@/types/service';
 import { fallbackServices, filterFallbackServices, getFallbackServiceById } from '../lib/firebase/fallback';
 
 // Tipos para el hook
@@ -63,140 +62,82 @@ const SERVICE_CACHE_TTL = 30 * 60 * 1000; // 30 minutos para cache de servicios 
 // Fetcher optimizado con caché
 const servicesFetcher = async ([_, options]: [string, UseServicesOptions]): Promise<Service[]> => {
   const { category, barrio, userId, featured, pageSize = 12, search } = options;
+  
+  // Generar una clave única para esta consulta
   const cacheKey = JSON.stringify({ category, barrio, userId, featured, pageSize, search });
   const now = Date.now();
   
-  // Inicializar el hook de caché
-  const { 
-    getAllServicesFromCache, 
-    setAllServicesCache,
-    loadPersistentCache,
-    setFeaturedServicesCache,
-    getFeaturedServicesFromCache
-  } = useServiceCache();
-  
   // Verificar caché primero
-  
-  // 1. Verificar caché primero
-  try {
-    // Si es una consulta de servicios destacados, verificar primero ese caché
-    if (featured) {
-      const featuredCache = getFeaturedServicesFromCache();
-      if (featuredCache && featuredCache.length > 0) {
-        console.log('🌟 [FEATURED CACHE] Usando caché de servicios destacados');
-        return featuredCache;
-      }
-    }
-    
-    // Intentar obtener del caché persistente
-    const persistentCache = loadPersistentCache();
-    if (persistentCache && persistentCache.length > 0) {
-      console.log('📦 [PERSISTENT CACHE] Usando datos de caché persistente');
-      
-      // Si es una consulta de servicios destacados, actualizar el caché específico
-      if (featured) {
-        const featuredServices = persistentCache.filter(service => service.featured === true);
-        if (featuredServices.length > 0) {
-          setFeaturedServicesCache(featuredServices);
-        }
-      }
-      
-      return persistentCache;
-    }
-    
-    // Si no hay caché persistente, intentar con el caché normal
-    const cachedServices = getAllServicesFromCache();
-    if (cachedServices && cachedServices.length > 0) {
-      console.log('📦 [CACHE HIT] Usando datos de caché para:', cacheKey);
-      
-      // Si es una consulta de servicios destacados, actualizar el caché específico
-      if (featured) {
-        const featuredServices = cachedServices.filter(service => service.featured === true);
-        if (featuredServices.length > 0) {
-          setFeaturedServicesCache(featuredServices);
-        }
-      }
-      
-      return cachedServices;
-    }
-  } catch (error) {
-    console.warn('⚠️ Error al acceder al caché:', error);
-    // Continuar con la carga normal en caso de error
+  const cached = servicesCache.get(cacheKey);
+  if (cached && (now - cached.timestamp < CACHE_TTL)) {
+    console.log('📦 [CACHE HIT] Usando datos de caché para:', cacheKey);
+    return cached.data;
   }
   
   // Si Firebase no está disponible, usar datos de respaldo
   if (!db) {
     console.warn('🔄 Firebase no disponible, usando datos de respaldo');
-    const fallbackData = filterFallbackServices({
+    return filterFallbackServices({
       category,
       barrio,
       search,
       featured,
       limit: pageSize
     });
-    
-    // Guardar en caché para futuras solicitudes
-    try {
-      if (fallbackData.length > 0) {
-        // Guardar en caché persistente
-        setAllServicesCache(fallbackData);
-        
-        // Si es una consulta de destacados, actualizar ese caché específico
-        if (featured) {
-          const featuredData = fallbackData.filter(service => service.featured === true);
-          if (featuredData.length > 0) {
-            setFeaturedServicesCache(featuredData);
-          }
-        }
-      }
-    } catch (error) {
-      console.warn('⚠️ Error guardando datos de respaldo en caché:', error);
-    }
-    
-    return fallbackData;
   }
   
   console.log('🔍 Ejecutando consulta a Firebase...');
 
   try {
-    // Construir consulta optimizada con solo los filtros necesarios
-    const constraints = [];
+
+  // Construir query optimizada con solo los filtros necesarios
+  const constraints = [];
+  
+  // Filtros del servidor (solo los estrictamente necesarios)
+  if (userId) {
+    constraints.push(where('userId', '==', userId));
+  }
+  
+  if (category && category !== 'Todas' && category !== 'Todos') {
+    constraints.push(where('category', '==', category));
+  }
+  
+  if (barrio) {
+    constraints.push(where('barrio', '==', barrio));
+  }
+  
+  // Solo servicios activos
+  constraints.push(where('active', '==', true));
+  
+  // Ordenamiento y límite
+  if (featured) {
+    // Para servicios destacados, limitar a 6 y ordenar por rating
+    constraints.push(orderBy('rating', 'desc'), limit(6));
+  } else if (search) {
+    // Para búsquedas, no aplicar límite aquí, lo haremos después del filtrado
+    constraints.push(orderBy('createdAt', 'desc'));
+  } else {
+    // Para listados normales, ordenar por fecha y paginar
+    constraints.push(orderBy('createdAt', 'desc'), limit(pageSize));
+  }
+  
+  // Crear la consulta final
+  const q = query(collection(db, 'services'), ...constraints);
+  
+    console.log(`🔥 Firebase Query: ${featured ? 'featured' : 'regular'} - Filtros:`, {
+      category: category || 'none',
+      barrio: barrio || 'none', 
+      userId: userId || 'none',
+      limit: featured ? 6 : pageSize
+    });
     
-    // Filtros del lado del servidor (solo los estrictamente necesarios)
-    if (userId) {
-      constraints.push(where('userId', '==', userId));
-    }
+    const snapshot = await getDocs(q);
     
-    // Otros filtros según sea necesario
-    if (category && category !== 'Todas' && category !== 'Todos') {
-      constraints.push(where('category', '==', category));
-    }
+    console.log(`✅ Firebase lecturas: ${snapshot.docs.length}`);
     
-    if (barrio) {
-      constraints.push(where('barrio', '==', barrio));
-    }
-    
-    // Solo servicios activos
-    constraints.push(where('active', '==', true));
-    
-    // Si es una consulta de destacados, agregar filtro
-    if (featured) {
-      constraints.push(where('featured', '==', true));
-    }
-    
-    // Construir la consulta
-    let q = query(collection(db, 'services'), ...constraints, orderBy('createdAt', 'desc'));
-    
-    // Aplicar paginación si es necesario
-    if (pageSize) {
-      q = query(q, limit(pageSize));
-    }
-    
-    // Ejecutar la consulta
-    const querySnapshot = await getDocs(q);
-    const services = querySnapshot.docs.map(doc => {
+    let services = snapshot.docs.map(doc => {
       const data = doc.data();
-      return {
+      const service = {
         id: doc.id,
         name: data.name || 'Servicio sin nombre',
         description: data.description || 'Sin descripción',
@@ -206,55 +147,33 @@ const servicesFetcher = async ([_, options]: [string, UseServicesOptions]): Prom
         location: data.location || 'Ubicación no especificada',
         contactUrl: data.contactUrl || '',
         detailsUrl: data.detailsUrl || '',
+        ...data,
         createdAt: data.createdAt?.toDate?.() || new Date(),
-        updatedAt: data.updatedAt?.toDate?.() || new Date(),
-        featured: data.featured || false,
-        active: data.active !== false // Default to true if not specified
+        updatedAt: data.updatedAt?.toDate?.() || new Date()
       } as Service;
+      
+      // Almacenar en caché individual
+      serviceByIdCache.set(doc.id, { data: service, timestamp: now });
+      return service;
     });
     
-    // Si hay búsqueda, aplicar filtros adicionales
-    const filteredServices = search && search.trim() !== ''
-      ? services.filter(service => 
-          (service.name?.toLowerCase().includes(search.toLowerCase()) ||
-          service.description?.toLowerCase().includes(search.toLowerCase()))
-        )
-      : services;
+    // Aplicar búsqueda en memoria si es necesario
+    if (search) {
+      const searchLower = search.toLowerCase();
+      services = services.filter(s => 
+        s.name.toLowerCase().includes(searchLower) || 
+        (s.description?.toLowerCase() || '').includes(searchLower) ||
+        (s.category?.toLowerCase() || '').includes(searchLower)
+      );
       
-    // Aplicar paginación
-    const paginatedServices = pageSize 
-      ? filteredServices.slice(0, pageSize)
-      : filteredServices;
-      
-    // Actualizar cachés
-    try {
-      // Actualizar caché de servicios completos si no hay búsqueda
-      if (filteredServices.length > 0 && (!search || search.trim() === '')) {
-        setAllServicesCache(filteredServices);
-        
-        // Actualizar caché de servicios destacados si corresponde
-        if (featured || filteredServices.some(s => s.featured)) {
-          const featuredServices = filteredServices.filter(s => s.featured);
-          if (featuredServices.length > 0) {
-            setFeaturedServicesCache(featuredServices);
-          }
-        }
+      // Aplicar límite de página después de filtrar
+      if (pageSize) {
+        services = services.slice(0, pageSize);
       }
-      
-      // Actualizar caché de servicios individuales
-      filteredServices.forEach(service => {
-        serviceByIdCache.set(service.id, { 
-          data: service, 
-          timestamp: now 
-        });
-      });
-      
-    } catch (cacheError) {
-      console.warn('⚠️ Error actualizando caché:', cacheError);
-      // No lanzar el error, solo registrar
     }
     
-    return paginatedServices;
+    return services;
+    
   } catch (error: any) {
     console.error('❌ Error al conectar con Firebase:', error.message);
     
@@ -263,9 +182,9 @@ const servicesFetcher = async ([_, options]: [string, UseServicesOptions]): Prom
     return filterFallbackServices({
       category,
       barrio,
-      search: options?.search,
+      search: options.search,
       featured,
-      limit: options?.pageSize
+      limit: pageSize
     });
   }
 };

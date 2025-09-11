@@ -3,6 +3,26 @@ import React, { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 
 // Componentes con carga perezosa y estados de carga personalizados
+const TodosLosServiciosWrapper = dynamic(
+  () => import('../app/todos-los-servicios/TodosLosServicios'),
+  { 
+    loading: () => (
+      <div className="py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="animate-pulse space-y-8">
+            <div className="h-12 bg-gray-200 rounded w-1/3 mb-8"></div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <div key={i} className="h-64 bg-gray-100 rounded-lg"></div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    ),
+    ssr: false 
+  }
+);
 const BusinessRegistration = dynamic(
   () => import('./BusinessRegistration'), 
   { 
@@ -20,18 +40,6 @@ const BusinessRegistration = dynamic(
 const WhatsAppButton = dynamic(
   () => import('./WhatsAppButton'), 
   { 
-    ssr: false 
-  }
-);
-
-const MapSection = dynamic(
-  () => import('./MapSection'),
-  { 
-    loading: () => (
-      <div className="h-96 bg-gray-100 flex items-center justify-center rounded-xl">
-        <p>Cargando mapa de cobertura...</p>
-      </div>
-    ),
     ssr: false 
   }
 );
@@ -115,13 +123,37 @@ const HomeClient = () => {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-0">
       {/* Servicios Destacados */}
       <FeaturedServices />
       
-     
+      {/* Todos los Servicios */}
+      <section id="todos-los-servicios" className="py-10 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl font-bold text-center text-gray-900 mb-8">
+          🔥 Explora Nuestros Servicios 🔥
+          </h2>
+          <TodosLosServiciosWrapper isHome={true} />
+        </div>
+      </section>
       
-    
+      {/* Sección de Cobertura - CTA */}
+      <section className="py-16 bg-white" id="cobertura">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-3xl font-bold text-gray-900 mb-6">
+            ¿Buscas cobertura en tu zona?
+          </h2>
+          <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
+            Descubre todas las zonas que cubrimos y verifica si estamos disponibles en tu ubicación.
+          </p>
+          <a
+            href="/cobertura"
+            className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-orange-500 hover:bg-orange-600 transition-colors"
+          >
+            Ver mapa de cobertura
+          </a>
+        </div>
+      </section>
       
       {/* Botón flotante de WhatsApp */}
       <WhatsAppButton phoneNumber="+51901426737" />

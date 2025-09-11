@@ -1,6 +1,9 @@
 import { GeistSans } from 'geist/font/sans';
 import { Suspense } from 'react';
 import "./globals.css";
+import "leaflet/dist/leaflet.css";
+import "@/styles/leaflet.css";
+import "@/styles/leaflet-fixes.css";
 import { Providers } from '@/app/providers';
 import { JsonLd } from '@/components/seo/JsonLd';
 import { Skeleton } from '@/components/ui/Skeleton';

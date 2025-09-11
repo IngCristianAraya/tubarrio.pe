@@ -1,10 +1,57 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { collection, getDocs, getDoc, doc, query, orderBy, where, limit, startAfter, Firestore } from 'firebase/firestore';
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
+import { 
+  collection, 
+  getDocs, 
+  getDoc, 
+  doc, 
+  query, 
+  orderBy, 
+  where, 
+  limit, 
+  startAfter, 
+  Firestore,
+  DocumentData,
+  QueryDocumentSnapshot
+} from 'firebase/firestore';
 import { getFirestore } from 'firebase/firestore';
 import { app } from '@/lib/firebase/config';
 import { toast } from 'react-hot-toast';
+
+// Simple debounce implementation for search
+function debounce<T extends (...args: any[]) => void>(
+  func: T,
+  wait: number,
+  immediate = false
+): T & { cancel: () => void } {
+  let timeout: NodeJS.Timeout | null = null;
+  
+  const debounced = function(this: any, ...args: Parameters<T>) {
+    const context = this;
+    
+    const later = function() {
+      timeout = null;
+      if (!immediate) func.apply(context, args);
+    };
+    
+    const callNow = immediate && !timeout;
+    
+    if (timeout) clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+    
+    if (callNow) func.apply(context, args);
+  } as T & { cancel: () => void };
+  
+  debounced.cancel = function() {
+    if (timeout) {
+      clearTimeout(timeout);
+      timeout = null;
+    }
+  };
+  
+  return debounced;
+}
 
 // Cache configuration
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
@@ -28,6 +75,7 @@ export interface Service {
   social?: string;
   whatsapp?: string;
   active?: boolean;
+  featured?: boolean;
 }
 
 interface ServicesContextType {
@@ -50,45 +98,102 @@ interface ServicesContextType {
 
 const ServicesContext = createContext<ServicesContextType | undefined>(undefined);
 
-// Cache implementation
-class ServiceCache<T = any> {
-  private cache: Map<string, { data: T; timestamp: number }> = new Map();
+// Enhanced Cache implementation with TTL and size limits
+class ServiceCache {
+  private cache = new Map<string, { data: any; timestamp: number; ttl: number }>();
+  private pendingRequests = new Map<string, Promise<any>>();
 
-  get(key: string): T | null {
+  // Get cached item if valid
+  get<T>(key: string, ttl: number = CACHE_DURATION): T | null {
     const item = this.cache.get(key);
     if (!item) return null;
     
     // Check if cache is still valid
-    if (Date.now() - item.timestamp > CACHE_DURATION) {
+    const isExpired = Date.now() - item.timestamp > (item.ttl || ttl);
+    if (isExpired) {
       this.cache.delete(key);
       return null;
     }
     
-    return item.data;
+    // Cast to T since we know the type when getting
+    return item.data as T;
   }
 
-  set(key: string, data: T): void {
-    // If cache is too big, remove the oldest items
+  // Set item in cache with optional TTL override
+  set<T>(key: string, data: T, ttl: number = CACHE_DURATION): void {
+    // Clean up old cache entries if we're reaching the limit
     if (this.cache.size >= MAX_CACHE_SIZE) {
-      const oldestKey = this.cache.keys().next().value;
-      if (oldestKey) {
-        this.cache.delete(oldestKey);
-      }
+      const keysToDelete = Array.from(this.cache.entries())
+        .sort((a, b) => a[1].timestamp - b[1].timestamp)
+        .slice(0, Math.floor(MAX_CACHE_SIZE / 4))
+        .map(([key]) => key);
+      
+      keysToDelete.forEach(key => this.cache.delete(key));
     }
     
     this.cache.set(key, {
       data,
-      timestamp: Date.now()
+      timestamp: Date.now(),
+      ttl
     });
+  }
+
+  // Get or create a value, preventing duplicate requests
+  async getOrCreate<T>(
+    key: string, 
+    creator: () => Promise<T>,
+    ttl: number = CACHE_DURATION
+  ): Promise<T> {
+    // Return cached value if available
+    const cached = this.get<T>(key, ttl);
+    if (cached !== null) {
+      return cached;
+    }
+    
+    // Return pending promise if request is in progress
+    if (this.pendingRequests.has(key)) {
+      return this.pendingRequests.get(key) as Promise<T>;
+    }
+    
+    // Create and store new promise
+    const promise = (async (): Promise<T> => {
+      try {
+        const data = await creator();
+        this.set(key, data, ttl);
+        return data;
+      } finally {
+        this.pendingRequests.delete(key);
+      }
+    })();
+    
+    this.pendingRequests.set(key, promise);
+    return promise;
   }
 
   clear(): void {
     this.cache.clear();
+    this.pendingRequests.clear();
+  }
+  
+  // Invalidate specific cache entries by key pattern
+  invalidate(pattern: string | RegExp): void {
+    const keysToDelete: string[] = [];
+    
+    // Convert iterator to array using Array.from
+    const keys = Array.from(this.cache.keys());
+    
+    for (const key of keys) {
+      if (typeof pattern === 'string' ? key === pattern : pattern.test(key)) {
+        keysToDelete.push(key);
+      }
+    }
+    
+    keysToDelete.forEach(key => this.cache.delete(key));
   }
 }
 
-// Initialize cache with proper typing
-const cache = new ServiceCache<Service | Service[]>();
+// Initialize cache
+const cache = new ServiceCache();
 
 export const ServicesProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [services, setServices] = useState<Service[]>([]);
@@ -117,28 +222,38 @@ export const ServicesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     setCategories(uniqueCategories);
   }, []);
 
-  // Search services
-  const searchServices = useCallback((query: string, category?: string) => {
-    setIsSearching(true);
-    
-    let results = [...services];
-    
-    if (query) {
-      const searchLower = query.toLowerCase();
-      results = results.filter(service => 
-        service.name.toLowerCase().includes(searchLower) ||
-        service.description?.toLowerCase().includes(searchLower) ||
-        service.tags?.some(tag => tag.toLowerCase().includes(searchLower))
-      );
-    }
-    
-    if (category) {
-      results = results.filter(service => service.category === category);
-    }
-    
-    setFilteredServices(results);
-    setIsSearching(false);
-  }, [services]);
+  // Debounced search implementation
+  const searchServices = useCallback(
+    debounce((query: string, category?: string) => {
+      setIsSearching(true);
+      
+      let results = [...services];
+      
+      if (query) {
+        const searchLower = query.toLowerCase();
+        results = results.filter(service => 
+          service.name.toLowerCase().includes(searchLower) ||
+          service.description?.toLowerCase().includes(searchLower) ||
+          service.tags?.some(tag => tag.toLowerCase().includes(searchLower))
+        );
+      }
+      
+      if (category) {
+        results = results.filter(service => service.category === category);
+      }
+      
+      setFilteredServices(results);
+      setIsSearching(false);
+    }, 300), // 300ms debounce
+    [services]
+  );
+  
+  // Clean up debounce on unmount
+  useEffect(() => {
+    return () => {
+      searchServices.cancel();
+    };
+  }, [searchServices]);
 
   // Reset search
   const resetSearch = useCallback(() => {
@@ -151,55 +266,55 @@ export const ServicesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const loadFeaturedServices = useCallback(async (servicesData?: Service[]) => {
     try {
       const cacheKey = 'featured-services';
-      const cached = cache.get(cacheKey) as Service[] | null;
       
-      if (cached) {
-        setFeaturedServices(cached);
-        return;
-      }
-
-      let featured: Service[] = [];
+      // Use getOrCreate to handle caching and deduplication
+      const featured = await cache.getOrCreate<Service[]>(
+        cacheKey,
+        async (): Promise<Service[]> => {
+          if (servicesData) {
+            // If we already have the services data, filter for featured
+            return servicesData
+              .filter(service => service.rating >= 4)
+              .slice(0, 6);
+          }
+          
+          // Otherwise, query for featured services
+          const db = getFirestoreInstance();
+          const servicesRef = collection(db, 'services');
+          const q = query(
+            servicesRef, 
+            where('active', '==', true),
+            where('rating', '>=', 4),
+            orderBy('rating', 'desc'),
+            limit(6)
+          );
+          
+          const querySnapshot = await getDocs(q);
+          return querySnapshot.docs.map(doc => {
+            const data = doc.data();
+            return {
+              id: doc.id,
+              name: data.name || '',
+              category: data.category || '',
+              image: data.image || '',
+              images: data.images || [],
+              rating: data.rating || 0,
+              location: data.location || '',
+              description: data.description || '',
+              contactUrl: data.contactUrl || '',
+              detailsUrl: data.detailsUrl || '',
+              horario: data.horario || '',
+              tags: data.tags || [],
+              hours: data.hours || '',
+              social: data.social || '',
+              whatsapp: data.whatsapp || '',
+              active: data.active !== undefined ? data.active : true
+            };
+          });
+        },
+        10 * 60 * 1000 // 10 minute cache for featured services
+      );
       
-      if (servicesData) {
-        // If we already have the services data, filter for featured
-        featured = servicesData.filter(service => service.rating >= 4).slice(0, 6);
-      } else {
-        // Otherwise, query for featured services
-        const db = getFirestoreInstance();
-        const servicesRef = collection(db, 'services');
-        const q = query(
-          servicesRef, 
-          where('active', '==', true),
-          where('rating', '>=', 4),
-          orderBy('rating', 'desc'),
-          limit(6)
-        );
-        
-        const querySnapshot = await getDocs(q);
-        featured = querySnapshot.docs.map(doc => {
-          const data = doc.data();
-          return {
-            id: doc.id,
-            name: data.name || '',
-            category: data.category || '',
-            image: data.image || '',
-            images: data.images || [],
-            rating: data.rating || 0,
-            location: data.location || '',
-            description: data.description || '',
-            contactUrl: data.contactUrl || '',
-            detailsUrl: data.detailsUrl || '',
-            horario: data.horario || '',
-            tags: data.tags || [],
-            hours: data.hours || '',
-            social: data.social || '',
-            whatsapp: data.whatsapp || '',
-            active: data.active !== undefined ? data.active : true
-          };
-        });
-      }
-
-      cache.set(cacheKey, featured);
       setFeaturedServices(featured);
     } catch (err) {
       console.error('Error loading featured services:', err);
@@ -207,118 +322,118 @@ export const ServicesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
   }, [getFirestoreInstance]);
 
-  // Get service by ID
+  // Get service by ID with optimized caching and request deduplication
   const getServiceById = useCallback(async (id: string): Promise<Service | null> => {
     if (!id) return null;
     
     const cacheKey = `service-${id}`;
-    const cached = cache.get(cacheKey) as Service | null;
     
-    if (cached) {
-      return cached;
-    }
-
     try {
-      const db = getFirestoreInstance();
-      const docRef = doc(db, 'services', id);
-      const docSnap = await getDoc(docRef);
+      const result = await cache.getOrCreate<Service>(
+        cacheKey,
+        async (): Promise<Service> => {
+          const db = getFirestoreInstance();
+          const docRef = doc(db, 'services', id);
+          const docSnap = await getDoc(docRef);
+          
+          if (docSnap.exists()) {
+            const data = docSnap.data();
+            return {
+              id: docSnap.id,
+              name: data.name || '',
+              category: data.category || '',
+              image: data.image || '',
+              images: data.images || [],
+              rating: data.rating || 0,
+              location: data.location || '',
+              description: data.description || '',
+              contactUrl: data.contactUrl || '',
+              detailsUrl: data.detailsUrl || '',
+              horario: data.horario || '',
+              tags: data.tags || [],
+              hours: data.hours || '',
+              social: data.social || '',
+              whatsapp: data.whatsapp || '',
+              active: data.active !== undefined ? data.active : true
+            };
+          }
+          throw new Error('Service not found');
+        },
+        10 * 60 * 1000 // 10 minute cache for individual services
+      );
       
-      if (docSnap.exists()) {
-        const data = docSnap.data();
-        const service: Service = {
-          id: docSnap.id,
-          name: data.name || '',
-          category: data.category || '',
-          image: data.image || '',
-          images: data.images || [],
-          rating: data.rating || 0,
-          location: data.location || '',
-          description: data.description || '',
-          contactUrl: data.contactUrl || '',
-          detailsUrl: data.detailsUrl || '',
-          horario: data.horario || '',
-          tags: data.tags || [],
-          hours: data.hours || '',
-          social: data.social || '',
-          whatsapp: data.whatsapp || '',
-          active: data.active !== undefined ? data.active : true
-        };
-        cache.set(cacheKey, service);
-        return service;
-      }
-      
-      return null;
+      return result;
     } catch (err) {
       console.error('Error getting service:', err);
       return null;
     }
   }, [getFirestoreInstance]);
 
-  // Load all services
+  // Load all services with optimized caching and request deduplication
   const loadServices = useCallback(async (forceRefresh = false) => {
     try {
       setLoading(true);
       setError(null);
       
       const cacheKey = 'all-services';
-      if (!forceRefresh) {
-        const cached = cache.get(cacheKey) as Service[] | null;
-        if (cached) {
-          setServices(cached);
-          setFilteredServices([...cached]);
-          updateCategories(cached);
-          // Load featured services from cache if available
-          const featuredCache = cache.get('featured-services') as Service[] | null;
-          if (!featuredCache) {
-            loadFeaturedServices(cached);
-          }
-          return;
-        }
-      }
-
-      const db = getFirestoreInstance();
-      const servicesRef = collection(db, 'services');
       
-      // Usar un índice existente que incluya 'active' y 'name'
-      const q = query(
-        servicesRef, 
-        where('active', '==', true),
-        orderBy('name')
+      // Use getOrCreate to handle concurrent requests and caching
+      const servicesData = await cache.getOrCreate<Service[]>(
+        cacheKey,
+        async (): Promise<Service[]> => {
+          if (!forceRefresh) {
+            const cached = cache.get(cacheKey) as Service[] | null;
+            if (cached) return cached;
+          }
+          
+          const db = getFirestoreInstance();
+          const servicesRef = collection(db, 'services');
+          
+          // Use an index that includes 'active' and 'name'
+          const q = query(
+            servicesRef, 
+            where('active', '==', true),
+            orderBy('name')
+          );
+          
+          console.log(' Executing services query...');
+          const querySnapshot = await getDocs(q);
+          console.log(` Found ${querySnapshot.docs.length} services`);
+          
+          return querySnapshot.docs.map(doc => {
+            const data = doc.data();
+            return {
+              id: doc.id,
+              name: data.name || '',
+              category: data.category || '',
+              image: data.image || '',
+              images: data.images || [],
+              rating: data.rating || 0,
+              location: data.location || '',
+              description: data.description || '',
+              contactUrl: data.contactUrl || '',
+              detailsUrl: data.detailsUrl || '',
+              horario: data.horario || '',
+              tags: data.tags || [],
+              hours: data.hours || '',
+              social: data.social || '',
+              whatsapp: data.whatsapp || '',
+              active: data.active !== undefined ? data.active : true
+            };
+          });
+        },
+        5 * 60 * 1000 // 5 minute cache for services list
       );
       
-      console.log('🔍 Ejecutando consulta de servicios...');
-      const querySnapshot = await getDocs(q);
-      console.log(`✅ Se encontraron ${querySnapshot.docs.length} servicios`);
-      
-      const servicesData = querySnapshot.docs.map(doc => {
-        const data = doc.data();
-        return {
-          id: doc.id,
-          name: data.name || '',
-          category: data.category || '',
-          image: data.image || '',
-          images: data.images || [],
-          rating: data.rating || 0,
-          location: data.location || '',
-          description: data.description || '',
-          contactUrl: data.contactUrl || '',
-          detailsUrl: data.detailsUrl || '',
-          horario: data.horario || '',
-          tags: data.tags || [],
-          hours: data.hours || '',
-          social: data.social || '',
-          whatsapp: data.whatsapp || '',
-          active: data.active !== undefined ? data.active : true
-        };
-      });
-
-      cache.set(cacheKey, servicesData);
       setServices(servicesData);
       setFilteredServices([...servicesData]);
       updateCategories(servicesData);
       
-      // Load featured services with the new data
-      loadFeaturedServices(servicesData);
+      // Load featured services if not already loaded
+      const featuredCache = cache.get('featured-services') as Service[] | null;
+      if (!featuredCache) {
+        loadFeaturedServices(servicesData);
+      }
     } catch (err) {
       console.error('Error loading services:', err);
       setError('Error al cargar los servicios. Por favor, intente de nuevo.');
