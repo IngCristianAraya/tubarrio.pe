@@ -149,34 +149,22 @@ export default function ServicioDetallePage() {
       {/* Header */}
       <Header />
       
-      {/* Main Content */}
-      <main className="flex-1 w-full py-2 px-1 sm:py-10 sm:px-4">
-        <div className="max-w-7xl mx-auto">
-          {/* Main Content Container - Optimizado para móvil */}
-          <div className="bg-white sm:rounded-3xl sm:shadow-xl overflow-hidden">
-            {/* Service Header Component (now includes all service details and actions) */}
-            <div className="p-2 sm:p-6 md:p-8">
-              <ServiceHeader service={service} />
-            </div>
-            
-            {/* Divider */}
-            <div className="border-t border-gray-200" />
-            
-            {/* Recommended Services Section */}
-            <div className="p-3 sm:p-6 md:p-8">
-              <RecommendedServices 
-                currentServiceId={service.id}
-                category={service.category}
-              />
-            </div>
-          </div>
+      {/* Contenido principal */}
+      <div className="flex-1 w-full">
+        {/* Contenido del servicio */}
+        <ServiceHeader service={service} />
+        
+        {/* Divider */}
+        <div className="border-t border-gray-200 max-w-7xl mx-auto" />
+        
+        {/* Sección de servicios recomendados */}
+        <div className="max-w-7xl mx-auto px-3 py-4 sm:px-6 sm:py-8 md:px-8">
+          <RecommendedServices 
+            currentServiceId={service.id}
+            category={service.category || ''}
+          />
         </div>
-
-      </main>
-      
-      {/* Footer */}
-      <Footer />
+      </div>
     </div>
   );
 }
-

@@ -42,11 +42,80 @@ const nextConfig = {
     ];
   },
   images: {
-    domains: ['unpkg.com', 'tile.openstreetmap.org', '*.tile.openstreetmap.org'],
     remotePatterns: [
       {
         protocol: 'https',
         hostname: 'firebasestorage.googleapis.com',
+        port: '',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.googleapis.com',
+        port: '',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.google.com',
+        port: '',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.gstatic.com',
+        port: '',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.pexels.com',
+        port: '',
+      },
+      {
+        protocol: 'https',
+        hostname: 'images.pexels.com',
+        port: '',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.unsplash.com',
+        port: '',
+      },
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+        port: '',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.pixabay.com',
+        port: '',
+      },
+      {
+        protocol: 'https',
+        hostname: 'cdn.pixabay.com',
+        port: '',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.cloudinary.com',
+        port: '',
+      },
+      {
+        protocol: 'https',
+        hostname: 'res.cloudinary.com',
+        port: '',
+      },
+      {
+        protocol: 'https',
+        hostname: 'tile.openstreetmap.org',
+        port: '',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.tile.openstreetmap.org',
+        port: '',
+      },
+      {
+        protocol: 'https',
+        hostname: 'unpkg.com',
         port: '',
         pathname: '/**',
       },
@@ -106,7 +175,30 @@ const nextConfig = {
     dangerouslyAllowSVG: true,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
-  webpack: (config, { isServer, dev }) => {
+  webpack: (config, { isServer, dev, webpack }) => {
+    // Resolver el problema con undici
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      undici: require.resolve('undici')
+    };
+
+    // Configuración para manejar módulos nativos
+    config.experiments = {
+      ...config.experiments,
+      layers: true,
+    };
+
+    // Excluir la versión problemática de undici
+    config.module.rules.push({
+      test: /node_modules[\\/]undici[\\/]lib[\\/]web[\\/]fetch[\\/]util\.js$/,
+      loader: 'string-replace-loader',
+      options: {
+        search: '!(#target in this)',
+        replace: '!(this && this[\'#target\'] !== undefined)',
+        flags: 'g'
+      }
+    });
+
     // Configuración de alias para rutas absolutas
     config.resolve.alias = {
       ...config.resolve.alias,
@@ -115,6 +207,58 @@ const nextConfig = {
       '@/components': require('path').resolve(__dirname, 'src/components'),
       '@/hooks': require('path').resolve(__dirname, 'src/hooks'),
       '@/types': require('path').resolve(__dirname, 'src/types'),
+    };
+
+    // Deshabilitar caché de chunks
+    config.cache = false;
+    
+    // Configuración para manejar mejor los errores de chunks
+    config.optimization.splitChunks = {
+      chunks: 'all',
+      maxInitialRequests: 25,
+      maxAsyncRequests: 25,
+      minSize: 20000,
+      cacheGroups: {
+        default: false,
+        vendors: false,
+        framework: {
+          chunks: 'all',
+          name: 'framework',
+          test: /[\\/]node_modules[\\/](react|react-dom|scheduler|prop-types|use-subscription)[\\/]/,
+          priority: 40,
+          enforce: true,
+        },
+        lib: {
+          test(module) {
+            return module.size() > 160000;
+          },
+          name(module) {
+            const packageName = module.context.match(
+              /[\\/]node_modules[\\/](.*?)([\\/]|$)/
+            )?.[1];
+            return packageName ? `lib-${packageName.replace('@', '')}` : null;
+          },
+          priority: 30,
+          minChunks: 1,
+          reuseExistingChunk: true,
+        },
+        commons: {
+          name: 'commons',
+          minChunks: 3,
+          priority: 20,
+        },
+      },
+    };
+    
+    // Asegurar que los chunks tén nombres deterministas
+    config.optimization.chunkIds = 'named';
+    
+    // Mejorar el manejo de errores
+    config.stats = 'minimal';
+    config.performance = {
+      hints: false,
+      maxEntrypointSize: 512000,
+      maxAssetSize: 512000,
     };
 
     // Fixes npm packages that depend on `fs` module

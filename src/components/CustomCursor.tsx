@@ -3,22 +3,30 @@
 import React, { useEffect, useState, useRef } from 'react'
 
 const CustomCursor: React.FC = () => {
-  const cursorRingRef = useRef<HTMLDivElement>(null)
-  const cursorDotRef = useRef<HTMLDivElement>(null)
-  const cursorInteractiveRef = useRef<HTMLDivElement>(null)
+  // Verificar si estamos en el navegador
+  const isBrowser = typeof window !== 'undefined';
+  
+  // Si no estamos en el navegador, no renderizar nada
+  if (!isBrowser) {
+    return null;
+  }
 
-  const [isVisible, setIsVisible] = useState(false)
-  const [isClicking, setIsClicking] = useState(false)
-  const [isHovering, setIsHovering] = useState(false)
+  const cursorRingRef = useRef<HTMLDivElement>(null);
+  const cursorDotRef = useRef<HTMLDivElement>(null);
+  const cursorInteractiveRef = useRef<HTMLDivElement>(null);
 
-  const mousePosition = useRef({ x: 0, y: 0 })
-  const cursorPosition = useRef({ x: 0, y: 0 })
-  const dotPosition = useRef({ x: 0, y: 0 })
+  const [isVisible, setIsVisible] = useState(false);
+  const [isClicking, setIsClicking] = useState(false);
+  const [isHovering, setIsHovering] = useState(false);
 
-  const cursorSpeed = 0.2
+  const mousePosition = useRef({ x: 0, y: 0 });
+  const cursorPosition = useRef({ x: 0, y: 0 });
+  const dotPosition = useRef({ x: 0, y: 0 });
+
+  const cursorSpeed = 0.2;
 
   useEffect(() => {
-    if (typeof window === 'undefined') return
+    if (!isBrowser) return;
 
     document.body.style.cursor = 'none'
 

@@ -9,6 +9,7 @@ import useSound from '../hooks/useSound';
 const Header = () => {
   const { play: playFolderSound } = useSound('folder', { volume: 0.4 });
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const menuRef = useRef<HTMLDivElement>(null);
 
   // Cerrar menú al hacer clic fuera
@@ -22,6 +23,14 @@ const Header = () => {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  // Función de búsqueda
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      window.location.href = `/todos-los-servicios?busqueda=${encodeURIComponent(searchQuery.trim())}`;
+    }
+  };
 
   const NavItem = ({ href, children }: { href: string; children: React.ReactNode }) => {
     // Determinar si el enlace es interno o externo (ancla)
@@ -88,13 +97,44 @@ const Header = () => {
   };
 
   return (
-    <header className="bg-white/95 backdrop-blur-lg shadow-sm fixed top-0 left-0 w-full z-50 border-b border-gray-200" ref={menuRef}>
+    <header className="bg-white shadow-sm sticky top-0 z-40 w-full">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 sm:h-18">
-          {/* Botón menú móvil */}
-          <div className="md:hidden">
-            <button 
-              className="p-3 rounded-lg !bg-transparent !text-gray-700 hover:!text-orange-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-orange-400 active:bg-gray-200 transition-all duration-150 min-h-[44px] min-w-[44px] flex items-center justify-center"
+        <div className="flex justify-between items-center h-16">
+          {/* Logo - visible en todas las pantallas pero con diferentes estilos */}
+          <div className="flex-shrink-0">
+            <Link href="/" className="flex items-center" aria-label="Ir a inicio">
+              <div className="relative h-12 w-40 md:h-14 md:w-48 lg:h-16 lg:w-56">
+                <Image
+                  src="/images/tubarriope_logo_penegro2.webp"
+                  alt="Logo TuBarrio.pe"
+                  fill
+                  className="object-contain"
+                  sizes="(max-width: 767px) 160px, 224px"
+                  priority
+                />
+              </div>
+            </Link>
+          </div>
+
+          {/* Barra de búsqueda para móvil */}
+          <div className="md:hidden flex-1 mx-2 -ml-4">
+            <form onSubmit={handleSearch} className="relative">
+              <input
+                type="text"
+                placeholder="Buscar"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-3 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm"
+              />
+              <Search className="absolute left-3 top-2.5 h-4 w-4 text-orange-500" />
+            </form>
+          </div>
+
+          {/* Botón de menú móvil */}
+          <div className="md:hidden flex-shrink-0 flex items-center">
+            <button
+              type="button"
+              className="inline-flex items-center justify-center p-2 rounded-full bg-white text-orange-500 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-orange-500"
               onClick={() => {
                 playFolderSound();
                 setIsMenuOpen(!isMenuOpen);
@@ -102,34 +142,16 @@ const Header = () => {
               aria-label={isMenuOpen ? "Cerrar menú" : "Abrir menú"}
               aria-expanded={isMenuOpen}
             >
-              {isMenuOpen ? <X className="w-6 h-6 !text-gray-700 hover:!text-orange-500" /> : <Menu className="w-6 h-6 !text-gray-700 hover:!text-orange-500" />}
+              {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
           </div>
 
-          {/* Logo centrado en móvil, a la izquierda en desktop */}
-          <div className="flex-shrink-0 flex items-center md:mr-auto absolute left-1/2 transform -translate-x-1/2 md:relative md:left-auto md:transform-none">
-            <Link href="/" className="flex items-center select-none" aria-label="Ir a inicio">
-              <div className="relative h-[60px] md:h-[50px] lg:h-[60px] w-auto aspect-[4/1] min-w-[140px] md:min-w-[100px] lg:min-w-[120px]">
-                <Image
-                  src="/images/tubarriope_logo_penegro2.webp"
-                  alt="Logo TuBarrio.pe"
-                  fill
-                  sizes="(max-width: 768px) 140px, 200px"
-                  className="object-contain"
-                  priority
-                />
-              </div>
-            </Link>
-          </div>
-
-          {/* Espaciador invisible en móvil para balancear el centrado */}
-          <div className="md:hidden w-[44px]"></div>
 
           {/* Navegación desktop */}
           <nav className="hidden md:flex gap-3 lg:gap-6 items-center mx-4">
             <NavItem href="/">Inicio</NavItem>
-            <NavItem href="/#servicios">Destacados</NavItem>
-            <NavItem href="/todos-los-servicios">Categorías</NavItem>
+            <NavItem href="/#inmuebles">Inmuebles</NavItem>
+            <NavItem href="/todos-los-servicios">Todos los servicios</NavItem>
             <NavItem href="/cobertura">Cobertura</NavItem>
           </nav>
 
@@ -151,10 +173,10 @@ const Header = () => {
                 <NavItem href="/">Inicio</NavItem>
               </div>
               <div className="py-3 px-4 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors duration-150 min-h-[48px] flex items-center">
-                <NavItem href="/#servicios">Destacados</NavItem>
+                <NavItem href="/#inmuebles">Inmuebles</NavItem>
               </div>
               <div className="py-3 px-4 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors duration-150 min-h-[48px] flex items-center">
-                <NavItem href="/todos-los-servicios">Categorías</NavItem>
+                <NavItem href="/todos-los-servicios">Todos los servicios</NavItem>
               </div>
               <div className="py-3 px-4 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors duration-150 min-h-[48px] flex items-center">
                 <NavItem href="/cobertura">Cobertura</NavItem>

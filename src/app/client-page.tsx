@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { sampleCategories, sampleServices } from '../mocks/services';
+import { sampleCategories, sampleServices } from '@/mocks';
 import { Category } from '@/types/service';
 
 // Cargar componentes dinámicamente

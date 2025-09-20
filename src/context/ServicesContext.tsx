@@ -15,9 +15,13 @@ import {
   DocumentData,
   QueryDocumentSnapshot
 } from 'firebase/firestore';
-import { getFirestore } from 'firebase/firestore';
-import { app } from '@/lib/firebase/config';
+import { db } from '@/lib/firebase/config';
 import { toast } from 'react-hot-toast';
+
+// Get Firestore instance with error handling
+function getFirestoreInstance(): Firestore {
+  return db.instance;
+}
 
 // Simple debounce implementation for search
 function debounce<T extends (...args: any[]) => void>(
@@ -57,25 +61,12 @@ function debounce<T extends (...args: any[]) => void>(
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 const MAX_CACHE_SIZE = 50; // Max number of services to cache
 
-// Types
-export interface Service {
+// Import the Service type from our types
+export interface Service extends Omit<import('@/types/service').Service, 'id'> {
   id: string;
-  name: string;
-  category: string;
-  image: string;
-  images?: string[];
-  rating: number;
-  location: string;
-  description: string;
-  contactUrl?: string;
-  detailsUrl?: string;
-  horario?: string;
-  tags?: string[];
-  hours?: string;
-  social?: string;
-  whatsapp?: string;
   active?: boolean;
   featured?: boolean;
+  // Add any additional fields specific to the context
 }
 
 interface ServicesContextType {
@@ -177,18 +168,12 @@ class ServiceCache {
   
   // Invalidate specific cache entries by key pattern
   invalidate(pattern: string | RegExp): void {
-    const keysToDelete: string[] = [];
-    
-    // Convert iterator to array using Array.from
     const keys = Array.from(this.cache.keys());
-    
     for (const key of keys) {
       if (typeof pattern === 'string' ? key === pattern : pattern.test(key)) {
-        keysToDelete.push(key);
+        this.cache.delete(key);
       }
     }
-    
-    keysToDelete.forEach(key => this.cache.delete(key));
   }
 }
 
@@ -206,13 +191,8 @@ export const ServicesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [categories, setCategories] = useState<string[]>([]);
 
-  // Get Firestore instance
-  const getFirestoreInstance = useCallback((): Firestore => {
-    if (!app) {
-      throw new Error('Firebase app is not initialized');
-    }
-    return getFirestore(app);
-  }, []);
+  // Use the Firestore instance
+  const firestore = getFirestoreInstance();
 
   // Update categories from services
   const updateCategories = useCallback((servicesData: Service[]) => {
@@ -234,7 +214,7 @@ export const ServicesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         results = results.filter(service => 
           service.name.toLowerCase().includes(searchLower) ||
           service.description?.toLowerCase().includes(searchLower) ||
-          service.tags?.some(tag => tag.toLowerCase().includes(searchLower))
+          service.tags?.some((tag: string) => tag.toLowerCase().includes(searchLower))
         );
       }
       
@@ -261,6 +241,11 @@ export const ServicesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     setSelectedCategory('');
     setFilteredServices(services);
   }, [services]);
+
+  const handleTagClick = useCallback((tag: string) => {
+    setSearchTerm(tag);
+    setSelectedCategory('');
+  }, []);
 
   // Load featured services
   const loadFeaturedServices = useCallback(async (servicesData?: Service[]) => {

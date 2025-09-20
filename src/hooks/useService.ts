@@ -1,9 +1,10 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import useSWR from 'swr';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase/config';
 import { Service } from '@/types/service';
 import { getFallbackServiceById } from '../lib/firebase/fallback';
+import { logger } from '@/lib/utils/logger';
 
 interface UseServiceResult {
   service: Service | null;
@@ -17,7 +18,7 @@ export const useService = (serviceId?: string): UseServiceResult => {
   
   const fetcher = useCallback(async ([_, id]: [string, string]): Promise<Service | null> => {
     if (!id) {
-      console.error('❌ ID de servicio no proporcionado');
+      logger.error('ID de servicio no proporcionado');
       throw { code: 'missing-id', message: 'ID de servicio no proporcionado' };
     }
     
@@ -26,16 +27,21 @@ export const useService = (serviceId?: string): UseServiceResult => {
     
     // Si estamos offline o Firebase no está disponible, usar datos de respaldo de inmediato
     if (isOffline || !db) {
-      console.warn(isOffline ? '📴 Modo offline' : '🔌 Firebase no disponible', 
-                  `buscando servicio ${id} en datos de respaldo`);
+      const message = isOffline ? 'Modo offline' : 'Firebase no disponible';
+      logger.warn(`${message}, buscando servicio ${id} en datos de respaldo`);
+      
       const fallbackService = getFallbackServiceById(id);
       if (!fallbackService) {
-        throw { 
+        const error = { 
           code: 'not-found', 
           message: 'Servicio no encontrado en datos de respaldo', 
           isOffline 
         };
+        logger.error('Error al buscar servicio en respaldo:', error);
+        throw error;
       }
+      
+      logger.debug(`Usando datos de respaldo para el servicio ${id}`);
       setIsFallbackData(true);
       return fallbackService;
     }
@@ -43,34 +49,83 @@ export const useService = (serviceId?: string): UseServiceResult => {
     try {
       console.log(`🔍 Buscando servicio con ID: ${id}`);
       
-      const docRef = doc(db, 'services', id);
-      const docSnap = await getDoc(docRef);
+      // Asegurarse de que db esté inicializado
+      let firestoreDb;
+      try {
+        firestoreDb = db.instance;
+        logger.debug('Firestore está disponible');
+      } catch (error) {
+        logger.error('Error al obtener la instancia de Firestore:', error);
+        throw { 
+          code: 'db-not-initialized', 
+          message: 'No se pudo inicializar Firestore',
+          originalError: error 
+        };
+      }
+      
+      // Usar la colección 'services' (en inglés) como principal
+      const docRef = doc(firestoreDb, 'services', id);
+      logger.debug(`Buscando servicio en colección 'services': ${id}`);
+      
+      logger.debug('Obteniendo documento de Firestore...');
+      let docSnap = await getDoc(docRef);
+      logger.debug('Documento obtenido:', { 
+        exists: docSnap.exists(), 
+        id: docSnap.id 
+      });
       
       if (!docSnap.exists()) {
-        console.warn(`⚠️ Servicio ${id} no encontrado en Firestore, buscando en respaldo`);
-        const fallbackService = getFallbackServiceById(id);
-        if (!fallbackService) {
-          throw { code: 'not-found', message: 'Servicio no encontrado' };
+        logger.warn(`Servicio ${id} no encontrado en 'services', intentando con 'servicios'...`);
+        
+        // Intentar con la colección 'servicios' (español) si no se encuentra en 'services'
+        const spanishDocRef = doc(firestoreDb, 'servicios', id);
+        logger.debug(`Buscando servicio en colección 'servicios': ${id}`);
+        const spanishDocSnap = await getDoc(spanishDocRef);
+        
+        if (!spanishDocSnap.exists()) {
+          logger.warn(`Servicio ${id} no encontrado en Firestore, buscando en respaldo local...`);
+          const fallbackService = getFallbackServiceById(id);
+          
+          if (!fallbackService) {
+            const error = { 
+              code: 'not-found', 
+              message: `Servicio ${id} no encontrado` 
+            };
+            logger.error('Error al buscar servicio:', error);
+            throw error;
+          }
+          
+          logger.debug(`Usando datos de respaldo local para el servicio ${id}`);
+          setIsFallbackData(true);
+          return fallbackService;
         }
-        setIsFallbackData(true);
-        return fallbackService;
+        
+        // Usar el documento de la colección 'servicios' si se encuentra allí
+        logger.debug(`Servicio ${id} encontrado en colección 'servicios'`);
+        docSnap = spanishDocSnap;
       }
       
       const data = docSnap.data();
       if (!data) {
-        console.error(`❌ Datos del servicio ${id} están vacíos`);
-        throw { code: 'no-data', message: 'Datos del servicio no disponibles' };
+        const error = { 
+          code: 'no-data', 
+          message: 'Datos del servicio no disponibles' 
+        };
+        logger.error(`Datos del servicio ${id} están vacíos`, error);
+        throw error;
       }
       
-      console.log(`✅ Servicio cargado: ${data.name || 'Sin nombre'} (ID: ${id})`);
+      logger.debug(`Servicio cargado: ${data.name || 'Sin nombre'} (ID: ${id})`);
       setIsFallbackData(false);
       
-      return {
+      const serviceData: Service = {
         id: docSnap.id,
         name: data.name || 'Servicio sin nombre',
         description: data.description || 'Sin descripción disponible',
         category: data.category || 'Sin categoría',
+        categorySlug: data.categorySlug || data.category?.toLowerCase().replace(/\s+/g, '-') || 'sin-categoria',
         image: data.image || '/images/placeholder-service.jpg',
+        images: data.images || [data.image || '/images/placeholder-service.jpg'],
         rating: data.rating || 0,
         location: data.location || 'Ubicación no especificada',
         contactUrl: data.contactUrl || '',
@@ -78,17 +133,26 @@ export const useService = (serviceId?: string): UseServiceResult => {
         ...data,
         createdAt: data.createdAt?.toDate?.() || new Date(),
         updatedAt: data.updatedAt?.toDate?.() || new Date()
-      } as Service;
+      };
+      
+      return serviceData;
       
     } catch (error: any) {
-      console.warn(`⚠️ Intento de carga fallido para servicio ${serviceId}:`, error.message);
+      logger.error(`Error al cargar el servicio ${serviceId}:`, {
+        code: error.code,
+        message: error.message,
+        name: error.name,
+        stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+      });
       
       // Intentar con datos de respaldo en caso de error
-      const fallbackService = getFallbackServiceById(serviceId || '');
+      const fallbackService = serviceId ? getFallbackServiceById(serviceId) : null;
       if (fallbackService) {
-        console.log('🔄 Usando datos de respaldo para el servicio', serviceId);
+        logger.debug(`Usando datos de respaldo para el servicio ${serviceId}`);
         setIsFallbackData(true);
         return fallbackService;
+      } else if (serviceId) {
+        logger.error(`No hay datos de respaldo disponibles para el servicio ${serviceId}`);
       }
       
       // Si no hay datos de respaldo, verificar si es un error de conexión

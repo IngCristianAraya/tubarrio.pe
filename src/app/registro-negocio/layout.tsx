@@ -2,15 +2,7 @@ import { Metadata } from 'next';
 import dynamic from 'next/dynamic';
 
 // Importaciones dinámicas con carga perezosa
-const Header = dynamic(() => import('@/components/Header'), {
-  loading: () => <header className="h-16 bg-white shadow-sm"></header>,
-  ssr: true
-});
 
-const Footer = dynamic(() => import('@/components/Footer'), {
-  loading: () => <footer className="h-20 bg-gray-800"></footer>,
-  ssr: true
-});
 
 const WhatsAppButton = dynamic(() => import('@/components/WhatsAppButton'), {
   ssr: false
@@ -43,11 +35,10 @@ export default function RegisterBusinessLayout({
 }) {
   return (
     <>
-      <Header />
+      
       <main className="pt-16"> {/* Ajuste para el header fijo */}
         {children}
       </main>
-      <Footer />
       <WhatsAppButton phoneNumber="+51901426737" message="Hola, me gustaría obtener más información sobre cómo registrar mi negocio en TuBarrio.pe" />
     </>
   );

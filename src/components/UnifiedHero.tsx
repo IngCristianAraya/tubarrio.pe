@@ -36,19 +36,22 @@ const Hero = () => {
   ];
 
   // Lógica de búsqueda - redirigir a todos los servicios
-  const handleSearch = () => {
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    
     // Construir la URL con parámetros de búsqueda
     const params = new URLSearchParams();
     
-    if (searchQuery.trim()) {
-      params.set('busqueda', searchQuery.trim());
+    const searchTerm = searchQuery.trim();
+    if (searchTerm) {
+      params.set('busqueda', searchTerm);
     }
     
     if (selectedCategory && selectedCategory !== 'Todos los servicios') {
       params.set('categoria', selectedCategory);
     }
     
-    // Redirigir a la página de todos los servicios
+    // Redirigir a la página de resultados de búsqueda
     const url = `/todos-los-servicios${params.toString() ? '?' + params.toString() : ''}`;
     window.location.href = url;
   };
@@ -56,17 +59,20 @@ const Hero = () => {
   return (
     <>
       <SEO 
-        title="Inicio - Tubarrio.pe"
+        title="Inicio - TuBarrio.pe"
         description="Descubre los mejores servicios y negocios locales en tu barrio. Tu guía digital para encontrar restaurantes, tiendas, servicios y más en tu zona."
         keywords="directorio comercial, negocios locales, servicios, restaurantes, emprendimientos, comercios, barrio"
         image="/images/hero_3.webp"
       />
       
+      {/* Hero section hidden on mobile */}
+      <div className="hidden md:block">
+      
       <section id="inicio" className="relative min-h-[70vh] md:min-h-screen overflow-hidden">
         {/* Imagen de fondo */}
         <div className="absolute inset-0 z-0">
           <OptimizedImage
-            src="/images/prueba_yasmin_hd.webp"
+            src="/images/prueba_yasmin.webp"
             alt="Tu Barrio PE - Conectando tu barrio con los mejores servicios locales"
             className="w-full h-full object-cover object-center"
             width={1920}
@@ -105,80 +111,41 @@ const Hero = () => {
                 Apoya a tu comunidad y encuentra lo que necesitas.
               </span>
             </p>
+            
+            <form onSubmit={handleSearch} className="w-full max-w-2xl mx-auto">
+              <div className="relative flex">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <Search className="h-5 w-5 text-gray-400" />
+                </div>
+                <input
+                  type="text"
+                  placeholder="¿Qué estás buscando? Ej: pizzas, lavandería, delivery..."
+                  className="w-full pl-12 pr-32 py-4 rounded-full text-gray-800 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && handleSearch(e)}
+                  aria-label="Buscar servicios"
+                />
+                <button 
+                  type="submit"
+                  className="absolute right-1 top-1/2 transform -translate-y-1/2 px-6 py-2 bg-orange-500 text-white rounded-full hover:bg-orange-600 transition-colors whitespace-nowrap"
+                >
+                  Buscar
+                </button>
+              </div>
+            </form>
           </div>
           
-          {/* Buscador */}
+          {/* Botones de categorías rápidas */}
           <div className="w-full max-w-2xl mt-8">
-            <div className="bg-white/90 backdrop-blur-sm p-6 rounded-xl shadow-lg">
-              <div className="flex flex-col space-y-4">
-                {/* Input de búsqueda y selector de categoría */}
-                <div className="flex flex-col md:flex-row gap-4">
-                  {/* Input de búsqueda */}
-                  <div className="w-full md:w-2/3 relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <Search className="h-5 w-5 text-gray-400" />
-                    </div>
-                    <input
-                      type="text"
-                      placeholder="¿Qué estás buscando?"
-                      className="block w-full pl-10 pr-3 py-4 sm:py-3 border border-gray-300 rounded-lg focus:ring-orange-500 focus:border-orange-500 bg-white text-gray-800 placeholder-gray-500 text-base sm:text-sm min-h-[48px] touch-manipulation"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-                    />
-                  </div>
-                  
-                  {/* Selector de categoría */}
-                  <div className="w-full md:w-1/3 relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <Filter className="h-5 w-5 text-gray-400" />
-                    </div>
-                    <select
-                      className="block w-full pl-10 pr-10 py-4 sm:py-3 border border-gray-300 rounded-lg appearance-none focus:ring-orange-500 focus:border-orange-500 bg-white text-gray-800 text-base sm:text-sm min-h-[48px] touch-manipulation"
-                      value={selectedCategory}
-                      onChange={(e) => setSelectedCategory(e.target.value)}
-                    >
-                      {categories.map((category) => (
-                        <option key={category} value={category}>
-                          {category}
-                        </option>
-                      ))}
-                    </select>
-                    <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                      <ChevronDown className="h-5 w-5 text-gray-400" />
-                    </div>
-                  </div>
-                </div>
-                
-                {/* Botón de búsqueda */}
-                <div className="flex flex-col sm:flex-row gap-3 w-full justify-center items-center text-center">
-                  <button
-                    className="bg-orange-500 hover:bg-orange-600 active:bg-orange-700 text-white font-bold py-4 px-6 rounded-lg flex items-center justify-center transition-all duration-300 shadow-md hover:shadow-lg w-full sm:w-auto min-h-[48px] touch-manipulation active:scale-95"
-                    onClick={handleSearch}
-                  >
-                    <Search className="w-5 h-5 mr-2" />
-                    Buscar servicios
-                  </button>
-                  
-                  <Link 
-                    href="/todos-los-servicios" 
-                    className="bg-white border-2 border-orange-500 text-orange-600 font-bold py-4 px-6 rounded-lg flex items-center justify-center transition-all duration-300 shadow-md hover:bg-orange-50 hover:text-orange-700 w-full sm:w-auto min-h-[48px] touch-manipulation active:scale-95"
-                  >
-                    Explora todos los servicios
-                  </Link>
-                </div>
-              </div>
-            </div>
-            
-            {/* Quick Category Buttons */}
-            <div className="flex flex-wrap justify-center sm:justify-start gap-3 mt-8 mb-12 sm:mb-16">
+            <div className="flex flex-wrap justify-start gap-3">
               {quickCategories.map((item) => (
                 <button
                   key={item.name}
                   onClick={() => {
                     window.location.href = `/todos-los-servicios?categoria=${encodeURIComponent(item.category)}`;
                   }}
-                  className={`flex items-center gap-2 px-5 py-4 rounded-full shadow-sm hover:shadow-md transition-all duration-200 font-medium min-h-[44px] touch-manipulation active:scale-95 ${
+                  className={`flex items-center gap-2 px-5 py-3 rounded-full shadow-sm hover:shadow-md transition-all duration-200 font-medium min-h-[44px] touch-manipulation active:scale-95 ${
                     selectedCategory === item.category
                       ? 'bg-orange-100 text-orange-600 border border-orange-200'
                       : 'bg-white text-gray-700 border border-gray-200 hover:border-orange-200 hover:text-orange-600'
@@ -188,6 +155,17 @@ const Hero = () => {
                   <span>{item.name}</span>
                 </button>
               ))}
+              
+              <Link 
+                href="/todos-los-servicios" 
+                className="flex items-center gap-2 px-5 py-3 rounded-full bg-white text-gray-700 border border-gray-200 hover:border-orange-200 hover:text-orange-600 font-medium transition-colors"
+              >
+                <span>Ver todos los servicios</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-arrow-right">
+                  <path d="M5 12h14"/>
+                  <path d="m12 5 7 7-7 7"/>
+                </svg>
+              </Link>
             </div>
           </div>
         </div>
@@ -195,6 +173,10 @@ const Hero = () => {
       
       {/* Espaciador adicional */}
       <div className="h-12 sm:h-8 md:h-4"></div>
+      </div>
+      
+      {/* Add some spacing on mobile */}
+      <div className="h-16 md:hidden"></div>
     </>
   );
 };

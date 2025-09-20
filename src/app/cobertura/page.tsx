@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import SEO from '@/components/SEO';
 
 // Cargar el componente Hero de forma dinámica
-const UnifiedHero = dynamic(() => import('@/components/UnifiedHero'), {
+const HeroCobertura = dynamic(() => import('@/app/cobertura/HeroCobertura'), {
   loading: () => <div className="h-[60vh] bg-gray-100 animate-pulse"></div>,
   ssr: true
 });
@@ -15,7 +15,7 @@ const UnifiedHero = dynamic(() => import('@/components/UnifiedHero'), {
 // Cargar el mapa de forma dinámica con manejo de errores
 const DynamicMapSection = dynamic(
   () => import('@/components/MapSection').then(mod => {
-    // Add error boundary to the component
+    // Add error boundary to the component  
     const MapWithErrorBoundary = (props: any) => {
       try {
         return <mod.default {...props} />;
@@ -102,17 +102,16 @@ const CoberturaPage = () => {
         keywords="cobertura, zonas de entrega, áreas de servicio, barrios cubiertos, TuBarrio.pe"
       />
       
-      <UnifiedHero 
-        variant="coverage"
+      <HeroCobertura 
         title={
-          <>
+          <>    
             <span className="text-gray-800">Nuestra </span>
             <span className="text-orange-500">Cobertura</span>
           </>
         }
         subtitle="Conectando negocios y clientes en toda la zona de Pando y alrededores"
-        backgroundImage="/images/coverage-bg.jpg"
-        showSearch={false}
+        imageUrl="/images/coverage-bg.jpg"
+        imageAlt="Mapa de cobertura de TuBarrio.pe"
       />
 
       {/* Mapa de Cobertura */}

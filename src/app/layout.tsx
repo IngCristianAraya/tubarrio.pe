@@ -11,6 +11,11 @@ import { AnalyticsInitializer } from '@/components/analytics/AnalyticsInitialize
 import { SITE_URL } from '@/lib/constants';
 import { generateMetadata } from "@/lib/seo";
 import { ReactNode } from 'react';
+import dynamic from 'next/dynamic';
+
+// Dynamically import Header and Footer with no SSR to avoid hydration issues
+const Header = dynamic(() => import('@/components/Header'), { ssr: false });
+const Footer = dynamic(() => import('@/components/Footer'), { ssr: false });
 
 
 // Loading component for the main layout
@@ -116,7 +121,11 @@ export default function RootLayout({ children }: RootLayoutProps) {
           <Suspense fallback={<GlobalLoading />}>
             <div className="min-h-screen flex flex-col">
               <AnalyticsInitializer />
-              {children}
+              <Header />
+              <main className="flex-grow">
+                {children}
+              </main>
+              <Footer />
             </div>
           </Suspense>
         </Providers>

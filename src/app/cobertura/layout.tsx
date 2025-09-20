@@ -2,16 +2,9 @@ import { ReactNode } from 'react';
 import dynamic from 'next/dynamic';
 import { Metadata } from 'next';
 
-// Cargar componentes dinámicamente
-const Header = dynamic(() => import('@/components/Header'), {
-  loading: () => <header className="h-16 bg-white shadow-sm"></header>,
-  ssr: true
-});
 
-const Footer = dynamic(() => import('@/components/Footer'), {
-  loading: () => <footer className="h-20 bg-gray-800"></footer>,
-  ssr: true
-});
+// Cargar componentes dinámicamente
+
 
 export const metadata: Metadata = {
   title: 'Zona de Cobertura | TuBarrio.pe',
@@ -27,7 +20,7 @@ export default function CoberturaLayout({
   return (
     <div className="min-h-screen flex flex-col bg-white">
       <div className="flex flex-col min-h-screen">
-        <Header />
+        
         
         <main className="flex-1">
           {/* Hero Section - ANCHO COMPLETO */}
@@ -45,7 +38,6 @@ export default function CoberturaLayout({
           </div>
         </main>
         
-        <Footer />
       </div>
     </div>
   );

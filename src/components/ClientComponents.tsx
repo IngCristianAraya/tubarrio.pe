@@ -27,10 +27,16 @@ const WhatsAppButton = dynamic(() => import('@/components/WhatsAppButton'), {
   ssr: false
 });
 
-const CustomCursor = dynamic(() => import('@/components/CustomCursor'), {
-  loading: () => null,
-  ssr: false
-});
+const CustomCursor = dynamic(
+  () => import('@/components/CustomCursor').catch(err => {
+    console.error('Error loading CustomCursor:', err);
+    return { default: () => null }; // Retorna un componente vacío en caso de error
+  }),
+  { 
+    loading: () => null,
+    ssr: false 
+  }
+);
 
 const ClientComponents = () => {
   const pathname = usePathname();

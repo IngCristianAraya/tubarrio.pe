@@ -3,16 +3,28 @@
  * Defines the structure of service objects used throughout the application
  */
 
+export interface Category {
+  id: string;
+  name: string;
+  slug: string;
+  icon: string;
+  emoji: string;
+  serviceCount: number;
+}
+
 export interface Service {
   id: string;
+  slug: string;
   name: string;
   description: string;
   category: string;
-  location: string;
+  categorySlug: string;
+  location?: string;
   address?: string;
   reference?: string;
   rating: number;
   image: string;
+  images: string[];
   detailsUrl?: string; // Made optional to match context
   contactUrl?: string; // Made optional to match context
   whatsapp?: string;

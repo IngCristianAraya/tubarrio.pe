@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import React from 'react';
 
 interface HeroCoberturaProps {
-  title: string;
+  title: React.ReactNode;
   subtitle: string;
   imageUrl: string;
   imageAlt: string;
