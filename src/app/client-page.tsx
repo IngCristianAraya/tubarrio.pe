@@ -2,12 +2,12 @@
 
 import { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { sampleCategories, sampleServices } from '@/mocks';
+import { sampleCategories, sampleServices } from '../mocks/services';
 import { Category } from '@/types/service';
 
 // Cargar componentes dinámicamente
 const CategorySection = dynamic(
-  () => import('@/components/home/CategorySection'),
+  () => import('@/components/CategorySection'),
   { ssr: false, loading: () => <div>Loading categories...</div> }
 );
 
