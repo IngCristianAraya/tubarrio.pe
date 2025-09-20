@@ -4,6 +4,18 @@
 // NOTE: This file should not be edited
 // see https://nextjs.org/docs/basic-features/typescript for more information.
 
+// Declaraciones para módulos que no tienen tipos
+// @ts-ignore
+declare module 'react' {
+  export function useState<T>(initialState: T | (() => T)): [T, (newState: T | ((prevState: T) => T)) => void];
+  export function useEffect(effect: () => void | (() => void), deps?: any[]): void;
+  export function useRef<T>(initialValue: T): { current: T };
+  export function useCallback<T extends (...args: any[]) => any>(callback: T, deps: any[]): T;
+  export function useMemo<T>(factory: () => T, deps: any[]): T;
+  export function useContext<T>(context: React.Context<T>): T;
+  // Agrega aquí otros hooks que necesites
+}
+
 // Extender la interfaz Window para incluir mapboxgl
 declare global {
   interface Window {

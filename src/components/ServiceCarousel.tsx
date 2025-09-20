@@ -1,10 +1,17 @@
 'use client';
 
-import { useKeenSlider } from 'keen-slider/react';
-import 'keen-slider/keen-slider.min.css';
+import * as React from 'react';
+const { useEffect, useState, useRef } = React;
+
+// Importación dinámica de Keen Slider
+let KeenSlider: any;
+if (typeof window !== 'undefined') {
+  KeenSlider = require('keen-slider');
+  require('keen-slider/keen-slider.min.css');
+}
+
 import Image from 'next/image';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
 
 interface ServiceCarouselProps {
   services: Array<{

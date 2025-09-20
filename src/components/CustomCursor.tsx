@@ -1,6 +1,8 @@
 'use client'
 
-import React, { useEffect, useState, useRef } from 'react'
+import * as React from 'react';
+
+const { useEffect, useState, useRef } = React;
 
 const CustomCursor: React.FC = () => {
   // Verificar si estamos en el navegador

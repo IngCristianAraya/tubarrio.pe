@@ -1,8 +1,10 @@
 'use client';
 
+import * as React from 'react';
+const { useEffect } = React;
+
 import dynamic from 'next/dynamic';
 import { usePathname } from 'next/navigation';
-import { useEffect } from 'react';
 import { PageTracker } from '@/components/PageTracker';
 
 // Dynamic imports for client-side components with custom loading states

@@ -1,8 +1,12 @@
 'use client';
+
+import * as React from 'react';
+const { useState, useEffect } = React;
+
 import Link from 'next/link';
 import Image from 'next/image';
 import { Service } from '@/types/service';
-import { useMediaQuery } from 'react-responsive'; 
+import { useMediaQuery } from 'react-responsive';
 import ServiceCarousel from './ServiceCarousel'; 
 
 interface CategorySectionProps {

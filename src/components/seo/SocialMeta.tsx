@@ -2,6 +2,7 @@
 
 import Head from 'next/head';
 import { usePathname } from 'next/navigation';
+import React from 'react';
 import { SITE_URL, SITE_NAME, DEFAULT_SEO } from '@/lib/constants';
 
 interface SocialMetaProps {
