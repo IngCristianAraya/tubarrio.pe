@@ -10,8 +10,8 @@ export const sampleServices: Record<string, Service[]> = {
       description: 'Comida típica peruana con los mejores sabores de la costa, sierra y selva.',
       category: 'Restaurantes',
       categorySlug: 'restaurantes',
-      image: '/images/anticuchos.webp',
-      images: ['/images/anticuchos.webp'],
+      image: '/anticuchos.webp',
+      images: ['/anticuchos.webp'],
       rating: 4.5,
       reviewCount: 128,
       featured: true
