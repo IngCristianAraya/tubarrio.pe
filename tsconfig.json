@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "target": "es2017",
     "lib": [
       "dom",
       "dom.iterable",
@@ -14,14 +14,11 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "module": "esnext",
-    "moduleResolution": "bundler",
+    "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
-    "allowUmdGlobalAccess": true,
-    "allowImportingTsExtensions": true,
-    "noEmitOnError": true,
     "baseUrl": ".",
     "paths": {
       "@/*": [
@@ -36,13 +33,16 @@
       {
         "name": "next"
       }
-    ]
+    ],
+    "downlevelIteration": true,
+    "allowUmdGlobalAccess": true
   },
   "include": [
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    ".next/types/**/*.ts"
+    ".next/types/**/*.ts",
+    "src/**/*"
   ],
   "exclude": [
     "node_modules"

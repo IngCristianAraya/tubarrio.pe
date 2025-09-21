@@ -7,7 +7,7 @@ import { Category } from '@/types/service';
 
 // Cargar componentes dinámicamente
 const CategorySection = dynamic(
-  () => import('@/components/CategorySection'),
+  () => import('@/components/home/CategorySection'),
   { ssr: false, loading: () => <div>Loading categories...</div> }
 );
 
@@ -26,7 +26,6 @@ export default function ClientHomePage() {
 
   useEffect(() => {
     setMounted(true);
-    // Cargar datos iniciales
     setCategories(sampleCategories);
     setServicesByCategory(sampleServices);
   }, []);
@@ -56,18 +55,39 @@ export default function ClientHomePage() {
   }
 
   return (
-    <main className="min-h-screen bg-white">
+    <main className="min-h-screen bg-white pt-16 md:pt-0">
       <UnifiedHero />
       
-      <div className="container mx-auto px-4 py-12">
-        {categories.map((category) => (
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-12">
+        {/* ✅ CATEGORIES GRID */}
+        <div className="mb-12">
+          <h2 className="text-2xl font-bold text-orange-500 mb-8 text-center">🔎 Explora por categoría</h2>
+          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-6">
+            {categories.map((category) => (
+              <a 
+                key={category.slug} 
+                href={`/categorias/${category.slug}`}
+                className="group flex flex-col items-center text-center hover:opacity-90 transition-opacity"
+              >
+                <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-gradient-to-br from-orange-100 to-orange-50 flex items-center justify-center mb-3 group-hover:shadow-md transition-shadow">
+                  <span className="text-2xl md:text-3xl">{category.emoji}</span>
+                </div>
+                <h3 className="font-medium text-gray-800 text-sm md:text-base">{category.name}</h3>
+                <p className="text-xs text-gray-500 mt-1">{category.serviceCount} lugares</p>
+              </a>
+            ))}
+          </div>
+        </div>
+        
+        {/* ✅ CATEGORY SECTIONS */}
+        {categories.map((category: Category) => (
           <div key={category.id} className="mb-12">
             <CategorySection 
               category={category} 
               services={servicesByCategory[category.slug] || []} 
             />
           </div>
-        ))}
+))}
       </div>
     </main>
   );

@@ -1,10 +1,8 @@
+// src/app/client-home.tsx
 'use client';
 
 import dynamic from 'next/dynamic';
-import { SITE_URL } from '@/lib/constants';
-import { SocialMeta } from '@/components/seo/SocialMeta';
 
-// Cargar el componente de cliente dinámicamente
 const ClientHomePage = dynamic(() => import('./client-page'), {
   ssr: false,
   loading: () => (
@@ -15,15 +13,5 @@ const ClientHomePage = dynamic(() => import('./client-page'), {
 });
 
 export default function ClientHome() {
-  return (
-    <>
-      <SocialMeta 
-        title="TuBarrio.pe - Descubre todos los servicios de tu zona"
-        description="Explora restaurantes, abarrotes, lavanderías, panaderías y más servicios locales en tu barrio."
-        image="/images/og-image.jpg"
-        url={SITE_URL}
-      />
-      <ClientHomePage />
-    </>
-  );
+  return <ClientHomePage />;
 }

@@ -1,30 +1,25 @@
+// src/components/home/ServiceCarousel.tsx
 'use client';
 
-import * as React from 'react';
-const { useEffect, useState, useRef } = React;
-
-// Importación dinámica de Keen Slider
-let KeenSlider: any;
-if (typeof window !== 'undefined') {
-  KeenSlider = require('keen-slider');
-  require('keen-slider/keen-slider.min.css');
-}
-
+import { useKeenSlider } from 'keen-slider/react';
+import 'keen-slider/keen-slider.min.css';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
+
+interface Service {
+  id: string;
+  slug: string;
+  name: string;
+  description: string;
+  images?: string[];
+  rating?: number;
+  reviewCount?: number;
+  featured?: boolean;
+}
 
 interface ServiceCarouselProps {
-  services: Array<{
-    id: string;
-    name: string;
-    description: string;
-    image?: string;
-    images?: string[];
-    rating?: number;
-    reviewCount?: number;
-    featured?: boolean;
-    slug: string;
-  }>;
+  services: Service[];
   categoryName: string;
 }
 
@@ -73,9 +68,9 @@ export default function ServiceCarousel({ services = [], categoryName = '' }: Se
           <div key={service.id} className="keen-slider__slide min-w-[280px] max-w-[280px]">
             <div className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow overflow-hidden border border-gray-100 h-full flex flex-col">
               <div className="relative h-40 bg-gray-100">
-                {(service.images?.[0] || service.image) && (
+                {service.images?.[0] && (
                   <Image
-                    src={service.images?.[0] || service.image || ''}
+                    src={service.images[0]}
                     alt={service.name}
                     fill
                     className="object-cover"

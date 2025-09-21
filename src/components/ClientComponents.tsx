@@ -1,7 +1,6 @@
 'use client';
 
-import * as React from 'react';
-const { useEffect } = React;
+import { useEffect } from 'react';
 
 import dynamic from 'next/dynamic';
 import { usePathname } from 'next/navigation';
