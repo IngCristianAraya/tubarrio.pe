@@ -1,23 +1,19 @@
 'use client';
 
-import dynamic from 'next/dynamic';
 import ClientOnlyTodosLosServicios from '@/components/ClientOnlyTodosLosServicios';
-
-// Dynamically import HeroCarousel with no SSR to avoid hydration issues
-const HeroCarousel = dynamic(() => import('@/components/HeroCarousel'), { ssr: false });
+import FeaturedBannersCarousel from '@/components/home/FeaturedBannersCarousel';
+import { featuredBanners } from '@/mocks/featuredBanners';
 
 export default function Page() {
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Hero Carousel Section */}
-      <section className="w-full">
-        <HeroCarousel />
-      </section>
+    <main className="min-h-screen bg-gray-50">
+      {/* Hero Carousel Section - Same as home page */}
+      <FeaturedBannersCarousel banners={featuredBanners} interval={3000} />
       
       {/* Main Content */}
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-12">
         <ClientOnlyTodosLosServicios />
       </div>
-    </div>
+    </main>
   );
 }

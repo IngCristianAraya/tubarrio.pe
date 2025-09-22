@@ -151,17 +151,14 @@ export default function FeaturedBannersCarousel({
   if (!banners || banners.length === 0) return null;
 
   return (
-    <div className="relative w-full -mt-20 md:mt-0" style={{ 
-      height: '300px',  // Altura fija para desktop
-      maxHeight: '400px' // Máxima altura para móvil
-    }} onMouseEnter={stopAutoplay} onMouseLeave={() => startAutoplay(slider.current)}>
-      <div ref={sliderRef} className="keen-slider h-full">
+    <div className="relative w-full" onMouseEnter={stopAutoplay} onMouseLeave={() => startAutoplay(slider.current)}>
+      <div ref={sliderRef} className="keen-slider" style={{ height: '300px' }}>
         {banners.map((banner) => (
           <div key={banner.id} className="keen-slider__slide h-full">
             <div className="relative w-full h-full">
               {/* Versión desktop - oculta en móviles */}
               <div className="hidden md:block w-full h-full relative">
-                <div className="absolute inset-0 bg-gray-100 flex items-center justify-center">
+                <div className="w-full h-full bg-gray-100 flex items-center justify-center">
                   <Image
                     src={typeof banner.image === 'string' ? banner.image : banner.image.desktop}
                     alt={banner.title || 'Banner promocional'}
@@ -181,14 +178,14 @@ export default function FeaturedBannersCarousel({
               </div>
               
               {/* Versión móvil - solo se muestra en móviles */}
-              <div className="md:hidden w-full h-full relative">
-                <div className="absolute inset-0 bg-gray-100 flex items-center justify-center">
+              <div className="md:hidden w-full relative">
+                <div className="relative w-full" style={{ height: '200px' }}>
                   <Image
                     src={typeof banner.image === 'string' ? banner.image : banner.image.mobile}
                     alt={banner.title || 'Banner promocional'}
                     width={800}
                     height={400}
-                    className="object-contain w-full h-full"
+                    className="object-cover w-full h-full"
                     priority={true}
                     loading="eager"
                     quality={85}
