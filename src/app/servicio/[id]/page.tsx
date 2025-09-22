@@ -46,7 +46,6 @@ export default function ServicioDetallePage() {
   if (loading || !service) {
     return (
       <div className="min-h-screen bg-orange-50 flex flex-col">
-        <Header />
         <main className="flex-1 w-full py-10 px-2 sm:px-4">
           <div className="max-w-7xl mx-auto">
             <div className="bg-white rounded-3xl shadow-xl overflow-hidden">
@@ -78,7 +77,6 @@ export default function ServicioDetallePage() {
   if (error) {
     return (
       <div className="min-h-screen bg-orange-50 flex flex-col">
-        <Header />
         <main className="flex-1 w-full py-10 px-2 sm:px-4">
           <div className="max-w-7xl mx-auto">
             <div className="bg-white rounded-3xl shadow-xl overflow-hidden p-8 text-center">
@@ -146,8 +144,7 @@ export default function ServicioDetallePage() {
       
       <BreadcrumbJsonLd items={breadcrumbs} />
       
-      {/* Header */}
-      <Header />
+      
       
       {/* Contenido principal */}
       <div className="flex-1 w-full">
