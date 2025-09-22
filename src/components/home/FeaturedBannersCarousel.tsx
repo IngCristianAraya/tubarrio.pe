@@ -159,42 +159,52 @@ export default function FeaturedBannersCarousel({
               {/* Versión desktop - oculta en móviles */}
               <div className="hidden md:block w-full h-full relative">
                 <div className="w-full h-full bg-gray-100 flex items-center justify-center">
-                  <Image
-                    src={typeof banner.image === 'string' ? banner.image : banner.image.desktop}
-                    alt={banner.title || 'Banner promocional'}
-                    width={1200}
-                    height={300}
-                    className="object-contain w-full h-full"
-                    priority={true}
-                    loading="eager"
-                    quality={85}
-                    sizes="(max-width: 767px) 0px, 1200px"
-                    onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
-                      const target = e.target as HTMLImageElement;
-                      console.error(`Error loading desktop image: ${target.src}`);
-                    }}
-                  />
+                  <div className="w-full h-full flex items-center justify-center">
+                    <Image
+                      src={typeof banner.image === 'string' ? banner.image : banner.image.desktop}
+                      alt={banner.title || 'Banner promocional'}
+                      width={1200}
+                      height={300}
+                      className="object-contain w-full h-auto max-h-[300px]"
+                      priority={true}
+                      loading="eager"
+                      quality={85}
+                      sizes="(max-width: 767px) 0px, 1200px"
+                      onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
+                        const target = e.target as HTMLImageElement;
+                        console.error(`Error loading desktop image: ${target.src}`);
+                        // Mostrar un placeholder o mensaje de error
+                        target.onerror = null; // Prevenir bucles de error
+                        target.src = '/images/placeholder.jpg';
+                      }}
+                    />
+                  </div>
                 </div>
               </div>
               
               {/* Versión móvil - solo se muestra en móviles */}
               <div className="md:hidden w-full relative">
-                <div className="relative w-full" style={{ height: '200px' }}>
-                  <Image
-                    src={typeof banner.image === 'string' ? banner.image : banner.image.mobile}
-                    alt={banner.title || 'Banner promocional'}
-                    width={800}
-                    height={400}
-                    className="object-cover w-full h-full"
-                    priority={true}
-                    loading="eager"
-                    quality={85}
-                    sizes="100vw"
-                    onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
-                      const target = e.target as HTMLImageElement;
-                      console.error(`Error loading mobile image: ${target.src}`);
-                    }}
-                  />
+                <div className="relative w-full" style={{ minHeight: '200px' }}>
+                  <div className="w-full h-full flex items-center justify-center">
+                    <Image
+                      src={typeof banner.image === 'string' ? banner.image : banner.image.mobile}
+                      alt={banner.title || 'Banner promocional'}
+                      width={800}
+                      height={400}
+                      className="object-contain w-full h-auto max-h-[200px]"
+                      priority={true}
+                      loading="eager"
+                      quality={85}
+                      sizes="100vw"
+                      onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
+                        const target = e.target as HTMLImageElement;
+                        console.error(`Error loading mobile image: ${target.src}`);
+                        // Mostrar un placeholder o mensaje de error
+                        target.onerror = null; // Prevenir bucles de error
+                        target.src = '/images/placeholder.jpg';
+                      }}
+                    />
+                  </div>
                 </div>
               </div>
             </div>

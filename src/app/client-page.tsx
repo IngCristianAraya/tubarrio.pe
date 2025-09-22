@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { sampleCategories, sampleServices } from '@/mocks';
 import { Category } from '@/types/service';
+import { featuredBanners } from '@/mocks/featuredBanners';
+import FeaturedBannersCarousel from '@/components/home/FeaturedBannersCarousel';
 
 // Cargar componentes dinámicamente
 const CategorySection = dynamic(
@@ -18,6 +20,7 @@ const UnifiedHero = dynamic(
     loading: () => <div className="h-[70vh] bg-gray-100 animate-pulse"></div> 
   }
 );
+
 
 export default function ClientHomePage() {
   const [mounted, setMounted] = useState(false);
@@ -55,10 +58,13 @@ export default function ClientHomePage() {
   }
 
   return (
-    <main className="min-h-screen bg-white pt-16 md:pt-0">
-      <UnifiedHero />
+    <main className="min-h-screen">
+      {mounted && <UnifiedHero />}
       
+      {/* ✅ CARRUSEL DE BANNERS DESTACADOS */}
+      <FeaturedBannersCarousel banners={featuredBanners} interval={5000} />
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-12">
+
         {/* ✅ CATEGORIES GRID */}
         <div className="mb-12">
           <h2 className="text-2xl font-bold text-orange-500 mb-8 text-center">🔎 Explora por categoría</h2>

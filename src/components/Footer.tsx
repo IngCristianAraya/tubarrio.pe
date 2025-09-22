@@ -87,9 +87,9 @@ const Footer = () => {
             <ul className="space-y-3">
               {[
                 { href: "/", label: "Inicio" },
-                { href: "#servicios", label: "Destacados" },
-                { href: "/todos-los-servicios", label: "Categorías" },
-                { href: "#cobertura", label: "Cobertura" },
+                { href: "/blog", label: "Blog" },
+                { href: "/todos-los-servicios", label: "Todos los servicios" },
+                { href: "/inmuebles", label: "Inmuebles" },
                 { href: "#registro", label: "Registrar Negocio" },
               ].map((item, index) => (
                 <motion.li 

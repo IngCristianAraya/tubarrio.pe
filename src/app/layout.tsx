@@ -1,5 +1,6 @@
 import { GeistSans } from 'geist/font/sans';
-import { Suspense } from 'react';
+import React, { Suspense } from 'react';
+import type { ReactNode } from 'react';
 import "./globals.css";
 import "leaflet/dist/leaflet.css";
 import "@/styles/leaflet.css";
@@ -10,12 +11,15 @@ import { Skeleton } from '@/components/ui/Skeleton';
 import { AnalyticsInitializer } from '@/components/analytics/AnalyticsInitializer';
 import { SITE_URL } from '@/lib/constants';
 import { generateMetadata } from "@/lib/seo";
-import { ReactNode } from 'react';
 import dynamic from 'next/dynamic';
 
-// Dynamically import Header and Footer with no SSR to avoid hydration issues
+// Dynamically import components with no SSR to avoid hydration issues
 const Header = dynamic(() => import('@/components/Header'), { ssr: false });
 const Footer = dynamic(() => import('@/components/Footer'), { ssr: false });
+const PromoBar = dynamic(() => import('@/components/PromoBar'), { 
+  ssr: false,
+  loading: () => <div className="h-10 bg-gray-100 animate-pulse"></div> 
+});
 
 
 // Loading component for the main layout
@@ -121,6 +125,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
           <Suspense fallback={<GlobalLoading />}>
             <div className="min-h-screen flex flex-col">
               <AnalyticsInitializer />
+              <PromoBar />
               <Header />
               <main className="flex-grow">
                 {children}

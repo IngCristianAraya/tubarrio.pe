@@ -150,9 +150,9 @@ const Header = () => {
           {/* Navegación desktop */}
           <nav className="hidden md:flex gap-3 lg:gap-6 items-center mx-4">
             <NavItem href="/">Inicio</NavItem>
-            <NavItem href="/#inmuebles">Inmuebles</NavItem>
             <NavItem href="/todos-los-servicios">Todos los servicios</NavItem>
-            <NavItem href="/cobertura">Cobertura</NavItem>
+            <NavItem href="/inmuebles">Inmuebles</NavItem>
+            <NavItem href="/blog">Blog</NavItem>
           </nav>
 
           {/* Acciones desktop */}
@@ -173,13 +173,13 @@ const Header = () => {
                 <NavItem href="/">Inicio</NavItem>
               </div>
               <div className="py-3 px-4 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors duration-150 min-h-[48px] flex items-center">
-                <NavItem href="/#inmuebles">Inmuebles</NavItem>
-              </div>
-              <div className="py-3 px-4 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors duration-150 min-h-[48px] flex items-center">
                 <NavItem href="/todos-los-servicios">Todos los servicios</NavItem>
               </div>
               <div className="py-3 px-4 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors duration-150 min-h-[48px] flex items-center">
-                <NavItem href="/cobertura">Cobertura</NavItem>
+                <NavItem href="/inmuebles">Inmuebles</NavItem>
+              </div>
+              <div className="py-3 px-4 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors duration-150 min-h-[48px] flex items-center">
+                <NavItem href="/blog">Blog</NavItem>
               </div>
               <div className="mt-6">
                 <NavItem href="/registro-negocio">

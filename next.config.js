@@ -42,6 +42,27 @@ const nextConfig = {
     ];
   },
   images: {
+    // Configuración para optimización de imágenes
+    formats: ['image/avif', 'image/webp'],
+    minimumCacheTTL: 60,
+    // Dominios permitidos para optimización de imágenes
+    domains: [
+      'localhost',
+      'vercel.app',
+      'tubarrio.vercel.app',
+      'firebasestorage.googleapis.com',
+      '*.googleapis.com',
+      '*.google.com',
+      '*.gstatic.com',
+      '*.pexels.com',
+      'images.pexels.com',
+      '*.unsplash.com',
+      'images.unsplash.com',
+      '*.pixabay.com',
+      'cdn.pixabay.com',
+      'res.cloudinary.com'
+    ],
+    // Patrones remotos para imágenes
     remotePatterns: [
       {
         protocol: 'https',
