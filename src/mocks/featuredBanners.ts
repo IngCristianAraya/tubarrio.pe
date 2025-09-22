@@ -6,8 +6,8 @@ export const featuredBanners = [
     title: "¡Ofertas de Verano!",
     subtitle: "Hasta 50% de descuento en restaurantes y lavanderías de tu barrio.",
     image: {
-      desktop: "/images/superburger_desktop.gif",  // 1200x300px
-      mobile: "/images/superbaner movil.gif"      // 800x400px - Nota: el archivo tiene un espacio en el nombre
+      desktop: "/images/superburger_desktop.png",  // 1200x300px
+      mobile: "/images/superburger_movil.gif"      // 800x400px - Nota: el archivo tiene un espacio en el nombre
     },
     buttonText: "Ver ofertas →",
     buttonLink: "/ofertas/verano",
@@ -17,8 +17,8 @@ export const featuredBanners = [
     title: "🏠 Nueva sección: Inmuebles",
     subtitle: "Alquileres y ventas de departamentos en tu zona. ¡Descúbrelos!",
     image: {
-      desktop: "/images/tubarrio_desktop.gif",
-      mobile: "/images/tubarrio_movil.gif"
+      desktop: "/images/tubarrio_desktop.png",
+      mobile: "/images/tubarrio_movil.png"
     },
     buttonText: "Explorar inmuebles →",
     buttonLink: "/inmuebles",
