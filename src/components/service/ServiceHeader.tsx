@@ -14,16 +14,111 @@
  *   - Información de contacto y horarios
  */
 
-import React, { useState, useCallback, ReactElement } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { Service } from '@/types/service';
 import { MapPin, Clock, Star, Share2, Heart, ChevronLeft, ChevronRight, Phone, ExternalLink } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
+import { FaWhatsapp } from 'react-icons/fa';
+
+type ReactElement = React.ReactElement;
+
+// Animation variants
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+      delayChildren: 0.2,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { y: 20, opacity: 0 },
+  visible: {
+    y: 0,
+    opacity: 1,
+    transition: {
+      type: 'spring',
+      stiffness: 100,
+      damping: 15,
+    },
+  },
+  hover: {
+    scale: 1.02,
+    transition: {
+      type: 'spring',
+      stiffness: 300,
+    },
+  },
+  tap: {
+    scale: 0.98,
+  },
+};
 
 interface ServiceHeaderProps {
-  service: Service;
+  service: Service & {
+    featured?: boolean;
+    images?: string[];
+    id: string;
+  };
 }
 
-const ServiceHeader: React.FC<ServiceHeaderProps> = ({ service }): ReactElement => {
+// Mapeo de categorías a colores
+type CategoryColors = {
+  [key: string]: {
+    from: string;
+    to: string;
+    via?: string;
+  };
+};
+
+const categoryColors: CategoryColors = {
+  'Restaurantes': { 
+    from: 'from-red-500', 
+    to: 'to-orange-500',
+    via: 'via-red-400' 
+  },
+  'Abarrotes': { 
+    from: 'from-green-500', 
+    to: 'to-emerald-500',
+    via: 'via-green-400' 
+  },
+  'Lavanderías': { 
+    from: 'from-blue-500', 
+    to: 'to-indigo-600',
+    via: 'via-blue-400' 
+  },
+  'Gimnasios': { 
+    from: 'from-purple-500', 
+    to: 'to-pink-600',
+    via: 'via-purple-400' 
+  },
+  'Servicios': { 
+    from: 'from-amber-500', 
+    to: 'to-orange-500',
+    via: 'via-amber-400' 
+  },
+  'Peluquerías': { 
+    from: 'from-pink-500', 
+    to: 'to-rose-500',
+    via: 'via-pink-400' 
+  },
+  'default': { 
+    from: 'from-gray-500', 
+    to: 'to-gray-700',
+    via: 'via-gray-400' 
+  },
+};
+
+const getCategoryGradient = (category: string) => {
+  const colors = categoryColors[category] || categoryColors.default;
+  return `bg-gradient-to-br ${colors.from} ${colors.via} ${colors.to}`;
+};
+
+const ServiceHeader = ({ service }: ServiceHeaderProps): ReactElement => {
   // Función para formatear el horario
   const formatSchedule = (): string => {
     if (service.horario) return service.horario;
@@ -36,8 +131,8 @@ const ServiceHeader: React.FC<ServiceHeaderProps> = ({ service }): ReactElement 
   const [isFavorite, setIsFavorite] = useState(false);
   const [showShareTooltip, setShowShareTooltip] = useState(false);
   // Función para validar si una imagen es válida
-  const isValidImage = (imageUrl: string): boolean => {
-    return imageUrl && 
+  const isValidImage = (imageUrl: string | null | undefined): boolean => {
+    return !!imageUrl && 
            imageUrl !== 'none' && 
            imageUrl !== '' && 
            imageUrl !== 'null' && 
@@ -46,14 +141,20 @@ const ServiceHeader: React.FC<ServiceHeaderProps> = ({ service }): ReactElement 
            (imageUrl.startsWith('http') || imageUrl.startsWith('/'));
   };
 
-  // Filtrar y validar imágenes
-  const validImages = service.images && service.images.length > 0 
-    ? service.images.filter(isValidImage)
-    : service.image && isValidImage(service.image)
-      ? [service.image]
+  // Asegurarse de que siempre trabajamos con un array de imágenes
+  const serviceImages = Array.isArray(service.images) 
+    ? service.images 
+    : service.image 
+      ? [service.image] 
       : [];
-      
-  const images: string[] = validImages.length > 0 
+  
+  // Filtrar y validar imágenes
+  const validImages = serviceImages.filter((img): img is string => 
+    typeof img === 'string' && isValidImage(img)
+  );
+  
+  // Usar imágenes válidas o el placeholder si no hay imágenes
+  const images = validImages.length > 0 
     ? validImages 
     : ['/images/placeholder-service.jpg'];
 
@@ -99,7 +200,7 @@ const ServiceHeader: React.FC<ServiceHeaderProps> = ({ service }): ReactElement 
   }, []);
 
   // Verificar si está en favoritos al cargar
-  React.useEffect(() => {
+  useEffect(() => {
     const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
     setIsFavorite(favorites.includes(service.id));
   }, [service.id]);
@@ -136,440 +237,214 @@ const ServiceHeader: React.FC<ServiceHeaderProps> = ({ service }): ReactElement 
     );
   };
 
+  // Obtener el gradiente basado en la categoría
+  const gradientClass = getCategoryGradient(service.category || '');
+
+  // Efecto para animar la entrada
+  useEffect(() => {
+    // Forzar una repintada para asegurar que las animaciones se ejecuten
+    const timer = setTimeout(() => {
+      // Este timeout vacío ayuda a asegurar que las animaciones se ejecuten
+    }, 100);
+    return () => clearTimeout(timer);
+  }, []);
+  
+  // Función para manejar el efecto de ondas al hacer clic en botones
+  const createRipple = (event: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>) => {
+    const button = event.currentTarget;
+    const rect = button.getBoundingClientRect();
+    const size = Math.max(rect.width, rect.height);
+    const x = event.clientX - rect.left - size / 2;
+    const y = event.clientY - rect.top - size / 2;
+    
+    const ripple = document.createElement('span');
+    ripple.style.width = ripple.style.height = `${size}px`;
+    ripple.style.left = `${x}px`;
+    ripple.style.top = `${y}px`;
+    ripple.classList.add('ripple');
+    
+    // Limpiar ripples anteriores
+    const existingRipples = button.getElementsByClassName('ripple');
+    Array.from(existingRipples).forEach(ripple => ripple.remove());
+    
+    button.appendChild(ripple);
+    
+    // Eliminar el ripple después de la animación
+    setTimeout(() => ripple.remove(), 1000);
+  };
+  
+  // Añadir estilos para el efecto ripple
+  useEffect(() => {
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes ripple {
+        to {
+          transform: scale(4);
+          opacity: 0;
+        }
+      }
+      
+      .ripple {
+        position: absolute;
+        border-radius: 50%;
+        background-color: rgba(255, 255, 255, 0.7);
+        transform: scale(0);
+        animation: ripple 600ms linear;
+        pointer-events: none;
+      }
+      
+      .gradient-text {
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+    `;
+    document.head.appendChild(style);
+    
+    return () => {
+      document.head.removeChild(style);
+    };
+  }, []);
+
   return (
-    <div className="w-full max-w-7xl mx-auto px-1 sm:px-6 lg:px-8 py-2 sm:py-12">
-      {/* Header con gradiente sutil - Optimizado para móvil */}
-      <div className="bg-gradient-to-br from-orange-50 via-white to-orange-50 rounded-xl sm:rounded-3xl p-3 sm:p-8 lg:p-12 shadow-lg sm:shadow-xl border border-orange-100">
-        
-        {/* Layout reorganizado para móvil */}
-        <div className="block lg:hidden space-y-4">
-          {/* 1. Título */}
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 leading-tight">
-            {service.name}
-          </h1>
-          
-          {/* 2. Categoría */}
-          <div>
-            <span className="inline-flex items-center px-2.5 py-1.5 sm:px-3 sm:py-2 bg-gradient-to-r from-orange-100 to-orange-200 text-orange-800 text-xs sm:text-sm font-semibold rounded-full border border-orange-300">
-              📂 {service.category}
-            </span>
-          </div>
-          
-          {/* 3. Rating */}
-          {service.rating && service.rating > 0 && (
-            <div className="flex items-center gap-2">
-              {renderRating(service.rating)}
-            </div>
-          )}
-          
-          {/* 4. Imagen del servicio */}
-          <div className="relative aspect-square w-full bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl overflow-hidden shadow-lg border border-gray-200">
-            <Image
-              src={images[currentImageIndex]}
-              alt={`${service.name} - Imagen ${currentImageIndex + 1}`}
-              fill
-              className="object-cover"
-              priority
-            />
+    <div className="relative overflow-hidden">
+      {/* Animated gradient background */}
+      <motion.div 
+        className={`absolute inset-0 -z-10 ${gradientClass} opacity-90`}
+        initial={{ scale: 1.2, opacity: 0 }}
+        animate={{ 
+          scale: 1,
+          opacity: 0.9,
+          transition: { duration: 0.8, ease: 'easeOut' }
+        }}
+      >
+        <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent"></div>
+      </motion.div>
+      
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative">
+        <motion.div 
+          className="lg:grid lg:grid-cols-2 lg:gap-8"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          {/* Columna derecha - Información */}
+          <motion.div 
+            className="space-y-6"
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+          >
+            {/* 1. Título */}
+            <motion.h1 
+              className="text-4xl lg:text-5xl font-bold text-gray-900 leading-tight bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent"
+              variants={itemVariants}
+            >
+              {service.name}
+            </motion.h1>
             
-            {/* Controles de navegación */}
-            {images.length > 1 && (
-              <>
-                <button
-                  onClick={prevImage}
-                  className="absolute left-4 top-1/2 -translate-y-1/2 p-3 bg-white/90 hover:bg-white rounded-full shadow-lg transition-all duration-200 hover:scale-110"
-                  aria-label="Imagen anterior"
-                >
-                  <ChevronLeft className="w-5 h-5 text-gray-700" />
-                </button>
-                <button
-                  onClick={nextImage}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 p-3 bg-white/90 hover:bg-white rounded-full shadow-lg transition-all duration-200 hover:scale-110"
-                  aria-label="Siguiente imagen"
-                >
-                  <ChevronRight className="w-5 h-5 text-gray-700" />
-                </button>
-              </>
-            )}
-          </div>
-          
-          {/* Miniaturas para móvil */}
-          {images.length > 1 && (
-            <div className="flex gap-3 overflow-x-auto pb-2">
-              {images.map((image, index) => (
-                <button
-                  key={index}
-                  onClick={() => setCurrentImageIndex(index)}
-                  className={`flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden border-2 transition-all bg-transparent hover:bg-transparent focus:bg-transparent ${
-                    index === currentImageIndex 
-                      ? 'border-orange-500 ring-2 ring-orange-200 shadow-md' 
-                      : 'border-transparent hover:border-gray-300'
-                  }`}
-                  style={{ background: 'transparent' }}
-                  aria-label={`Ver imagen ${index + 1}`}
-                >
-                  <Image
-                    src={image}
-                    alt={`${service.name} - Miniatura ${index + 1}`}
-                    width={80}
-                    height={80}
-                    className="w-full h-full object-cover"
-                  />
-                </button>
-              ))}
-            </div>
-          )}
-          
-          {/* 5. Descripción del servicio */}
-          {service.description && (
-            <div className="bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-gray-100 shadow-sm">
-              <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2 sm:mb-3">Descripción</h3>
-              <p className="text-gray-700 leading-relaxed text-sm sm:text-base">
-                {service.description}
-              </p>
-            </div>
-          )}
-          
-          {/* 6. Información del servicio */}
-          <div className="bg-white p-3 sm:p-6 rounded-xl sm:rounded-2xl border border-gray-100 shadow-sm">
-            <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">Información del Servicio</h3>
-            <div className="space-y-3 sm:space-y-4">
-              {/* Ubicación */}
-              {(service.location || service.address) && (
-                <div className="flex items-start gap-4 p-4 bg-blue-50 rounded-xl border border-blue-100">
-                  <div className="p-2 bg-blue-500 rounded-lg">
-                    <MapPin className="w-5 h-5 text-white" />
-                  </div>
-                  <div className="flex-1">
-                    <h4 className="font-semibold text-blue-900 mb-1">Ubicación</h4>
-                    <div className="space-y-1">
-                      {(() => {
-                        const address = service.address?.trim();
-                        const reference = service.reference?.trim();
-                        const location = service.location?.trim();
-                        
-                        // Si address y reference son iguales, solo mostrar address
-                        if (address && reference && address === reference) {
-                          return (
-                            <p className="text-gray-700 text-sm font-medium">
-                              {address}
-                            </p>
-                          );
-                        }
-                        
-                        // Si hay address y reference diferentes, mostrar ambos
-                        if (address && reference && address !== reference) {
-                          return (
-                            <div className="space-y-1">
-                              <p className="text-gray-700 text-sm font-medium">
-                                {address}
-                              </p>
-                              <p className="text-gray-600 text-sm">
-                                <span className="font-medium">Referencia:</span> {reference}
-                              </p>
-                            </div>
-                          );
-                        }
-                        
-                        // Si solo hay address, mostrarlo
-                        if (address) {
-                          return (
-                            <p className="text-gray-700 text-sm font-medium">
-                              {address}
-                            </p>
-                          );
-                        }
-                        
-                        // Si solo hay location, mostrarlo
-                        if (location) {
-                          return (
-                            <p className="text-gray-700 text-sm">
-                              {location}
-                            </p>
-                          );
-                        }
-                        
-                        return null;
-                      })()}
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Horario */}
-              {service.horario && (
-                <div className="flex items-start gap-4 p-4 bg-green-50 rounded-xl border border-green-100">
-                  <div className="p-2 bg-green-500 rounded-lg">
-                    <Clock className="w-5 h-5 text-white" />
-                  </div>
-                  <div className="flex-1">
-                    <h4 className="font-semibold text-green-900 mb-1">Horario</h4>
-                    <p className="text-gray-700 text-sm">{formatSchedule()}</p>
-                  </div>
-                </div>
-              )}
-
-              {/* Contacto */}
-              <div className="flex items-start gap-4 p-4 bg-orange-50 rounded-xl border border-orange-100">
-                <div className="p-2 bg-orange-500 rounded-lg">
-                  <Phone className="w-5 h-5 text-white" />
-                </div>
-                <div className="flex-1">
-                  <h4 className="font-semibold text-orange-900 mb-1">Contacto</h4>
-                  <div className="space-y-2">
-                    {(service.whatsapp || (service.contactUrl && (service.contactUrl.includes('wa.me') || service.contactUrl.includes('whatsapp') || service.contactUrl.includes('wa.link')))) && (
-                      <div className="text-gray-700 text-sm">
-                        💬 {
-                          service.contactUrl && (service.contactUrl.includes('wa.me') || service.contactUrl.includes('whatsapp') || service.contactUrl.includes('wa.link'))
-                            ? (service.whatsapp || 'WhatsApp')
-                            : service.whatsapp
-                        }
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          {/* 7. Botones de contacto */}
-          <div className="bg-white p-3 sm:p-6 rounded-xl sm:rounded-2xl border border-gray-100 shadow-sm">
-            <h3 className="text-base font-semibold text-gray-900 mb-3 text-center">Contactar</h3>
-            
-            <div className="space-y-3">
-              {/* Botón WhatsApp */}
-              {(service.whatsapp || (service.contactUrl && (service.contactUrl.includes('wa.me') || service.contactUrl.includes('whatsapp') || service.contactUrl.includes('wa.link')))) && (
-                <a 
-                  href={
-                    service.contactUrl && (service.contactUrl.includes('wa.me') || service.contactUrl.includes('whatsapp') || service.contactUrl.includes('wa.link'))
-                      ? service.contactUrl
-                      : `https://wa.me/${service.whatsapp}`
-                  }
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-4 rounded-xl transition-colors duration-200 flex items-center justify-center gap-2 text-sm sm:text-base"
-                >
-                  <span>💬</span>
-                  <span>Chatear por WhatsApp</span>
-                </a>
-              )}
+            {/* Categoría y Rating */}
+            <motion.div 
+              className="flex flex-col sm:flex-row sm:items-center gap-4"
+              variants={itemVariants}
+            >
+              <motion.span 
+                className="inline-flex items-center px-4 py-2 bg-white/80 backdrop-blur-sm text-gray-800 text-sm font-semibold rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300"
+                whileHover={{ y: -2 }}
+              >
+                <span className="mr-2">
+                  {service.category === 'Restaurantes' && '🍽️'}
+                  {service.category === 'Abarrotes' && '🛒'}
+                  {service.category === 'Lavanderías' && '🧺'}
+                  {service.category === 'Gimnasios' && '💪'}
+                  {service.category === 'Servicios' && '🔧'}
+                  {service.category === 'Peluquerías' && '✂️'}
+                  {!['Restaurantes', 'Abarrotes', 'Lavanderías', 'Gimnasios', 'Servicios', 'Peluquerías'].includes(service.category || '') && '🏷️'}
+                </span>
+                {service.category}
+              </motion.span>
               
-              {/* Botón Ver Página Web */}
-              {service.detailsUrl && (
-                <a 
-                  href={service.detailsUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-4 rounded-xl transition-colors duration-200 flex items-center justify-center gap-2 text-sm sm:text-base"
+              {service.rating && service.rating > 0 && (
+                <motion.div 
+                  className="flex items-center gap-2 bg-white/80 backdrop-blur-sm px-3 py-1.5 rounded-xl border border-gray-200 shadow-sm"
+                  whileHover={{ scale: 1.03 }}
                 >
-                  <span>🌐</span>
-                  <span>Visitar Página Web</span>
-                </a>
+                  {renderRating(service.rating)}
+                </motion.div>
               )}
-              
-              {/* Botones secundarios */}
-              <div className="flex gap-2 sm:gap-3 pt-2">
-                <button 
-                  onClick={handleFavoriteToggle}
-                  className={`flex-1 font-medium py-2 px-2 sm:px-3 rounded-lg transition-all duration-200 flex items-center justify-center gap-1 sm:gap-2 text-xs sm:text-sm ${
-                    isFavorite 
-                      ? 'bg-red-100 hover:bg-red-200 text-red-700' 
-                      : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
-                  }`}
-                >
-                  <Heart className={`w-4 h-4 ${isFavorite ? 'fill-current' : ''}`} />
-                  <span className="hidden xs:inline">{isFavorite ? 'Guardado' : 'Guardar'}</span>
-                  <span className="xs:hidden">{isFavorite ? '❤️' : '♥'}</span>
-                </button>
-                <div className="relative flex-1">
-                  <button 
-                    onClick={handleShare}
-                    className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2 px-2 sm:px-3 rounded-lg transition-colors duration-200 flex items-center justify-center gap-1 sm:gap-2 text-xs sm:text-sm"
-                  >
-                    <Share2 className="w-4 h-4" />
-                    <span className="hidden xs:inline">Compartir</span>
-                    <span className="xs:hidden">📤</span>
-                  </button>
-                  {showShareTooltip && (
-                    <div className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded whitespace-nowrap">
-                      ¡Enlace copiado!
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <div className="hidden lg:grid lg:grid-cols-[1fr_1.2fr] gap-4 sm:gap-8 lg:gap-16 items-start">
-          {/* Columna de la Imagen - Solo Desktop */}
-          <div className="space-y-3 sm:space-y-6 order-1 lg:order-1">
-            <div className="relative aspect-square w-full bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl overflow-hidden shadow-lg border border-gray-200">
+            </motion.div>
+
+            {/* Galería de imágenes (solo móvil) */}
+            <div className="lg:hidden relative aspect-square w-full overflow-hidden rounded-2xl shadow-xl my-6">
               <Image
                 src={images[currentImageIndex]}
-                alt={`${service.name} - Imagen ${currentImageIndex + 1}`}
+                alt={service.name}
                 fill
                 className="object-cover"
                 priority
               />
               
-              {/* Controles de navegación */}
               {images.length > 1 && (
                 <>
                   <button
                     onClick={prevImage}
-                    className="absolute left-4 top-1/2 -translate-y-1/2 p-3 bg-white/90 hover:bg-white rounded-full shadow-lg transition-all duration-200 hover:scale-110"
+                    className="absolute left-3 top-1/2 -translate-y-1/2 bg-white/80 backdrop-blur-sm p-2 rounded-full shadow-lg hover:bg-white transition-colors duration-200 z-10"
                     aria-label="Imagen anterior"
                   >
                     <ChevronLeft className="w-5 h-5 text-gray-700" />
                   </button>
                   <button
                     onClick={nextImage}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 p-3 bg-white/90 hover:bg-white rounded-full shadow-lg transition-all duration-200 hover:scale-110"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 bg-white/80 backdrop-blur-sm p-2 rounded-full shadow-lg hover:bg-white transition-colors duration-200 z-10"
                     aria-label="Siguiente imagen"
                   >
                     <ChevronRight className="w-5 h-5 text-gray-700" />
                   </button>
+                  
+                  <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2">
+                    {images.map((_, index) => (
+                      <button
+                        key={index}
+                        onClick={() => setCurrentImageIndex(index)}
+                        className={`h-2 rounded-full transition-all duration-300 ${
+                          index === currentImageIndex 
+                            ? 'w-6 bg-white' 
+                            : 'w-2 bg-white/50 hover:bg-white/80'
+                        }`}
+                        aria-label={`Ir a imagen ${index + 1}`}
+                      />
+                    ))}
+                  </div>
                 </>
               )}
             </div>
-            
-            {/* Miniaturas */}
-            {images.length > 1 && (
-              <div className="flex gap-3 overflow-x-auto pb-2">
-                {images.map((image, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setCurrentImageIndex(index)}
-                    className={`flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden border-2 transition-all bg-transparent hover:bg-transparent focus:bg-transparent ${
-                      index === currentImageIndex 
-                        ? 'border-orange-500 ring-2 ring-orange-200 shadow-md' 
-                        : 'border-transparent hover:border-gray-300'
-                    }`}
-                    style={{ background: 'transparent' }}
-                    aria-label={`Ver imagen ${index + 1}`}
-                  >
-                    <Image
-                      src={image}
-                      alt={`${service.name} - Miniatura ${index + 1}`}
-                      width={80}
-                      height={80}
-                      className="w-full h-full object-cover"
-                    />
-                  </button>
-                ))}
-              </div>
-            )}
-            
-            {/* Botones de Acción */}
-            <div className="bg-white p-3 sm:p-6 rounded-xl sm:rounded-2xl border border-gray-100 shadow-sm">
-              <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4 text-center lg:block hidden">¿Te interesa este servicio?</h3>
-              <h3 className="text-base font-semibold text-gray-900 mb-3 text-center lg:hidden">Contactar</h3>
-              
-              <div className="space-y-3">
-                {/* Botón WhatsApp */}
-                {(service.whatsapp || (service.contactUrl && (service.contactUrl.includes('wa.me') || service.contactUrl.includes('whatsapp') || service.contactUrl.includes('wa.link')))) && (
-                  <a 
-                    href={
-                      service.contactUrl && (service.contactUrl.includes('wa.me') || service.contactUrl.includes('whatsapp') || service.contactUrl.includes('wa.link'))
-                        ? service.contactUrl
-                        : `https://wa.me/${service.whatsapp}`
-                    }
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-4 rounded-xl transition-colors duration-200 flex items-center justify-center gap-2 text-sm sm:text-base"
-                  >
-                    <span>💬</span>
-                    <span>Chatear por WhatsApp</span>
-                  </a>
-                )}
-                
-                {/* Botón Ver Página Web */}
-                {service.detailsUrl && (
-                  <a 
-                    href={service.detailsUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-4 rounded-xl transition-colors duration-200 flex items-center justify-center gap-2 text-sm sm:text-base"
-                  >
-                    <span>🌐</span>
-                    <span>Visitar Página Web</span>
-                  </a>
-                )}
-                
-                {/* Botones secundarios */}
-                <div className="flex gap-2 sm:gap-3 pt-2">
-                  <button 
-                    onClick={handleFavoriteToggle}
-                    className={`flex-1 font-medium py-2 px-2 sm:px-3 rounded-lg transition-all duration-200 flex items-center justify-center gap-1 sm:gap-2 text-xs sm:text-sm ${
-                      isFavorite 
-                        ? 'bg-red-100 hover:bg-red-200 text-red-700' 
-                        : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
-                    }`}
-                  >
-                    <Heart className={`w-4 h-4 ${isFavorite ? 'fill-current' : ''}`} />
-                    <span className="hidden xs:inline">{isFavorite ? 'Guardado' : 'Guardar'}</span>
-                    <span className="xs:hidden">{isFavorite ? '❤️' : '♥'}</span>
-                  </button>
-                  <div className="relative flex-1">
-                    <button 
-                      onClick={handleShare}
-                      className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2 px-2 sm:px-3 rounded-lg transition-colors duration-200 flex items-center justify-center gap-1 sm:gap-2 text-xs sm:text-sm"
-                    >
-                      <Share2 className="w-4 h-4" />
-                      <span className="hidden xs:inline">Compartir</span>
-                      <span className="xs:hidden">📤</span>
-                    </button>
-                    {showShareTooltip && (
-                      <div className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded whitespace-nowrap">
-                        ¡Enlace copiado!
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
 
-          {/* Columna de Información - Solo Desktop */}
-          <div className="space-y-3 sm:space-y-6 order-2 lg:order-2">
-            {/* Información básica del servicio - Solo visible en desktop */}
-            <div className="hidden lg:block space-y-4">
-              <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 leading-tight">
-                {service.name}
-              </h1>
-              
-              {/* Categoría y Rating */}
-              <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-                <span className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-orange-100 to-orange-200 text-orange-800 text-sm font-semibold rounded-full border border-orange-300">
-                  📂 {service.category}
-                </span>
-                
-                {service.rating && service.rating > 0 && (
-                  <div className="flex items-center gap-2">
-                    {renderRating(service.rating)}
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Descripción - Solo visible en desktop */}
+            {/* Descripción */}
             {service.description && (
-              <div className="hidden lg:block bg-white p-4 sm:p-6 rounded-xl sm:rounded-2xl border border-gray-100 shadow-sm">
+              <motion.div 
+                className="bg-white/80 backdrop-blur-sm p-4 sm:p-6 rounded-xl sm:rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300"
+                whileHover={{ y: -2 }}
+              >
                 <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2 sm:mb-3">Descripción</h3>
                 <p className="text-gray-700 leading-relaxed text-sm sm:text-base">
                   {service.description}
                 </p>
-              </div>
+              </motion.div>
             )}
 
-            {/* Información del Servicio - Solo visible en desktop */}
-            <div className="hidden lg:block bg-white p-3 sm:p-6 rounded-xl sm:rounded-2xl border border-gray-100 shadow-sm">
+            {/* Información del Servicio */}
+            <motion.div 
+              className="bg-white/80 backdrop-blur-sm p-4 sm:p-6 rounded-xl sm:rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300"
+              whileHover={{ y: -2 }}
+            >
               <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">Información del Servicio</h3>
               <div className="space-y-3 sm:space-y-4">
                 {/* Ubicación */}
                 {(service.location || service.address) && (
-                  <div className="flex items-start gap-4 p-4 bg-blue-50 rounded-xl border border-blue-100">
+                  <motion.div 
+                    className="flex items-start gap-4 p-4 bg-white/80 backdrop-blur-sm rounded-xl border border-blue-100 shadow-sm hover:shadow-md transition-all duration-300"
+                    whileHover={{ y: -2 }}
+                  >
                     <div className="p-2 bg-blue-500 rounded-lg">
                       <MapPin className="w-5 h-5 text-white" />
                     </div>
@@ -626,12 +501,16 @@ const ServiceHeader: React.FC<ServiceHeaderProps> = ({ service }): ReactElement 
                         })()}
                       </div>
                     </div>
-                  </div>
+                  </motion.div>
                 )}
 
                 {/* Horario */}
                 {service.horario && (
-                  <div className="flex items-start gap-4 p-4 bg-green-50 rounded-xl border border-green-100">
+                  <motion.div 
+                    className="flex items-start gap-4 p-4 bg-white/80 backdrop-blur-sm rounded-xl border border-green-100 shadow-sm hover:shadow-md transition-all duration-300"
+                    whileHover={{ y: -2 }}
+                    variants={itemVariants}
+                  >
                     <div className="p-2 bg-green-500 rounded-lg">
                       <Clock className="w-5 h-5 text-white" />
                     </div>
@@ -639,11 +518,15 @@ const ServiceHeader: React.FC<ServiceHeaderProps> = ({ service }): ReactElement 
                       <h4 className="font-semibold text-green-900 mb-1">Horario</h4>
                       <p className="text-gray-700 text-sm">{formatSchedule()}</p>
                     </div>
-                  </div>
+                  </motion.div>
                 )}
 
                 {/* Contacto */}
-                <div className="flex items-start gap-4 p-4 bg-orange-50 rounded-xl border border-orange-100">
+                <motion.div 
+                  className="flex items-start gap-4 p-4 bg-white/80 backdrop-blur-sm rounded-xl border border-orange-100 shadow-sm hover:shadow-md transition-all duration-300"
+                  whileHover={{ y: -2 }}
+                  variants={itemVariants}
+                >
                   <div className="p-2 bg-orange-500 rounded-lg">
                     <Phone className="w-5 h-5 text-white" />
                   </div>
@@ -651,23 +534,229 @@ const ServiceHeader: React.FC<ServiceHeaderProps> = ({ service }): ReactElement 
                     <h4 className="font-semibold text-orange-900 mb-1">Contacto</h4>
                     <div className="space-y-2">
                       {(service.whatsapp || (service.contactUrl && (service.contactUrl.includes('wa.me') || service.contactUrl.includes('whatsapp') || service.contactUrl.includes('wa.link')))) && (
-                        <div className="text-gray-700 text-sm">
-                          💬 {
-                            service.contactUrl && (service.contactUrl.includes('wa.me') || service.contactUrl.includes('whatsapp') || service.contactUrl.includes('wa.link'))
-                              ? (service.whatsapp || 'WhatsApp')
-                              : service.whatsapp
-                          }
-                        </div>
+                        <motion.a
+                          variants={itemVariants}
+                          whileHover="hover"
+                          whileTap="tap"
+                          href={`https://wa.me/${service.whatsapp?.replace(/\s/g, '')}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="group relative flex-1 inline-flex justify-center items-center px-6 py-3.5 border border-transparent text-base font-semibold rounded-xl text-white bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden"
+                        >
+                          {/* Animated background effect */}
+                          <span className="absolute inset-0 bg-white/20 group-hover:bg-white/30 transition-all duration-300 transform -translate-x-full group-hover:translate-x-0"></span>
+                          
+                          {/* WhatsApp icon with animation */}
+                          <motion.span 
+                            className="relative flex items-center gap-2"
+                            initial={{ x: -5, opacity: 0 }}
+                            animate={{ x: 0, opacity: 1 }}
+                            transition={{ delay: 0.1, type: 'spring', stiffness: 300, damping: 15 }}
+                          >
+                            <FaWhatsapp className="w-5 h-5 text-white" />
+                            <span>Enviar mensaje</span>
+                          </motion.span>
+                        </motion.a>
                       )}
                     </div>
                   </div>
-                </div>
+                </motion.div>
               </div>
+              <motion.button
+                variants={itemVariants}
+                whileHover={{ 
+                  scale: 1.1,
+                  backgroundColor: isFavorite ? 'rgba(239, 68, 68, 0.1)' : 'rgba(0, 0, 0, 0.05)'
+                }}
+                whileTap={{ scale: 0.95 }}
+                type="button"
+                onClick={handleFavoriteToggle}
+                className={`p-3 rounded-xl bg-white/80 backdrop-blur-sm ${isFavorite ? 'text-red-500' : 'text-gray-400'} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 border border-gray-200 shadow-md hover:shadow-lg transition-all duration-300`}
+                aria-label={isFavorite ? 'Eliminar de favoritos' : 'Añadir a favoritos'}
+              >
+                <motion.div
+                  animate={isFavorite ? { scale: [1, 1.2, 1] } : {}}
+                  transition={{ duration: 0.3 }}
+                >
+                  <Heart 
+                    className={`h-6 w-6 ${isFavorite ? 'fill-red-500' : ''}`} 
+                    aria-hidden="true" 
+                  />
+                </motion.div>
+              </motion.button>
+              <motion.button
+                variants={itemVariants}
+                whileHover={{ 
+                  scale: 1.1,
+                  backgroundColor: 'rgba(59, 130, 246, 0.1)'
+                }}
+                whileTap={{ scale: 0.95 }}
+                type="button"
+                onClick={handleShare}
+                className="p-3 rounded-xl bg-white/80 backdrop-blur-sm text-gray-400 hover:text-blue-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 border border-gray-200 shadow-md hover:shadow-lg transition-all duration-300"
+                aria-label="Compartir"
+              >
+                <Share2 className="h-6 w-6" aria-hidden="true" />
+              </motion.button>
+            </motion.div>
+          </motion.div>
+
+          {/* Columna izquierda - Imágenes (solo escritorio) */}
+          <motion.div 
+            className="mb-8 lg:mb-0 relative hidden lg:block"
+            variants={itemVariants}
+          >
+            {/* Imagen principal */}
+            <div className="relative aspect-square w-full overflow-hidden rounded-2xl shadow-xl">
+              <Image
+                src={images[currentImageIndex]}
+                alt={service.name}
+                fill
+                className="object-cover"
+                priority
+              />
+              {/* Controles de navegación de imágenes */}
+              {images.length > 1 && (
+                <>
+                  <button
+                    onClick={prevImage}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 bg-white/80 backdrop-blur-sm p-2 rounded-full shadow-lg hover:bg-white transition-colors duration-200 z-10"
+                    aria-label="Imagen anterior"
+                  >
+                    <ChevronLeft className="w-5 h-5 text-gray-700" />
+                  </button>
+                  <button
+                    onClick={nextImage}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 bg-white/80 backdrop-blur-sm p-2 rounded-full shadow-lg hover:bg-white transition-colors duration-200 z-10"
+                    aria-label="Siguiente imagen"
+                  >
+                    <ChevronRight className="w-5 h-5 text-gray-700" />
+                  </button>
+                </>
+              )}
+              {/* Indicadores de imagen */}
+              {images.length > 1 && (
+                <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2">
+                  {images.map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setCurrentImageIndex(index)}
+                      className={`h-2 rounded-full transition-all duration-300 ${
+                        index === currentImageIndex 
+                          ? 'w-6 bg-white' 
+                          : 'w-2 bg-white/50 hover:bg-white/80'
+                      }`}
+                      aria-label={`Ir a la imagen ${index + 1}`}
+                    />
+                  ))}
+                </div>
+              )}
             </div>
 
+            {/* Enhanced Featured Badge */}
+            {service.featured && (
+              <motion.div 
+                className="absolute top-4 left-4 z-10"
+                initial={{ scale: 0, rotate: -15, opacity: 0 }}
+                animate={{ 
+                  scale: 1, 
+                  rotate: 0, 
+                  opacity: 1,
+                  transition: {
+                    type: 'spring',
+                    stiffness: 300,
+                    damping: 15,
+                    delay: 0.3
+                  }
+                }}
+                whileHover={{
+                  scale: 1.05,
+                  rotate: [0, -5, 5, -5, 0],
+                  transition: { duration: 0.6 }
+                }}
+              >
+                <span className="inline-flex items-center bg-gradient-to-r from-amber-400 to-yellow-500 text-black text-xs font-bold px-4 py-1.5 rounded-full shadow-lg border border-yellow-300">
+                  <svg 
+                    className="w-4 h-4 mr-1.5 text-yellow-700" 
+                    fill="currentColor" 
+                    viewBox="0 0 20 20" 
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
+                  Destacado
+                </span>
+              </motion.div>
+            )}
+          </motion.div>
 
+          {/* Botones de acción (solo en móvil) */}
+          <div className="lg:hidden mt-6 space-y-3">
+            {/* Botón WhatsApp */}
+            {(service.whatsapp || (service.contactUrl && (service.contactUrl.includes('wa.me') || service.contactUrl.includes('whatsapp') || service.contactUrl.includes('wa.link')))) && (
+              <motion.a
+                variants={itemVariants}
+                whileHover="hover"
+                whileTap="tap"
+                href={`https://wa.me/${service.whatsapp?.replace(/\s/g, '')}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group relative flex-1 inline-flex justify-center items-center px-6 py-3.5 border border-transparent text-base font-semibold rounded-xl text-white bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden w-full"
+              >
+                <span className="absolute inset-0 bg-white/20 group-hover:bg-white/30 transition-all duration-300 transform -translate-x-full group-hover:translate-x-0"></span>
+                <motion.span 
+                  className="relative flex items-center gap-2"
+                  initial={{ x: -5, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  transition={{ delay: 0.1, type: 'spring', stiffness: 300, damping: 15 }}
+                >
+                  <FaWhatsapp className="w-5 h-5 text-white" />
+                  <span>Enviar mensaje</span>
+                </motion.span>
+              </motion.a>
+            )}
+            
+            {/* Botones secundarios */}
+            <div className="flex gap-3">
+              <motion.button
+                variants={itemVariants}
+                whileHover={{ 
+                  scale: 1.1,
+                  backgroundColor: isFavorite ? 'rgba(239, 68, 68, 0.1)' : 'rgba(0, 0, 0, 0.05)'
+                }}
+                whileTap={{ scale: 0.95 }}
+                type="button"
+                onClick={handleFavoriteToggle}
+                className={`p-3 rounded-xl bg-white/80 backdrop-blur-sm ${isFavorite ? 'text-red-500' : 'text-gray-400'} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 border border-gray-200 shadow-md hover:shadow-lg transition-all duration-300 flex-1`}
+                aria-label={isFavorite ? 'Eliminar de favoritos' : 'Añadir a favoritos'}
+              >
+                <motion.div
+                  animate={isFavorite ? { scale: [1, 1.2, 1] } : {}}
+                  transition={{ duration: 0.3 }}
+                >
+                  <Heart 
+                    className={`h-6 w-6 ${isFavorite ? 'fill-red-500' : ''}`} 
+                    aria-hidden="true" 
+                  />
+                </motion.div>
+              </motion.button>
+              <motion.button
+                variants={itemVariants}
+                whileHover={{ 
+                  scale: 1.1,
+                  backgroundColor: 'rgba(59, 130, 246, 0.1)'
+                }}
+                whileTap={{ scale: 0.95 }}
+                type="button"
+                onClick={handleShare}
+                className="p-3 rounded-xl bg-white/80 backdrop-blur-sm text-gray-400 hover:text-blue-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 border border-gray-200 shadow-md hover:shadow-lg transition-all duration-300 flex-1"
+                aria-label="Compartir"
+              >
+                <Share2 className="h-6 w-6" aria-hidden="true" />
+              </motion.button>
+            </div>
           </div>
-        </div>
+        </motion.div>
       </div>
     </div>
   );
