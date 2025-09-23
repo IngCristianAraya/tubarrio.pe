@@ -10,16 +10,17 @@
  *   - Categoría y ubicación
  *   - Calificación con estrellas
  *   - Descripción
- *   - Botones de acción (contacto, WhatsApp, etc.)
+ *   - Componente ServiceActions para botones de acción
  *   - Información de contacto y horarios
  */
 
 import React, { useState, useCallback, useEffect } from 'react';
 import { Service } from '@/types/service';
-import { MapPin, Clock, Star, Share2, Heart, ChevronLeft, ChevronRight, Phone, ExternalLink } from 'lucide-react';
+import { MapPin, Clock, Star, ChevronLeft, ChevronRight, Phone } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
-import { FaWhatsapp } from 'react-icons/fa';
+import ServiceActions from './ServiceActions';
+import ServiceImages from './ServiceImages';
 
 type ReactElement = React.ReactElement;
 
@@ -126,10 +127,10 @@ const ServiceHeader = ({ service }: ServiceHeaderProps): ReactElement => {
     return 'No especificado';
   };
 
-  // Manejo de la galería de imágenes
-  const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
+  // Estados para favoritos y compartir
   const [isFavorite, setIsFavorite] = useState(false);
   const [showShareTooltip, setShowShareTooltip] = useState(false);
+  
   // Función para validar si una imagen es válida
   const isValidImage = (imageUrl: string | null | undefined): boolean => {
     return !!imageUrl && 
@@ -158,24 +159,15 @@ const ServiceHeader = ({ service }: ServiceHeaderProps): ReactElement => {
     ? validImages 
     : ['/images/placeholder-service.jpg'];
 
-  // Función para manejar favoritos
-  const handleFavoriteToggle = useCallback(() => {
-    setIsFavorite(!isFavorite);
-    // Aquí puedes agregar lógica para guardar en localStorage o base de datos
-    const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
-    if (!isFavorite) {
-      favorites.push(service.id);
-      localStorage.setItem('favorites', JSON.stringify(favorites));
-    } else {
-      const updatedFavorites = favorites.filter((id: string) => id !== service.id);
-      localStorage.setItem('favorites', JSON.stringify(updatedFavorites));
-    }
-  }, [isFavorite, service.id]);
+  // Manejar el cambio de favoritos
+  const handleFavoriteToggle = (newIsFavorite: boolean) => {
+    setIsFavorite(newIsFavorite);
+  };
 
   // Función para compartir
   const handleShare = useCallback(async () => {
     const shareData = {
-      title: service.name,
+      title: service.name || 'Servicio',
       text: `Descubre ${service.name} en TuBarrio.pe`,
       url: window.location.href
     };
@@ -199,19 +191,10 @@ const ServiceHeader = ({ service }: ServiceHeaderProps): ReactElement => {
     setTimeout(() => setShowShareTooltip(false), 2000);
   }, []);
 
-  // Verificar si está en favoritos al cargar
   useEffect(() => {
     const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
     setIsFavorite(favorites.includes(service.id));
   }, [service.id]);
-
-  const nextImage = useCallback((): void => {
-    setCurrentImageIndex(prev => (prev === images.length - 1 ? 0 : prev + 1));
-  }, [images.length]);
-
-  const prevImage = useCallback((): void => {
-    setCurrentImageIndex(prev => (prev === 0 ? images.length - 1 : prev - 1));
-  }, [images.length]);
 
   // Función para formatear el rating
   const renderRating = (rating: number): ReactElement => {
@@ -239,72 +222,6 @@ const ServiceHeader = ({ service }: ServiceHeaderProps): ReactElement => {
 
   // Obtener el gradiente basado en la categoría
   const gradientClass = getCategoryGradient(service.category || '');
-
-  // Efecto para animar la entrada
-  useEffect(() => {
-    // Forzar una repintada para asegurar que las animaciones se ejecuten
-    const timer = setTimeout(() => {
-      // Este timeout vacío ayuda a asegurar que las animaciones se ejecuten
-    }, 100);
-    return () => clearTimeout(timer);
-  }, []);
-  
-  // Función para manejar el efecto de ondas al hacer clic en botones
-  const createRipple = (event: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>) => {
-    const button = event.currentTarget;
-    const rect = button.getBoundingClientRect();
-    const size = Math.max(rect.width, rect.height);
-    const x = event.clientX - rect.left - size / 2;
-    const y = event.clientY - rect.top - size / 2;
-    
-    const ripple = document.createElement('span');
-    ripple.style.width = ripple.style.height = `${size}px`;
-    ripple.style.left = `${x}px`;
-    ripple.style.top = `${y}px`;
-    ripple.classList.add('ripple');
-    
-    // Limpiar ripples anteriores
-    const existingRipples = button.getElementsByClassName('ripple');
-    Array.from(existingRipples).forEach(ripple => ripple.remove());
-    
-    button.appendChild(ripple);
-    
-    // Eliminar el ripple después de la animación
-    setTimeout(() => ripple.remove(), 1000);
-  };
-  
-  // Añadir estilos para el efecto ripple
-  useEffect(() => {
-    const style = document.createElement('style');
-    style.textContent = `
-      @keyframes ripple {
-        to {
-          transform: scale(4);
-          opacity: 0;
-        }
-      }
-      
-      .ripple {
-        position: absolute;
-        border-radius: 50%;
-        background-color: rgba(255, 255, 255, 0.7);
-        transform: scale(0);
-        animation: ripple 600ms linear;
-        pointer-events: none;
-      }
-      
-      .gradient-text {
-        background-clip: text;
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-      }
-    `;
-    document.head.appendChild(style);
-    
-    return () => {
-      document.head.removeChild(style);
-    };
-  }, []);
 
   return (
     <div className="relative overflow-hidden">
@@ -375,48 +292,12 @@ const ServiceHeader = ({ service }: ServiceHeaderProps): ReactElement => {
             </motion.div>
 
             {/* Galería de imágenes (solo móvil) */}
-            <div className="lg:hidden relative aspect-square w-full overflow-hidden rounded-2xl shadow-xl my-6">
-              <Image
-                src={images[currentImageIndex]}
-                alt={service.name}
-                fill
-                className="object-cover"
-                priority
+            <div className="lg:hidden my-6">
+              <ServiceImages 
+                images={images}
+                name={service.name}
+                className="sticky top-8"
               />
-              
-              {images.length > 1 && (
-                <>
-                  <button
-                    onClick={prevImage}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 bg-white/80 backdrop-blur-sm p-2 rounded-full shadow-lg hover:bg-white transition-colors duration-200 z-10"
-                    aria-label="Imagen anterior"
-                  >
-                    <ChevronLeft className="w-5 h-5 text-gray-700" />
-                  </button>
-                  <button
-                    onClick={nextImage}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 bg-white/80 backdrop-blur-sm p-2 rounded-full shadow-lg hover:bg-white transition-colors duration-200 z-10"
-                    aria-label="Siguiente imagen"
-                  >
-                    <ChevronRight className="w-5 h-5 text-gray-700" />
-                  </button>
-                  
-                  <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2">
-                    {images.map((_, index) => (
-                      <button
-                        key={index}
-                        onClick={() => setCurrentImageIndex(index)}
-                        className={`h-2 rounded-full transition-all duration-300 ${
-                          index === currentImageIndex 
-                            ? 'w-6 bg-white' 
-                            : 'w-2 bg-white/50 hover:bg-white/80'
-                        }`}
-                        aria-label={`Ir a imagen ${index + 1}`}
-                      />
-                    ))}
-                  </div>
-                </>
-              )}
             </div>
 
             {/* Descripción */}
@@ -523,131 +404,73 @@ const ServiceHeader = ({ service }: ServiceHeaderProps): ReactElement => {
 
                 {/* Contacto */}
                 <motion.div 
-                  className="flex items-start gap-4 p-4 bg-white/80 backdrop-blur-sm rounded-xl border border-orange-100 shadow-sm hover:shadow-md transition-all duration-300"
+                  className="flex flex-col gap-4 p-4 bg-white/80 backdrop-blur-sm rounded-xl border border-orange-100 shadow-sm hover:shadow-md transition-all duration-300"
                   whileHover={{ y: -2 }}
                   variants={itemVariants}
                 >
-                  <div className="p-2 bg-orange-500 rounded-lg">
-                    <Phone className="w-5 h-5 text-white" />
-                  </div>
-                  <div className="flex-1">
-                    <h4 className="font-semibold text-orange-900 mb-1">Contacto</h4>
-                    <div className="space-y-2">
-                      {(service.whatsapp || (service.contactUrl && (service.contactUrl.includes('wa.me') || service.contactUrl.includes('whatsapp') || service.contactUrl.includes('wa.link')))) && (
-                        <motion.a
-                          variants={itemVariants}
-                          whileHover="hover"
-                          whileTap="tap"
-                          href={`https://wa.me/${service.whatsapp?.replace(/\s/g, '')}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="group relative flex-1 inline-flex justify-center items-center px-6 py-3.5 border border-transparent text-base font-semibold rounded-xl text-white bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden"
-                        >
-                          {/* Animated background effect */}
-                          <span className="absolute inset-0 bg-white/20 group-hover:bg-white/30 transition-all duration-300 transform -translate-x-full group-hover:translate-x-0"></span>
-                          
-                          {/* WhatsApp icon with animation */}
-                          <motion.span 
-                            className="relative flex items-center gap-2"
-                            initial={{ x: -5, opacity: 0 }}
-                            animate={{ x: 0, opacity: 1 }}
-                            transition={{ delay: 0.1, type: 'spring', stiffness: 300, damping: 15 }}
+                  <div className="flex items-start gap-4">
+                    <div className="p-2 bg-orange-500 rounded-lg">
+                      <Phone className="w-5 h-5 text-white" />
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="font-semibold text-orange-900 mb-1">Contacto</h4>
+                      {service.phone && (
+                        <div className="flex items-center gap-2 mb-3">
+                          <a 
+                            href={`tel:${service.phone}`} 
+                            className="text-gray-700 text-sm font-medium hover:text-orange-600 transition-colors"
                           >
-                            <FaWhatsapp className="w-5 h-5 text-white" />
-                            <span>Enviar mensaje</span>
-                          </motion.span>
-                        </motion.a>
+                            {service.phone}
+                          </a>
+                        </div>
                       )}
                     </div>
                   </div>
+                  
+                  {/* Botones de acción */}
+                  <div className="flex flex-col sm:flex-row gap-3 mt-2">
+                    <ServiceActions 
+                      service={service} 
+                      onFavoriteToggle={handleFavoriteToggle}
+                    />
+                  </div>
                 </motion.div>
               </div>
-              <motion.button
-                variants={itemVariants}
-                whileHover={{ 
-                  scale: 1.1,
-                  backgroundColor: isFavorite ? 'rgba(239, 68, 68, 0.1)' : 'rgba(0, 0, 0, 0.05)'
-                }}
-                whileTap={{ scale: 0.95 }}
-                type="button"
-                onClick={handleFavoriteToggle}
-                className={`p-3 rounded-xl bg-white/80 backdrop-blur-sm ${isFavorite ? 'text-red-500' : 'text-gray-400'} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 border border-gray-200 shadow-md hover:shadow-lg transition-all duration-300`}
-                aria-label={isFavorite ? 'Eliminar de favoritos' : 'Añadir a favoritos'}
-              >
-                <motion.div
-                  animate={isFavorite ? { scale: [1, 1.2, 1] } : {}}
-                  transition={{ duration: 0.3 }}
-                >
-                  <Heart 
-                    className={`h-6 w-6 ${isFavorite ? 'fill-red-500' : ''}`} 
-                    aria-hidden="true" 
-                  />
-                </motion.div>
-              </motion.button>
-              <motion.button
-                variants={itemVariants}
-                whileHover={{ 
-                  scale: 1.1,
-                  backgroundColor: 'rgba(59, 130, 246, 0.1)'
-                }}
-                whileTap={{ scale: 0.95 }}
-                type="button"
-                onClick={handleShare}
-                className="p-3 rounded-xl bg-white/80 backdrop-blur-sm text-gray-400 hover:text-blue-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 border border-gray-200 shadow-md hover:shadow-lg transition-all duration-300"
-                aria-label="Compartir"
-              >
-                <Share2 className="h-6 w-6" aria-hidden="true" />
-              </motion.button>
             </motion.div>
           </motion.div>
 
           {/* Columna izquierda - Imágenes (solo escritorio) */}
           <motion.div 
-            className="mb-8 lg:mb-0 relative hidden lg:block"
+            className="lg:sticky lg:top-40 lg:self-start hidden lg:block mt-20"
             variants={itemVariants}
           >
-            {/* Imagen principal */}
-            <div className="relative aspect-square w-full overflow-hidden rounded-2xl shadow-xl">
-              <Image
-                src={images[currentImageIndex]}
-                alt={service.name}
-                fill
-                className="object-cover"
-                priority
-              />
-              {/* Controles de navegación de imágenes */}
+            <div className="space-y-4">
+              {/* Imagen principal */}
+              <div className="relative aspect-square w-full max-w-xl overflow-hidden rounded-2xl shadow-xl bg-white/50 backdrop-blur-sm p-1">
+                <Image
+                  src={images[0]}
+                  alt={service.name}
+                  fill
+                  className="object-cover"
+                  priority
+                />
+              </div>
+
+              {/* Miniaturas de la galería (solo si hay más de una imagen) */}
               {images.length > 1 && (
-                <>
-                  <button
-                    onClick={prevImage}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 bg-white/80 backdrop-blur-sm p-2 rounded-full shadow-lg hover:bg-white transition-colors duration-200 z-10"
-                    aria-label="Imagen anterior"
-                  >
-                    <ChevronLeft className="w-5 h-5 text-gray-700" />
-                  </button>
-                  <button
-                    onClick={nextImage}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 bg-white/80 backdrop-blur-sm p-2 rounded-full shadow-lg hover:bg-white transition-colors duration-200 z-10"
-                    aria-label="Siguiente imagen"
-                  >
-                    <ChevronRight className="w-5 h-5 text-gray-700" />
-                  </button>
-                </>
-              )}
-              {/* Indicadores de imagen */}
-              {images.length > 1 && (
-                <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2">
-                  {images.map((_, index) => (
-                    <button
+                <div className="grid grid-cols-4 gap-2">
+                  {images.slice(0, 4).map((img, index) => (
+                    <div 
                       key={index}
-                      onClick={() => setCurrentImageIndex(index)}
-                      className={`h-2 rounded-full transition-all duration-300 ${
-                        index === currentImageIndex 
-                          ? 'w-6 bg-white' 
-                          : 'w-2 bg-white/50 hover:bg-white/80'
-                      }`}
-                      aria-label={`Ir a la imagen ${index + 1}`}
-                    />
+                      className="relative aspect-square overflow-hidden rounded-lg border-2 border-transparent hover:border-orange-400 transition-colors"
+                    >
+                      <Image
+                        src={img}
+                        alt={`${service.name} - Imagen ${index + 1}`}
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
                   ))}
                 </div>
               )}
@@ -689,73 +512,6 @@ const ServiceHeader = ({ service }: ServiceHeaderProps): ReactElement => {
               </motion.div>
             )}
           </motion.div>
-
-          {/* Botones de acción (solo en móvil) */}
-          <div className="lg:hidden mt-6 space-y-3">
-            {/* Botón WhatsApp */}
-            {(service.whatsapp || (service.contactUrl && (service.contactUrl.includes('wa.me') || service.contactUrl.includes('whatsapp') || service.contactUrl.includes('wa.link')))) && (
-              <motion.a
-                variants={itemVariants}
-                whileHover="hover"
-                whileTap="tap"
-                href={`https://wa.me/${service.whatsapp?.replace(/\s/g, '')}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group relative flex-1 inline-flex justify-center items-center px-6 py-3.5 border border-transparent text-base font-semibold rounded-xl text-white bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden w-full"
-              >
-                <span className="absolute inset-0 bg-white/20 group-hover:bg-white/30 transition-all duration-300 transform -translate-x-full group-hover:translate-x-0"></span>
-                <motion.span 
-                  className="relative flex items-center gap-2"
-                  initial={{ x: -5, opacity: 0 }}
-                  animate={{ x: 0, opacity: 1 }}
-                  transition={{ delay: 0.1, type: 'spring', stiffness: 300, damping: 15 }}
-                >
-                  <FaWhatsapp className="w-5 h-5 text-white" />
-                  <span>Enviar mensaje</span>
-                </motion.span>
-              </motion.a>
-            )}
-            
-            {/* Botones secundarios */}
-            <div className="flex gap-3">
-              <motion.button
-                variants={itemVariants}
-                whileHover={{ 
-                  scale: 1.1,
-                  backgroundColor: isFavorite ? 'rgba(239, 68, 68, 0.1)' : 'rgba(0, 0, 0, 0.05)'
-                }}
-                whileTap={{ scale: 0.95 }}
-                type="button"
-                onClick={handleFavoriteToggle}
-                className={`p-3 rounded-xl bg-white/80 backdrop-blur-sm ${isFavorite ? 'text-red-500' : 'text-gray-400'} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 border border-gray-200 shadow-md hover:shadow-lg transition-all duration-300 flex-1`}
-                aria-label={isFavorite ? 'Eliminar de favoritos' : 'Añadir a favoritos'}
-              >
-                <motion.div
-                  animate={isFavorite ? { scale: [1, 1.2, 1] } : {}}
-                  transition={{ duration: 0.3 }}
-                >
-                  <Heart 
-                    className={`h-6 w-6 ${isFavorite ? 'fill-red-500' : ''}`} 
-                    aria-hidden="true" 
-                  />
-                </motion.div>
-              </motion.button>
-              <motion.button
-                variants={itemVariants}
-                whileHover={{ 
-                  scale: 1.1,
-                  backgroundColor: 'rgba(59, 130, 246, 0.1)'
-                }}
-                whileTap={{ scale: 0.95 }}
-                type="button"
-                onClick={handleShare}
-                className="p-3 rounded-xl bg-white/80 backdrop-blur-sm text-gray-400 hover:text-blue-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 border border-gray-200 shadow-md hover:shadow-lg transition-all duration-300 flex-1"
-                aria-label="Compartir"
-              >
-                <Share2 className="h-6 w-6" aria-hidden="true" />
-              </motion.button>
-            </div>
-          </div>
         </motion.div>
       </div>
     </div>
