@@ -8,8 +8,8 @@ export const sampleServices: Record<string, Service[]> = {
       slug: 'sabor-peruano',
       name: 'Sabor Peruano',
       description: 'Comida típica peruana con los mejores sabores de la costa, sierra y selva.',
-      category: 'Restaurantes',
-      categorySlug: 'restaurantes',
+      category: 'Restaurantes y menús',  // Nombre legible para mostrar
+      categorySlug: 'restaurantes-y-menus',  // Para URLs y código interno
       image: '/Anticuchos.webp',
       images: ['/Anticuchos.webp'],
       rating: 4.5,
@@ -24,7 +24,7 @@ export const sampleServices: Record<string, Service[]> = {
       name: 'Superburguer',
       description: 'Servicio de lavado y planchado con los mejores productos.',
       category: 'Comida rápida',
-      categorySlug: 'comida rapida',
+      categorySlug: 'comida-rapida',
       image: 'https://cdn.pixabay.com/photo/2017/09/14/19/34/laundry-2750158_1280.jpg',
       images: ['https://cdn.pixabay.com/photo/2017/09/14/19/34/laundry-2750158_1280.jpg'],
       rating: 4.7,

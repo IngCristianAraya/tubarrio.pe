@@ -2,75 +2,202 @@
  * Componente ServiceActions
  * 
  * Maneja los botones de acción para un servicio, incluyendo:
- * - Botón principal de contacto (correo/formulario de contacto)
- * - Botón de WhatsApp (cuando está disponible)
- * - Cualquier otro botón de acción relacionado con el servicio
+ * - Botón de WhatsApp con animación
+ * - Botón de favoritos con persistencia local
+ * - Botón para compartir en redes sociales
+ * - Botón para ver más detalles
  * 
  * Este componente es responsable de los elementos interactivos que permiten a los usuarios
- * iniciar contacto o realizar acciones relacionadas con el servicio.
+ * interactuar con el servicio de diversas formas.
  */
 
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Service } from '@/types/service';
-import useWhatsApp from '@/hooks/useWhatsApp';
+import { Share2, Heart, ExternalLink } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { FaWhatsapp } from 'react-icons/fa';
 
 interface ServiceActionsProps {
-  service: Service;
+  service: Service & {
+    id: string;
+    detailsUrl?: string;
+    whatsapp?: string;
+    contactUrl?: string;
+  };
+  onFavoriteToggle?: (isFavorite: boolean) => void;
 }
 
-const ServiceActions: React.FC<ServiceActionsProps> = ({ service }) => {
-  const defaultMessage = `Hola, estoy interesado en el servicio de ${service.name}. ¿Podrían brindarme más información?`;
-  const { getWhatsAppUrl } = useWhatsApp(service.whatsapp || '', defaultMessage);
-  
-  // If no contact method is available, don't render anything
-  if (!service.detailsUrl && !service.whatsapp) {
+const ServiceActions: React.FC<ServiceActionsProps> = ({ service, onFavoriteToggle }) => {
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [isClient, setIsClient] = useState(false);
+
+  // Verificar si estamos en el cliente para acceder a localStorage
+  useEffect(() => {
+    setIsClient(true);
+    
+    if (typeof window !== 'undefined') {
+      const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+      setIsFavorite(favorites.includes(service.id));
+    }
+  }, [service.id]);
+
+  // Manejar el cambio de favoritos
+  const toggleFavorite = () => {
+    if (typeof window === 'undefined') return;
+    
+    const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+    let newFavorites;
+    
+    if (isFavorite) {
+      newFavorites = favorites.filter((id: string) => id !== service.id);
+    } else {
+      newFavorites = [...favorites, service.id];
+    }
+    
+    localStorage.setItem('favorites', JSON.stringify(newFavorites));
+    const newIsFavorite = !isFavorite;
+    setIsFavorite(newIsFavorite);
+    
+    if (onFavoriteToggle) {
+      onFavoriteToggle(newIsFavorite);
+    }
+  };
+
+  // Manejar el compartir
+  const handleShare = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: service.name,
+          text: `Mira este servicio: ${service.name}`,
+          url: window.location.href,
+        });
+      } catch (error) {
+        console.error('Error al compartir:', error);
+      }
+    } else {
+      // Fallback para navegadores que no soportan la API de Web Share
+      navigator.clipboard.writeText(window.location.href);
+      alert('Enlace copiado al portapapeles');
+    }
+  };
+
+  // Variantes de animación
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: {
+        type: 'spring',
+        stiffness: 100,
+        damping: 15,
+      },
+    },
+    hover: {
+      scale: 1.05,
+      transition: { duration: 0.2 },
+    },
+    tap: { scale: 0.95 },
+  };
+
+  // No renderizar nada hasta que estemos en el cliente
+  if (!isClient) {
     return null;
   }
+
   return (
-    <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mt-4 w-full">
-      <a 
-        href={service.detailsUrl} 
-        target="_blank" 
-        rel="noopener noreferrer" 
-        className="inline-flex items-center justify-center bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-xl font-bold text-base sm:text-lg shadow-lg transition-all duration-200 w-full sm:w-auto sm:min-w-[210px] text-center"
-      >
-        <svg 
-          xmlns="http://www.w3.org/2000/svg" 
-          className="w-5 h-5 mr-2" 
-          fill="none" 
-          viewBox="0 0 24 24" 
-          stroke="currentColor"
+    <div className="flex flex-wrap items-center gap-2 mt-4 w-full">
+      {/* Botón de WhatsApp */}
+      {(service.whatsapp || (service.contactUrl && (service.contactUrl.includes('wa.me') || 
+          service.contactUrl.includes('whatsapp') || service.contactUrl.includes('wa.link')))) && (
+        <motion.a
+          variants={itemVariants}
+          whileHover="hover"
+          whileTap="tap"
+          href={`https://wa.me/${service.whatsapp?.replace(/\s/g, '')}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="group relative flex-1 min-w-[calc(50%-0.5rem)] sm:min-w-0 inline-flex justify-center items-center px-4 py-3 border border-transparent text-base font-semibold rounded-xl text-white bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden"
         >
-          <path 
-            strokeLinecap="round" 
-            strokeLinejoin="round" 
-            strokeWidth={2} 
-            d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" 
-          />
-        </svg>
-        Contactar negocio
-      </a>
-      
-      {service.whatsapp && service.whatsapp !== 'none' && (
-        <a 
-          href={getWhatsAppUrl()} 
-          target="_blank" 
-          rel="noopener noreferrer" 
-          className="inline-flex items-center justify-center bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-xl font-bold text-base sm:text-lg shadow-lg transition-all duration-200 w-full sm:w-auto sm:min-w-[210px] text-center"
-        >
-          <svg 
-            className="w-5 h-5 mr-2" 
-            viewBox="0 0 24 24" 
-            fill="currentColor"
+          <span className="absolute inset-0 bg-white/20 group-hover:bg-white/30 transition-all duration-300 transform -translate-x-full group-hover:translate-x-0"></span>
+          <motion.span 
+            className="relative flex items-center justify-center gap-2 w-full"
+            initial={{ x: -5, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ delay: 0.1, type: 'spring', stiffness: 300, damping: 15 }}
           >
-            <path d="M17.5 14.4l-2-2c-.3-.2-.6-.3-1-.2-1.1.3-2.2.4-3.3.4-3.6 0-6.5-2.9-6.5-6.5 0-.5.1-1 .2-1.5.1-.4 0-.8-.2-1.1l-2-2C2.5 3.3 2 4.6 2 6c0 5.5 4.5 10 10 10 1.4 0 2.7-.3 3.9-.8.4-.2.8-.1 1.1.1l2.5 2.5c.4.4 1 .4 1.4 0l1.4-1.4c.4-.4.4-1 0-1.4l-3-3z"/>
-            <path d="M21.6 18.1l-1.8-1.8c.5-.9.9-1.9 1.1-2.9.1-.4 0-.8-.2-1.1l-2.9-2.9c-.3-.3-.7-.4-1.1-.2-.9.2-1.8.3-2.7.3-1.8 0-3.5-.5-5-1.4l-1.4 1.4c1.2.9 2.6 1.6 4.1 2.1l-4.1 4.1c-1.6-1.6-2.6-3.8-2.6-6.1 0-1.1.2-2.1.5-3.1l1.4-1.4c-.9-1.5-1.4-3.2-1.4-5 0-1.3.3-2.6.8-3.8L5.9 2.4C4.8 3.5 4 5 4 6.5 4 12.4 8.6 17 14.5 17c1.5 0 2.9-.4 4.2-1l1.8 1.8c.4.4 1 .4 1.4 0l1.4-1.4c.4-.4.4-1 0-1.4l-1.7-1.9z"/>
-          </svg>
-          WhatsApp
-        </a>
+            <FaWhatsapp className="w-5 h-5 text-white flex-shrink-0" />
+            <span className="whitespace-nowrap truncate">Enviar mensaje</span>
+          </motion.span>
+        </motion.a>
       )}
+
+      {/* Botón de Ver Detalles */}
+      {service.detailsUrl && (
+        <motion.a
+          variants={itemVariants}
+          whileHover={{ 
+            scale: 1.02,
+            backgroundColor: 'rgba(99, 102, 241, 0.9)'
+          }}
+          whileTap={{ scale: 0.98 }}
+          href={service.detailsUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex-1 min-w-[calc(50%-0.5rem)] sm:min-w-0 inline-flex justify-center items-center px-4 py-3 border border-transparent text-base font-semibold rounded-xl text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 shadow-lg hover:shadow-xl transition-all duration-300"
+          aria-label="Ver más detalles"
+          title="Ver más detalles"
+        >
+          <div className="flex items-center justify-center gap-2 w-full">
+            <ExternalLink className="w-5 h-5 flex-shrink-0" />
+            <span className="whitespace-nowrap truncate">Ver detalles</span>
+          </div>
+        </motion.a>
+      )}
+
+      <div className="flex gap-2 w-full sm:w-auto sm:ml-auto">
+        {/* Botón de Compartir */}
+        <motion.button
+          variants={itemVariants}
+          whileHover={{ 
+            scale: 1.05,
+            backgroundColor: 'rgba(99, 102, 241, 0.1)'
+          }}
+          whileTap={{ scale: 0.95 }}
+          onClick={handleShare}
+          className="flex-1 sm:flex-none flex justify-center items-center p-3 rounded-xl bg-white/80 backdrop-blur-sm text-gray-400 hover:text-indigo-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 border border-gray-200 shadow-md hover:shadow-lg transition-all duration-300 min-w-[48px]"
+          aria-label="Compartir"
+          title="Compartir"
+        >
+          <Share2 className="h-6 w-6" aria-hidden="true" />
+        </motion.button>
+
+        {/* Botón de Favoritos */}
+        <motion.button
+          variants={itemVariants}
+          whileHover={{ 
+            scale: 1.05,
+            backgroundColor: isFavorite ? 'rgba(239, 68, 68, 0.1)' : 'rgba(0, 0, 0, 0.05)'
+          }}
+          whileTap={{ scale: 0.95 }}
+          onClick={toggleFavorite}
+          className={`flex-1 sm:flex-none flex justify-center items-center p-3 rounded-xl bg-white/80 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-offset-2 border shadow-md hover:shadow-lg transition-all duration-300 min-w-[48px] ${
+            isFavorite 
+              ? 'text-red-500 border-red-200 focus:ring-red-500 hover:bg-red-50' 
+              : 'text-gray-400 border-gray-200 focus:ring-indigo-500 hover:text-red-500 hover:border-red-200'
+          }`}
+          aria-label={isFavorite ? 'Quitar de favoritos' : 'Añadir a favoritos'}
+          title={isFavorite ? 'Quitar de favoritos' : 'Añadir a favoritos'}
+        >
+          <Heart 
+            className={`h-6 w-6 ${isFavorite ? 'fill-current' : ''}`} 
+            aria-hidden="true" 
+          />
+        </motion.button>
+      </div>
     </div>
   );
 };

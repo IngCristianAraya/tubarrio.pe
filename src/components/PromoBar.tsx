@@ -16,17 +16,16 @@ export default function PromoBar() {
           whileHover={{ scale: 1.02 }}
         >
           <span className="text-sm md:text-base font-medium mb-1 sm:mb-0 sm:mr-2"></span>
-          <Link
-            href="/registro-negocio"
+          <a
+            href="https://forms.gle/qhVw6sFc2VvkXDeL9"
+            target="_blank"
+            rel="noopener noreferrer"
             className="text-sm md:text-base font-bold text-yellow-400 hover:underline transition-all duration-300 group flex flex-col sm:flex-row items-center"
           >
             <span className="group-hover:text-yellow-200 transition-colors">
-            📢 ¿Tienes un negocio? ¡Anúnciate en TuBarrio.pe! 🚀
+            📢 ¿Tienes un negocio? ¡Regístrate en TuBarrio.pe! 
             </span>
-            <span className="sm:inline-block sm:ml-2 text-yellow-200 group-hover:text-white transition-colors">
-              Regístrate
-            </span>
-          </Link>
+          </a>
         </motion.div>
       </div>
     </div>

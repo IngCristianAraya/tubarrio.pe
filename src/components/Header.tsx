@@ -10,7 +10,7 @@ const Header = () => {
   const { play: playFolderSound } = useSound('folder', { volume: 0.4 });
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const menuRef = useRef<HTMLDivElement>(null);
+  const menuRef = useRef<HTMLDivElement | null>(null);
 
   // Cerrar menú al hacer clic fuera
   useEffect(() => {
@@ -157,11 +157,15 @@ const Header = () => {
 
           {/* Acciones desktop */}
           <div className="hidden md:flex items-center gap-4">
-            <NavItem href="/registro-negocio">
-              <span className="px-4 py-2 rounded-xl font-bold bg-gradient-to-r from-orange-500 to-yellow-400 text-white shadow-md hover:from-orange-600 hover:to-yellow-500 transition-all duration-200 flex items-center">
-                <span className="mr-2">+</span> Registrar Negocio
-              </span>
-            </NavItem>
+            <a 
+              href="https://forms.gle/qhVw6sFc2VvkXDeL9" 
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-4 py-2 rounded-xl font-bold bg-gradient-to-r from-orange-500 to-yellow-400 text-white shadow-md hover:from-orange-600 hover:to-yellow-500 transition-all duration-200 flex items-center"
+              onClick={() => playFolderSound()}
+            >
+              <span className="mr-2">+</span> Registrar Negocio
+            </a>
           </div>
         </div>
 
@@ -182,14 +186,18 @@ const Header = () => {
                 <NavItem href="/blog">Blog</NavItem>
               </div>
               <div className="mt-6">
-                <NavItem href="/registro-negocio">
-                  <span 
-                    className="block w-full px-6 py-4 text-center rounded-xl font-bold bg-gradient-to-r from-orange-500 to-yellow-400 text-white shadow-md hover:from-orange-600 hover:to-yellow-500 active:from-orange-700 active:to-yellow-600 transition-all duration-200 min-h-[52px] flex items-center justify-center"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    + Registrar Negocio
-                  </span>
-                </NavItem>
+                <a 
+                  href="https://forms.gle/qhVw6sFc2VvkXDeL9" 
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block w-full px-6 py-4 text-center rounded-xl font-bold bg-gradient-to-r from-orange-500 to-yellow-400 text-white shadow-md hover:from-orange-600 hover:to-yellow-500 active:from-orange-700 active:to-yellow-600 transition-all duration-200 min-h-[52px] flex items-center justify-center"
+                  onClick={() => {
+                    playFolderSound();
+                    setIsMenuOpen(false);
+                  }}
+                >
+                  + Registrar Negocio
+                </a>
               </div>
             </nav>
           </div>

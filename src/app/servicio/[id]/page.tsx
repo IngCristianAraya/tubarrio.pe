@@ -2,6 +2,7 @@
 
 import { notFound, useParams } from 'next/navigation';
 import { useServiceById } from '@/hooks/useServices';
+import type { Service } from '@/types/service';
 import React from 'react';
 import Head from 'next/head';
 import { usePathname } from 'next/navigation';
@@ -158,7 +159,7 @@ export default function ServicioDetallePage() {
         <div className="max-w-7xl mx-auto px-3 py-4 sm:px-6 sm:py-8 md:px-8">
           <RecommendedServices 
             currentServiceId={service.id}
-            category={service.category || ''}
+            categorySlug={service.categorySlug || ''}
           />
         </div>
       </div>
