@@ -1,6 +1,7 @@
 'use client';
 
-import React, { memo, useMemo } from 'react';
+import * as React from 'react';
+const { useMemo } = React;
 import { Virtuoso } from 'react-virtuoso';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -23,7 +24,7 @@ interface VirtualizedServicesTableProps {
   onDelete: (id: string) => void;
 }
 
-const ServiceRow = memo(({ service, onToggleStatus, onDelete }: {
+const ServiceRow = ({ service, onToggleStatus, onDelete }: {
   service: Service;
   onToggleStatus: (id: string, currentStatus: boolean) => void;
   onDelete: (id: string) => void;
@@ -119,9 +120,9 @@ const ServiceRow = memo(({ service, onToggleStatus, onDelete }: {
       </div>
     </div>
   );
-});
+};
 
-ServiceRow.displayName = 'ServiceRow';
+// ServiceRow.displayName = 'ServiceRow';
 
 const VirtualizedServicesTable = ({ services, onToggleStatus, onDelete }: VirtualizedServicesTableProps) => {
   const rowContent = useMemo(() => 

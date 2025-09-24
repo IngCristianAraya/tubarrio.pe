@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import Link from 'next/link';
 import { AnalyticsDashboard } from '@/components/analytics/AnalyticsDashboard';
 import { useServices } from '@/hooks/useServices';
@@ -10,6 +10,7 @@ interface Stats {
   activeServices: number;
   categories: string[];
   recentServices: any[];
+  lastUpdated?: string;
 }
 
 export default function AdminDashboard() {
@@ -17,17 +18,42 @@ export default function AdminDashboard() {
   // 🚀 OPTIMIZACIÓN: Usar hook optimizado de servicios
   const { services, loading: servicesLoading, error: servicesError } = useServices({ limit: 1000 });
 
-  // 🚀 OPTIMIZACIÓN: Calcular estadísticas directamente de los servicios
-  const stats = useMemo(() => {
-    if (!services) {
-      return {
-        totalServices: 0,
-        activeServices: 0,
-        categories: [],
-        recentServices: []
-      };
-    }
+  // Estado para las estadísticas
+  const [stats, setStats] = useState<Stats>({
+    totalServices: 0,
+    activeServices: 0,
+    categories: [],
+    recentServices: [],
+    lastUpdated: ''
+  });
 
+  // Función para cargar/actualizar las estadísticas
+  const loadStats = useCallback(() => {
+    if (!services) return;
+    
+    const totalServices = services.length;
+    const activeServices = services.filter(service => service.active !== false).length;
+    const categories = [...new Set(services.map(service => service.category).filter(Boolean))];
+    const recentServices = [...services]
+      .sort((a, b) => ((b.createdAt?.toDate?.() || new Date()).getTime() - (a.createdAt?.toDate?.() || new Date()).getTime()))
+      .slice(0, 5);
+    
+    setStats({
+      totalServices,
+      activeServices,
+      categories,
+      recentServices,
+      lastUpdated: new Date().toLocaleString()
+    });
+    
+    // Mostrar notificación de éxito
+    alert('Datos actualizados correctamente');
+  }, [services]);
+
+  // 🚀 OPTIMIZACIÓN: Calcular estadísticas directamente de los servicios
+  useEffect(() => {
+    if (!services) return;
+    
     const totalServices = services.length;
     const activeServices = services.filter(service => service.active !== false).length;
     const categories = [...new Set(services.map(service => service.category).filter(Boolean))];
@@ -35,12 +61,14 @@ export default function AdminDashboard() {
       .sort((a, b) => ((b.createdAt?.toDate?.() || new Date()).getTime() - (a.createdAt?.toDate?.() || new Date()).getTime()))
       .slice(0, 5);
 
-    return {
+    setStats(prev => ({
+      ...prev,
       totalServices,
       activeServices,
       categories,
-      recentServices
-    };
+      recentServices,
+      lastUpdated: new Date().toLocaleString()
+    }));
   }, [services]);
 
   if (servicesLoading && !services) {

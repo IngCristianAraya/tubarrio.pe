@@ -118,7 +118,7 @@ export default function ServicioDetallePage() {
         image={service.image || '/images/og-image.jpg'}
         url={canonicalUrl}
         type="website"
-        tags={[service.category, service.location, 'servicios locales']}
+        tags={[service.category, service.location, 'servicios locales'].filter(Boolean) as string[]}
       />
       
       {/* JSON-LD Structured Data */}

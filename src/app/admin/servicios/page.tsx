@@ -1,29 +1,24 @@
 'use client';
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
-// Removed Firebase Client SDK imports - now using API endpoints
 import Link from 'next/link';
 import { useServices } from '@/hooks/useServices';
 import { useDebounce } from '@/hooks/useDebounce';
 import ServicesTable from '@/components/admin/ServicesTable';
 import VirtualizedServicesTable from '@/components/admin/VirtualizedServicesTable';
+import { Service } from '@/types/service';
 
-interface Service {
-  id: string;
-  name: string;
-  category: string;
-  description: string;
+// Extendemos la interfaz Service para incluir propiedades adicionales necesarias
+type ExtendedService = Service & {
   phone: string;
   whatsapp: string;
   address: string;
-  image: string;
-  images?: string[];
   active: boolean;
   createdAt?: any;
-}
+};
 
 export default function ServicesPage() {
-  const [localServices, setLocalServices] = useState<Service[]>([]);
+  const [localServices, setLocalServices] = useState<ExtendedService[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
@@ -41,12 +36,25 @@ export default function ServicesPage() {
   // Actualizar servicios locales cuando cambien los datos del hook
   useEffect(() => {
     if (services) {
+      // Convertir los servicios al tipo ExtendedService
+      const extendedServices: ExtendedService[] = services.map(service => ({
+        ...service,
+        // Proporcionar valores por defecto para las propiedades requeridas
+        phone: 'phone' in service ? String(service.phone) : '',
+        whatsapp: 'whatsapp' in service ? String(service.whatsapp) : '',
+        address: 'address' in service ? String(service.address) : '',
+        active: 'active' in service ? Boolean(service.active) : true,
+        // Asegurarse de que createdAt sea un objeto de fecha válido
+        createdAt: service.createdAt?.toDate?.() || new Date()
+      }));
+
       // Ordenar por fecha de creación (más recientes primero)
-      const sortedServices = [...services].sort((a, b) => {
-        const dateA = a.createdAt?.toDate?.() || new Date(0);
-        const dateB = b.createdAt?.toDate?.() || new Date(0);
+      const sortedServices = [...extendedServices].sort((a, b) => {
+        const dateA = a.createdAt instanceof Date ? a.createdAt : new Date(0);
+        const dateB = b.createdAt instanceof Date ? b.createdAt : new Date(0);
         return dateB.getTime() - dateA.getTime();
       });
+
       setLocalServices(sortedServices);
     }
   }, [services]);

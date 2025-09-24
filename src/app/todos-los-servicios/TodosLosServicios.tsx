@@ -1,12 +1,11 @@
 'use client';
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { useServices } from '../../context/ServicesContext';
+import { useServices, type Service } from '../../context/ServicesContext';
 import ServiceCard from '../../components/ServiceCard';
 import ServiceCardSkeleton from '../../components/ServiceCardSkeleton';
 import EmptyState from '../../components/EmptyState';
 import CategoryChips from '../../components/CategoryChips';
-import type { Service } from '../../types/service';
 import { useSearchParams } from 'next/navigation';
 
 const PAGE_SIZE = 6;

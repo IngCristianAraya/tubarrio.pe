@@ -4,15 +4,22 @@ import { useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import { useAnalytics } from '@/context/AnalyticsContext';
 
+// Definir un tipo seguro para analytics
+interface SafeAnalytics {
+  trackPageView?: (path: string) => Promise<void>;
+}
+
 export function AnalyticsInitializer() {
   const pathname = usePathname();
-  const { trackPageView } = useAnalytics();
+  const analytics = useAnalytics() as unknown as SafeAnalytics;
 
   useEffect(() => {
-    if (pathname) {
-      trackPageView(pathname);
+    if (pathname && analytics?.trackPageView) {
+      analytics.trackPageView(pathname).catch((error: unknown) => {
+        console.error('Error tracking page view:', error);
+      });
     }
-  }, [pathname, trackPageView]);
+  }, [pathname, analytics]);
 
   return null; // This component doesn't render anything
 }

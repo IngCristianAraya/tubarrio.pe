@@ -221,6 +221,26 @@ const nextConfig = {
   },
   // Configuración avanzada de Webpack para optimización
   webpack: (config, { isServer, dev, webpack }) => {
+    // Configuración para manejar módulos de Node.js
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        net: false,
+        tls: false,
+        dns: false,
+        child_process: false,
+        dgram: false,
+        zlib: false,
+        http: require.resolve('stream-http'),
+        https: require.resolve('https-browserify'),
+        stream: require.resolve('stream-browserify'),
+        buffer: require.resolve('buffer/'),
+        util: require.resolve('util/'),
+        url: require.resolve('url/'),
+        string_decoder: require.resolve('string_decoder/')
+      };
+    }
     // Solo en producción
     if (!dev) {
       // Habilitar tree shaking

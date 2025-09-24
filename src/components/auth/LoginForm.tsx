@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
+import * as React from 'react';
+const { useState } = React;
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
@@ -17,10 +18,10 @@ export default function LoginForm({ redirectTo = '/admin' }: LoginFormProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   
-  const { login, resetPassword } = useAuth();
+  const { signIn: login, resetPassword } = useAuth();
   const router = useRouter();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: any) => {
     e.preventDefault();
     
     if (!email || !password) {
@@ -52,7 +53,7 @@ export default function LoginForm({ redirectTo = '/admin' }: LoginFormProps) {
     }
   };
 
-  const handleForgotPassword = async (e: React.FormEvent) => {
+  const handleForgotPassword = async (e: any) => {
     e.preventDefault();
     
     if (!email) {

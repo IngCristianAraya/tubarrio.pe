@@ -26,22 +26,22 @@ const BusinessRegistration = dynamic(
 export default function RegisterBusinessClient() {
   const benefits = [
     {
-      icon: <FaStore className="text-2xl text-orange-500" />,
+      icon: <div className="text-2xl text-orange-500"><FaStore /></div>,
       title: 'Perfil de Negocio',
       description: 'Crea un perfil completo con información de contacto, horarios, servicios y fotos de tu negocio.'
     },
     {
-      icon: <FaMapMarkerAlt className="text-2xl text-blue-500" />,
+      icon: <div className="text-2xl text-blue-500"><FaMapMarkerAlt /></div>,
       title: 'Visibilidad Local',
       description: 'Sé encontrado por clientes en tu zona que buscan tus productos o servicios.'
     },
     {
-      icon: <FaPhone className="text-2xl text-green-500" />,
+      icon: <div className="text-2xl text-green-500"><FaPhone /></div>,
       title: 'Atención Personalizada',
       description: 'Recibe consultas directas de clientes interesados en lo que ofreces.'
     },
     {
-      icon: <FaCheckCircle className="text-2xl text-purple-500" />,
+      icon: <div className="text-2xl text-purple-500"><FaCheckCircle /></div>,
       title: 'Verificación',
       description: 'Obtén un sello de verificación que genera confianza en tus clientes.'
     }
@@ -128,7 +128,7 @@ export default function RegisterBusinessClient() {
               
               <div className="mt-8 pt-6 border-t border-gray-200">
                 <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
-                  <FaCheckCircle className="text-green-500" />
+                  <div className="text-green-500"><FaCheckCircle /></div>
                   <span>Protegemos tus datos según nuestra Política de Privacidad</span>
                 </div>
               </div>

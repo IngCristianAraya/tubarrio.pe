@@ -1,15 +1,18 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import * as React from 'react';
+const { useEffect } = React;
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { Loader2, Shield, AlertCircle } from 'lucide-react';
 
+type ReactNode = any; // Usamos any temporalmente para evitar problemas de tipos
+
 interface ProtectedRouteProps {
-  children: React.ReactNode;
+  children: ReactNode;
   requireAdmin?: boolean;
   redirectTo?: string;
-  fallback?: React.ReactNode;
+  fallback?: ReactNode;
 }
 
 export default function ProtectedRoute({ 
@@ -129,18 +132,18 @@ export default function ProtectedRoute({
 }
 
 // Componente específico para rutas de admin
-export function AdminRoute({ children, fallback }: { children: React.ReactNode; fallback?: React.ReactNode }) {
+export function AdminRoute({ children, fallback }: { children: ReactNode; fallback?: ReactNode }) {
   return (
-    <ProtectedRoute requireAdmin={true} redirectTo="/admin/login" fallback={fallback}>
+    <ProtectedRoute requireAdmin={true} fallback={fallback}>
       {children}
     </ProtectedRoute>
   );
 }
 
 // Componente para rutas que requieren autenticación básica
-export function AuthRoute({ children, fallback }: { children: React.ReactNode; fallback?: React.ReactNode }) {
+export function AuthRoute({ children, fallback }: { children: ReactNode; fallback?: ReactNode }) {
   return (
-    <ProtectedRoute requireAdmin={false} redirectTo="/login" fallback={fallback}>
+    <ProtectedRoute fallback={fallback}>
       {children}
     </ProtectedRoute>
   );

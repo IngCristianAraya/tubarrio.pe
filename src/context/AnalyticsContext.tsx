@@ -1,6 +1,7 @@
 'use client';
 
-import React, { createContext, useContext, useReducer, useEffect, useCallback, useMemo } from 'react';
+import * as React from 'react';
+const { createContext, useContext, useReducer, useEffect, useCallback, useMemo } = React;
 import { db } from '../lib/firebase/config';
 import { AuthContext } from './AuthContext';
 
@@ -320,8 +321,8 @@ function useAnalytics() {
   return context;
 }
 
-// Export the provider and hook
+// Export the provider, hook and types
 export { useAnalytics };
-export type { AnalyticsEvent, AnalyticsMetrics };
+export type { AnalyticsEvent, AnalyticsMetrics, AnalyticsContextType };
 
 export default AnalyticsProvider;

@@ -1,30 +1,26 @@
 'use client';
 
-import { memo } from 'react';
+import * as React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { Service } from '@/types/service';
 
-interface Service {
-  id: string;
-  name: string;
-  category: string;
-  description: string;
+// Extendemos la interfaz Service para incluir propiedades adicionales necesarias
+type ExtendedService = Service & {
   phone: string;
   whatsapp: string;
   address: string;
-  image: string;
-  images?: string[];
   active: boolean;
   createdAt?: any;
-}
+};
 
 interface ServicesTableProps {
-  services: Service[];
+  services: ExtendedService[];
   onToggleStatus: (serviceId: string, currentStatus: boolean) => void;
   onDelete: (serviceId: string) => void;
 }
 
-const ServicesTable = memo(function ServicesTable({
+function ServicesTable({
   services,
   onToggleStatus,
   onDelete
@@ -131,6 +127,6 @@ const ServicesTable = memo(function ServicesTable({
       </table>
     </div>
   );
-});
+}
 
 export default ServicesTable;

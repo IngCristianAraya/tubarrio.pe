@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useEffect, FormEvent, ChangeEvent } from 'react';
+import * as React from 'react';
+const { useState, useEffect } = React;
 import { CheckCircle, Loader2, XCircle, Users, TrendingUp, Star } from 'lucide-react';
 import useSound from '../hooks/useSound';
 
@@ -25,11 +26,11 @@ interface BusinessRegistrationProps {
   onSuccess?: () => void;
 }
 
-const BusinessRegistration: React.FC<BusinessRegistrationProps> = ({
+function BusinessRegistration({
   className = '',
   showTitle = true,
   onSuccess
-}) => {
+}: BusinessRegistrationProps) {
   const { play: playClickSound } = useSound('click', { volume: 0.5 });
   
   const [formData, setFormData] = useState<FormData>({
@@ -66,7 +67,7 @@ const BusinessRegistration: React.FC<BusinessRegistrationProps> = ({
     };
   }, []);
 
-  const handleSubmit = async (e: FormEvent) => {
+  const handleSubmit = async (e: any) => {
     e.preventDefault();
     playClickSound();
     
@@ -174,7 +175,7 @@ const BusinessRegistration: React.FC<BusinessRegistrationProps> = ({
     }
   };
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+  const handleChange = (e: { target: { name: string; value: string } }) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,

@@ -13,7 +13,7 @@ import { redirect } from 'next/navigation';
 
 // Página de perfil optimizada con consultas del servidor
 const PerfilPage = () => {
-  const [user, loading, error] = useAuthState(auth);
+  const [user, loading, error] = useAuthState(auth.instance);
   const [activeTab, setActiveTab] = useState<'servicios' | 'estadisticas'>('servicios');
   
   // Hook optimizado que solo consulta servicios del usuario autenticado

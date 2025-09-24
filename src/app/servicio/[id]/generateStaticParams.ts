@@ -4,7 +4,8 @@ import { db } from '@/lib/firebase/config';
 export async function generateStaticParams() {
   try {
     // Obtener todos los servicios de Firestore
-    const servicesRef = collection(db, 'services');
+    const firestore = db.instance;
+    const servicesRef = collection(firestore, 'services');
     const querySnapshot = await getDocs(servicesRef);
     
     // Mapear los IDs de los servicios para generar las rutas estáticas
