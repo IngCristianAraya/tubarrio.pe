@@ -12,7 +12,9 @@
   ],
   "regions": ["iad1"],
   "functions": {
-    "nodeVersion": "22.x"
+    "node": {
+      "minRange": "22.x"
+    }
   },
   "buildCommand": "npm run build",
   "devCommand": "npm run dev",
