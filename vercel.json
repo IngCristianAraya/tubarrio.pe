@@ -5,6 +5,9 @@
   "installCommand": "npm install --legacy-peer-deps --force",
   "framework": "nextjs",
   "outputDirectory": ".next",
+  "functions": {
+    "nodeVersion": "18.x"
+  },
   "builds": [
     {
       "src": "package.json",
@@ -17,5 +20,6 @@
   "routes": [
     { "handle": "filesystem" },
     { "src": "/.*", "dest": "/" }
-  ]
+  ],
+  "regions": ["iad1"]
 }

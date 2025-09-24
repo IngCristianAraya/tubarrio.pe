@@ -7,6 +7,7 @@
     "npm": ">=10.0.0"
   },
   "scripts": {
+    "postinstall": "node postinstall.js",
     "preinstall": "npx npm-force-resolutions",
     "dev": "next dev",
     "build": "next build",
@@ -94,7 +95,8 @@
     "workerize": "^0.1.8"
   },
   "resolutions": {
-    "sharp": "^0.34.4",
-    "undici": "5.28.2"
+    "sharp": "0.34.4",
+    "undici": "5.28.2",
+    "ipx/sharp": "0.34.4"
   }
 }
