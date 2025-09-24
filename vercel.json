@@ -1,25 +1,20 @@
 {
   "version": 2,
-  "buildCommand": "npm run build",
-  "devCommand": "npm run dev",
-  "installCommand": "npm install --legacy-peer-deps --force",
-  "framework": "nextjs",
-  "outputDirectory": ".next",
-  "functions": {
-    "nodeVersion": "18.x"
-  },
   "builds": [
     {
       "src": "package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": ".next"
-      }
+      "use": "@vercel/next"
     }
   ],
   "routes": [
     { "handle": "filesystem" },
     { "src": "/.*", "dest": "/" }
   ],
-  "regions": ["iad1"]
+  "regions": ["iad1"],
+  "functions": {
+    "nodeVersion": "22.x"
+  },
+  "buildCommand": "npm run build",
+  "devCommand": "npm run dev",
+  "installCommand": "npm install --legacy-peer-deps --force"
 }
