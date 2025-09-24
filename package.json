@@ -3,11 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "engines": {
-    "node": "18.x",
-    "npm": ">=9.0.0"
-  },
-  "resolutions": {
-    "sharp": "0.32.6"
+    "node": "22.x",
+    "npm": ">=10.0.0"
   },
   "scripts": {
     "preinstall": "npx npm-force-resolutions",
@@ -97,6 +94,7 @@
     "workerize": "^0.1.8"
   },
   "resolutions": {
+    "sharp": "^0.34.4",
     "undici": "5.28.2"
   }
 }
