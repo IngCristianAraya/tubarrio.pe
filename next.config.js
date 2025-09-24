@@ -1,7 +1,18 @@
 /** @type {import('next').NextConfig} */
-// Force redeploy for CSP fix
+const withBundleAnalyzer = require('@next/bundle-analyzer')({
+  enabled: process.env.ANALYZE === 'true',
+});
+
 const nextConfig = {
-  reactStrictMode: false, // Desactivado para evitar duplicación de mensajes en desarrollo
+  // Configuración de rendimiento
+  reactStrictMode: true,
+  compress: true,
+  generateEtags: true,
+  poweredByHeader: false,
+  generateBuildId: () => 'build',
+  productionBrowserSourceMaps: false,
+  optimizeFonts: true,
+  swcMinify: true,
   
   async headers() {
     const csp = [
@@ -41,10 +52,24 @@ const nextConfig = {
       },
     ];
   },
+  // Configuración optimizada de imágenes
   images: {
-    // Configuración para optimización de imágenes
+    // Formatos modernos con prioridad AVIF
     formats: ['image/avif', 'image/webp'],
-    minimumCacheTTL: 60,
+    // Patrones de dominios remotos permitidos
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**',
+      },
+    ],
+    deviceSizes: [375, 480, 640, 750, 828, 1080, 1200, 1920],
+    // Tamaños de imágenes para diferentes breakpoints
+    imageSizes: [64, 96, 128, 256, 384],
+    // Tiempo de caché extendido (1 semana)
+    minimumCacheTTL: 60 * 60 * 24 * 7,
+    // Desactivar en desarrollo para mejor rendimiento
+    disableStaticImages: process.env.NODE_ENV === 'development',
     // Dominios permitidos para optimización de imágenes
     domains: [
       'localhost',
@@ -189,14 +214,44 @@ const nextConfig = {
         pathname: '/**',
       },
     ],
-    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
-    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
-    formats: ['image/webp', 'image/avif'], // Usar formatos modernos pero con alta calidad
-    minimumCacheTTL: 60,
+    // Permitir SVGs con precaución
     dangerouslyAllowSVG: true,
-    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+    // Configuración de Content Security Policy
+    contentSecurityPolicy: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' *.googleapis.com *.firebaseio.com *.firebase.com *.gstatic.com *.google.com *.google-analytics.com *.googletagmanager.com; style-src 'self' 'unsafe-inline' *.googleapis.com *.gstatic.com; img-src 'self' data: blob: https: *.googleapis.com *.google.com *.gstatic.com *.firebaseio.com *.firebase.com *.google-analytics.com *.googletagmanager.com *.pexels.com images.pexels.com *.unsplash.com images.unsplash.com *.pixabay.com cdn.pixabay.com *.cloudinary.com res.cloudinary.com *.tile.openstreetmap.org; font-src 'self' data: *.gstatic.com *.googleapis.com; connect-src 'self' http://localhost:* ws://localhost:* https://*.googleapis.com wss://*.firebaseio.com https://*.firebaseio.com https://*.firebase.com https://*.firestore.googleapis.com https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://*.google-analytics.com https://*.analytics.google.com; frame-src 'self' *.google.com *.googleapis.com *.firebaseapp.com *.firebase.com; media-src 'self' data: blob: *.googleapis.com https:; worker-src 'self' blob:; form-action 'self';",
   },
+  // Configuración avanzada de Webpack para optimización
   webpack: (config, { isServer, dev, webpack }) => {
+    // Solo en producción
+    if (!dev) {
+      // Habilitar tree shaking
+      config.optimization.usedExports = true;
+      
+      // Configurar split chunks
+      config.optimization.splitChunks = {
+        chunks: 'all',
+        maxInitialRequests: 25,
+        maxAsyncRequests: 25,
+        cacheGroups: {
+          default: false,
+          vendors: false,
+          // Agrupar módulos de node_modules
+          vendor: {
+            name: 'vendors',
+            test: /[\\/]node_modules[\\/]/,
+            priority: 20,
+          },
+          // Agrupar código compartido
+          common: {
+            name: 'common',
+            minChunks: 2,
+            priority: 10,
+            reuseExistingChunk: true,
+            enforce: true,
+          },
+        },
+      };
+    }
+    
     // Resolver el problema con undici
     config.resolve.alias = {
       ...config.resolve.alias,
@@ -324,19 +379,23 @@ const nextConfig = {
           publicPath: '/_next/',
           inline: true,
           name: 'static/[hash].worker.js'
-        } 
-      },
+        }
+      }
     });
 
     return config;
   },
-  // TypeScript configuration
+  // Configuración de TypeScript
   typescript: {
-    // !! WARN !!
-    // Dangerously allow production builds to successfully complete even if
-    // your project has type errors.
-    // !! WARN !!
-    ignoreBuildErrors: true,
+    // Habilitar comprobación de tipos en modo producción
+    ignoreBuildErrors: process.env.NODE_ENV === 'development',
+  },
+  
+  // Configuración de modularizeImports
+  modularizeImports: {
+    'react-icons': {
+      transform: 'react-icons/{{member}}',
+    },
   },
   // ESLint configuration
   eslint: {
@@ -345,8 +404,17 @@ const nextConfig = {
     ignoreDuringBuilds: true,
   },
   experimental: {
-    optimizeCss: false,
+    // Optimización de CSS
+    optimizeCss: true,
+    // Mejorar el rendimiento de la compilación
+    // Nota: serverActions ya está habilitado por defecto en Next.js 14
+    // modularizeImports se ha movido a la raíz de la configuración
+    // Se ha eliminado la configuración redundante
+    // Se mantiene solo la configuración estable y compatible
   },
 };
 
-module.exports = nextConfig;
+// Aplicar el analizador de paquetes si está habilitado
+module.exports = process.env.ANALYZE === 'true' 
+  ? withBundleAnalyzer(nextConfig) 
+  : nextConfig;
