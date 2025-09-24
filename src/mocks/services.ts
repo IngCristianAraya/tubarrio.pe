@@ -119,8 +119,8 @@ export const sampleServices: Record<string, Service[]> = {
       description: 'Todo lo que necesitas para tu hogar en un solo lugar.',
       category: 'Abarrotes',
       categorySlug: 'abarrotes',
-      image: '/images/cursos_de_programacion.png',
-      images: ['/images/cursos_de_programacion.png'],
+      image: 'https://images.pexels.com/photos/1005638/pexels-photo-1005638.jpeg?auto=compress&cs=tinysrgb&w=400',
+      images: ['https://images.pexels.com/photos/1005638/pexels-photo-1005638.jpeg?auto=compress&cs=tinysrgb&w=400'],
       rating: 4.2,
       reviewCount: 64,
       featured: true

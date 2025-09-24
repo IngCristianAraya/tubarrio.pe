@@ -1,10 +1,29 @@
 import { Metadata } from 'next';
 
+// Constantes de configuración
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://tubarrio.pe';
 const SITE_NAME = 'TuBarrio.pe';
-const DEFAULT_DESCRIPTION = 'Encuentra los mejores servicios en tu barrio. Conectamos negocios locales con su comunidad.';
+const DEFAULT_DESCRIPTION = 'Descubre y encuentra los mejores servicios, restaurantes y comercios en tu barrio. Conectamos negocios locales con su comunidad.';
 const DEFAULT_IMAGE = `${SITE_URL}/images/og-image.jpg`;
 const TWITTER_HANDLE = '@tubarriope';
+const SITE_KEYWORDS = [
+  'servicios locales', 
+  'restaurantes cerca de mí',
+  'comercios locales',
+  'directorio de servicios',
+  'TuBarrio.pe',
+  'guía de barrio',
+  'negocios locales',
+  'comercio local',
+  'servicios por barrio',
+  'encontrar servicios',
+  'directorio comercial',
+  'guía de la ciudad',
+  'recomendaciones locales',
+  'negocios cercanos',
+  'servicios profesionales',
+  'comercios en mi zona'
+];
 
 type PageMetadata = {
   title?: string;
@@ -23,18 +42,7 @@ type PageMetadata = {
 export function generateMetadata({
   title = SITE_NAME,
   description = DEFAULT_DESCRIPTION,
-  keywords = [
-    'servicios locales', 
-    'negocios cerca de mí', 
-    'directorio de servicios', 
-    'TuBarrio.pe',
-    'servicios por barrio',
-    'negocios locales',
-    'comercio local',
-    'servicios profesionales',
-    'encontrar servicios',
-    'guía de servicios'
-  ],
+  keywords = [],
   image = DEFAULT_IMAGE,
   url = SITE_URL,
   type = 'website',
@@ -44,16 +52,29 @@ export function generateMetadata({
   section,
   tags = [],
 }: PageMetadata = {}): Metadata {
+  // Combinar palabras clave globales con las específicas de la página
+  const allKeywords = [...new Set([...SITE_KEYWORDS, ...keywords])];
+  
   const metadata: Metadata = {
     title: title === SITE_NAME ? title : `${title} | ${SITE_NAME}`,
     description,
-    keywords: [...new Set([...keywords])].join(', '),
+    keywords: allKeywords.join(', '),
+    applicationName: SITE_NAME,
+    authors: [{ name: SITE_NAME, url: SITE_URL }],
+    creator: SITE_NAME,
+    publisher: SITE_NAME,
+    formatDetection: {
+      email: false,
+      address: false,
+      telephone: false,
+    },
     metadataBase: new URL(SITE_URL),
     alternates: {
       canonical: url,
     },
     openGraph: {
       type,
+      locale: 'es_PE',
       url,
       title,
       description,
@@ -66,7 +87,6 @@ export function generateMetadata({
           alt: title,
         },
       ],
-      locale: 'es_PE',
     },
     twitter: {
       card: 'summary_large_image',
@@ -86,27 +106,68 @@ export function generateMetadata({
         'max-image-preview': 'large',
         'max-snippet': -1,
       },
+      nocache: false,
+      noimageindex: false,
+      'max-snippet': -1,
+      'max-image-preview': 'large',
+      'max-video-preview': -1,
     },
+  };
+
+  // Definir el objeto schemaOrg
+  const schemaOrg = JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: SITE_NAME,
+    url: SITE_URL,
+    potentialAction: {
+      '@type': 'SearchAction',
+      target: `${SITE_URL}/buscar?q={search_term_string}`,
+      'query-input': 'required name=search_term_string'
+    }
+  });
+
+  // Inicializar metadata.other con el tipo correcto
+  metadata.other = {
+    ...(metadata.other as Record<string, string | string[]>),
+    'application-ld+json': schemaOrg
   };
 
   // Add article specific metadata
   if (type === 'article') {
-    metadata.other = {
-      ...(publishedTime && { 'article:published_time': publishedTime }),
-      ...(modifiedTime && { 'article:modified_time': modifiedTime })
-    };
+    // Usar campos nativos de Next.js cuando sea posible
+    if (author) {
+      metadata.authors = [{ name: author }];
+    }
+    
+    if (section) {
+      metadata.category = section;
+    }
+    
+    // Usar el campo 'other' para metadatos personalizados
+    const articleMeta: Record<string, string> = {};
+    
+    if (publishedTime) {
+      articleMeta['article:published_time'] = publishedTime;
+    }
+    
+    if (modifiedTime) {
+      articleMeta['article:modified_time'] = modifiedTime;
+    }
+    
+    // Añadir metadatos personalizados si existen
+    if (Object.keys(articleMeta).length > 0) {
+      metadata.other = {
+        ...(metadata.other as Record<string, string | string[]> || {}),
+        ...articleMeta
+      };
+    }
   }
 
-  if (author) {
-    metadata.authors = [{ name: author }];
-  }
-
-  if (section) {
-    metadata.category = section;
-  }
+  // Los campos de autor y sección ya se manejan dentro del bloque de artículos
 
   if (tags.length > 0) {
-    metadata.keywords = [...new Set([...keywords, ...tags])].join(', ');
+    metadata.keywords = [...new Set([...allKeywords, ...tags])].join(', ');
   }
 
   return metadata;
