@@ -122,7 +122,7 @@ export default function AdminLoginPage() {
               ¿Problemas para acceder?
             </p>
             <button
-              onClick={() => toast.info('Contacta al administrador del sistema para obtener ayuda')}
+              onClick={() => toast('Contacta al administrador del sistema para obtener ayuda')}
               className="text-blue-400 hover:text-blue-300 text-sm font-medium"
             >
               Contactar soporte técnico

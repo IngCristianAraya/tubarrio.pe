@@ -391,6 +391,25 @@ const nextConfig = {
     ignoreBuildErrors: process.env.NODE_ENV === 'development',
   },
   
+  // Excluir scripts de prueba de la compilación
+  webpack: (config, { isServer }) => {
+    // Ignorar archivos .test.ts y .test.tsx
+    config.module.rules.push({
+      test: /\.test\.(ts|tsx)$/,
+      loader: 'ignore-loader'
+    });
+    
+    // Ignorar la carpeta scripts en producción
+    if (!isServer && process.env.NODE_ENV === 'production') {
+      config.module.rules.push({
+        test: /\/scripts\/.*\.ts$/,
+        loader: 'ignore-loader'
+      });
+    }
+    
+    return config;
+  },
+  
   // Configuración de modularizeImports
   modularizeImports: {
     'react-icons': {

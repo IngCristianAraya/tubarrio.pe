@@ -1,14 +1,17 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useState, useMemo } from 'react';
+import * as React from 'react';
+import { createContext, useContext, useEffect, useState, useMemo, useCallback } from 'react';
+import type { ReactNode } from 'react';
 import { 
   User, 
   onAuthStateChanged,
-  signInWithEmailAndPassword,
+  signInWithEmailAndPassword as firebaseSignIn,
   signOut as firebaseSignOut,
-  sendPasswordResetEmail,
+  sendPasswordResetEmail as firebaseSendPasswordResetEmail,
   getAuth,
-  Auth
+  Auth,
+  signInWithEmailAndPassword
 } from 'firebase/auth';
 import { auth as firebaseAuth, initializeFirebase } from '@/lib/firebase/config';
 import { toast } from 'react-hot-toast';
@@ -50,18 +53,35 @@ interface AuthContextType {
   user: User | null;
   loading: boolean;
   isAuthenticated: boolean;
+  isAdmin: boolean;
   error: Error | null;
   signIn: (email: string, password: string) => Promise<User>;
   signOut: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const defaultAuthContext: AuthContextType = {
+  user: null,
+  loading: true,
+  isAuthenticated: false,
+  isAdmin: false,
+  error: null,
+  signIn: async () => { throw new Error('Auth context not initialized'); },
+  signOut: async () => { throw new Error('Auth context not initialized'); },
+  resetPassword: async () => { throw new Error('Auth context not initialized'); }
+};
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
+const AuthContext = createContext<AuthContextType>(defaultAuthContext);
+
+interface AuthProviderProps {
+  children: ReactNode;
+}
+
+export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
   const isAuthenticated = !!user;
   
   // Get auth instance with memoization
@@ -157,8 +177,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     try {
-      const unsubscribe = onAuthStateChanged(auth, (user) => {
+      const unsubscribe = onAuthStateChanged(auth, async (user) => {
         setUser(user);
+        
+        // Verificar si el usuario es administrador
+        if (user) {
+          try {
+            const idTokenResult = await user.getIdTokenResult();
+            setIsAdmin(!!idTokenResult.claims.admin);
+          } catch (error) {
+            console.error('Error al verificar rol de administrador:', error);
+            setIsAdmin(false);
+          }
+        } else {
+          setIsAdmin(false);
+        }
+        
         setLoading(false);
       }, (error) => {
         console.error('Auth state change error:', error);
@@ -173,7 +207,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [auth]);
 
   // Sign in with email and password
-  const signIn = async (email: string, password: string) => {
+  const signIn = useCallback(async (email: string, password: string): Promise<User> => {
     console.log('🔐 Attempting to sign in with email:', email);
     
     if (!auth) {
@@ -185,9 +219,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     try {
       console.log('🔑 Calling signInWithEmailAndPassword...');
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await firebaseSignIn(auth, email, password);
       console.log('✅ Sign in successful, user:', userCredential.user?.email);
       toast.success('Inicio de sesión exitoso');
+      
+      // Actualizar el estado de administrador después del inicio de sesión
+      if (userCredential.user) {
+        const idTokenResult = await userCredential.user.getIdTokenResult();
+        setIsAdmin(!!idTokenResult.claims.admin);
+      }
+      
       return userCredential.user;
     } catch (error: any) {
       console.error('❌ Error during sign in:', {
@@ -220,49 +261,74 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
       
       toast.error(errorMessage);
-      throw error;
+      throw new Error(errorMessage);
     }
-  };
+  }, [auth]);
 
   // Sign out
-  const signOut = async () => {
-    if (!auth) throw new Error('Auth no está disponible');
+  const signOut = useCallback(async (): Promise<void> => {
+    if (!auth) {
+      const errorMsg = 'Auth no está disponible';
+      console.error('❌', errorMsg);
+      throw new Error(errorMsg);
+    }
     
     try {
       setLoading(true);
+      console.log('🚪 Signing out...');
       await firebaseSignOut(auth);
+      setIsAdmin(false);
+      setUser(null);
       toast.success('Sesión cerrada correctamente');
+      console.log('✅ Sign out successful');
     } catch (error: any) {
-      console.error('Error al cerrar sesión:', error);
-      toast.error(error.message || 'Error al cerrar sesión');
-      throw error;
+      console.error('❌ Error al cerrar sesión:', error);
+      const errorMsg = error.message || 'Error al cerrar sesión';
+      toast.error(errorMsg);
+      throw new Error(errorMsg);
     } finally {
       setLoading(false);
     }
-  };
+  }, [auth]);
 
   // Reset password
-  const resetPassword = async (email: string) => {
-    try {
-      if (!auth) throw new Error('Firebase auth not initialized');
-      await sendPasswordResetEmail(auth, email);
-      toast.success('Correo de recuperación enviado');
-    } catch (error) {
-      console.error('Error resetting password:', error);
-      toast.error('Error al enviar correo de recuperación');
-      throw error;
+  const resetPassword = useCallback(async (email: string): Promise<void> => {
+    if (!auth) {
+      const errorMsg = 'Firebase auth no está inicializado';
+      console.error('❌', errorMsg);
+      throw new Error(errorMsg);
     }
-  };
+    
+    try {
+      console.log('📧 Sending password reset email to:', email);
+      await firebaseSendPasswordResetEmail(auth, email);
+      console.log('✅ Password reset email sent');
+      toast.success('Correo de recuperación enviado');
+    } catch (error: any) {
+      console.error('❌ Error al restablecer la contraseña:', error);
+      
+      let errorMessage = 'Error al enviar correo de recuperación';
+      if (error.code === 'auth/user-not-found') {
+        errorMessage = 'No hay ninguna cuenta asociada a este correo electrónico';
+      } else if (error.code === 'auth/invalid-email') {
+        errorMessage = 'El formato del correo electrónico no es válido';
+      }
+      
+      toast.error(errorMessage);
+      throw new Error(errorMessage);
+    }
+  }, [auth]);
 
-  const value = useMemo(() => ({
+  const value = useMemo<AuthContextType>(() => ({
     user,
     loading,
     isAuthenticated,
+    isAdmin,
     error,
     signIn,
     signOut,
     resetPassword,
-  }), [user, loading, isAuthenticated, error, signIn, signOut, resetPassword]);
+  }), [user, loading, isAuthenticated, isAdmin, error, signIn, signOut, resetPassword]);
 
   return (
     <AuthContext.Provider value={value}>
@@ -271,12 +337,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
-export function useAuth() {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
+export function useAuth(): AuthContextType {
+  return useContext(AuthContext);
 }
 
 // Export the context and provider

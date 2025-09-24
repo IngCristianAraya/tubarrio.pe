@@ -1,23 +1,39 @@
 import useSWR from 'swr';
 import { useState, useCallback, useMemo, useEffect } from 'react';
 import { useService } from './useService';
-import { useServiceCache } from './useServiceCache';
+import { db } from '@/lib/firebase/config';
 import { 
   collection, 
   query, 
   where, 
-  orderBy, 
-  limit, 
-  startAfter, 
   getDocs, 
+  orderBy, 
+  limit as firestoreLimit,
+  startAfter, 
+  DocumentSnapshot, 
+  QueryDocumentSnapshot,
   getDoc,
   doc,
-  DocumentSnapshot,
-  Firestore
+  Firestore,
+  Query,
+  QueryConstraint,
+  DocumentData,
+  QueryDocumentSnapshot as FirestoreQueryDocumentSnapshot
 } from 'firebase/firestore';
-import { db, initializeFirebase } from '@/lib/firebase/config';
 import { Service } from '@/context/ServicesContext';
 import { fallbackServices, filterFallbackServices, getFallbackServiceById } from '../lib/firebase/fallback';
+
+// Logger simple para desarrollo
+const logger = {
+  debug: (...args: any[]) => {
+    if (process.env.NODE_ENV === 'development') {
+      console.debug(...args);
+    }
+  },
+  error: console.error,
+  info: console.log,
+  warn: console.warn
+};
 
 // Tipos para el hook
 interface UseServicesOptions {
@@ -26,6 +42,7 @@ interface UseServicesOptions {
   userId?: string;
   featured?: boolean;
   pageSize?: number;
+  limit?: number;
   enabled?: boolean;
   search?: string;
   onSuccess?: (data: Service[]) => void;
@@ -47,9 +64,16 @@ interface ServicesResult {
 }
 
 // Cache keys para SWR
-const getCacheKey = (options: UseServicesOptions) => {
-  const { category, barrio, userId, featured, pageSize, search } = options;
-  return ['services', { category, barrio, userId, featured, pageSize, search }];
+const getCacheKey = (options: UseServicesOptions): string => {
+  return JSON.stringify({
+    category: options.category,
+    barrio: options.barrio,
+    userId: options.userId,
+    featured: options.featured,
+    pageSize: options.pageSize,
+    limit: options.limit,
+    search: options.search
+  });
 };
 
 // Cache para almacenar resultados temporalmente
@@ -61,19 +85,26 @@ const serviceByIdCache = new Map<string, { data: Service | null; timestamp: numb
 const SERVICE_CACHE_TTL = 30 * 60 * 1000; // 30 minutos para cache de servicios individuales
 
 // Fetcher optimizado con caché
-const servicesFetcher = async ([_, options]: [string, UseServicesOptions]): Promise<Service[]> => {
+const servicesFetcher = async ([, options]: [string, UseServicesOptions]): Promise<Service[]> => {
+  // Obtener la instancia de Firestore
+  const firestore = db.instance;
+  if (!firestore) {
+    logger.error('Firestore no está inicializado');
+    return [];
+  }
+  
   const { category, barrio, userId, featured, pageSize = 12, search } = options;
-  const cacheKey = JSON.stringify({ category, barrio, userId, featured, pageSize, search });
+  const cacheKey = getCacheKey(options);
   const now = Date.now();
   
-  // Inicializar el hook de caché
-  const { 
-    getAllServicesFromCache, 
-    setAllServicesCache,
-    loadPersistentCache,
-    setFeaturedServicesCache,
-    getFeaturedServicesFromCache
-  } = useServiceCache();
+  // Verificar caché
+  const cachedServices = servicesCache.get(cacheKey);
+  if (cachedServices && (now - cachedServices.timestamp < CACHE_TTL)) {
+    logger.debug('Usando servicios desde caché');
+    return cachedServices.data;
+  }
+    return cachedServices.data;
+  }
   
   // Verificar caché primero
   
@@ -184,13 +215,19 @@ const servicesFetcher = async ([_, options]: [string, UseServicesOptions]): Prom
       constraints.push(where('featured', '==', true));
     }
     
-    // Construir la consulta
-    let q = query(collection(db, 'services'), ...constraints, orderBy('createdAt', 'desc'));
+    // Construir la consulta base
+    const servicesRef = collection(firestore, 'services');
+    const queryConstraints: QueryConstraint[] = [
+      ...constraints,
+      orderBy('createdAt', 'desc')
+    ];
     
-    // Aplicar paginación si es necesario
-    if (pageSize) {
-      q = query(q, limit(pageSize));
-    }
+    // Aplicar límite de página o límite de opciones, lo que sea mayor
+    const finalLimit = pageSize || options.limit || 12;
+    queryConstraints.push(firestoreLimit(finalLimit));
+    
+    // Crear la consulta final
+    const q = query(servicesRef, ...queryConstraints);
     
     // Ejecutar la consulta
     const querySnapshot = await getDocs(q);
@@ -272,6 +309,8 @@ const servicesFetcher = async ([_, options]: [string, UseServicesOptions]): Prom
 
 // Hook principal para servicios
 export const useServices = (options: UseServicesOptions = {}): ServicesResult => {
+  const cacheKey = getCacheKey(options);
+  
   const { enabled = true } = options;
   
   const { data, error, mutate, isValidating } = useSWR<Service[]>(
@@ -295,19 +334,34 @@ export const useServices = (options: UseServicesOptions = {}): ServicesResult =>
   
   // Usar caché para servicios individuales si es posible
   const cachedServices = useMemo(() => {
-    if (!data) return [];
+    // Verificar si tenemos datos en caché
+    const cacheKey = getCacheKey(options);
+    const cached = servicesCache.get(cacheKey);
     
-    return data.map(service => {
-      const cached = serviceByIdCache.get(service.id);
-      if (cached && (Date.now() - cached.timestamp < SERVICE_CACHE_TTL)) {
-        return cached.data || service;
-      }
-      return service;
-    });
+    if (cached && (Date.now() - cached.timestamp < CACHE_TTL)) {
+      logger.debug('Usando servicios desde caché');
+      return cached.data;
+    }
+    
+    // Obtener la instancia de Firestore
+    const firestore = db.instance();
+    
+    // ...
   }, [data]);
   
+  // Asegurarse de que siempre devolvemos un array de servicios
+  const services = data || [];
+  
+  // Actualizar la caché
+  if (services.length > 0) {
+    servicesCache.set(cacheKey, {
+      data: services,
+      timestamp: Date.now()
+    });
+  }
+  
   return {
-    services: cachedServices,
+    services,
     loading: isValidating,
     error,
     mutate
@@ -316,16 +370,10 @@ export const useServices = (options: UseServicesOptions = {}): ServicesResult =>
 
 // Hook para servicios destacados (optimizado)
 export const useFeaturedServices = (): ServicesResult => {
-  // Usar un caché más largo para servicios destacados (30 minutos)
-  const cacheKey = 'featured_services';
-  const now = Date.now();
-  
-  // Verificar caché primero
-  const cached = servicesCache.get(cacheKey);
-  if (cached && (now - cached.timestamp < 30 * 60 * 1000)) {
-    console.log('📦 [CACHE HIT] Usando caché de servicios destacados');
-    return {
-      services: cached.data,
+  return useServices({
+    featured: true,
+    limit: 10 // Limitar a 10 servicios destacados
+  });
       loading: false,
       error: null,
       mutate: () => {}
@@ -348,7 +396,10 @@ export const useFeaturedServices = (): ServicesResult => {
 
 // Hook para servicios del usuario (optimizado)
 export const useUserServices = (userId?: string): ServicesResult => {
-  return useServices({ userId, enabled: !!userId });
+  return useServices({
+    userId,
+    enabled: !!userId
+  });
 };
 
 // Hook para servicios por categoría (optimizado)

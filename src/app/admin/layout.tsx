@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
+import { getAuth, signOut as firebaseSignOut } from 'firebase/auth';
 import AdminAuthGuard from '@/components/AdminAuthGuard';
 
 interface AdminLayoutProps {
@@ -14,11 +15,17 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
-  const { logout } = useAuth();
+  const authContext = useAuth();
 
   const handleLogout = async () => {
     try {
-      await logout();
+      if (authContext && typeof authContext.signOut === 'function') {
+        await authContext.signOut();
+      } else {
+        // Fallback en caso de que el contexto no esté disponible
+        const authInstance = getAuth();
+        await firebaseSignOut(authInstance);
+      }
       router.push('/admin/login');
     } catch (error) {
       console.error('Error al cerrar sesión:', error);

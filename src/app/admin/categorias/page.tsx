@@ -44,8 +44,12 @@ export default function CategoriesPage() {
       setLoading(true);
       
       // Cargar servicios para contar por categoría
-      const servicesSnapshot = await getDocs(collection(db, 'services'));
-      const services = servicesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      // Obtener servicios
+      const servicesSnapshot = await getDocs(collection(db.instance, 'services'));
+      const services = servicesSnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
       
       // Contar servicios por categoría
       const categoryCounts: { [key: string]: number } = {};

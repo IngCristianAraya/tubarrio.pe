@@ -32,6 +32,14 @@ interface SystemConfig {
   };
 }
 
+interface Service {
+  id: string;
+  name: string;
+  active: boolean;
+  category: string;
+  [key: string]: any; // Para otras propiedades que puedan existir
+}
+
 interface SystemStats {
   totalServices: number;
   totalCategories: number;
@@ -102,11 +110,19 @@ export default function ConfigurationPage() {
       setLoading(true);
       
       // Cargar estadísticas de servicios
-      const servicesSnapshot = await getDocs(collection(db, 'services'));
-      const services = servicesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      const servicesSnapshot = await getDocs(collection(db.instance, 'services'));
+      const services = servicesSnapshot.docs.map(doc => ({
+        id: doc.id,
+        name: doc.data().name || '',
+        active: doc.data().active || false,
+        category: doc.data().category || 'sin-categoria',
+        ...doc.data()
+      } as Service));
       
-      const activeServices = services.filter((service: any) => service.active).length;
-      const categories = [...new Set(services.map((service: any) => service.category))];
+      const activeServices = services.filter(service => service.active).length;
+      const categories = Array.from(new Set(services
+        .map(service => service.category)
+        .filter((category): category is string => !!category)));
       
       setStats({
         totalServices: services.length,
@@ -128,14 +144,21 @@ export default function ConfigurationPage() {
     }
   };
 
-  const handleConfigChange = (section: string, field: string, value: any) => {
-    setConfig(prev => ({
-      ...prev,
-      [section]: {
-        ...prev[section as keyof SystemConfig],
-        [field]: value
+  const handleConfigChange = (section: keyof SystemConfig, field: string, value: any) => {
+    setConfig(prev => {
+      // Crear una copia segura de la sección actual
+      const sectionValue = prev[section];
+      if (sectionValue && typeof sectionValue === 'object' && !Array.isArray(sectionValue)) {
+        return {
+          ...prev,
+          [section]: {
+            ...sectionValue,
+            [field]: value
+          }
+        };
       }
-    }));
+      return prev;
+    });
   };
 
   const handleSaveConfig = async () => {
