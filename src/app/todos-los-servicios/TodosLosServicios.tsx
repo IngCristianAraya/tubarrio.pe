@@ -12,13 +12,21 @@ import { useSearchParams } from 'next/navigation';
 const PAGE_SIZE = 6;
 
 const getUniqueCategories = (services: Service[]): string[] => {
-  const categories = new Set<string>();
+  const categories = new Map<string, string>();
+  
   services.forEach(service => {
     if (service.category) {
-      categories.add(service.category);
+      // Usamos el nombre de la categoría en minúsculas como clave
+      const lowerCaseCategory = service.category.toLowerCase();
+      // Almacenamos el nombre original de la categoría
+      if (!categories.has(lowerCaseCategory)) {
+        categories.set(lowerCaseCategory, service.category);
+      }
     }
   });
-  return Array.from(categories).sort();
+  
+  // Devolvemos los nombres originales de las categorías, ordenados
+  return Array.from(categories.values()).sort();
 };
 
 interface TodosLosServiciosProps {
@@ -55,11 +63,12 @@ export default function TodosLosServicios({
     if (search) {
       const searchTerm = search.toLowerCase().trim();
       filtered = filtered.filter(service => {
-        // Buscar en nombre, descripción, categoría y etiquetas
+        // Buscar en nombre, descripción, categoría, categorySlug y etiquetas
         const matchesSearch = 
           service.name?.toLowerCase().includes(searchTerm) ||
           service.description?.toLowerCase().includes(searchTerm) ||
           service.category?.toLowerCase().includes(searchTerm) ||
+          service.categorySlug?.toLowerCase().includes(searchTerm) ||
           (Array.isArray(service.tags) && 
            service.tags.some(tag => 
              tag && typeof tag === 'string' && 
@@ -71,7 +80,25 @@ export default function TodosLosServicios({
     }
     
     if (category) {
-      filtered = filtered.filter(service => service.category === category);
+      // Normalizar la categoría para comparación (sin acentos, sin espacios/guiones y en minúsculas)
+      const normalize = (str: string) => 
+        str.normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')  // Eliminar acentos
+          .toLowerCase()
+          .trim()
+          .replace(/[\s-]/g, '');  // Eliminar espacios y guiones
+      
+      const normalizedCategory = normalize(category);
+      
+      filtered = filtered.filter(service => {
+        if (!service.category && !service.categorySlug) return false;
+        
+        const serviceCategory = service.category ? normalize(service.category) : '';
+        const serviceCategorySlug = service.categorySlug ? normalize(service.categorySlug) : '';
+        
+        return serviceCategory === normalizedCategory || 
+               serviceCategorySlug === normalizedCategory;
+      });
     }
     
     return filtered;

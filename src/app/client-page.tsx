@@ -72,7 +72,7 @@ export default function ClientHomePage() {
             {categories.map((category) => (
               <a 
                 key={category.slug} 
-                href={`/categorias/${category.slug}`}
+                href={`/todos-los-servicios?categoria=${category.slug}`}
                 className="group flex flex-col items-center text-center hover:opacity-90 transition-opacity"
               >
                 <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-gradient-to-br from-orange-100 to-orange-50 flex items-center justify-center mb-3 group-hover:shadow-md transition-shadow">

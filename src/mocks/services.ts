@@ -2,7 +2,47 @@ import { Service } from '@/types/service';
 
 
 export const sampleServices: Record<string, Service[]> = {
+
   'restaurantes-y-menus': [
+    {
+      id: '1',
+      slug: 'sabor-peruano',
+      name: 'Sabor Peruano',
+      description: 'Comida típica peruana con los mejores sabores de la costa, sierra y selva.',
+      category: 'Restaurantes y menús',  // Nombre legible para mostrar
+      categorySlug: 'restaurantes-y-menus',  // Para URLs y código interno
+      image: '/Anticuchos.webp',
+      images: ['/Anticuchos.webp'],
+      rating: 4.5,
+      reviewCount: 128,
+      featured: true
+    },
+    {
+      id: '1',
+      slug: 'sabor-peruano',
+      name: 'Sabor Peruano',
+      description: 'Comida típica peruana con los mejores sabores de la costa, sierra y selva.',
+      category: 'Restaurantes y menús',  // Nombre legible para mostrar
+      categorySlug: 'restaurantes-y-menus',  // Para URLs y código interno
+      image: '/Anticuchos.webp',
+      images: ['/Anticuchos.webp'],
+      rating: 4.5,
+      reviewCount: 128,
+      featured: true
+    },
+    {
+      id: '1',
+      slug: 'sabor-peruano',
+      name: 'Sabor Peruano',
+      description: 'Comida típica peruana con los mejores sabores de la costa, sierra y selva.',
+      category: 'Restaurantes y menús',  // Nombre legible para mostrar
+      categorySlug: 'restaurantes-y-menus',  // Para URLs y código interno
+      image: '/Anticuchos.webp',
+      images: ['/Anticuchos.webp'],
+      rating: 4.5,
+      reviewCount: 128,
+      featured: true
+    },
     {
       id: '1',
       slug: 'sabor-peruano',
@@ -20,13 +60,52 @@ export const sampleServices: Record<string, Service[]> = {
   'comida-rapida': [
     {
       id: '9',
-      slug: 'superburguer',
-      name: 'Superburguer',
-      description: 'Servicio de lavado y planchado con los mejores productos.',
+      slug: 'superburger',
+      name: 'Superburger',
+      description: 'Las mejores hamburguesas artesanales.',
       category: 'Comida rápida',
       categorySlug: 'comida-rapida',
-      image: 'https://cdn.pixabay.com/photo/2017/09/14/19/34/laundry-2750158_1280.jpg',
-      images: ['https://cdn.pixabay.com/photo/2017/09/14/19/34/laundry-2750158_1280.jpg'],
+      image: 'https://images.pexels.com/photos/1639557/pexels-photo-1639557.jpeg?auto=compress&cs=tinysrgb&w=800',
+      images: ['https://images.pexels.com/photos/1639557/pexels-photo-1639557.jpeg?auto=compress&cs=tinysrgb&w=800'],
+      rating: 4.7,
+      reviewCount: 89,
+      featured: true
+    },  
+    {
+      id: '9',
+      slug: 'rey-del-shawarma',
+      name: 'Rey del Shawarma',
+      description: 'Las mejores Shawarma artesanales.',
+      category: 'Comida rápida',
+      categorySlug: 'comida-rapida',
+      image: 'https://images.pexels.com/photos/4958792/pexels-photo-4958792.jpeg?auto=compress&cs=tinysrgb&w=400',
+      images: ['https://images.pexels.com/photos/4958792/pexels-photo-4958792.jpeg?auto=compress&cs=tinysrgb&w=400'],
+      rating: 4.7,
+      reviewCount: 89,
+      featured: true
+    },  
+    {
+      id: '9',
+      slug: 'shawarma-el-faraon',
+      name: 'Shawarma El Faraon',
+      description: 'Disfruta del sabor tradicional del Medio Oriente con nuestro shawarma artesanal.',
+      category: 'Comida rápida',
+      categorySlug: 'comida-rapida',
+      image: 'https://images.pexels.com/photos/4394613/pexels-photo-4394613.jpeg?auto=compress&cs=tinysrgb&w=800',
+      images: ['https://images.pexels.com/photos/4394613/pexels-photo-4394613.jpeg?auto=compress&cs=tinysrgb&w=800'],
+      rating: 4.7,
+      reviewCount: 89,
+      featured: true
+    },  
+    {
+      id: '9',
+      slug: 'superburger',
+      name: 'Superburger',
+      description: 'Las mejores hamburguesas artesanales.',
+      category: 'Comida rápida',
+      categorySlug: 'comida-rapida',
+      image: 'https://images.pexels.com/photos/1639557/pexels-photo-1639557.jpeg?auto=compress&cs=tinysrgb&w=800',
+      images: ['https://images.pexels.com/photos/1639557/pexels-photo-1639557.jpeg?auto=compress&cs=tinysrgb&w=800'],
       rating: 4.7,
       reviewCount: 89,
       featured: true
