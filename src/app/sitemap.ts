@@ -1,29 +1,51 @@
 import { MetadataRoute } from 'next';
-import { SITE_URL, SITE_NAME, SITE_DESCRIPTION } from '@/lib/constants';
+import { SITE_URL } from '@/lib/constants';
+import sampleServices from '@/mocks/services';
+import sampleCategories from '@/mocks/categories';
 
 // Tipos para los datos de servicios y categorías
 type Service = {
   id: string;
   slug: string;
-  updatedAt: Date;
-  // Agrega más campos según sea necesario
+  name: string;
+  categorySlug?: string;
+  updatedAt?: Date;
 };
 
 type Category = {
+  id: string;
   slug: string;
-  // Agrega más campos según sea necesario
+  name: string;
 };
 
-// Función para obtener servicios (simulada por ahora)
-async function getServices(): Promise<Service[]> {
-  // Implementar lógica real para obtener servicios
-  return [];
+// Función para obtener servicios
+export async function getServices(): Promise<Service[]> {
+  // Aplanar el objeto de servicios por categoría a un solo array
+  const allServices: Service[] = [];
+  
+  Object.values(sampleServices).forEach(categoryServices => {
+    categoryServices.forEach(service => {
+      allServices.push({
+        id: service.id,
+        slug: service.slug,
+        name: service.name,
+        categorySlug: service.categorySlug,
+        updatedAt: new Date() // Usamos la fecha actual como última modificación
+      });
+    });
+  });
+  
+  return allServices;
 }
 
-// Función para obtener categorías (simulada por ahora)
-async function getCategories(): Promise<Category[]> {
-  // Implementar lógica real para obtener categorías
-  return [];
+// Función para obtener categorías
+export async function getCategories(): Promise<Category[]> {
+  // Mapear las categorías de muestra al formato esperado
+  return sampleCategories.map(category => ({
+    id: category.id,
+    slug: category.slug,
+    name: category.name
+  }));
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -64,12 +86,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Obtener servicios dinámicos
   const services = await getServices();
   
-  const serviceRoutes: MetadataRoute.Sitemap = services.map((service) => ({
-    url: `${SITE_URL}/servicio/${service.slug || service.id}`,
-    lastModified: service.updatedAt || new Date(),
-    changeFrequency: 'weekly' as const,
-    priority: 0.8,
-  }));
+  const serviceRoutes: MetadataRoute.Sitemap = services.map((service) => {
+    // Construir la URL del servicio
+    const url = service.categorySlug 
+      ? `${SITE_URL}/${service.categorySlug}/${service.slug}`
+      : `${SITE_URL}/servicio/${service.slug || service.id}`;
+      
+    return {
+      url,
+      lastModified: service.updatedAt || new Date(),
+      changeFrequency: 'weekly' as const,
+      priority: 0.8,
+    };
+  });
 
   // Obtener categorías
   const categories = await getCategories();
@@ -80,12 +109,21 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     changeFrequency: 'weekly' as const,
     priority: 0.7,
   }));
+  
+  // Agregar ruta para cada categoría individual
+  const categoryPageRoutes: MetadataRoute.Sitemap = categories.map((category) => ({
+    url: `${SITE_URL}/${category.slug}`,
+    lastModified: new Date(),
+    changeFrequency: 'daily' as const,
+    priority: 0.8,
+  }));
 
   // Combinar todas las rutas
   return [
     ...staticRoutes,
     ...serviceRoutes,
     ...categoryRoutes,
+    ...categoryPageRoutes,
   ];
 }
 
