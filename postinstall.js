@@ -38,16 +38,19 @@ try {
   runCommand('npm cache clean --force', 'Cleaning npm cache');
   
   // 3. Forzar la instalación de sharp con la versión específica
-  runCommand('npm install sharp@0.34.4 --no-save --force --ignore-scripts=false', 'Installing sharp@0.34.4');
+  runCommand('npm install sharp@0.32.6 --no-save --force --ignore-scripts=false', 'Installing sharp@0.32.6');
   
-  // 4. Reconstruir sharp
+  // 5. Reconstruir sharp
   runCommand('npm rebuild sharp --build-from-source', 'Rebuilding sharp');
   
-  // 5. Instalar ipx
+  // 6. Instalar ipx
   runCommand('npm install ipx@3.1.1 --no-save --force', 'Installing ipx@3.1.1');
   
-  // 6. Reconstruir ipx
+  // 7. Reconstruir ipx
   runCommand('npm rebuild ipx --build-from-source', 'Rebuilding ipx');
+  
+  // 7. Instalar @netlify/ipx
+  runCommand('npm install @netlify/ipx@3.4.3 --no-save --force', 'Installing @netlify/ipx@3.4.3');
   
   console.log('\n🎉 Postinstall script completed successfully!');
 } catch (error) {

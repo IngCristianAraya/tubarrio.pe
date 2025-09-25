@@ -96,8 +96,9 @@
     "workerize": "^0.1.8"
   },
   "resolutions": {
-    "sharp": "0.34.4",
+    "sharp": "0.32.6",
     "undici": "5.28.2",
-    "ipx": "3.1.1"
+    "ipx": "3.1.1",
+    "@netlify/ipx": "^3.4.3"
   }
 }
