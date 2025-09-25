@@ -18,6 +18,7 @@
     "install:ci": "npm install --legacy-peer-deps --force"
   },
   "dependencies": {
+    "ipx": "1.5.0",
     "@radix-ui/react-slot": "^1.0.2",
     "@types/leaflet": "^1.9.8",
     "@types/react-leaflet": "^2.8.3",
@@ -97,6 +98,7 @@
   "resolutions": {
     "sharp": "0.34.4",
     "undici": "5.28.2",
-    "ipx/sharp": "0.34.4"
+    "ipx/sharp": "0.34.4",
+    "ipx": "1.5.0"
   }
 }
