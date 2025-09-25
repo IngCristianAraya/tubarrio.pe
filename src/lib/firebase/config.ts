@@ -118,6 +118,7 @@ export const app = {
   }
 };
 
+// Export the Firestore instance directly for Firebase SDK compatibility
 export const db = {
   get instance(): Firestore {
     if (!_db) {
@@ -128,8 +129,12 @@ export const db = {
       }
     }
     return _db;
+  },
+  // Alias for direct compatibility with Firebase SDK
+  get firestore(): Firestore {
+    return this.instance;
   }
-};
+} as Firestore & { instance: Firestore, firestore: Firestore };
 
 export const auth = {
   get instance(): Auth {

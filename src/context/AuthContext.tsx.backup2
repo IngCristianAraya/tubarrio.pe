@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+const { createContext, useState, useEffect, useMemo } = React;
 import { 
   User, 
   onAuthStateChanged,
@@ -9,22 +10,17 @@ import {
   sendPasswordResetEmail as firebaseSendPasswordResetEmail,
   Auth,
   AuthError,
-  AuthErrorCodes,
-  UserCredential
+  AuthErrorCodes
 } from 'firebase/auth';
 import { FirebaseError } from 'firebase/app';
 import { auth as firebaseAuth, initializeFirebase } from '@/lib/firebase/config';
 import { toast } from 'react-hot-toast';
-
-// Definir tipos necesarios
-type ReactNode = React.ReactNode;
 
 // Definir los tipos necesarios
 interface AuthContextType {
   user: User | null;
   loading: boolean;
   isAuthenticated: boolean;
-  isAdmin: boolean; // Agregar esta línea
   error: Error | null;
   signIn: (email: string, password: string) => Promise<User>;
   signOut: () => Promise<void>;
@@ -34,12 +30,36 @@ interface AuthContextType {
 // Crear el contexto con un valor por defecto
 const AuthContext = React.createContext<AuthContextType | undefined>(undefined);
 
-// Hook personalizado para usar el contexto de autenticación
-export function useAuth() {
-  const context = React.useContext(AuthContext);
+// Get auth instance with lazy initialization
+const getAuthInstance = (): Auth | null => {
+  if (typeof window === 'undefined') {
+    console.log('Skipping Firebase Auth initialization during SSR');
+    return null;
+  }
   
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+  console.log('🔧 Initializing Firebase Auth...');
+  
+  try {
+    // Log environment variables (redacted for security)
+    console.log('🔧 Firebase Config:', {
+      hasApiKey: !!process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+      authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+      projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+      appId: !!process.env.NEXT_PUBLIC_FIREBASE_APP_ID
+    });
+    
+    // Ensure Firebase is initialized
+    console.log('🔧 Initializing Firebase...');
+    initializeFirebase();
+    
+    // Get the Firebase Auth instance
+    const authInstance = firebaseAuth?.instance;
+    console.log('🔧 Firebase Auth instance:', authInstance ? '✅ Success' : '❌ Failed');
+    
+    return authInstance || null;
+  } catch (error) {
+    console.error('❌ Error initializing Firebase Auth:', error);
+    return null;
   }
   
   return context;
@@ -49,25 +69,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = React.useState<User | null>(null);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<Error | null>(null);
-  const [auth, setAuth] = React.useState<Auth | null>(null);
   const isAuthenticated = !!user;
 
   // Inicializar Firebase Auth
-  React.useEffect(() => {
+  const auth = React.useMemo<Auth | null>(() => {
     try {
       const { auth: firebaseAuthInstance } = initializeFirebase();
-      if (firebaseAuthInstance) {
-        setAuth(firebaseAuthInstance);
-      } else {
-        console.error('Failed to initialize Firebase Auth');
-        setError(new Error('Failed to initialize Firebase Auth'));
-        setLoading(false);
-      }
+      return firebaseAuthInstance || null;
     } catch (err) {
       const error = err instanceof Error ? err : new Error('Unknown error initializing Firebase');
       console.error('Error initializing Firebase:', error);
       setError(error);
-      setLoading(false);
+      return null;
     }
   }, []);
 
@@ -175,24 +188,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  // Determinar si el usuario es administrador
-  const isAdmin = React.useMemo(() => {
-    return !!user?.email?.endsWith('@admin.com'); // Ajusta esta lógica según tus necesidades
-  }, [user]);
-
   // Valor del contexto
   const contextValue = React.useMemo<AuthContextType>(
     () => ({
       user,
       loading,
       isAuthenticated,
-      isAdmin, // Incluir isAdmin en el contexto
       error,
       signIn,
       signOut,
       resetPassword,
     }),
-    [user, loading, isAuthenticated, isAdmin, error]
+    [user, loading, isAuthenticated, error]
   );
 
   return (
@@ -202,4 +209,4 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
-export { AuthContext };
+export default AuthContext;

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { collection, getDocs, addDoc, deleteDoc, doc, updateDoc } from '@firebase/firestore';
+import { collection, getDocs, addDoc, deleteDoc, doc, updateDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase/config';
 
 interface Category {
@@ -44,7 +44,9 @@ export default function CategoriesPage() {
       setLoading(true);
       
       // Cargar servicios para contar por categoría
-      const servicesSnapshot = await getDocs(collection(db, 'services'));
+      const firestore = db.instance;
+      const servicesRef = collection(firestore, 'services');
+      const servicesSnapshot = await getDocs(servicesRef);
       const services = servicesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       
       // Contar servicios por categoría

@@ -13,9 +13,8 @@ interface Stats {
 }
 
 export default function AdminDashboard() {
-  
   // 🚀 OPTIMIZACIÓN: Usar hook optimizado de servicios
-  const { services, loading: servicesLoading, error: servicesError } = useServices({ limit: 1000 });
+  const { services, loading: servicesLoading, error: servicesError } = useServices({ pageSize: 1000 });
 
   // 🚀 OPTIMIZACIÓN: Calcular estadísticas directamente de los servicios
   const stats = useMemo(() => {
@@ -160,16 +159,6 @@ export default function AdminDashboard() {
             </div>
           </Link>
 
-          <button
-            onClick={loadStats}
-            className="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
-          >
-            <span className="text-xl mr-3">🔄</span>
-            <div>
-              <p className="font-medium text-gray-900">Actualizar Datos</p>
-              <p className="text-sm text-gray-600">Refrescar estadísticas</p>
-            </div>
-          </button>
         </div>
       </div>
 

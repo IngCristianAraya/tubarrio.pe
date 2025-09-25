@@ -128,14 +128,14 @@ export default function ConfigurationPage() {
     }
   };
 
-  const handleConfigChange = (section: string, field: string, value: any) => {
+  const handleConfigChange = <K extends keyof SystemConfig, F extends keyof SystemConfig[K]>(section: K, field: F, value: SystemConfig[K][F]) => {
     setConfig(prev => ({
       ...prev,
       [section]: {
-        ...prev[section as keyof SystemConfig],
+        ...(prev[section] as object),
         [field]: value
       }
-    }));
+    } as SystemConfig));
   };
 
   const handleSaveConfig = async () => {
