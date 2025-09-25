@@ -7,15 +7,15 @@
     "npm": ">=10.0.0"
   },
   "scripts": {
-    "postinstall": "node postinstall.js",
     "preinstall": "npx npm-force-resolutions",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "analyze": "ANALYZE=true next build",
-    "vercel-build": "npm install --force && next build",
-    "install:ci": "npm install --legacy-peer-deps --force"
+    "vercel-build": "npm install --legacy-peer-deps --force && next build",
+    "install:ci": "npm install --legacy-peer-deps --force",
+    "postinstall": "node postinstall.js"
   },
   "dependencies": {
     "ipx": "3.1.1",
@@ -97,8 +97,6 @@
   },
   "resolutions": {
     "sharp": "0.32.6",
-    "undici": "5.28.2",
-    "ipx": "3.1.1",
-    "@netlify/ipx": "^3.4.3"
+    "undici": "5.28.2"
   }
 }
