@@ -44,7 +44,7 @@ try {
   runCommand('npm rebuild sharp --build-from-source', 'Rebuilding sharp');
   
   // 5. Instalar ipx
-  runCommand('npm install ipx@1.5.0 --no-save --force', 'Installing ipx@1.5.0');
+  runCommand('npm install ipx@3.1.1 --no-save --force', 'Installing ipx@3.1.1');
   
   // 6. Reconstruir ipx
   runCommand('npm rebuild ipx --build-from-source', 'Rebuilding ipx');
