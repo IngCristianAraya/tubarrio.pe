@@ -87,7 +87,7 @@
     "workerize": "^0.1.8"
   },
   "engines": {
-    "node": "18.x"
+    "node": "22.x"
   },
   "resolutions": {
     "undici": "5.28.2"
