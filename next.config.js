@@ -114,13 +114,13 @@ const nextConfig = {
         http: false, // Usar el nativo del navegador
         https: false, // Usar el nativo del navegador
         stream: false, // Usar el nativo del navegador
-        buffer: require.resolve('buffer/'),
-        util: require.resolve('util/'),
-        url: require.resolve('url/'),
-        string_decoder: require.resolve('string_decoder/'),
-        path: require.resolve('path-browserify'),
-        crypto: require.resolve('crypto-browserify'),
-        os: require.resolve('os-browserify/browser')
+        buffer: false, // Usar el nativo del navegador
+        util: false, // Usar el nativo del navegador
+        url: false, // Usar el nativo del navegador
+        string_decoder: false, // Usar el nativo del navegador
+        path: false, // Usar el nativo del navegador
+        crypto: false, // Usar el nativo del navegador
+        os: false // Usar el nativo del navegador
       };
     }
 
