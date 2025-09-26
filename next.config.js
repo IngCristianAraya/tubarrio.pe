@@ -113,7 +113,7 @@ const nextConfig = {
         zlib: false, // Usar el nativo del navegador
         http: false, // Usar el nativo del navegador
         https: false, // Usar el nativo del navegador
-        stream: require.resolve('stream-browserify'),
+        stream: false, // Usar el nativo del navegador
         buffer: require.resolve('buffer/'),
         util: require.resolve('util/'),
         url: require.resolve('url/'),
