@@ -9,7 +9,7 @@
     "start": "next start",
     "lint": "next lint",
     "analyze": "ANALYZE=true next build",
-    "vercel-build": "node vercel-build.js",
+    "vercel-build": "vercel-build.cmd",
     "install:ci": "npm install --legacy-peer-deps --force",
     "postinstall": "npm rebuild sharp --build-from-source",
     "install": "npm install --ignore-scripts"
