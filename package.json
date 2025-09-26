@@ -51,7 +51,7 @@
     "@babel/core": "^7.22.9",
     "@babel/preset-env": "^7.22.9",
     "@netlify/plugin-nextjs": "^4.41.0",
-    "@next/bundle-analyzer": "^14.0.4",
+    "@next/bundle-analyzer": "^14.2.33",
     "@tailwindcss/nesting": "0.0.0-insiders.565cd3e",
     "@tailwindcss/typography": "^0.5.9",
     "@types/node": "^20.19.17",
