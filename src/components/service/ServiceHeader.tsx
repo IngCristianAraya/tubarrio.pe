@@ -14,15 +14,15 @@
  *   - Información de contacto y horarios
  */
 
-import React, { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { Service } from '@/types/service';
+
+type ReactElement = JSX.Element;
 import { MapPin, Clock, Star, ChevronLeft, ChevronRight, Phone } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import ServiceActions from './ServiceActions';
 import ServiceImages from './ServiceImages';
-
-type ReactElement = React.ReactElement;
 
 // Animation variants
 const containerVariants = {
@@ -197,7 +197,7 @@ const ServiceHeader = ({ service }: ServiceHeaderProps): ReactElement => {
   }, [service.id]);
 
   // Función para formatear el rating
-  const renderRating = (rating: number): ReactElement => {
+  const renderRating = (rating: number, textClass: string = 'text-sm'): ReactElement => {
     const stars: ReactElement[] = [];
     const fullStars = Math.floor(rating);
     const hasHalfStar = rating % 1 >= 0.5;
@@ -213,9 +213,11 @@ const ServiceHeader = ({ service }: ServiceHeaderProps): ReactElement => {
     }
     
     return (
-      <div className="flex items-center gap-1">
+      <div className="flex items-center">
         {stars}
-        <span className="ml-2 text-sm text-gray-600">({rating.toFixed(1)})</span>
+        <span className={`ml-1 ${textClass || 'text-sm'} font-medium text-gray-700`}>
+          ({rating.toFixed(1)})
+        </span>
       </div>
     );
   };
@@ -260,35 +262,60 @@ const ServiceHeader = ({ service }: ServiceHeaderProps): ReactElement => {
               {service.name}
             </motion.h1>
             
-            {/* Categoría y Rating */}
+            {/* Categoría, Ubicación y Rating */}
             <motion.div 
-              className="flex flex-col sm:flex-row sm:items-center gap-4"
+              className="w-full"
               variants={itemVariants}
             >
-              <motion.span 
-                className="inline-flex items-center px-4 py-2 bg-white/80 backdrop-blur-sm text-gray-800 text-sm font-semibold rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300"
-                whileHover={{ y: -2 }}
-              >
-                <span className="mr-2">
-                  {service.category === 'Restaurantes' && '🍽️'}
-                  {service.category === 'Abarrotes' && '🛒'}
-                  {service.category === 'Lavanderías' && '🧺'}
-                  {service.category === 'Gimnasios' && '💪'}
-                  {service.category === 'Servicios' && '🔧'}
-                  {service.category === 'Peluquerías' && '✂️'}
-                  {!['Restaurantes', 'Abarrotes', 'Lavanderías', 'Gimnasios', 'Servicios', 'Peluquerías'].includes(service.category || '') && '🏷️'}
-                </span>
-                {service.category}
-              </motion.span>
-              
-              {service.rating && service.rating > 0 && (
-                <motion.div 
-                  className="flex items-center gap-2 bg-white/80 backdrop-blur-sm px-3 py-1.5 rounded-xl border border-gray-200 shadow-sm"
-                  whileHover={{ scale: 1.03 }}
-                >
-                  {renderRating(service.rating)}
+              <div className="grid grid-cols-3 gap-2 sm:flex sm:flex-wrap sm:gap-3">
+                {/* Categoría */}
+                <motion.div className="flex-1 min-w-[100px]">
+                  <motion.span 
+                    className="inline-flex items-center justify-center w-full px-2 py-2 bg-white/80 backdrop-blur-sm text-gray-800 text-xs sm:text-sm font-semibold rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300 whitespace-nowrap overflow-hidden text-ellipsis"
+                    whileHover={{ y: -2 }}
+                    title={service.category}
+                  >
+                    <span className="mr-1 sm:mr-2">
+                      {service.category === 'Restaurantes' && '🍽️'}
+                      {service.category === 'Abarrotes' && '🛒'}
+                      {service.category === 'Lavanderías' && '🧺'}
+                      {service.category === 'Gimnasios' && '💪'}
+                      {service.category === 'Servicios' && '🔧'}
+                      {service.category === 'Peluquerías' && '✂️'}
+                      {!['Restaurantes', 'Abarrotes', 'Lavanderías', 'Gimnasios', 'Servicios', 'Peluquerías'].includes(service.category || '') && '🏷️'}
+                    </span>
+                    <span className="truncate">{service.category}</span>
+                  </motion.span>
                 </motion.div>
-              )}
+                
+                {/* Barrio */}
+                {service.neighborhood?.trim() && (
+                  <motion.div className="flex-1 min-w-[100px]">
+                    <motion.span 
+                      className="inline-flex items-center justify-center w-full px-2 py-2 bg-blue-50/80 backdrop-blur-sm text-blue-800 text-xs sm:text-sm font-medium rounded-xl border border-blue-100 shadow-sm hover:shadow-md transition-all duration-300 whitespace-nowrap overflow-hidden text-ellipsis"
+                      whileHover={{ y: -2 }}
+                      title={service.neighborhood.trim()}
+                    >
+                      <MapPin className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 flex-shrink-0 text-blue-500" />
+                      <span className="truncate">{service.neighborhood.trim()}</span>
+                    </motion.span>
+                  </motion.div>
+                )}
+                
+                {/* Rating */}
+                {service.rating && service.rating > 0 && (
+                  <motion.div className="flex-1 min-w-[100px]">
+                    <motion.div 
+                      className="flex items-center justify-center w-full h-full px-2 py-2 bg-white/80 backdrop-blur-sm rounded-xl border border-gray-200 shadow-sm"
+                      whileHover={{ scale: 1.03 }}
+                    >
+                      {renderRating(service.rating)}
+                    </motion.div>
+                  </motion.div>
+                )}
+              </div>
+              
+              {/* Se eliminó la sección de dirección duplicada en móvil */}
             </motion.div>
 
             {/* Galería de imágenes (solo móvil) */}
@@ -336,49 +363,94 @@ const ServiceHeader = ({ service }: ServiceHeaderProps): ReactElement => {
                           const address = service.address?.trim();
                           const reference = service.reference?.trim();
                           const location = service.location?.trim();
+                          const neighborhood = service.neighborhood?.trim();
+                          const district = service.district?.trim();
                           
-                          // Si address y reference son iguales, solo mostrar address
-                          if (address && reference && address === reference) {
-                            return (
-                              <p className="text-gray-700 text-sm font-medium">
-                                {address}
-                              </p>
-                            );
+                          // Crear un array para almacenar las partes de la dirección
+                          const addressParts = [];
+                          
+                          // Agregar barrio si existe
+                          if (neighborhood) {
+                            addressParts.push({
+                              label: 'Barrio',
+                              value: neighborhood,
+                              className: 'font-medium text-gray-800',
+                              icon: <MapPin className="w-4 h-4 mr-1 text-blue-500 inline" />
+                            });
                           }
                           
-                          // Si hay address y reference diferentes, mostrar ambos
-                          if (address && reference && address !== reference) {
-                            return (
-                              <div className="space-y-1">
-                                <p className="text-gray-700 text-sm font-medium">
-                                  {address}
-                                </p>
-                                <p className="text-gray-600 text-sm">
-                                  <span className="font-medium">Referencia:</span> {reference}
-                                </p>
-                              </div>
-                            );
+                          // Agregar distrito si existe
+                          if (district) {
+                            addressParts.push({
+                              label: 'Distrito',
+                              value: district,
+                              className: 'font-medium text-gray-800',
+                              icon: <MapPin className="w-4 h-4 mr-1 text-purple-500 inline" />
+                            });
                           }
                           
-                          // Si solo hay address, mostrarlo
+                          // Agregar dirección si existe
                           if (address) {
+                            addressParts.push({
+                              label: 'Dirección',
+                              value: address,
+                              className: 'text-gray-700'
+                            });
+                          }
+                          
+                          // Agregar referencia si existe y es diferente a la dirección
+                          if (reference && reference !== address) {
+                            addressParts.push({
+                              label: 'Referencia',
+                              value: reference,
+                              className: 'text-gray-600 text-sm'
+                            });
+                          }
+                          
+                          // Agregar ubicación general si no hay otros datos
+                          if (addressParts.length === 0 && location) {
+                            addressParts.push({
+                              label: 'Ubicación',
+                              value: location,
+                              className: 'text-gray-700'
+                            });
+                          }
+                          
+                          // Si no hay datos de ubicación
+                          if (addressParts.length === 0) {
                             return (
-                              <p className="text-gray-700 text-sm font-medium">
-                                {address}
+                              <p className="text-gray-500 text-sm">
+                                Ubicación no especificada
                               </p>
                             );
                           }
                           
-                          // Si solo hay location, mostrarlo
-                          if (location) {
-                            return (
-                              <p className="text-gray-700 text-sm">
-                                {location}
-                              </p>
-                            );
-                          }
-                          
-                          return null;
+                          // Renderizar solo dirección y referencia (sin barrio/distrito duplicados)
+                          return (
+                            <div className="space-y-2">
+                              {addressParts
+                                .filter(part => part.label === 'Dirección' || part.label === 'Referencia')
+                                .map((part, index) => (
+                                  <div key={index} className="flex flex-col">
+                                    {part.label && (
+                                      <span className="text-xs text-gray-500 font-medium">
+                                        {part.label}:
+                                      </span>
+                                    )}
+                                    <span className={part.className}>
+                                      {part.icon}
+                                      {part.value}
+                                    </span>
+                                  </div>
+                                ))}
+                              
+                              {addressParts.length === 0 && (
+                                <p className="text-gray-500 text-sm">
+                                  Ubicación no especificada
+                                </p>
+                              )}
+                            </div>
+                          );
                         })()}
                       </div>
                     </div>

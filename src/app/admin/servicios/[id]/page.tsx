@@ -22,6 +22,8 @@ interface ServiceForm {
   detailsUrl: string;
   horario: string;
   location: string;
+  neighborhood: string;
+  district: string;
   tags: string;
   plan: string;
 }
@@ -69,6 +71,8 @@ export default function EditServicePage({ params }: EditServicePageProps) {
     detailsUrl: '',
     horario: '',
     location: '',
+    neighborhood: '',
+    district: '',
     tags: '',
     plan: 'básico'
   });
@@ -118,6 +122,8 @@ export default function EditServicePage({ params }: EditServicePageProps) {
         detailsUrl: serviceData.detailsUrl || '',
         horario: serviceData.horario || '',
         location: serviceData.location || '',
+        neighborhood: serviceData.neighborhood || '',
+        district: serviceData.district || '',
         tags: Array.isArray(serviceData.tags) ? serviceData.tags.join(', ') : (serviceData.tags || ''),
         plan: serviceData.plan || 'básico'
       });
@@ -245,6 +251,8 @@ export default function EditServicePage({ params }: EditServicePageProps) {
         detailsUrl: formData.detailsUrl.trim() || '',
         horario: formData.horario.trim() || '',
         location: formData.location.trim() || '',
+        neighborhood: formData.neighborhood.trim() || '',
+        district: formData.district.trim() || '',
         tags: formData.tags.trim().split(',').map(tag => tag.trim()).filter(tag => tag.length > 0),
         rating: Number(formData.rating) || 0,
         plan: formData.plan || 'básico',
@@ -699,6 +707,34 @@ export default function EditServicePage({ params }: EditServicePageProps) {
                 onChange={handleInputChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Cerca del mercado central"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Barrio/Urbanización
+              </label>
+              <input
+                type="text"
+                name="neighborhood"
+                value={formData.neighborhood}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Ej: Pando 3ra etapa, Santa Emma, Palomino"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Distrito
+              </label>
+              <input
+                type="text"
+                name="district"
+                value={formData.district}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Ej: San Martín de Porres, Los Olivos"
               />
             </div>
           </div>

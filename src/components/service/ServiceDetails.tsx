@@ -19,7 +19,7 @@ interface ServiceDetailsProps {
   service: Service;
 }
 
-const ServiceDetails: React.FC<ServiceDetailsProps> = ({ service }) => {
+const ServiceDetails = ({ service }: ServiceDetailsProps) => {
   // Función para formatear el horario
   const formatSchedule = () => {
     if (service.horario) return service.horario;
@@ -119,7 +119,19 @@ const ServiceDetails: React.FC<ServiceDetailsProps> = ({ service }) => {
             </div>
             <div>
               <h3 className="font-semibold text-gray-900">Ubicación</h3>
-              <p className="text-gray-600">{formatLocation()}</p>
+              <p className="text-gray-600">
+                {service.neighborhood && (
+                  <span className="block">{service.neighborhood}</span>
+                )}
+                {service.district && (
+                  <span className="block">{service.district}</span>
+                )}
+                {(!service.neighborhood && !service.district) ? (
+                  <span>{formatLocation()}</span>
+                ) : (
+                  <span className="block text-sm text-gray-500">{formatLocation()}</span>
+                )}
+              </p>
             </div>
           </div>
           

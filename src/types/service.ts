@@ -12,6 +12,15 @@ export interface Category {
   serviceCount: number;
 }
 
+export interface SocialMedia {
+  facebook?: string;
+  instagram?: string;
+  tiktok?: string;
+  youtube?: string;
+  twitter?: string;
+  website?: string;
+}
+
 export interface Service {
   id: string;
   slug: string;
@@ -19,18 +28,26 @@ export interface Service {
   description: string;
   category: string;
   categorySlug: string;
-  location?: string;
+  // Ubicación específica (barrio/urbanización)
+  neighborhood?: string;
+  // Dirección específica (opcional)
   address?: string;
+  // Referencia de ubicación (opcional)
   reference?: string;
+  // Ciudad o distrito (opcional, para búsquedas más amplias)
+  district?: string;
   rating: number;
   image: string;
   images: string[];
-  detailsUrl?: string; // Made optional to match context
-  contactUrl?: string; // Made optional to match context
+  detailsUrl?: string;
+  contactUrl?: string;
   whatsapp?: string;
-  social?: string;
+  social?: string; // Mantenemos esto por compatibilidad
+  socialMedia?: SocialMedia; // Nueva estructura para redes sociales
   horario?: string;
   hours?: string;
+  available?: boolean;
+  price?: string;
   // Add any other fields that might be present in your service objects
   [key: string]: any; // This allows for additional properties
 }
