@@ -3,20 +3,12 @@
   "builds": [
     {
       "src": "package.json",
-      "use": "@vercel/next",
-      "config": {
-        "nodeVersion": "18.x",
-        "installCommand": "npm install --legacy-peer-deps --force",
-        "buildCommand": "npm run build"
-      }
+      "use": "@vercel/next"
     }
   ],
   "build": {
     "env": {
-      "NODE_ENV": "production",
-      "SHARP_IGNORE_GLOBAL_LIBVIPS": "1",
-      "NPM_CONFIG_PLATFORM": "linux",
-      "NPM_CONFIG_ARCH": "x64"
+      "NODE_ENV": "production"
     }
   }
 }

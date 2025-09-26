@@ -43,7 +43,7 @@
     "react-virtuoso": "^4.14.0",
     "react-window": "^1.8.9",
     "recharts": "2.7.2",
-    "sharp": "0.32.6",
+    "sharp": "^0.33.4",
     "swiper": "^10.2.0",
     "swr": "^2.2.4",
     "tailwind-merge": "^1.14.0",
@@ -87,13 +87,13 @@
     "workerize": "^0.1.8"
   },
   "engines": {
-    "node": "18.x"
+    "node": "22.x"
   },
   "resolutions": {
     "undici": "5.28.2",
-    "sharp": "0.32.6"
+    "sharp": "^0.33.4"
   },
   "overrides": {
-    "sharp": "0.32.6"
+    "sharp": "^0.33.4"
   }
 }
