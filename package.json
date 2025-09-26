@@ -12,7 +12,7 @@
     "vercel-build": "npm install --force && next build",
     "install:ci": "npm install --legacy-peer-deps --force",
     "postinstall": "npm rebuild sharp --build-from-source",
-    "install": "npm install --ignore-scripts"
+    "install": "npm install"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.0.2",
@@ -87,7 +87,7 @@
     "workerize": "^0.1.8"
   },
   "engines": {
-    "node": "22.x"
+    "node": "18.x"
   },
   "resolutions": {
     "undici": "5.28.2"
