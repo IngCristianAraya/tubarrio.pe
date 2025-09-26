@@ -66,6 +66,7 @@
     "buffer": "^6.0.3",
     "crypto-browserify": "^3.12.0",
     "css-loader": "^6.8.1",
+    "cssnano": "^7.1.1",
     "eslint": "^8.50.0",
     "eslint-config-next": "14.0.4",
     "https-browserify": "^1.0.0",
