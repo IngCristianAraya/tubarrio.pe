@@ -90,6 +90,10 @@
     "node": "22.x"
   },
   "resolutions": {
-    "undici": "5.28.2"
+    "undici": "5.28.2",
+    "sharp": "0.32.6"
+  },
+  "overrides": {
+    "sharp": "0.32.6"
   }
 }
