@@ -11,7 +11,8 @@
     "analyze": "ANALYZE=true next build",
     "vercel-build": "npm install --force && next build",
     "install:ci": "npm install --legacy-peer-deps --force",
-    "postinstall": "npm rebuild sharp"
+    "postinstall": "npm rebuild sharp --build-from-source",
+    "install": "npm install --ignore-scripts"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.0.2",
