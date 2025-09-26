@@ -65,7 +65,6 @@ const imageDomains = [
 ];
 
 const nextConfig = {
-  // Configuración básica
   reactStrictMode: true,
   compress: true,
   generateEtags: true,
@@ -74,7 +73,6 @@ const nextConfig = {
   productionBrowserSourceMaps: false,
   swcMinify: true,
   optimizeFonts: true,
-  // optimizeCss movido a la sección experimental
 
   // Headers de seguridad
   async headers() {
@@ -103,15 +101,18 @@ const nextConfig = {
     if (!isServer) {
       config.resolve.fallback = {
         ...config.resolve.fallback,
+        // Módulos que no necesitamos en el cliente
         fs: false,
         net: false,
         tls: false,
         dns: false,
         child_process: false,
         dgram: false,
-        zlib: require.resolve('browserify-zlib'),
-        http: require.resolve('stream-http'),
-        https: require.resolve('https-browserify'),
+        
+        // Polyfills necesarios
+        zlib: false, // Usar el nativo del navegador
+        http: false, // Usar el nativo del navegador
+        https: false, // Usar el nativo del navegador
         stream: require.resolve('stream-browserify'),
         buffer: require.resolve('buffer/'),
         util: require.resolve('util/'),
@@ -119,7 +120,7 @@ const nextConfig = {
         string_decoder: require.resolve('string_decoder/'),
         path: require.resolve('path-browserify'),
         crypto: require.resolve('crypto-browserify'),
-        os: require.resolve('os-browserify/browser'),
+        os: require.resolve('os-browserify/browser')
       };
     }
 
@@ -191,15 +192,6 @@ const nextConfig = {
             inline: true,
             name: 'static/[hash].worker.js'
           }
-        }
-      },
-      {
-        test: /node_modules[\\/]undici[\\/]lib[\\/]web[\\/]fetch[\\/]util\.js$/,
-        loader: 'string-replace-loader',
-        options: {
-          search: '!(#target in this)',
-          replace: '!(this && this[\'#target\'] !== undefined)',
-          flags: 'g'
         }
       }
     );
