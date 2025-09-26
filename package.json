@@ -22,6 +22,7 @@
     "class-variance-authority": "^0.7.0",
     "cloudinary": "^1.37.3",
     "clsx": "^2.0.0",
+    "critters": "^0.0.23",
     "firebase": "^10.4.0",
     "framer-motion": "^10.18.0",
     "geist": "^1.1.0",

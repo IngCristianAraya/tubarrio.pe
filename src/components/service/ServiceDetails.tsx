@@ -21,9 +21,36 @@ interface ServiceDetailsProps {
 
 const ServiceDetails: React.FC<ServiceDetailsProps> = ({ service }) => {
   // Función para formatear el horario
-  const formatSchedule = () => {
+  const formatSchedule = (): React.ReactNode => {
     if (service.horario) return service.horario;
-    if (service.hours) return service.hours;
+    
+    if (service.hours) {
+      // Si es un string, retornarlo directamente
+      if (typeof service.hours === 'string') return service.hours;
+      
+      // Si es un objeto, formatear los horarios
+      if (typeof service.hours === 'object' && service.hours !== null && !Array.isArray(service.hours)) {
+        const days = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domingo'] as const;
+        return (
+          <div className="space-y-1">
+            {days.map(day => {
+              const dayHours = service.hours && typeof service.hours === 'object' && day in service.hours 
+                ? (service.hours as Record<string, any>)[day]
+                : null;
+                
+              if (!dayHours || dayHours.closed) return null;
+              return (
+                <div key={day} className="flex justify-between">
+                  <span className="capitalize">{day}:</span>
+                  <span>{dayHours.open} - {dayHours.close}</span>
+                </div>
+              );
+            })}
+          </div>
+        );
+      }
+    }
+    
     return 'No especificado';
   };
 

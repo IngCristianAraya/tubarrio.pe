@@ -64,10 +64,18 @@ export const useServicePreloader = () => {
       const data = serviceDoc.data();
       const service: Service = {
         id: serviceDoc.id,
-        ...data,
+        slug: data.slug || serviceDoc.id,
+        name: data.name || 'Servicio sin nombre',
+        description: data.description || 'Sin descripción',
+        category: data.category || 'Sin categoría',
+        categorySlug: data.categorySlug || (data.category ? data.category.toLowerCase().replace(/\s+/g, '-') : 'sin-categoria'),
+        rating: data.rating || 0,
+        image: data.image || '/images/placeholder-service.jpg',
+        images: data.images || [data.image || '/images/placeholder-service.jpg'],
+        ...data, // Spread the rest of the data to include optional fields
         createdAt: data.createdAt?.toDate?.() || new Date(),
         updatedAt: data.updatedAt?.toDate?.() || new Date()
-      } as Service;
+      };
       
       // Guardar en cache
       setSingleServiceCache(serviceId, service);

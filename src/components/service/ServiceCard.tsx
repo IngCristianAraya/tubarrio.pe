@@ -123,13 +123,19 @@ export function ServiceCardSkeleton({ className }: { className?: string }) {
   return <ServiceCard 
     service={{
       id: 'loading',
+      slug: 'loading',
       name: 'Cargando servicio',
       description: 'Cargando descripción del servicio',
       category: 'Cargando categoría',
+      categorySlug: 'cargando-categoria',
       location: 'Cargando ubicación',
       rating: 0,
       image: '/images/default-service.jpg',
-      available: false
+      images: ['/images/default-service.jpg'],
+      available: false,
+      whatsapp: '',
+      hours: '',
+      social: ''
     }} 
     isLoading={true}
     className={className}

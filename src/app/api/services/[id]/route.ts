@@ -2,6 +2,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 
+// Definir interfaz para el tipo de datos del servicio
+interface ServiceData {
+  id: string;
+  name?: string;
+  [key: string]: any; // Para otras propiedades dinámicas
+}
+
 // Configuración de Firebase Admin SDK
 const initializeFirebaseAdmin = () => {
   if (getApps().length === 0) {
@@ -46,12 +53,12 @@ export async function GET(
       return NextResponse.json({ error: 'Servicio no encontrado' }, { status: 404 });
     }
     
-    const serviceData = {
+    const serviceData: ServiceData = {
       id: serviceDoc.id,
       ...serviceDoc.data()
     };
     
-    console.log(`✅ Servicio encontrado: ${serviceData.name}`);
+    console.log(`✅ Servicio encontrado: ${serviceData.name || 'Sin nombre'}`);
     
     return NextResponse.json(serviceData);
     
