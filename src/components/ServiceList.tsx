@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { useServicesPaginated } from '@/hooks/useServices';
-import ServiceCard from '@/components/ServiceCard';
+import { ServiceCard } from '@/components/service/ServiceCard';
 import { ChevronDown, Filter, MapPin, Tag } from 'lucide-react';
 import { CloudinaryUtils, CLOUDINARY_TRANSFORMATIONS } from '@/hooks/useCloudinary';
 import { Service } from '@/types/service';
@@ -211,19 +211,36 @@ const ServiceList: React.FC<ServiceListProps> = ({
           {/* Grid de servicios */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
             {services.map((service) => (
-              <ServiceCard 
-                key={service.id} 
-                service={{
-                  ...service,
-                  images: service.images?.main && CloudinaryUtils.isCloudinaryUrl(service.images.main)
-                    ? {
-                        ...service.images,
-                        main: service.images.main.replace('/upload/', `/upload/${CLOUDINARY_TRANSFORMATIONS.thumbnail}/`)
-                      }
-                    : service.images
-                }}
-                className="transform hover:scale-105 transition-transform duration-200"
-              />
+              <div key={service.id} className="transform hover:scale-105 transition-transform duration-200">
+                <ServiceCard 
+                  service={{
+                    id: service.id,
+                    slug: service.slug || `service-${service.id}`,
+                    name: service.name || 'Servicio sin nombre',
+                    description: service.description || '',
+                    category: service.category || 'Sin categoría',
+                    categorySlug: service.categorySlug || 'sin-categoria',
+                    location: service.location,
+                    address: service.address,
+                    reference: service.reference,
+                    rating: service.rating || 0,
+                    image: service.image || '/images/default-service.jpg',
+                    images: service.images || [],
+                    detailsUrl: service.detailsUrl,
+                    contactUrl: service.contactUrl,
+                    whatsapp: service.whatsapp,
+                    social: service.social,
+                    horario: service.horario,
+                    hours: service.hours,
+                    ...(service.images?.main && CloudinaryUtils.isCloudinaryUrl(service.images.main) ? {
+                      images: [
+                        service.images.main.replace('/upload/', `/upload/${CLOUDINARY_TRANSFORMATIONS.thumbnail}/`),
+                        ...(Array.isArray(service.images) ? service.images : [])
+                      ]
+                    } : {})
+                  }}
+                />
+              </div>
             ))}
           </div>
 

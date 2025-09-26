@@ -1,27 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
-import { getFirestore, Timestamp } from 'firebase-admin/firestore';
+import { getFirestore } from 'firebase-admin/firestore';
 
-// Definir la interfaz para los datos del servicio
+// Definir interfaz para el tipo de datos del servicio
 interface ServiceData {
   id: string;
   name?: string;
-  description?: string;
-  category?: string;
-  barrio?: string;
-  address?: string;
-  phone?: string;
-  whatsapp?: string;
-  email?: string;
-  website?: string;
-  featured?: boolean;
-  active?: boolean;
-  images?: string[];
-  logo?: string;
-  createdAt?: Timestamp | string;
-  updatedAt?: Timestamp | string;
-  userId?: string;
-  [key: string]: any; // Para propiedades adicionales
+  [key: string]: any; // Para otras propiedades dinámicas
 }
 
 // Configuración de Firebase Admin SDK
@@ -71,18 +56,11 @@ export async function GET(
     const serviceData: ServiceData = {
       id: serviceDoc.id,
       ...serviceDoc.data()
-    } as ServiceData;
+    };
     
     console.log(`✅ Servicio encontrado: ${serviceData.name || 'Sin nombre'}`);
     
-    // Convertir Timestamp a string para la respuesta
-    const responseData = {
-      ...serviceData,
-      createdAt: serviceData.createdAt instanceof Timestamp ? serviceData.createdAt.toDate().toISOString() : serviceData.createdAt,
-      updatedAt: serviceData.updatedAt instanceof Timestamp ? serviceData.updatedAt.toDate().toISOString() : serviceData.updatedAt
-    };
-    
-    return NextResponse.json(responseData);
+    return NextResponse.json(serviceData);
     
   } catch (error) {
     console.error('❌ Error al obtener servicio:', error);
@@ -124,19 +102,12 @@ export async function PUT(
     
     // Obtener datos actualizados
     const updatedDoc = await serviceRef.get();
-    const result: ServiceData = {
+    const result = {
       id: updatedDoc.id,
       ...updatedDoc.data()
-    } as ServiceData;
-    
-    // Convertir Timestamp a string para la respuesta
-    const responseData = {
-      ...result,
-      createdAt: result.createdAt instanceof Timestamp ? result.createdAt.toDate().toISOString() : result.createdAt,
-      updatedAt: result.updatedAt instanceof Timestamp ? result.updatedAt.toDate().toISOString() : result.updatedAt
     };
     
-    return NextResponse.json(responseData);
+    return NextResponse.json(result);
     
   } catch (error) {
     console.error('❌ Error al actualizar servicio:', error);

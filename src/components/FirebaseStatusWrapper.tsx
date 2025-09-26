@@ -6,7 +6,8 @@ import { db } from '@/lib/firebase/config';
 import FirebaseStatus from './FirebaseStatus';
 
 export default function FirebaseStatusWrapper() {
-  const { services, loading: servicesLoading, error: servicesError } = useServices({ limit: 1 });
+  // Obtener solo el primer servicio para verificar la conexión
+  const { services, loading: servicesLoading, error: servicesError } = useServices();
   const [isUsingFallback, setIsUsingFallback] = useState(false);
 
   useEffect(() => {

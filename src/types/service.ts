@@ -30,7 +30,13 @@ export interface Service {
   whatsapp?: string;
   social?: string;
   horario?: string;
-  hours?: string;
+  hours?: {
+    [key: string]: {
+      open: string;
+      close: string;
+      closed: boolean;
+    };
+  } | string;
   // Add any other fields that might be present in your service objects
   [key: string]: any; // This allows for additional properties
 }

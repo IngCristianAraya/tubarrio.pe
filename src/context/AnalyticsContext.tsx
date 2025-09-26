@@ -3,7 +3,6 @@
 import * as React from 'react';
 const { createContext, useContext, useReducer, useEffect, useCallback, useMemo } = React;
 import { db } from '../lib/firebase/config';
-import { AuthContext } from './AuthContext';
 
 // Función para obtener funciones de Firebase dinámicamente
 const getFirestoreFunctions = async () => {
@@ -108,37 +107,25 @@ interface AnalyticsContextType {
   trackServiceClick: (serviceId: string, serviceName: string) => Promise<void>;
   trackContactClick: (method: 'whatsapp' | 'phone', serviceId?: string) => Promise<void>;
 }
-
 const AnalyticsContext = createContext<AnalyticsContextType | undefined>(undefined);
 
 function AnalyticsProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(analyticsReducer, initialState);
-  // Get user from AuthContext without using useAuth hook
-  const authContext = useContext(AuthContext);
-  const user = authContext?.user || null;
-  const isAdmin = user?.uid === process.env.NEXT_PUBLIC_ADMIN_UID;
 
   const trackEvent = useCallback(async (event: Omit<AnalyticsEvent, 'timestamp'>) => {
     try {
-      const fullEvent: AnalyticsEvent = {
+      const firestore = await getFirestoreFunctions();
+      if (!firestore) return;
+
+      const newEvent: AnalyticsEvent = {
         ...event,
         timestamp: new Date(),
-        userAgent: typeof window !== 'undefined' ? window.navigator.userAgent : '',
-        referrer: typeof window !== 'undefined' ? document.referrer : ''
       };
 
-      // Get Firebase functions dynamically
-      const firestore = await getFirestoreFunctions();
-      if (!db || !firestore) {
-        console.warn('Firebase not available, skipping analytics tracking');
-        return;
-      }
+      dispatch({ type: 'ADD_EVENT', payload: newEvent });
 
       // Guardar en Firestore
-      await firestore.addDoc(firestore.collection(db, 'analytics'), fullEvent);
-      
-      // Actualizar estado local
-      dispatch({ type: 'ADD_EVENT', payload: fullEvent });
+      await firestore.addDoc(firestore.collection(db, 'analytics_events'), newEvent);
     } catch (error) {
       console.error('Error tracking event:', error);
     }
@@ -170,13 +157,9 @@ function AnalyticsProvider({ children }: { children: React.ReactNode }) {
     try {
       dispatch({ type: 'SET_LOADING', payload: true });
       
-      // Verificar si el usuario es administrador
-      if (!user || !isAdmin) {
-        console.warn('⚠️ Analytics: Solo administradores pueden acceder a las métricas');
-        dispatch({ type: 'SET_METRICS', payload: initialState.metrics });
-        dispatch({ type: 'SET_LOADING', payload: false });
-        return;
-      }
+      // No se requiere autenticación para ver métricas
+      console.log('Cargando métricas de analíticas...');
+      
       
       // Get Firebase functions dynamically
       const firestore = await getFirestoreFunctions();
@@ -221,9 +204,11 @@ function AnalyticsProvider({ children }: { children: React.ReactNode }) {
     } catch (error: any) {
       console.error('Error getting metrics:', error);
       
-      // Si es un error de permisos, mostrar mensaje específico
+      // Manejar errores de Firebase
       if (error.code === 'permission-denied') {
-        console.warn('⚠️ Analytics: Acceso denegado a colección analytics. Solo administradores pueden ver métricas.');
+        console.warn('⚠️ Analytics: No se tienen permisos para acceder a las métricas.');
+      } else {
+        console.error('Error al cargar métricas:', error);
       }
       
       // En caso de error, usar métricas vacías
@@ -231,7 +216,7 @@ function AnalyticsProvider({ children }: { children: React.ReactNode }) {
     } finally {
       dispatch({ type: 'SET_LOADING', payload: false });
     }
-  }, [user, isAdmin]);
+  }, []);
 
   const calculateTopServices = (events: AnalyticsEvent[]) => {
     const serviceClicks = events.filter(e => e.type === 'service_click' && e.serviceId);

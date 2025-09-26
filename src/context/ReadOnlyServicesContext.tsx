@@ -1,38 +1,30 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode, useMemo } from 'react';
-import { collection, getDocs, getDoc, doc, query, orderBy, where, limit, startAfter, Firestore, DocumentData } from 'firebase/firestore';
-import { getFirestore } from 'firebase/firestore';
-import { app } from '@/lib/firebase/config';
+import { collection, getDocs, getDoc, doc, query, where, orderBy, limit, DocumentData } from 'firebase/firestore';
+import { db } from '@/lib/firebase/config';
 import { toast } from 'react-hot-toast';
 
-// Type for the cache entry
+// Cache configuration
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+const MAX_CACHE_SIZE = 50; // Max number of services to cache
+
+// Cache entry interface
 interface CacheEntry<T> {
   data: T;
   timestamp: number;
 }
 
-// Initialize Firestore with null check
-let db: Firestore;
-
-try {
-  if (!app) {
-    throw new Error('Firebase app is not initialized');
-  }
-  
-  db = getFirestore(app);
-  
-  if (process.env.NODE_ENV === 'development') {
-    console.log('Firestore initialized successfully');
-  }
-} catch (error) {
-  console.error('Failed to initialize Firestore:', error);
-  throw new Error('Firebase initialization failed. Please check your configuration.');
+// Verify Firestore initialization
+if (process.env.NODE_ENV === 'development' && db) {
+  console.log('Firestore initialized successfully');
 }
 
-// Cache configuration
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
-const MAX_CACHE_SIZE = 50; // Max number of services to cache
+if (!db) {
+  const error = 'Firebase initialization failed. Please check your configuration.';
+  console.error(error);
+  throw new Error(error);
+}
 
 // Types
 export interface Service {
@@ -63,12 +55,12 @@ interface ServicesContextType {
   searchTerm: string;
   selectedCategory: string;
   categories: string[];
+  isSearching: boolean;
   setSearchTerm: (term: string) => void;
   setSelectedCategory: (category: string) => void;
   getServiceById: (id: string) => Promise<Service | null>;
   searchServices: (query: string, category?: string) => void;
   resetSearch: () => void;
-  isSearching: boolean;
   refreshServices: () => Promise<void>;
 }
 
@@ -103,8 +95,11 @@ class ServiceCache<T> {
     // Enforce max cache size
     if (this.cache.size >= this.maxSize) {
       // Delete the oldest entry
-      const oldestKey = this.cache.keys().next().value;
-      this.cache.delete(oldestKey);
+      const oldestEntry = this.cache.entries().next();
+      if (!oldestEntry.done) {
+        const [oldestKey] = oldestEntry.value;
+        this.cache.delete(oldestKey);
+      }
     }
     
     this.cache.set(key, {
@@ -117,10 +112,9 @@ class ServiceCache<T> {
     this.cache.clear();
   }
 
-  // Optional: Add method to clean up expired entries
+  // Clean up expired entries
   cleanup(): void {
     const now = Date.now();
-    // Convert to array to safely delete entries while iterating
     Array.from(this.cache.entries()).forEach(([key, entry]) => {
       if (now - entry.timestamp > this.cacheDuration) {
         this.cache.delete(key);
@@ -129,18 +123,15 @@ class ServiceCache<T> {
   }
 }
 
-// Initialize cache with proper typing and configuration
-const cache = new ServiceCache<Service | Service[]>(
-  MAX_CACHE_SIZE,
-  CACHE_DURATION
-);
+// Initialize cache
+const cache = new ServiceCache<Service | Service[]>();
 
 interface ServicesProviderProps {
   children: ReactNode;
 }
 
 export const ServicesProvider: React.FC<ServicesProviderProps> = ({ children }) => {
-  // State management using a single state object for better performance
+  // State management
   const [state, setState] = useState({
     services: [] as Service[],
     filteredServices: [] as Service[],
@@ -158,34 +149,30 @@ export const ServicesProvider: React.FC<ServicesProviderProps> = ({ children }) 
     services,
     filteredServices,
     featuredServices,
-    categories,
     loading,
     error: stateError,
     searchTerm,
     selectedCategory,
+    categories,
     isSearching
   } = state;
-
+  
   // Helper function to update state
   const updateState = useCallback((updates: Partial<typeof state>) => {
     setState(prev => ({ ...prev, ...updates }));
   }, []);
 
-  // Get Firestore instance
-  const getFirestoreInstance = useCallback((): Firestore => {
-    if (!app) {
-      throw new Error('Firebase app is not initialized');
-    }
-    return getFirestore(app);
-  }, []);
-
   // Update categories from services
   const updateCategories = useCallback((servicesData: Service[]) => {
-    const categoriesList = Array.from(
-      new Set(servicesData.map(service => service.category).filter(Boolean))
-    ) as string[];
-    
-    updateState({ categories: categoriesList });
+    try {
+      const uniqueCategories = Array.from(
+        new Set(servicesData.map(service => service.category).filter(Boolean))
+      ) as string[];
+      updateState({ categories: uniqueCategories });
+    } catch (error) {
+      console.error('Error updating categories:', error);
+      updateState({ error: 'Failed to update categories' });
+    }
   }, [updateState]);
 
   // Load featured services
@@ -199,15 +186,14 @@ export const ServicesProvider: React.FC<ServicesProviderProps> = ({ children }) 
         return;
       }
       
-      // If services data is provided, use it; otherwise, fetch from Firestore
       let featured: Service[] = [];
-      
       if (servicesData) {
         // Filter featured services from provided data
-        featured = servicesData.filter(service => service.tags?.includes('featured'));
+        featured = servicesData.filter(service => 
+          service.tags?.includes('featured') && service.active !== false
+        );
       } else {
         // Fetch from Firestore if no data provided
-        const db = getFirestoreInstance();
         const featuredQuery = query(
           collection(db, 'services'),
           where('tags', 'array-contains', 'featured'),
@@ -219,7 +205,7 @@ export const ServicesProvider: React.FC<ServicesProviderProps> = ({ children }) 
         featured = querySnapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data()
-        })) as Service[];
+        } as Service));
       }
       
       // Update cache and state
@@ -227,178 +213,151 @@ export const ServicesProvider: React.FC<ServicesProviderProps> = ({ children }) 
       updateState({ featuredServices: featured });
     } catch (error) {
       console.error('Error loading featured services:', error);
+      updateState({ error: 'Failed to load featured services' });
       toast.error('Error al cargar los servicios destacados');
     }
-  }, [getFirestoreInstance, updateState]);
+  }, [updateState]);
 
-  // Load services from Firestore or cache
+  // Load all services
   const loadServices = useCallback(async (forceRefresh = false) => {
-    const cacheKey = 'all-services';
-    
     try {
       updateState({ loading: true, error: null });
       
-      // Try to get from cache first if not forcing refresh
-      if (!forceRefresh) {
-        const cached = cache.get(cacheKey) as Service[] | null;
-        if (cached) {
-          updateState({
-            services: cached,
-            filteredServices: cached,
-            loading: false
-          });
-          updateCategories(cached);
-          // Load featured services from cache if available
-          const featuredCache = cache.get('featured-services') as Service[] | null;
-          if (!featuredCache) {
-            loadFeaturedServices(cached);
-          }
-          return cached;
-        }
+      const cacheKey = 'all-services';
+      const cached = !forceRefresh ? cache.get(cacheKey) as Service[] | null : null;
+      
+      if (cached) {
+        updateState({ 
+          services: cached,
+          filteredServices: cached,
+          loading: false 
+        });
+        updateCategories(cached);
+        await loadFeaturedServices(cached);
+        return;
       }
       
       // Fetch from Firestore
-      const db = getFirestoreInstance();
-      const servicesRef = collection(db, 'services');
-      const q = query(servicesRef, where('active', '==', true), orderBy('name'));
-      const querySnapshot = await getDocs(q);
+      const servicesQuery = query(
+        collection(db, 'services'),
+        where('active', '==', true),
+        orderBy('name')
+      );
       
-      const servicesData = querySnapshot.docs.map(doc => {
-        const data = doc.data();
-        return {
-          id: doc.id,
-          name: data.name || '',
-          category: data.category || '',
-          image: data.image || '',
-          images: data.images || [],
-          rating: data.rating || 0,
-          location: data.location || '',
-          description: data.description || '',
-          contactUrl: data.contactUrl || '',
-          detailsUrl: data.detailsUrl || '',
-          horario: data.horario || '',
-          tags: data.tags || [],
-          hours: data.hours || '',
-          social: data.social || '',
-          whatsapp: data.whatsapp || '',
-          active: data.active !== undefined ? data.active : true
-        } as Service;
-      });
+      const querySnapshot = await getDocs(servicesQuery);
+      const servicesData = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      } as Service));
       
-      // Update cache
+      // Cache the results
       cache.set(cacheKey, servicesData);
       
-      // Update state
-      updateState({
+      updateState({ 
         services: servicesData,
         filteredServices: servicesData,
-        loading: false
+        loading: false 
       });
       
-      // Update categories and load featured services
       updateCategories(servicesData);
-      loadFeaturedServices(servicesData);
-      
-      return servicesData;
+      await loadFeaturedServices(servicesData);
     } catch (error) {
       console.error('Error loading services:', error);
-      updateState({
-        error: 'Error al cargar los servicios. Por favor, intente nuevamente.',
-        loading: false
+      updateState({ 
+        loading: false, 
+        error: 'Failed to load services. Please try again later.' 
       });
-      throw error;
+      toast.error('Error al cargar los servicios. Por favor, inténtalo de nuevo.');
     }
-  }, [getFirestoreInstance, updateCategories, loadFeaturedServices, updateState]);
+  }, [updateState, updateCategories, loadFeaturedServices]);
+
+  // Load services on component mount
+  useEffect(() => {
+    loadServices();
+  }, [loadServices]);
 
   // Get service by ID
   const getServiceById = useCallback(async (id: string): Promise<Service | null> => {
-    if (!id) return null;
-    
     try {
-      // Check cache first
-      const cachedService = services.find(service => service.id === id);
-      if (cachedService) return cachedService;
+      const cacheKey = `service-${id}`;
+      const cached = cache.get(cacheKey) as Service | null;
       
-      // If not in cache, fetch from Firestore
-      const db = getFirestoreInstance();
+      if (cached) {
+        return cached;
+      }
+      
       const docRef = doc(db, 'services', id);
       const docSnap = await getDoc(docRef);
       
-      if (!docSnap.exists()) {
-        throw new Error('Service not found');
+      if (docSnap.exists()) {
+        const serviceData = { 
+          id: docSnap.id, 
+          ...docSnap.data() 
+        } as Service;
+        cache.set(cacheKey, serviceData);
+        return serviceData;
       }
       
-      const serviceData = {
-        id: docSnap.id,
-        ...docSnap.data()
-      } as Service;
-      
-      // Update cache with the fetched service
-      const updatedServices = [...services];
-      const existingIndex = updatedServices.findIndex(s => s.id === id);
-      
-      if (existingIndex >= 0) {
-        updatedServices[existingIndex] = serviceData;
-      } else {
-        updatedServices.push(serviceData);
-      }
-      
-      // Update state with the new service data
-      updateState({
-        services: updatedServices,
-        filteredServices: updatedServices
-      });
-      
-      return serviceData;
+      return null;
     } catch (error) {
       console.error('Error getting service by ID:', error);
-      toast.error('Error al cargar el servicio');
+      toast.error('Error al cargar el servicio. Por favor, inténtalo de nuevo.');
       return null;
     }
-  }, [getFirestoreInstance, services, updateState]);
+  }, []);
 
   // Search services
   const searchServices = useCallback((searchQuery: string, category: string = '') => {
-    updateState({ isSearching: true, searchTerm: searchQuery, selectedCategory: category });
+    updateState({ 
+      isSearching: true, 
+      searchTerm: searchQuery, 
+      selectedCategory: category 
+    });
     
-    let results = [...services];
+    let results = [...state.services];
     
-    // Apply search query filter
+    // Filter by search term
     if (searchQuery) {
-      const query = searchQuery.toLowerCase();
+      const searchLower = searchQuery.toLowerCase();
       results = results.filter(service => 
-        service.name.toLowerCase().includes(query) ||
-        service.description.toLowerCase().includes(query) ||
-        service.tags?.some(tag => tag.toLowerCase().includes(query))
+        service.name.toLowerCase().includes(searchLower) ||
+        service.description?.toLowerCase().includes(searchLower) ||
+        service.category.toLowerCase().includes(searchLower) ||
+        service.tags?.some(tag => tag.toLowerCase().includes(searchLower))
       );
     }
     
-    // Apply category filter
+    // Filter by category
     if (category) {
       results = results.filter(service => service.category === category);
     }
     
     updateState({ filteredServices: results });
-  }, [services, updateState]);
+  }, [state.services, updateState]);
 
   // Reset search
   const resetSearch = useCallback(() => {
     updateState({
-      filteredServices: services,
       searchTerm: '',
       selectedCategory: '',
+      filteredServices: state.services,
       isSearching: false
     });
-  }, [services, updateState]);
+  }, [state.services, updateState]);
+
+  // Set search term
+  const setSearchTerm = useCallback((term: string) => {
+    updateState({ searchTerm: term });
+  }, [updateState]);
+
+  // Set selected category
+  const setSelectedCategory = useCallback((category: string) => {
+    updateState({ selectedCategory: category });
+  }, [updateState]);
 
   // Refresh services
   const refreshServices = useCallback(async () => {
-    return loadServices(true);
-  }, [loadServices]);
-
-  // Load services on mount
-  useEffect(() => {
-    loadServices();
+    await loadServices(true);
   }, [loadServices]);
 
   // Context value
@@ -412,8 +371,8 @@ export const ServicesProvider: React.FC<ServicesProviderProps> = ({ children }) 
     selectedCategory,
     categories,
     isSearching,
-    setSearchTerm: (term: string) => updateState({ searchTerm: term }),
-    setSelectedCategory: (category: string) => updateState({ selectedCategory: category }),
+    setSearchTerm,
+    setSelectedCategory,
     getServiceById,
     searchServices,
     resetSearch,
@@ -428,7 +387,8 @@ export const ServicesProvider: React.FC<ServicesProviderProps> = ({ children }) 
     selectedCategory,
     categories,
     isSearching,
-    updateState,
+    setSearchTerm,
+    setSelectedCategory,
     getServiceById,
     searchServices,
     resetSearch,
@@ -442,6 +402,7 @@ export const ServicesProvider: React.FC<ServicesProviderProps> = ({ children }) 
   );
 };
 
+// Custom hook to use the services context
 export const useServices = (): ServicesContextType => {
   const context = useContext(ServicesContext);
   if (context === undefined) {

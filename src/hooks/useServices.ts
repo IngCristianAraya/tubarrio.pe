@@ -1,130 +1,31 @@
 import useSWR from 'swr';
 import { useState, useCallback, useMemo, useEffect } from 'react';
 import { useService } from './useService';
-import { db } from '@/lib/firebase/config';
+import { useServiceCache } from './useServiceCache';
 import { 
   collection, 
   query, 
   where, 
-  getDocs, 
   orderBy, 
-  limit as firestoreLimit,
+  limit, 
   startAfter, 
-  DocumentSnapshot, 
-  QueryDocumentSnapshot,
+  getDocs, 
   getDoc,
   doc,
-  DocumentData,
-  QueryConstraint,
-  Firestore,
-  Query,
-  QueryDocumentSnapshot as FirestoreQueryDocumentSnapshot,
-  Timestamp,
-  setDoc,
-  updateDoc,
-  deleteDoc
+  DocumentSnapshot,
+  Firestore
 } from 'firebase/firestore';
-import { Service as BaseService } from '@/types/service';
-
-// Extender la interfaz Service para incluir propiedades adicionales
-export type Service = BaseService & {
-  phone?: string;
-  whatsapp?: string;
-  address?: string;
-  active?: boolean;
-  createdAt?: any;
-  updatedAt?: any;
-  featured?: boolean;
-};
-
-export type ExtendedService = Service;
-
+import { db } from '@/lib/firebase/config';
+import { Service } from '@/context/ServicesContext';
 import { fallbackServices, filterFallbackServices, getFallbackServiceById } from '../lib/firebase/fallback';
 
-// Funciones de caché
-const getFeaturedServicesFromCache = (): Service[] => {
-  if (typeof window === 'undefined') return [];
-  const cached = localStorage.getItem('featuredServices');
-  if (!cached) return [];
-  
-  try {
-    const { data, timestamp } = JSON.parse(cached);
-    // Verificar si la caché es reciente (menos de 1 hora)
-    if (Date.now() - timestamp < 60 * 60 * 1000) {
-      return data;
-    }
-  } catch (error) {
-    console.error('Error al analizar caché de servicios destacados:', error);
-  }
-
-  return [];
-};
-
-const setFeaturedServicesCache = (services: Service[]): void => {
-  if (typeof window === 'undefined') return;
-  try {
-    localStorage.setItem('featuredServices', JSON.stringify({
-      data: services,
-      timestamp: Date.now()
-    }));
-  } catch (error) {
-    console.error('Error al guardar en caché los servicios destacados:', error);
-  }
-};
-
-const getAllServicesFromCache = (): Service[] => {
-  if (typeof window === 'undefined') return [];
-  const cached = localStorage.getItem('allServices');
-  if (!cached) return [];
-
-  try {
-    const { data, timestamp } = JSON.parse(cached);
-    // Verificar si la caché es reciente (menos de 5 minutos)
-    if (Date.now() - timestamp < 5 * 60 * 1000) {
-      return data;
-    }
-  } catch (error) {
-    console.error('Error al analizar caché de todos los servicios:', error);
-  }
-
-  return [];
-};
-
-const setAllServicesCache = (services: Service[]): void => {
-  if (typeof window === 'undefined') return;
-  try {
-    localStorage.setItem('allServices', JSON.stringify({
-      data: services,
-      timestamp: Date.now()
-    }));
-  } catch (error) {
-    console.error('Error al guardar en caché todos los servicios:', error);
-  }
-};
-
-const loadPersistentCache = (): Service[] => {
-  return getAllServicesFromCache();
-};
-
-// Logger simple para desarrollo
-const logger = {
-  debug: (...args: any[]) => {
-    if (process.env.NODE_ENV === 'development') {
-      console.debug(...args);
-    }
-  },
-  error: console.error,
-  info: console.log,
-  warn: console.warn
-};
-
+// Tipos para el hook
 interface UseServicesOptions {
   category?: string;
   barrio?: string;
   userId?: string;
   featured?: boolean;
   pageSize?: number;
-  limit?: number;
   enabled?: boolean;
   search?: string;
   onSuccess?: (data: Service[]) => void;
@@ -146,143 +47,235 @@ interface ServicesResult {
 }
 
 // Cache keys para SWR
-const getCacheKey = (options: UseServicesOptions): string => {
-  const { category, barrio, userId, featured, pageSize, limit, search } = options;
-  const parts = [];
-  
-  if (category) parts.push(`category:${category}`);
-  if (barrio) parts.push(`barrio:${barrio}`);
-  if (userId) parts.push(`userId:${userId}`);
-  if (featured) parts.push('featured:true');
-  if (pageSize) parts.push(`pageSize:${pageSize}`);
-  if (limit) parts.push(`limit:${limit}`);
-  if (search) parts.push(`search:${search}`);
-  
-  return parts.join('|') || 'all';
+const getCacheKey = (options: UseServicesOptions) => {
+  const { category, barrio, userId, featured, pageSize, search } = options;
+  return ['services', { category, barrio, userId, featured, pageSize, search }];
 };
 
 // Cache para almacenar resultados temporalmente
 const servicesCache = new Map<string, { data: Service[]; timestamp: number }>();
 const CACHE_TTL = 15 * 60 * 1000; // 15 minutos (aumentado desde 5)
 
-// Cache para almacenar servicios individuales por ID
-const serviceByIdCache = new Map<string, { data: Service; timestamp: number }>();
-const SERVICE_CACHE_TTL = 30 * 60 * 1000; // 30 minutos
+// Cache para consultas individuales por ID
+const serviceByIdCache = new Map<string, { data: Service | null; timestamp: number }>();
+const SERVICE_CACHE_TTL = 30 * 60 * 1000; // 30 minutos para cache de servicios individuales
 
-// Función para obtener servicios con caché
-const servicesFetcher = async ([, options]: [string, UseServicesOptions]): Promise<Service[]> => {
+// Fetcher optimizado con caché
+const servicesFetcher = async ([_, options]: [string, UseServicesOptions]): Promise<Service[]> => {
   const { category, barrio, userId, featured, pageSize = 12, search } = options;
+  const cacheKey = JSON.stringify({ category, barrio, userId, featured, pageSize, search });
+  const now = Date.now();
+  
+  // Inicializar el hook de caché
+  const { 
+    getAllServicesFromCache, 
+    setAllServicesCache,
+    loadPersistentCache,
+    setFeaturedServicesCache,
+    getFeaturedServicesFromCache
+  } = useServiceCache();
   
   // Verificar caché primero
-  const cacheKey = getCacheKey(options);
-  const cached = servicesCache.get(cacheKey);
   
-  if (cached && (Date.now() - cached.timestamp < CACHE_TTL)) {
-    logger.debug('[CACHE] Usando servicios desde caché:', cacheKey);
-    return cached.data;
+  // 1. Verificar caché primero
+  try {
+    // Si es una consulta de servicios destacados, verificar primero ese caché
+    if (featured) {
+      const featuredCache = getFeaturedServicesFromCache();
+      if (featuredCache && featuredCache.length > 0) {
+        console.log('🌟 [FEATURED CACHE] Usando caché de servicios destacados');
+        return featuredCache;
+      }
+    }
+    
+    // Intentar obtener del caché persistente
+    const persistentCache = loadPersistentCache();
+    if (persistentCache && persistentCache.length > 0) {
+      console.log('📦 [PERSISTENT CACHE] Usando datos de caché persistente');
+      
+      // Si es una consulta de servicios destacados, actualizar el caché específico
+      if (featured) {
+        const featuredServices = persistentCache.filter(service => service.featured === true);
+        if (featuredServices.length > 0) {
+          setFeaturedServicesCache(featuredServices);
+        }
+      }
+      
+      return persistentCache;
+    }
+    
+    // Si no hay caché persistente, intentar con el caché normal
+    const cachedServices = getAllServicesFromCache();
+    if (cachedServices && cachedServices.length > 0) {
+      console.log('📦 [CACHE HIT] Usando datos de caché para:', cacheKey);
+      
+      // Si es una consulta de servicios destacados, actualizar el caché específico
+      if (featured) {
+        const featuredServices = cachedServices.filter(service => service.featured === true);
+        if (featuredServices.length > 0) {
+          setFeaturedServicesCache(featuredServices);
+        }
+      }
+      
+      return cachedServices;
+    }
+  } catch (error) {
+    console.warn('⚠️ Error al acceder al caché:', error);
+    // Continuar con la carga normal en caso de error
   }
   
+  // Si Firebase no está disponible, usar datos de respaldo
+  if (!db) {
+    console.warn('🔄 Firebase no disponible, usando datos de respaldo');
+    const fallbackData = filterFallbackServices({
+      category,
+      barrio,
+      search,
+      featured,
+      limit: pageSize
+    });
+    
+    // Guardar en caché para futuras solicitudes
+    try {
+      if (fallbackData.length > 0) {
+        // Guardar en caché persistente
+        setAllServicesCache(fallbackData);
+        
+        // Si es una consulta de destacados, actualizar ese caché específico
+        if (featured) {
+          const featuredData = fallbackData.filter(service => service.featured === true);
+          if (featuredData.length > 0) {
+            setFeaturedServicesCache(featuredData);
+          }
+        }
+      }
+    } catch (error) {
+      console.warn('⚠️ Error guardando datos de respaldo en caché:', error);
+    }
+    
+    return fallbackData;
+  }
+  
+  console.log('🔍 Ejecutando consulta a Firebase...');
+
   try {
-    // Verificar si Firebase está inicializado
-    if (!db || !db.instance) {
-      throw new Error('Firebase no está inicializado');
-    }
+    // Construir consulta optimizada con solo los filtros necesarios
+    const constraints = [];
     
-    const firestore = db.instance;
-    let q = query(collection(firestore, 'services'));
-    
-    // Aplicar filtros
+    // Filtros del lado del servidor (solo los estrictamente necesarios)
     if (userId) {
-      q = query(q, where('userId', '==', userId));
+      constraints.push(where('userId', '==', userId));
     }
     
+    // Otros filtros según sea necesario
     if (category && category !== 'Todas' && category !== 'Todos') {
-      q = query(q, where('category', '==', category));
+      constraints.push(where('category', '==', category));
     }
     
     if (barrio) {
-      q = query(q, where('barrio', '==', barrio));
+      constraints.push(where('barrio', '==', barrio));
     }
     
+    // Solo servicios activos
+    constraints.push(where('active', '==', true));
+    
+    // Si es una consulta de destacados, agregar filtro
     if (featured) {
-      q = query(q, where('featured', '==', true));
+      constraints.push(where('featured', '==', true));
     }
     
-    if (search) {
-      // Búsqueda por texto en nombre, descripción y categoría
-      const searchLower = search.toLowerCase();
-      q = query(q, where('searchTerms', 'array-contains', searchLower));
-    }
+    // Construir la consulta
+    let q = query(collection(db, 'services'), ...constraints, orderBy('createdAt', 'desc'));
     
-    q = query(q, where('active', '==', true));
-    q = query(q, orderBy('createdAt', 'desc'));
-    
+    // Aplicar paginación si es necesario
     if (pageSize) {
-      q = query(q, firestoreLimit(pageSize));
+      q = query(q, limit(pageSize));
     }
     
-    const snapshot = await getDocs(q);
-    
-    const services = snapshot.docs.map(doc => {
+    // Ejecutar la consulta
+    const querySnapshot = await getDocs(q);
+    const services = querySnapshot.docs.map(doc => {
       const data = doc.data();
       return {
         id: doc.id,
         name: data.name || 'Servicio sin nombre',
         description: data.description || 'Sin descripción',
         category: data.category || 'Sin categoría',
-        barrio: data.barrio || 'Sin barrio',
-        address: data.address || 'Sin dirección',
-        phone: data.phone || '',
-        whatsapp: data.whatsapp || '',
-        email: data.email || '',
-        website: data.website || '',
-        featured: data.featured || false,
-        active: data.active !== false, // Por defecto true
-        images: data.images || [],
-        logo: data.logo || '',
+        image: data.image || '/images/placeholder-service.jpg',
+        rating: data.rating || 0,
+        location: data.location || 'Ubicación no especificada',
+        contactUrl: data.contactUrl || '',
+        detailsUrl: data.detailsUrl || '',
         createdAt: data.createdAt?.toDate?.() || new Date(),
         updatedAt: data.updatedAt?.toDate?.() || new Date(),
-        userId: data.userId || '',
-        ...data
+        featured: data.featured || false,
+        active: data.active !== false // Default to true if not specified
       } as Service;
     });
     
-    // Actualizar caché
-    servicesCache.set(cacheKey, {
-      data: services,
-      timestamp: Date.now()
-    });
-    
-    // Actualizar caché de servicios individuales
-    services.forEach(service => {
-      serviceByIdCache.set(service.id, {
-        data: service,
-        timestamp: Date.now()
+    // Si hay búsqueda, aplicar filtros adicionales
+    const filteredServices = search && search.trim() !== ''
+      ? services.filter(service => 
+          (service.name?.toLowerCase().includes(search.toLowerCase()) ||
+          service.description?.toLowerCase().includes(search.toLowerCase()))
+        )
+      : services;
+      
+    // Aplicar paginación
+    const paginatedServices = pageSize 
+      ? filteredServices.slice(0, pageSize)
+      : filteredServices;
+      
+    // Actualizar cachés
+    try {
+      // Actualizar caché de servicios completos si no hay búsqueda
+      if (filteredServices.length > 0 && (!search || search.trim() === '')) {
+        setAllServicesCache(filteredServices);
+        
+        // Actualizar caché de servicios destacados si corresponde
+        if (featured || filteredServices.some(s => s.featured)) {
+          const featuredServices = filteredServices.filter(s => s.featured);
+          if (featuredServices.length > 0) {
+            setFeaturedServicesCache(featuredServices);
+          }
+        }
+      }
+      
+      // Actualizar caché de servicios individuales
+      filteredServices.forEach(service => {
+        serviceByIdCache.set(service.id, { 
+          data: service, 
+          timestamp: now 
+        });
       });
-    });
+      
+    } catch (cacheError) {
+      console.warn('⚠️ Error actualizando caché:', cacheError);
+      // No lanzar el error, solo registrar
+    }
     
-    return services;
-  } catch (error) {
-    console.error('Error al cargar servicios:', error);
+    return paginatedServices;
+  } catch (error: any) {
+    console.error('❌ Error al conectar con Firebase:', error.message);
     
-    // En caso de error, intentar usar datos de respaldo
-    const fallbackData = filterFallbackServices({
+    // Usar datos de respaldo en caso de error
+    console.warn('🔄 Error en Firebase, usando datos de respaldo:', error.message);
+    return filterFallbackServices({
       category,
       barrio,
-      search,
-      limit: pageSize
+      search: options?.search,
+      featured,
+      limit: options?.pageSize
     });
-    
-    return fallbackData;
   }
 };
 
 // Hook principal para servicios
 export const useServices = (options: UseServicesOptions = {}): ServicesResult => {
-  const cacheKey = getCacheKey(options);
+  const { enabled = true } = options;
   
-  const { data, error, isValidating, mutate } = useSWR<Service[]>(
-    ['services', options],
+  const { data, error, mutate, isValidating } = useSWR<Service[]>(
+    enabled ? ['services', options] : null,
     servicesFetcher,
     {
       revalidateOnFocus: false,
@@ -300,34 +293,21 @@ export const useServices = (options: UseServicesOptions = {}): ServicesResult =>
     }
   );
   
-  // Obtener datos de la caché o de la respuesta de SWR
-  const servicesToUse = useMemo(() => {
-    // Verificar si tenemos datos en caché
-    const cacheKey = getCacheKey(options);
-    const cached = servicesCache.get(cacheKey);
+  // Usar caché para servicios individuales si es posible
+  const cachedServices = useMemo(() => {
+    if (!data) return [];
     
-    // Si hay datos en caché y no están expirados, usarlos
-    if (cached && (Date.now() - cached.timestamp < CACHE_TTL)) {
-      return cached.data;
-    }
-    
-    // Si no hay datos en caché, usar los datos de SWR
-    return data || [];
-  }, [data, options]);
+    return data.map(service => {
+      const cached = serviceByIdCache.get(service.id);
+      if (cached && (Date.now() - cached.timestamp < SERVICE_CACHE_TTL)) {
+        return cached.data || service;
+      }
+      return service;
+    });
+  }, [data]);
   
-  // Actualizar la caché cuando hay nuevos datos
-  useEffect(() => {
-    if (servicesToUse && servicesToUse.length > 0) {
-      const cacheKey = getCacheKey(options);
-      servicesCache.set(cacheKey, {
-        data: servicesToUse,
-        timestamp: Date.now()
-      });
-    }
-  }, [servicesToUse, options]);
-
   return {
-    services: servicesToUse,
+    services: cachedServices,
     loading: isValidating,
     error,
     mutate
@@ -336,30 +316,39 @@ export const useServices = (options: UseServicesOptions = {}): ServicesResult =>
 
 // Hook para servicios destacados (optimizado)
 export const useFeaturedServices = (): ServicesResult => {
-  const options = {
-    featured: true,
-    limit: 10 // Limitar a 10 servicios destacados
-  };
+  // Usar un caché más largo para servicios destacados (30 minutos)
+  const cacheKey = 'featured_services';
+  const now = Date.now();
   
-  const result = useServices(options);
-  const cacheKey = getCacheKey(options);
+  // Verificar caché primero
+  const cached = servicesCache.get(cacheKey);
+  if (cached && (now - cached.timestamp < 30 * 60 * 1000)) {
+    console.log('📦 [CACHE HIT] Usando caché de servicios destacados');
+    return {
+      services: cached.data,
+      loading: false,
+      error: null,
+      mutate: () => {}
+    };
+  }
+  
+  const result = useServices({ 
+    featured: true
+  });
   
   // Actualizar caché cuando se obtengan nuevos datos
   useEffect(() => {
     if (result.services.length > 0) {
-      servicesCache.set(cacheKey, { data: result.services, timestamp: Date.now() });
+      servicesCache.set(cacheKey, { data: result.services, timestamp: now });
     }
-  }, [result.services, cacheKey]);
+  }, [result.services]);
   
   return result;
 };
 
 // Hook para servicios del usuario (optimizado)
 export const useUserServices = (userId?: string): ServicesResult => {
-  return useServices({
-    userId,
-    enabled: !!userId
-  });
+  return useServices({ userId, enabled: !!userId });
 };
 
 // Hook para servicios por categoría (optimizado)
@@ -377,7 +366,6 @@ export const useServicesPaginated = (options: UseServicesOptions = {}): Paginate
   const [error, setError] = useState<any>(null);
   const [initialized, setInitialized] = useState(false);
   const [isClient, setIsClient] = useState(false);
-  const [isUsingFallback, setIsUsingFallback] = useState(false);
   
   // Reset function for filter changes
   const resetPagination = useCallback(() => {
@@ -404,12 +392,11 @@ export const useServicesPaginated = (options: UseServicesOptions = {}): Paginate
     
     try {
       // Verificar si Firebase está inicializado
-      if (!db || !db.instance) {
+      if (!db) {
         throw new Error('Firebase no está inicializado');
       }
       
-      const firestore = db.instance;
-      let q = query(collection(firestore, 'services'));
+      let q = query(collection(db, 'services'));
       
       // Aplicar filtros
       if (userId) {
@@ -425,7 +412,7 @@ export const useServicesPaginated = (options: UseServicesOptions = {}): Paginate
       }
       
       q = query(q, where('active', '==', true));
-      q = query(q, orderBy('createdAt', 'desc'), firestoreLimit(pageSize));
+      q = query(q, orderBy('createdAt', 'desc'), limit(pageSize));
       
       const snapshot = await getDocs(q);
       
@@ -436,20 +423,14 @@ export const useServicesPaginated = (options: UseServicesOptions = {}): Paginate
           name: data.name || 'Servicio sin nombre',
           description: data.description || 'Sin descripción',
           category: data.category || 'Sin categoría',
-          barrio: data.barrio || 'Sin barrio',
-          address: data.address || 'Sin dirección',
-          phone: data.phone || '',
-          whatsapp: data.whatsapp || '',
-          email: data.email || '',
-          website: data.website || '',
-          featured: data.featured || false,
-          active: data.active !== false, // Por defecto true
-          images: data.images || [],
-          logo: data.logo || '',
+          image: data.image || '/images/placeholder-service.jpg',
+          rating: data.rating || 0,
+          location: data.location || 'Ubicación no especificada',
+          contactUrl: data.contactUrl || '',
+          detailsUrl: data.detailsUrl || '',
+          ...data,
           createdAt: data.createdAt?.toDate?.() || new Date(),
-          updatedAt: data.updatedAt?.toDate?.() || new Date(),
-          userId: data.userId || '',
-          ...data
+          updatedAt: data.updatedAt?.toDate?.() || new Date()
         } as Service;
       });
       
@@ -457,12 +438,10 @@ export const useServicesPaginated = (options: UseServicesOptions = {}): Paginate
       setLastDoc(snapshot.docs[snapshot.docs.length - 1] || null);
       setHasMore(snapshot.docs.length === pageSize);
       setInitialized(true);
-      setIsUsingFallback(false);
       
     } catch (err) {
       console.error('Error cargando servicios:', err);
       setError(err);
-      setIsUsingFallback(true);
       
       // Usar datos de respaldo en caso de error
       const fallbackData = filterFallbackServices({
@@ -487,12 +466,11 @@ export const useServicesPaginated = (options: UseServicesOptions = {}): Paginate
     
     try {
       // Verificar si Firebase está inicializado
-      if (!db || !db.instance) {
+      if (!db) {
         throw new Error('Firebase no está inicializado');
       }
       
-      const firestore = db.instance;
-      let q = query(collection(firestore, 'services'));
+      let q = query(collection(db, 'services'));
       
       // Aplicar filtros
       if (userId) {
@@ -509,7 +487,11 @@ export const useServicesPaginated = (options: UseServicesOptions = {}): Paginate
       
       q = query(q, where('active', '==', true));
       q = query(q, orderBy('createdAt', 'desc'));
-      q = query(q, startAfter(lastDoc), firestoreLimit(pageSize));
+      
+      // Paginación
+      if (lastDoc) {
+        q = query(q, startAfter(lastDoc), limit(pageSize));
+      }
       
       const snapshot = await getDocs(q);
       
@@ -520,20 +502,14 @@ export const useServicesPaginated = (options: UseServicesOptions = {}): Paginate
           name: data.name || 'Servicio sin nombre',
           description: data.description || 'Sin descripción',
           category: data.category || 'Sin categoría',
-          barrio: data.barrio || 'Sin barrio',
-          address: data.address || 'Sin dirección',
-          phone: data.phone || '',
-          whatsapp: data.whatsapp || '',
-          email: data.email || '',
-          website: data.website || '',
-          featured: data.featured || false,
-          active: data.active !== false, // Por defecto true
-          images: data.images || [],
-          logo: data.logo || '',
+          image: data.image || '/images/placeholder-service.jpg',
+          rating: data.rating || 0,
+          location: data.location || 'Ubicación no especificada',
+          contactUrl: data.contactUrl || '',
+          detailsUrl: data.detailsUrl || '',
+          ...data,
           createdAt: data.createdAt?.toDate?.() || new Date(),
-          updatedAt: data.updatedAt?.toDate?.() || new Date(),
-          userId: data.userId || '',
-          ...data
+          updatedAt: data.updatedAt?.toDate?.() || new Date()
         } as Service;
       });
       
@@ -544,18 +520,31 @@ export const useServicesPaginated = (options: UseServicesOptions = {}): Paginate
     } catch (err) {
       console.error('Error cargando más servicios:', err);
       setError(err);
-      setHasMore(false);
     } finally {
       setLoading(false);
     }
-  }, [hasMore, loading, lastDoc, category, barrio, userId, search, pageSize]);
+  }, [category, barrio, userId, search, pageSize, hasMore, loading, lastDoc]);
   
-  // Cargar datos cuando el componente se monte o cambien las dependencias
+  // Efecto para manejar el estado del cliente
   useEffect(() => {
     setIsClient(true);
-    loadInitialData();
-  }, [loadInitialData]);
-
+  }, []);
+  
+  // Cargar datos iniciales cuando el componente se monta o cambian las dependencias
+  useEffect(() => {
+    if (isClient && !initialized) {
+      loadInitialData();
+    }
+  }, [isClient, initialized, loadInitialData]);
+  
+  // Verificar si estamos mostrando datos de respaldo
+  const isUsingFallback = (error?.code === 'not-found' && allServices.length > 0) || 
+                         (error && allServices.length > 0);
+  
+  if (isUsingFallback) {
+    console.warn('⚠️ Usando datos de respaldo debido a un error:', error?.message);
+  }
+  
   return {
     services: allServices,
     hasMore,
@@ -567,7 +556,6 @@ export const useServicesPaginated = (options: UseServicesOptions = {}): Paginate
 
 // Alias para compatibilidad
 export const useServiceById = useService;
-
 // Utilidad para precargar servicios
 export const preloadServices = (options: UseServicesOptions) => {
   // Esta función se puede usar para precargar datos

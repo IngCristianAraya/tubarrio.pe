@@ -104,7 +104,7 @@ export default function FeaturedBannersCarousel({
       banners.forEach(banner => {
         const addImageToPreload = (url: string) => {
           if (!url) return;
-          const img = new Image();
+          const img = document.createElement('img');
           const promise = new Promise<void>((resolve) => {
             img.onload = () => resolve();
             img.onerror = () => resolve(); // No hacer nada en caso de error

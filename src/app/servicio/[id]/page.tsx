@@ -10,6 +10,54 @@ import { LocalBusinessJsonLd, BreadcrumbJsonLd } from '@/components/seo/JsonLd';
 import { SocialMeta } from '@/components/seo/SocialMeta';
 import { SITE_URL } from '@/lib/constants';
 
+// Utility function to format business hours for JSON-LD
+const formatBusinessHours = (hours: Record<string, any>): string[] => {
+  if (!hours) return ['Mo-Sa 09:00-18:00'];
+  
+  const days = {
+    monday: 'Mo',
+    tuesday: 'Tu',
+    wednesday: 'We',
+    thursday: 'Th',
+    friday: 'Fr',
+    saturday: 'Sa',
+    sunday: 'Su'
+  };
+  
+  const result: string[] = [];
+  
+  // Group consecutive days with the same hours
+  let currentGroup: string[] = [];
+  let currentHours = '';
+  
+  Object.entries(days).forEach(([day, shortDay]) => {
+    const dayHours = hours[day];
+    if (!dayHours || dayHours.closed) return;
+    
+    const hoursStr = `${dayHours.open}-${dayHours.close}`;
+    
+    if (currentHours === hoursStr) {
+      // Extend current group
+      currentGroup[1] = shortDay;
+    } else {
+      // Close previous group if exists
+      if (currentGroup.length > 0) {
+        result.push(`${currentGroup[0]}-${currentGroup[1]} ${currentHours}`);
+      }
+      // Start new group
+      currentGroup = [shortDay, shortDay];
+      currentHours = hoursStr;
+    }
+  });
+  
+  // Add the last group if exists
+  if (currentGroup.length > 0) {
+    result.push(`${currentGroup[0]}-${currentGroup[1]} ${currentHours}`);
+  }
+  
+  return result.length > 0 ? result : ['Mo-Sa 09:00-18:00'];
+};
+
 // Components
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -139,7 +187,11 @@ export default function ServicioDetallePage() {
           longitude: '-77.0428',
         }}
         telephone={service.whatsapp || service.social || '+51999999999'}
-        openingHours={service.hours || service.horario || 'Mo-Sa 09:00-18:00'}
+        openingHours={
+          service.hours && typeof service.hours === 'object'
+            ? formatBusinessHours(service.hours)
+            : (service.horario || 'Mo-Sa 09:00-18:00')
+        }
         priceRange="$$"
       />
       

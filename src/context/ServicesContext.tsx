@@ -62,8 +62,11 @@ const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 const MAX_CACHE_SIZE = 50; // Max number of services to cache
 
 // Import the Service type from our types
-export interface Service extends Omit<import('@/types/service').Service, 'id'> {
-  id: string;
+import { Service as BaseService } from '@/types/service';
+
+export interface Service extends Omit<BaseService, 'slug' | 'categorySlug'> {
+  slug?: string;
+  categorySlug?: string;
   active?: boolean;
   featured?: boolean;
   // Add any additional fields specific to the context
@@ -180,6 +183,42 @@ class ServiceCache {
 // Initialize cache
 const cache = new ServiceCache();
 
+// Función para generar un slug a partir de un texto
+const generateSlug = (text: string): string => {
+  if (!text) return '';
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '');
+};
+
+// Función para crear un objeto de servicio con valores predeterminados
+const createServiceFromData = (id: string, data: any): Service => {
+  const slug = data.slug || generateSlug(data.name) || id;
+  const categorySlug = data.categorySlug || generateSlug(data.category) || '';
+  
+  return {
+    id,
+    slug,
+    name: data.name || '',
+    category: data.category || '',
+    categorySlug,
+    image: data.image || '',
+    images: data.images || [],
+    rating: data.rating || 0,
+    location: data.location || '',
+    description: data.description || '',
+    contactUrl: data.contactUrl || '',
+    detailsUrl: data.detailsUrl || '',
+    horario: data.horario || '',
+    tags: data.tags || [],
+    hours: data.hours || '',
+    social: data.social || '',
+    whatsapp: data.whatsapp || '',
+    active: data.active !== undefined ? data.active : true
+  };
+};
+
 export const ServicesProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [services, setServices] = useState<Service[]>([]);
   const [filteredServices, setFilteredServices] = useState<Service[]>([]);
@@ -276,25 +315,7 @@ export const ServicesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           
           const querySnapshot = await getDocs(q);
           return querySnapshot.docs.map(doc => {
-            const data = doc.data();
-            return {
-              id: doc.id,
-              name: data.name || '',
-              category: data.category || '',
-              image: data.image || '',
-              images: data.images || [],
-              rating: data.rating || 0,
-              location: data.location || '',
-              description: data.description || '',
-              contactUrl: data.contactUrl || '',
-              detailsUrl: data.detailsUrl || '',
-              horario: data.horario || '',
-              tags: data.tags || [],
-              hours: data.hours || '',
-              social: data.social || '',
-              whatsapp: data.whatsapp || '',
-              active: data.active !== undefined ? data.active : true
-            };
+            return createServiceFromData(doc.id, doc.data());
           });
         },
         10 * 60 * 1000 // 10 minute cache for featured services
@@ -322,25 +343,7 @@ export const ServicesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           const docSnap = await getDoc(docRef);
           
           if (docSnap.exists()) {
-            const data = docSnap.data();
-            return {
-              id: docSnap.id,
-              name: data.name || '',
-              category: data.category || '',
-              image: data.image || '',
-              images: data.images || [],
-              rating: data.rating || 0,
-              location: data.location || '',
-              description: data.description || '',
-              contactUrl: data.contactUrl || '',
-              detailsUrl: data.detailsUrl || '',
-              horario: data.horario || '',
-              tags: data.tags || [],
-              hours: data.hours || '',
-              social: data.social || '',
-              whatsapp: data.whatsapp || '',
-              active: data.active !== undefined ? data.active : true
-            };
+            return createServiceFromData(docSnap.id, docSnap.data());
           }
           throw new Error('Service not found');
         },
@@ -386,25 +389,7 @@ export const ServicesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           console.log(` Found ${querySnapshot.docs.length} services`);
           
           return querySnapshot.docs.map(doc => {
-            const data = doc.data();
-            return {
-              id: doc.id,
-              name: data.name || '',
-              category: data.category || '',
-              image: data.image || '',
-              images: data.images || [],
-              rating: data.rating || 0,
-              location: data.location || '',
-              description: data.description || '',
-              contactUrl: data.contactUrl || '',
-              detailsUrl: data.detailsUrl || '',
-              horario: data.horario || '',
-              tags: data.tags || [],
-              hours: data.hours || '',
-              social: data.social || '',
-              whatsapp: data.whatsapp || '',
-              active: data.active !== undefined ? data.active : true
-            };
+            return createServiceFromData(doc.id, doc.data());
           });
         },
         5 * 60 * 1000 // 5 minute cache for services list

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { db, auth, app } from '@/lib/firebase/config';
+import { db, app } from '@/lib/firebase/config';
 import { collection, getDocs } from 'firebase/firestore';
 
 export default function TestFirebase() {
@@ -27,7 +27,6 @@ export default function TestFirebase() {
     const status = {
       app: !!app,
       db: !!db,
-      auth: !!auth,
       envVars
     };
     

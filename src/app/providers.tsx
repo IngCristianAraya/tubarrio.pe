@@ -2,14 +2,13 @@
 
 import { ThemeProvider } from 'next-themes';
 import { Toaster } from 'react-hot-toast';
-import * as React from 'react';
+import { ReactNode, Suspense } from 'react';
 
-import { AuthProvider } from '@/context/AuthContext';
 import { ServicesProvider } from '@/context/ServicesContext';
 import AnalyticsProvider from '@/context/AnalyticsContext';
 
 type ProvidersProps = {
-  children: any;
+  children: ReactNode;
 };
 
 function LoadingFallback() {
@@ -23,14 +22,14 @@ function LoadingFallback() {
 export function Providers({ children }: ProvidersProps) {
   return (
     <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
-      <AuthProvider>
-        <AnalyticsProvider>
-          <ServicesProvider>
+      <Suspense fallback={<LoadingFallback />}>
+        <ServicesProvider>
+          <AnalyticsProvider>
             {children}
             <Toaster position="bottom-right" />
-          </ServicesProvider>
-        </AnalyticsProvider>
-      </AuthProvider>
+          </AnalyticsProvider>
+        </ServicesProvider>
+      </Suspense>
     </ThemeProvider>
   );
 }
