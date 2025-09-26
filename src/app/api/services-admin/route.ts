@@ -1,29 +1,15 @@
 import { NextResponse } from 'next/server';
-import { initializeApp, getApps, cert } from 'firebase-admin/app';
-import { getFirestore } from 'firebase-admin/firestore';
+import { db } from '@/lib/firebase-admin';
 
 // Configuración de Firebase Admin SDK
 const initializeFirebaseAdmin = () => {
-  if (getApps().length === 0) {
-    // Usar variables de entorno para Firebase Admin
-    const serviceAccount = {
-      projectId: (process.env.FIREBASE_PROJECT_ID || '').trim(),
-      clientEmail: (process.env.FIREBASE_CLIENT_EMAIL || '').trim(),
-      privateKey: (process.env.FIREBASE_PRIVATE_KEY || '').replace(/\\n/g, '\n').trim(),
-    };
-    
-    console.log('🔧 Inicializando Firebase Admin con:', {
-      projectId: serviceAccount.projectId,
-      hasClientEmail: !!serviceAccount.clientEmail,
-      hasPrivateKey: !!serviceAccount.privateKey
-    });
-    
-    return initializeApp({
-      credential: cert(serviceAccount),
-      projectId: serviceAccount.projectId
-    });
+  try {
+    // La inicialización ya se maneja en firebase-admin.ts
+    return db;
+  } catch (error) {
+    console.error('Error initializing Firebase Admin:', error);
+    throw error;
   }
-  return getApps()[0];
 };
 
 export async function GET() {
@@ -31,8 +17,7 @@ export async function GET() {
     console.log('🚀 Iniciando consulta con Firebase Admin SDK...');
     
     // Inicializar Firebase Admin
-    const app = initializeFirebaseAdmin();
-    const db = getFirestore(app);
+    const db = initializeFirebaseAdmin();
     
     console.log('✅ Firebase Admin inicializado correctamente');
     
