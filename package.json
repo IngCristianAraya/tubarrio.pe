@@ -12,7 +12,7 @@
     "vercel-build": "node vercel-build.js",
     "install:ci": "npm install --legacy-peer-deps --force",
     "postinstall": "npm rebuild sharp --build-from-source",
-    "install": "npm install --ignore-scripts"
+    "install": "bash install-sharp.sh"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.0.2",
