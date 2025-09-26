@@ -1,5 +1,4 @@
-
-    /** @type {import('next').NextConfig} */
+/** @type {import('next').NextConfig} */
 let withBundleAnalyzer = (config) => config;
 
 try {
@@ -75,7 +74,7 @@ const nextConfig = {
   productionBrowserSourceMaps: false,
   swcMinify: true,
   optimizeFonts: true,
-  optimizeCss: true,
+  // optimizeCss movido a la sección experimental
 
   // Headers de seguridad
   async headers() {
@@ -110,7 +109,7 @@ const nextConfig = {
         dns: false,
         child_process: false,
         dgram: false,
-        zlib: false,
+        zlib: require.resolve('browserify-zlib'),
         http: require.resolve('stream-http'),
         https: require.resolve('https-browserify'),
         stream: require.resolve('stream-browserify'),
@@ -118,7 +117,7 @@ const nextConfig = {
         util: require.resolve('util/'),
         url: require.resolve('url/'),
         string_decoder: require.resolve('string_decoder/'),
-        path: false,
+        path: require.resolve('path-browserify'),
         crypto: require.resolve('crypto-browserify'),
         os: require.resolve('os-browserify/browser'),
       };
