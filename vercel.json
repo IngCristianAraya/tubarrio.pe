@@ -1,9 +1,13 @@
 {
-  "version": 2,
   "builds": [
     {
       "src": "package.json",
-      "use": "@vercel/next"
+      "use": "@vercel/next",
+      "config": {
+        "nodeVersion": "18.x",
+        "installCommand": "npm install --include=dev",
+        "buildCommand": "npm run build"
+      }
     }
   ],
   "build": {
