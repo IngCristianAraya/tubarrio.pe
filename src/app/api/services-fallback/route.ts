@@ -3,6 +3,42 @@ import { NextResponse } from 'next/server';
 // Datos mock de servicios para usar como fallback
 const mockServices = [
   {
+    id: 'mock-0',
+    slug: 'tienda-de-moda-urbana',
+    name: 'Tienda de Moda Urbana',
+    category: 'Ropa y Moda',
+    categorySlug: 'ropa-y-moda',
+    description: 'Ropa urbana de tendencia para hombres y mujeres',
+    address: 'Av. La Moda 789, Lima',
+    phone: '+51 999 111 222',
+    whatsapp: '+51999111222',
+    email: 'contacto@modaurbana.pe',
+    image: 'https://images.pexels.com/photos/996329/pexels-photo-996329.jpeg',
+    images: [
+      'https://images.pexels.com/photos/996329/pexels-photo-996329.jpeg',
+      'https://images.pexels.com/photos/994523/pexels-photo-994523.jpeg'
+    ],
+    rating: 4.8,
+    reviewCount: 215,
+    isOpen: true,
+    socialMedia: {
+      facebook: 'modaurbanaperu',
+      instagram: 'modaurbana_pe',
+      tiktok: 'modaurbana.oficial',
+      youtube: 'modaurbanatv',
+      twitter: 'modaurbana_pe',
+      website: 'modaurbana.pe'
+    },
+    featured: true,
+    active: true,
+    available: true,
+    price: 'S/50 - S/300',
+    detailsUrl: '/servicio/tienda-de-moda-urbana',
+    contactUrl: 'https://wa.me/51999111222',
+    createdAt: new Date('2024-06-10').toISOString(),
+    updatedAt: new Date('2024-09-20').toISOString()
+  },
+  {
     id: 'mock-1',
     name: 'Restaurante El Sabor',
     category: 'Restaurantes',

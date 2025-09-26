@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { Skeleton } from '../ui/Skeleton';
 import { Service } from '@/types/service';
+import { FaFacebook, FaInstagram, FaTiktok, FaYoutube, FaTwitter, FaGlobe, FaWhatsapp } from 'react-icons/fa';
 
 // Helper function to get ARIA attributes for loading state
 function getAriaLoadingProps(isLoading: boolean) {
@@ -98,6 +99,96 @@ export function ServiceCard({ service, className, isLoading = false }: ServiceCa
           {service.description || 'Sin descripción disponible'}
         </p>
         
+        {/* Redes Sociales */}
+        {(service.socialMedia?.facebook || service.socialMedia?.instagram || service.socialMedia?.tiktok || service.socialMedia?.youtube || service.socialMedia?.twitter || service.socialMedia?.website) && (
+          <div className="mt-3 flex flex-wrap gap-2">
+            {service.socialMedia?.facebook && (
+              <a 
+                href={service.socialMedia.facebook.startsWith('http') ? service.socialMedia.facebook : `https://${service.socialMedia.facebook}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-600 hover:text-blue-600 transition-colors"
+                aria-label="Facebook"
+                title="Facebook"
+              >
+                <FaFacebook size={20} />
+              </a>
+            )}
+            {service.socialMedia?.instagram && (
+              <a 
+                href={service.socialMedia.instagram.startsWith('http') ? service.socialMedia.instagram : `https://${service.socialMedia.instagram}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-600 hover:text-pink-600 transition-colors"
+                aria-label="Instagram"
+                title="Instagram"
+              >
+                <FaInstagram size={20} />
+              </a>
+            )}
+            {service.socialMedia?.tiktok && (
+              <a 
+                href={service.socialMedia.tiktok.startsWith('http') ? service.socialMedia.tiktok : `https://${service.socialMedia.tiktok}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-600 hover:text-black transition-colors"
+                aria-label="TikTok"
+                title="TikTok"
+              >
+                <FaTiktok size={20} />
+              </a>
+            )}
+            {service.socialMedia?.youtube && (
+              <a 
+                href={service.socialMedia.youtube.startsWith('http') ? service.socialMedia.youtube : `https://${service.socialMedia.youtube}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-600 hover:text-red-600 transition-colors"
+                aria-label="YouTube"
+                title="YouTube"
+              >
+                <FaYoutube size={20} />
+              </a>
+            )}
+            {service.socialMedia?.twitter && (
+              <a 
+                href={service.socialMedia.twitter.startsWith('http') ? service.socialMedia.twitter : `https://${service.socialMedia.twitter}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-600 hover:text-blue-400 transition-colors"
+                aria-label="Twitter"
+                title="Twitter"
+              >
+                <FaTwitter size={20} />
+              </a>
+            )}
+            {service.socialMedia?.website && (
+              <a 
+                href={service.socialMedia.website.startsWith('http') ? service.socialMedia.website : `https://${service.socialMedia.website}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-600 hover:text-indigo-600 transition-colors"
+                aria-label="Sitio web"
+                title="Sitio web"
+              >
+                <FaGlobe size={20} />
+              </a>
+            )}
+            {service.whatsapp && (
+              <a 
+                href={`https://wa.me/${service.whatsapp.replace(/[^0-9]/g, '')}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-600 hover:text-green-600 transition-colors"
+                aria-label="WhatsApp"
+                title="WhatsApp"
+              >
+                <FaWhatsapp size={20} />
+              </a>
+            )}
+          </div>
+        )}
+        
         <div className="flex justify-between items-center mt-4">
           <span className="text-sm text-gray-500">
             {service.location || 'Ubicación no especificada'}
@@ -123,12 +214,15 @@ export function ServiceCardSkeleton({ className }: { className?: string }) {
   return <ServiceCard 
     service={{
       id: 'loading',
+      slug: 'cargando-servicio',
       name: 'Cargando servicio',
       description: 'Cargando descripción del servicio',
       category: 'Cargando categoría',
+      categorySlug: 'cargando-categoria',
       location: 'Cargando ubicación',
       rating: 0,
-      image: '/images/default-service.jpg',
+      image: '/images/placeholder.jpg',
+      images: ['/images/placeholder.jpg'],
       available: false
     }} 
     isLoading={true}
