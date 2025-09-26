@@ -12,7 +12,7 @@
     "vercel-build": "npm install --force && next build",
     "install:ci": "npm install --legacy-peer-deps --force",
     "postinstall": "npm rebuild sharp --build-from-source",
-    "install": "npm install"
+    "install": "npm install --ignore-scripts"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.0.2",
@@ -43,7 +43,7 @@
     "react-virtuoso": "^4.14.0",
     "react-window": "^1.8.9",
     "recharts": "2.7.2",
-    "sharp": "0.32.6",
+    "sharp": "0.33.2",
     "swiper": "^10.2.0",
     "swr": "^2.2.4",
     "tailwind-merge": "^1.14.0",
