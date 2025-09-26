@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import * as React from 'react';
 import dynamic from 'next/dynamic';
 import { Metadata } from 'next';
 
@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 export default function CoberturaLayout({
   children,
 }: {
-  children: ReactNode;
+  children: any;
 }) {
   return (
     <div className="min-h-screen flex flex-col bg-white">

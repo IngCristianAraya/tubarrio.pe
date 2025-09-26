@@ -1,6 +1,5 @@
 import { GeistSans } from 'geist/font/sans';
-import React, { Suspense } from 'react';
-import type { ReactNode } from 'react';
+import React from 'react';
 import "./globals.css";
 import "leaflet/dist/leaflet.css";
 import "@/styles/leaflet.css";
@@ -69,7 +68,7 @@ export const metadata = generateMetadata({
 
 
 interface RootLayoutProps {
-  children: ReactNode;
+  children: any;
 }
 
 export default function RootLayout({ children }: RootLayoutProps) {
@@ -122,17 +121,15 @@ export default function RootLayout({ children }: RootLayoutProps) {
       </head>
       <body className={`${GeistSans.className} antialiased bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-200`}>
         <Providers>
-          <Suspense fallback={<GlobalLoading />}>
-            <div className="min-h-screen flex flex-col">
-              <AnalyticsInitializer />
-              <PromoBar />
-              <Header />
-              <main className="flex-grow">
-                {children}
-              </main>
-              <Footer />
-            </div>
-          </Suspense>
+          <div className="min-h-screen flex flex-col">
+            <AnalyticsInitializer />
+            <PromoBar />
+            <Header />
+            <main className="flex-grow">
+              {children}
+            </main>
+            <Footer />
+          </div>
         </Providers>
       </body>
     </html>

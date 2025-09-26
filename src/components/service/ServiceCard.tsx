@@ -214,16 +214,29 @@ export function ServiceCardSkeleton({ className }: { className?: string }) {
   return <ServiceCard 
     service={{
       id: 'loading',
+<<<<<<< HEAD
       slug: 'cargando-servicio',
+=======
+      slug: 'loading',
+>>>>>>> 740a7fcda5bb7188a74029eb5919ab34a304f0ab
       name: 'Cargando servicio',
       description: 'Cargando descripción del servicio',
       category: 'Cargando categoría',
       categorySlug: 'cargando-categoria',
       location: 'Cargando ubicación',
       rating: 0,
+<<<<<<< HEAD
       image: '/images/placeholder.jpg',
       images: ['/images/placeholder.jpg'],
       available: false
+=======
+      image: '/images/default-service.jpg',
+      images: ['/images/default-service.jpg'],
+      available: false,
+      whatsapp: '',
+      hours: '',
+      social: ''
+>>>>>>> 740a7fcda5bb7188a74029eb5919ab34a304f0ab
     }} 
     isLoading={true}
     className={className}

@@ -123,7 +123,58 @@ const ServiceHeader = ({ service }: ServiceHeaderProps): ReactElement => {
   // Función para formatear el horario
   const formatSchedule = (): string => {
     if (service.horario) return service.horario;
-    if (service.hours) return service.hours;
+    
+    if (service.hours) {
+      // Si hours es un string, retornarlo directamente
+      if (typeof service.hours === 'string') return service.hours;
+      
+      // Si hours es un objeto, formatearlo a un string legible
+      if (typeof service.hours === 'object' && service.hours !== null) {
+        const days = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domingo'] as const;
+        const dayMap = {
+          'lunes': 'Lun',
+          'martes': 'Mar',
+          'miércoles': 'Mié',
+          'jueves': 'Jue',
+          'viernes': 'Vie',
+          'sábado': 'Sáb',
+          'domingo': 'Dom'
+        };
+        
+        // Agrupar días consecutivos con el mismo horario
+        let result: string[] = [];
+        let currentGroup: string[] = [];
+        let currentHours = '';
+        
+        days.forEach(day => {
+          const dayHours = (service.hours as Record<string, any>)?.[day];
+          if (!dayHours || dayHours.closed) return;
+          
+          const hoursStr = `${dayHours.open}-${dayHours.close}`;
+          
+          if (currentHours === hoursStr) {
+            // Extender el grupo actual
+            currentGroup[1] = dayMap[day];
+          } else {
+            // Cerrar el grupo anterior si existe
+            if (currentGroup.length > 0) {
+              result.push(`${currentGroup[0]}-${currentGroup[1]} ${currentHours}`);
+            }
+            // Iniciar nuevo grupo
+            currentGroup = [dayMap[day], dayMap[day]];
+            currentHours = hoursStr;
+          }
+        });
+        
+        // Agregar el último grupo si existe
+        if (currentGroup.length > 0) {
+          result.push(`${currentGroup[0]}-${currentGroup[1]} ${currentHours}`);
+        }
+        
+        return result.length > 0 ? result.join(', ') : 'No especificado';
+      }
+    }
+    
     return 'No especificado';
   };
 

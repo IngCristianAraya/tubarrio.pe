@@ -6,8 +6,8 @@ export const featuredBanners = [
     title: "¡Ofertas de Verano!",
     subtitle: "Hasta 50% de descuento en restaurantes y lavanderías de tu barrio.",
     image: {
-      desktop: "/images/superburger_desktop.png",  // 1200x300px
-      mobile: "/images/superburger_movil.gif"      // 800x400px - Nota: el archivo tiene un espacio en el nombre
+      desktop: "/images/superburger_desktop.webp",
+      mobile: "/images/superburger_movil.webp"
     },
     buttonText: "Ver ofertas →",
     buttonLink: "/ofertas/verano",
@@ -17,8 +17,8 @@ export const featuredBanners = [
     title: "🏠 Nueva sección: Inmuebles",
     subtitle: "Alquileres y ventas de departamentos en tu zona. ¡Descúbrelos!",
     image: {
-      desktop: "/images/tubarrio_desktop.png",
-      mobile: "/images/tubarrio_movil.png"
+      desktop: "/images/tubarrio_desktop.webp",
+      mobile: "/images/tubarrio_movil.webp"
     },
     buttonText: "Explorar inmuebles →",
     buttonLink: "/inmuebles",
@@ -28,8 +28,8 @@ export const featuredBanners = [
     title: "¿Eres un negocio local?",
     subtitle: "Registra tu negocio GRATIS y llega a cientos de clientes en tu barrio.",
     image: {
-      desktop: "/images/creciendodigital_desktop.png",
-      mobile: "/images/creciendodigital_movil.png"
+      desktop: "/images/creciendodigital_desktop.webp",
+      mobile: "/images/creciendodigital_movil.webp"
     },
     buttonText: "Registrar negocio →",
     buttonLink: "/registro-negocio",

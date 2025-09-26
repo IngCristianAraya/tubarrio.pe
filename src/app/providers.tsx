@@ -4,7 +4,6 @@ import { ThemeProvider } from 'next-themes';
 import { Toaster } from 'react-hot-toast';
 import { ReactNode, Suspense } from 'react';
 
-import { AuthProvider } from '@/context/AuthContext';
 import { ServicesProvider } from '@/context/ServicesContext';
 import AnalyticsProvider from '@/context/AnalyticsContext';
 
@@ -24,14 +23,12 @@ export function Providers({ children }: ProvidersProps) {
   return (
     <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
       <Suspense fallback={<LoadingFallback />}>
-        <AuthProvider>
+        <ServicesProvider>
           <AnalyticsProvider>
-            <ServicesProvider>
-              {children}
-              <Toaster position="bottom-right" />
-            </ServicesProvider>
+            {children}
+            <Toaster position="bottom-right" />
           </AnalyticsProvider>
-        </AuthProvider>
+        </ServicesProvider>
       </Suspense>
     </ThemeProvider>
   );

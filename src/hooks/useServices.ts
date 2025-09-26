@@ -15,7 +15,7 @@ import {
   DocumentSnapshot,
   Firestore
 } from 'firebase/firestore';
-import { db, initializeFirebase } from '@/lib/firebase/config';
+import { db } from '@/lib/firebase/config';
 import { Service } from '@/context/ServicesContext';
 import { fallbackServices, filterFallbackServices, getFallbackServiceById } from '../lib/firebase/fallback';
 

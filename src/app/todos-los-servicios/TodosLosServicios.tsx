@@ -1,17 +1,19 @@
 'use client';
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { useServices } from '../../context/ServicesContext';
+import { useServices, type Service as ContextService } from '../../context/ServicesContext';
+import type { Service } from '@/types/service';
 import ServiceCard from '../../components/ServiceCard';
 import ServiceCardSkeleton from '../../components/ServiceCardSkeleton';
 import EmptyState from '../../components/EmptyState';
 import CategoryChips from '../../components/CategoryChips';
-import type { Service } from '../../types/service';
 import { useSearchParams } from 'next/navigation';
 
 const PAGE_SIZE = 6;
 
-const getUniqueCategories = (services: Service[]): string[] => {
+type AnyService = Service | ContextService;
+
+const getUniqueCategories = (services: AnyService[]): string[] => {
   const categories = new Map<string, string>();
   
   services.forEach(service => {

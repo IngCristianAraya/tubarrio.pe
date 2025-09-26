@@ -1,34 +1,27 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { initializeApp, getApps, cert } from 'firebase-admin/app';
-import { getFirestore } from 'firebase-admin/firestore';
+import { db as firebaseDb } from '@/lib/firebase-admin';
+import type { Firestore } from 'firebase-admin/firestore';
+
+// Definir interfaz para el tipo de datos del servicio
+interface ServiceData {
+  id: string;
+  name?: string;
+  [key: string]: any; // Para otras propiedades dinámicas
+}
 
 // Configuración de Firebase Admin SDK
-const initializeFirebaseAdmin = () => {
-  if (getApps().length === 0) {
-    // Usar variables de entorno para Firebase Admin
-    const serviceAccount = {
-      projectId: (process.env.FIREBASE_PROJECT_ID || 'tubarriope-7ed1d').trim(),
-      clientEmail: (process.env.FIREBASE_CLIENT_EMAIL || 'firebase-adminsdk-fbsvc@tubarriope-7ed1d.iam.gserviceaccount.com').trim(),
-      privateKey: (process.env.FIREBASE_PRIVATE_KEY || process.env.FIREBASE_ADMIN_PRIVATE_KEY || '').replace(/\\n/g, '\n').trim(),
-    };
-    
-    console.log('🔧 Inicializando Firebase Admin con:', {
-      projectId: serviceAccount.projectId,
-      hasClientEmail: !!serviceAccount.clientEmail,
-      hasPrivateKey: !!serviceAccount.privateKey
-    });
-    
-    return initializeApp({
-      credential: cert(serviceAccount),
-      projectId: serviceAccount.projectId
-    });
+const initializeFirebaseAdmin = (): Firestore => {
+  try {
+    // La inicialización ya se maneja en firebase-admin.ts
+    return firebaseDb;
+  } catch (error) {
+    console.error('Error initializing Firebase Admin:', error);
+    throw error;
   }
-  return getApps()[0];
 };
 
 // Inicializar Firebase Admin
-const app = initializeFirebaseAdmin();
-const db = getFirestore(app);
+const db = initializeFirebaseAdmin();
 
 // GET - Obtener servicio específico por ID
 export async function GET(
@@ -46,12 +39,12 @@ export async function GET(
       return NextResponse.json({ error: 'Servicio no encontrado' }, { status: 404 });
     }
     
-    const serviceData = {
+    const serviceData: ServiceData = {
       id: serviceDoc.id,
       ...serviceDoc.data()
     };
     
-    console.log(`✅ Servicio encontrado: ${serviceData.name}`);
+    console.log(`✅ Servicio encontrado: ${serviceData.name || 'Sin nombre'}`);
     
     return NextResponse.json(serviceData);
     

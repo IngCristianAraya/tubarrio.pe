@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { db, auth, app } from '@/lib/firebase/config';
+import { db, app } from '@/lib/firebase/config';
 import { collection, getDocs } from 'firebase/firestore';
 
 export default function TestFirebase() {
@@ -27,7 +27,6 @@ export default function TestFirebase() {
     const status = {
       app: !!app,
       db: !!db,
-      auth: !!auth,
       envVars
     };
     
@@ -37,8 +36,9 @@ export default function TestFirebase() {
     // Intentar conectar a Firestore
     if (db) {
       console.log('🔄 Intentando conectar a Firestore...');
+      const firestore = db.instance;
       
-      getDocs(collection(db, 'services'))
+      getDocs(collection(firestore, 'services'))
         .then((snapshot) => {
           console.log('✅ Conexión exitosa a Firestore');
           console.log('📊 Documentos encontrados:', snapshot.docs.length);

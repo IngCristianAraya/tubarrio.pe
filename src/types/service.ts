@@ -45,9 +45,19 @@ export interface Service {
   social?: string; // Mantenemos esto por compatibilidad
   socialMedia?: SocialMedia; // Nueva estructura para redes sociales
   horario?: string;
+<<<<<<< HEAD
   hours?: string;
   available?: boolean;
   price?: string;
+=======
+  hours?: {
+    [key: string]: {
+      open: string;
+      close: string;
+      closed: boolean;
+    };
+  } | string;
+>>>>>>> 740a7fcda5bb7188a74029eb5919ab34a304f0ab
   // Add any other fields that might be present in your service objects
   [key: string]: any; // This allows for additional properties
 }

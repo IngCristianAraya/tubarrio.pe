@@ -120,6 +120,7 @@ export const useService = (serviceId?: string): UseServiceResult => {
       
       const serviceData: Service = {
         id: docSnap.id,
+        slug: data.slug || docSnap.id, // Use provided slug or fallback to ID
         name: data.name || 'Servicio sin nombre',
         description: data.description || 'Sin descripción disponible',
         category: data.category || 'Sin categoría',

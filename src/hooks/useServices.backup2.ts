@@ -412,28 +412,38 @@ export const useServices = (options: UseServicesOptions = {}): ServicesResult =>
     }
   );
   
-  // Usar caché para servicios individuales si es posible
-  const cachedServices = useMemo(() => {
+  // Obtener datos de la caché o de la respuesta de SWR
+  const servicesToUse = useMemo(() => {
     // Verificar si tenemos datos en caché
     const cacheKey = getCacheKey(options);
     const cached = servicesCache.get(cacheKey);
     
+    // Si hay datos en caché y no están expirados, usarlos
     if (cached && (Date.now() - cached.timestamp < CACHE_TTL)) {
-  // Actualizar la caché
-  if (services.length > 0) {
-    servicesCache.set(cacheKey, {
-      data: services,
-      timestamp: Date.now()
-    });
-  }
+      return cached.data;
+    }
+    
+    // Si no hay datos en caché, usar los datos de SWR
+    return data || [];
+  }, [data, options]);
   
+  // Actualizar la caché cuando hay nuevos datos
+  useEffect(() => {
+    if (servicesToUse && servicesToUse.length > 0) {
+      const cacheKey = getCacheKey(options);
+      servicesCache.set(cacheKey, {
+        data: servicesToUse,
+        timestamp: Date.now()
+      });
+    }
+  }, [servicesToUse, options]);
+
   return {
-    services,
+    services: servicesToUse,
     loading: isValidating,
     error,
     mutate
   };
-};
 
 // Hook para servicios destacados (optimizado)
 export const useFeaturedServices = (): ServicesResult => {
@@ -504,11 +514,12 @@ export const useServicesPaginated = (options: UseServicesOptions = {}): Paginate
     
     try {
       // Verificar si Firebase está inicializado
-      if (!db) {
-        throw new Error('Firebase no está inicializado');
-      }
-      
-      let q = query(collection(db, 'services'));
+      if (!db || !db.instance) {
+      throw new Error('Firebase no está inicializado');
+    }
+    
+    const firestore = db.instance;
+    let q = query(collection(firestore, 'services'));
       
       // Aplicar filtros
       if (userId) {
@@ -578,11 +589,12 @@ export const useServicesPaginated = (options: UseServicesOptions = {}): Paginate
     
     try {
       // Verificar si Firebase está inicializado
-      if (!db) {
-        throw new Error('Firebase no está inicializado');
-      }
-      
-      let q = query(collection(db, 'services'));
+      if (!db || !db.instance) {
+      throw new Error('Firebase no está inicializado');
+    }
+    
+    const firestore = db.instance;
+    let q = query(collection(firestore, 'services'));
       
       // Aplicar filtros
       if (userId) {

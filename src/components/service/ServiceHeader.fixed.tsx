@@ -29,7 +29,58 @@ const ServiceHeader: React.FC<ServiceHeaderProps> = ({ service }): ReactElement 
   // Format schedule information
   const formatSchedule = (): string => {
     if (service.horario) return service.horario;
-    if (service.hours) return service.hours;
+    
+    if (service.hours) {
+      // If hours is a string, return it directly
+      if (typeof service.hours === 'string') return service.hours;
+      
+      // If hours is an object, format it into a readable string
+      if (typeof service.hours === 'object' && service.hours !== null) {
+        const days = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domingo'] as const;
+        const dayMap = {
+          'lunes': 'Lun',
+          'martes': 'Mar',
+          'miércoles': 'Mié',
+          'jueves': 'Jue',
+          'viernes': 'Vie',
+          'sábado': 'Sáb',
+          'domingo': 'Dom'
+        };
+        
+        // Group consecutive days with the same hours
+        let result: string[] = [];
+        let currentGroup: string[] = [];
+        let currentHours = '';
+        
+        days.forEach(day => {
+          const dayHours = (service.hours as Record<string, any>)?.[day];
+          if (!dayHours || dayHours.closed) return;
+          
+          const hoursStr = `${dayHours.open}-${dayHours.close}`;
+          
+          if (currentHours === hoursStr) {
+            // Extend current group
+            currentGroup[1] = dayMap[day];
+          } else {
+            // Close previous group if exists
+            if (currentGroup.length > 0) {
+              result.push(`${currentGroup[0]}-${currentGroup[1]} ${currentHours}`);
+            }
+            // Start new group
+            currentGroup = [dayMap[day], dayMap[day]];
+            currentHours = hoursStr;
+          }
+        });
+        
+        // Add the last group if exists
+        if (currentGroup.length > 0) {
+          result.push(`${currentGroup[0]}-${currentGroup[1]} ${currentHours}`);
+        }
+        
+        return result.length > 0 ? result.join(', ') : 'No especificado';
+      }
+    }
+    
     return 'No especificado';
   };
 

@@ -1,13 +1,13 @@
 'use client';
 
-import React from 'react';
+import * as React from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import WhatsAppButton from '@/components/WhatsAppButton';
 import CustomCursor from '@/components/CustomCursor';
 
 // Componente para las tarjetas de sección
-const SectionCard = ({ title, children }: { title: string; children: React.ReactNode }) => (
+const SectionCard = ({ title, children }: { title: string; children: any }) => (
   <div className="relative bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 md:p-8 shadow-[0_8px_32px_0_rgba(0,0,0,0.36)] border border-gray-700/50 hover:border-amber-500/30 transition-all duration-300 hover:shadow-[0_8px_32px_0_rgba(245,158,11,0.1)]">
     <h2 className="text-2xl font-bold text-amber-400 mb-4 relative">
       <span className="absolute -left-8 top-1/2 -translate-y-1/2 w-6 h-0.5 bg-amber-500/50"></span>
@@ -20,7 +20,7 @@ const SectionCard = ({ title, children }: { title: string; children: React.React
 );
 
 // Componente para los ítems de lista
-const InfoItem = ({ children }: { children: React.ReactNode }) => (
+const InfoItem = ({ children }: { children: any }) => (
   <li className="flex items-start">
     <span className="flex-shrink-0 w-1.5 h-1.5 mt-2.5 mr-2 rounded-full bg-amber-400/80"></span>
     <span className="text-gray-300">{children}</span>
