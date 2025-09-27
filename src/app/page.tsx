@@ -1,5 +1,3 @@
-'use client';
-
 import dynamic from 'next/dynamic';
 import { generateMetadata as generateSeoMetadata } from '@/lib/seo';
 import { SITE_URL } from '@/lib/constants';

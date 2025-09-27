@@ -1,12 +1,7 @@
-'use client';
-
 import * as React from 'react';
-import dynamic from 'next/dynamic';
 import { Metadata } from 'next';
-
-// Importar el Header y Footer dinámicamente para evitar problemas de hidratación
-const Header = dynamic(() => import('@/components/Header'), { ssr: false });
-const Footer = dynamic(() => import('@/components/Footer'), { ssr: false });
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
 
 
 export const metadata: Metadata = {
