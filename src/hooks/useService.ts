@@ -25,25 +25,21 @@ export const useService = (serviceId?: string): UseServiceResult => {
     // Verificar si estamos offline
     const isOffline = typeof navigator !== 'undefined' && !navigator.onLine;
     
-    // Si estamos offline o Firebase no está disponible, usar datos de respaldo de inmediato
-    if (isOffline || !db) {
+    // Intentar usar datos de fallback primero si estamos offline o Firebase no está disponible
+    const shouldUseFallback = isOffline || !db;
+    
+    if (shouldUseFallback) {
       const message = isOffline ? 'Modo offline' : 'Firebase no disponible';
-      logger.warn(`${message}, buscando servicio ${id} en datos de respaldo`);
+      logger.warn(`${message}, usando datos de respaldo para servicio ${id}`);
       
       const fallbackService = getFallbackServiceById(id);
-      if (!fallbackService) {
-        const error = { 
-          code: 'not-found', 
-          message: 'Servicio no encontrado en datos de respaldo', 
-          isOffline 
-        };
-        logger.error('Error al buscar servicio en respaldo:', error);
-        throw error;
+      if (fallbackService) {
+        logger.debug(`Datos de respaldo encontrados para el servicio ${id}`);
+        setIsFallbackData(true);
+        return fallbackService;
       }
       
-      logger.debug(`Usando datos de respaldo para el servicio ${id}`);
-      setIsFallbackData(true);
-      return fallbackService;
+      logger.warn(`No se encontraron datos de respaldo para el servicio ${id}`);
     }
     
     try {
@@ -146,35 +142,32 @@ export const useService = (serviceId?: string): UseServiceResult => {
         stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
       });
       
-      // Intentar con datos de respaldo en caso de error
-      const fallbackService = serviceId ? getFallbackServiceById(serviceId) : null;
-      if (fallbackService) {
-        logger.debug(`Usando datos de respaldo para el servicio ${serviceId}`);
-        setIsFallbackData(true);
-        return fallbackService;
-      } else if (serviceId) {
+      // Siempre intentar con datos de respaldo en caso de cualquier error
+      if (serviceId) {
+        const fallbackService = getFallbackServiceById(serviceId);
+        if (fallbackService) {
+          logger.debug(`Firebase falló, usando datos de respaldo para el servicio ${serviceId}`);
+          setIsFallbackData(true);
+          return fallbackService;
+        }
+        
         logger.error(`No hay datos de respaldo disponibles para el servicio ${serviceId}`);
       }
       
-      // Si no hay datos de respaldo, verificar si es un error de conexión
+      // Si no hay datos de respaldo, propagar el error
       const isConnectionError = error.code === 'unavailable' || 
                               error.message?.includes('offline') || 
                               error.message?.includes('failed to get document') || 
-                              error.message?.includes('network error');
+                              error.message?.includes('network error') ||
+                              error.code === 'permission-denied' ||
+                              error.message?.includes('Missing or insufficient permissions');
       
-      if (isConnectionError) {
-        console.warn('🔌 Problema de conexión, no se encontraron datos de respaldo');
-      } else {
-        console.error(`❌ No se pudo cargar el servicio ${serviceId} y no hay datos de respaldo`);
-      }
-      
-      // Propagar el error con información adicional
       throw { 
         ...error, 
         isOffline: typeof navigator !== 'undefined' && !navigator.onLine,
         isFallbackData: false,
         message: isConnectionError 
-          ? 'No se pudo conectar al servidor. Por favor verifica tu conexión.'
+          ? 'Servicio temporalmente no disponible. Mostrando datos locales.'
           : `No se encontró el servicio solicitado (${serviceId})`
       };
     }

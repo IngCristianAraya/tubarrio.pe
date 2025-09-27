@@ -186,6 +186,69 @@ export const fallbackServices: Service[] = [
       saturday: { open: '08:00', close: '22:00', closed: false },
       sunday: { open: '09:00', close: '21:00', closed: false }
     }
+  },
+  {
+    id: 'creciendo-digital',
+    slug: 'creciendo-digital',
+    name: 'Creciendo Digital Cursos',
+    description: 'Cursos de programación para principiantes y avanzados. Aprende las tecnologías más demandadas del mercado.',
+    category: 'Tecnología',
+    categorySlug: 'tecnologia',
+    barrio: 'Pando 3ra Etapa',
+    address: 'Av. Pando 123, 3ra Etapa',
+    phone: '+51 1 890-1234',
+    whatsapp: '+51 987 890 123',
+    email: 'info@creciendodigital.pe',
+    website: 'https://creciendodigital.pe',
+    image: '/images/cursos_de_programacion.png',
+    images: ['/images/cursos_de_programacion.png'],
+    rating: 4.8,
+    reviewCount: 45,
+    active: true,
+    featured: true,
+    userId: 'user7',
+    createdAt: new Date('2024-01-20'),
+    updatedAt: new Date('2024-01-20'),
+    hours: {
+      monday: { open: '09:00', close: '21:00', closed: false },
+      tuesday: { open: '09:00', close: '21:00', closed: false },
+      wednesday: { open: '09:00', close: '21:00', closed: false },
+      thursday: { open: '09:00', close: '21:00', closed: false },
+      friday: { open: '09:00', close: '21:00', closed: false },
+      saturday: { open: '09:00', close: '18:00', closed: false },
+      sunday: { open: '00:00', close: '00:00', closed: true }
+    }
+  },
+  {
+    id: 'test-service-1',
+    slug: 'desarrollo-web-profesional',
+    name: 'Desarrollo Web Profesional',
+    description: 'Creamos sitios web modernos y responsivos para tu negocio',
+    category: 'Desarrollo Web',
+    categorySlug: 'desarrollo-web',
+    barrio: 'Lima',
+    address: 'Av. Javier Prado 123',
+    phone: '+51 999 888 777',
+    whatsapp: '+51 999 888 777',
+    email: 'contacto@test.com',
+    image: '/images/services/web-development.jpg',
+    images: ['/images/services/web-development.jpg'],
+    rating: 4.8,
+    reviewCount: 25,
+    active: true,
+    featured: true,
+    userId: 'user8',
+    createdAt: new Date('2024-01-25'),
+    updatedAt: new Date('2024-01-25'),
+    hours: {
+      monday: { open: '09:00', close: '18:00', closed: false },
+      tuesday: { open: '09:00', close: '18:00', closed: false },
+      wednesday: { open: '09:00', close: '18:00', closed: false },
+      thursday: { open: '09:00', close: '18:00', closed: false },
+      friday: { open: '09:00', close: '18:00', closed: false },
+      saturday: { open: '00:00', close: '00:00', closed: true },
+      sunday: { open: '00:00', close: '00:00', closed: true }
+    }
   }
 ];
 
