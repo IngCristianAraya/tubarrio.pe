@@ -44,8 +44,27 @@ const WhatsAppButton = dynamic(
   }
 );
 
-// FeaturedServices temporalmente deshabilitado
-const FeaturedServices = () => null;
+// Importación dinámica de FeaturedServices
+const FeaturedServices = dynamic(
+  () => import('./FeaturedServices'),
+  { 
+    ssr: false,
+    loading: () => (
+      <div className="py-16 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="animate-pulse space-y-8">
+            <div className="h-8 bg-gray-200 rounded w-1/3 mx-auto"></div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="h-64 bg-gray-100 rounded-lg"></div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+);
 
 // Componente memoizado para evitar renderizados innecesarios
 const HomeClient = () => {
