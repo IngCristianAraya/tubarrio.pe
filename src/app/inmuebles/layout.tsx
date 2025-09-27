@@ -1,9 +1,12 @@
+'use client';
+
 import * as React from 'react';
 import dynamic from 'next/dynamic';
 import { Metadata } from 'next';
 
-
-// Cargar componentes dinámicamente
+// Importar el Header y Footer dinámicamente para evitar problemas de hidratación
+const Header = dynamic(() => import('@/components/Header'), { ssr: false });
+const Footer = dynamic(() => import('@/components/Footer'), { ssr: false });
 
 
 export const metadata: Metadata = {
@@ -20,8 +23,7 @@ export default function CoberturaLayout({
   return (
     <div className="min-h-screen flex flex-col bg-white">
       <div className="flex flex-col min-h-screen">
-        
-        
+        <Header />
         <main className="flex-1">
           {/* Hero Section - ANCHO COMPLETO */}
           <div className="w-full bg-gradient-to-br from-orange-50 to-orange-100 relative overflow-hidden">
@@ -37,7 +39,7 @@ export default function CoberturaLayout({
             </div>
           </div>
         </main>
-        
+        <Footer />
       </div>
     </div>
   );

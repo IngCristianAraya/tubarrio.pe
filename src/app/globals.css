@@ -19,15 +19,15 @@
   }
   
   body {
-    @apply bg-background text-foreground;
+    background-color: var(--background);
+    color: var(--foreground);
   }
-}
 
-@theme inline {
+:root {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -46,13 +46,16 @@
   }
 }
 
-@layer base {
-  html {
-    scroll-behavior: smooth;
-  }
+html {
+  scroll-behavior: smooth;
+  font-family: var(--font-sans);
+}
+
+} /* Cierre de @layer base */
   
   body {
-    @apply bg-background text-foreground;
+    background-color: var(--background);
+    color: var(--foreground);
     font-feature-settings: "rlig" 1, "calt" 1;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -61,35 +64,60 @@
 
   /* Better focus styles for better keyboard navigation */
   *:focus-visible {
-    @apply outline-2 outline-offset-2 outline-primary ring-2 ring-ring ring-offset-2 ring-offset-background;
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 2px var(--ring);
   }
 
   /* Improve contrast for disabled elements */
   :disabled {
-    @apply opacity-70 cursor-not-allowed;
+    opacity: 0.7;
+    cursor: not-allowed;
   }
 
   /* Better contrast for links */
   a {
-    @apply text-primary hover:underline underline-offset-4;
+    color: var(--primary);
+    text-decoration: none;
+  }
+  
+  a:hover {
+    text-decoration: underline;
+    text-underline-offset: 4px;
   }
 
   /* Better contrast for form elements */
   input, textarea, select {
-    @apply bg-background border border-input rounded-md px-3 py-2 text-foreground placeholder-muted-foreground;
+    background-color: var(--background);
+    border: 1px solid var(--input);
+    border-radius: 0.375rem;
+    padding: 0.5rem 0.75rem;
+    color: var(--foreground);
+  }
+  input::placeholder, textarea::placeholder {
+    color: var(--muted-foreground);
   }
 
   /* Better contrast for buttons */
   button, [role="button"], [type="button"], [type="submit"] {
-    @apply bg-primary text-primary-foreground px-4 py-2 rounded-md font-medium hover:opacity-90 transition-opacity;
+    background-color: var(--primary);
+    color: var(--primary-foreground);
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+    font-weight: 500;
+    transition: background-color 0.2s;
+  }
+  
+  button:hover {
+    background-color: color-mix(in srgb, var(--primary), transparent 10%);
   }
 
   /* Better contrast for secondary text */
   .text-muted-foreground {
-    @apply text-muted-foreground;
+    color: var(--muted-foreground);
   }
 
-  /* Ocultar scrollbar para carrusel móvil */
+  /* Hide scrollbar for mobile carousel */
   .scrollbar-hide {
     -ms-overflow-style: none;  /* Internet Explorer 10+ */
     scrollbar-width: none;  /* Firefox */
@@ -105,4 +133,3 @@
   .hide-scrollbar::-webkit-scrollbar {
     display: none;             /* Chrome, Safari, Opera */
   }
-}

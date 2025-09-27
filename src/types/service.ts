@@ -40,24 +40,17 @@ export interface Service {
   image: string;
   images: string[];
   detailsUrl?: string;
-  contactUrl?: string;
   whatsapp?: string;
   social?: string; // Mantenemos esto por compatibilidad
   socialMedia?: SocialMedia; // Nueva estructura para redes sociales
   horario?: string;
-<<<<<<< HEAD
-  hours?: string;
+  hours?: Record<string, { open: string; close: string; closed?: boolean }> | string;
   available?: boolean;
   price?: string;
-=======
-  hours?: {
-    [key: string]: {
-      open: string;
-      close: string;
-      closed: boolean;
-    };
-  } | string;
->>>>>>> 740a7fcda5bb7188a74029eb5919ab34a304f0ab
+  phone?: string;
+  location?: string;
+  contactUrl?: string;
+  tags?: string[];
   // Add any other fields that might be present in your service objects
   [key: string]: any; // This allows for additional properties
 }

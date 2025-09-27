@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { useServicesPaginated } from '@/hooks/useServices';
-import { ServiceCard } from '@/components/service/ServiceCard';
+import ServiceCard from '@/components/service/ServiceCard';
 import { ChevronDown, Filter, MapPin, Tag } from 'lucide-react';
 import { CloudinaryUtils, CLOUDINARY_TRANSFORMATIONS } from '@/hooks/useCloudinary';
 import { Service } from '@/types/service';

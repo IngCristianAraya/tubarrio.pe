@@ -124,11 +124,8 @@ export default function RootLayout({ children }: RootLayoutProps) {
           <div className="min-h-screen flex flex-col">
             <AnalyticsInitializer />
             <PromoBar />
-            <Header />
-            <main className="flex-grow">
-              {children}
-            </main>
-            <Footer />
+            {/* Header y Footer se manejan en layouts específicos para ciertas rutas */}
+            {children}
           </div>
         </Providers>
       </body>

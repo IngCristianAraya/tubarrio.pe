@@ -1,7 +1,7 @@
 'use client';
 
 import { Service } from '@/types/service';
-import { ServiceCard } from './ServiceCard';
+import ServiceCard from '../ServiceCard';
 import { sampleServices } from '@/mocks/services';
 
 interface RecommendedServicesProps {

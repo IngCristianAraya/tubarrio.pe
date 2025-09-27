@@ -180,8 +180,24 @@ class ServiceCache {
   }
 }
 
-// Initialize cache
-const cache = new ServiceCache();
+// Initialize cache as a variable that will be set on the client side
+let cache: ServiceCache;
+
+// Initialize cache only on the client side
+if (typeof window !== 'undefined') {
+  cache = new ServiceCache();
+}
+
+// Create a function to get the cache instance
+export function getCache() {
+  if (typeof window === 'undefined') {
+    throw new Error('Cache can only be used on the client side');
+  }
+  if (!cache) {
+    cache = new ServiceCache();
+  }
+  return cache;
+}
 
 // Función para generar un slug a partir de un texto
 const generateSlug = (text: string): string => {
@@ -291,18 +307,24 @@ export const ServicesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     try {
       const cacheKey = 'featured-services';
       
-      // Use getOrCreate to handle caching and deduplication
-      const featured = await cache.getOrCreate<Service[]>(
+      // Skip if we're on the server
+      if (typeof window === 'undefined') {
+        return Promise.resolve([]);
+      }
+      
+      // If services data is provided, filter for featured
+      if (servicesData) {
+        const featured = servicesData
+          .filter(service => service.rating && service.rating >= 4)
+          .slice(0, 6);
+        getCache().set(cacheKey, featured);
+        return Promise.resolve(featured);
+      }
+      
+      // Otherwise, use cache or fetch from Firestore
+      return getCache().getOrCreate<Service[]>(
         cacheKey,
         async (): Promise<Service[]> => {
-          if (servicesData) {
-            // If we already have the services data, filter for featured
-            return servicesData
-              .filter(service => service.rating >= 4)
-              .slice(0, 6);
-          }
-          
-          // Otherwise, query for featured services
           const db = getFirestoreInstance();
           const servicesRef = collection(db, 'services');
           const q = query(
@@ -314,93 +336,91 @@ export const ServicesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           );
           
           const querySnapshot = await getDocs(q);
-          return querySnapshot.docs.map(doc => {
-            return createServiceFromData(doc.id, doc.data());
-          });
-        },
-        10 * 60 * 1000 // 10 minute cache for featured services
+          const featuredServices = querySnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...createServiceFromData(doc.id, doc.data())
+          }));
+          
+          return featuredServices;
+        }
       );
-      
-      setFeaturedServices(featured);
     } catch (err) {
       console.error('Error loading featured services:', err);
-      // Don't show error to user for featured services
+      return Promise.resolve([]);
     }
-  }, [getFirestoreInstance]);
+  }, []);
 
-  // Get service by ID with optimized caching and request deduplication
+  // Get service by ID with optimized caching
   const getServiceById = useCallback(async (id: string): Promise<Service | null> => {
-    if (!id) return null;
-    
-    const cacheKey = `service-${id}`;
+    // Skip if we're on the server
+    if (typeof window === 'undefined') {
+      return Promise.resolve(null);
+    }
     
     try {
-      const result = await cache.getOrCreate<Service>(
-        cacheKey,
-        async (): Promise<Service> => {
-          const db = getFirestoreInstance();
-          const docRef = doc(db, 'services', id);
-          const docSnap = await getDoc(docRef);
-          
-          if (docSnap.exists()) {
-            return createServiceFromData(docSnap.id, docSnap.data());
-          }
-          throw new Error('Service not found');
-        },
-        10 * 60 * 1000 // 10 minute cache for individual services
-      );
+      const cacheKey = `service-${id}`;
+      const cachedService = getCache().get<Service>(cacheKey);
+      if (cachedService) return cachedService;
       
-      return result;
+      // If not in cache, fetch from Firestore
+      const db = getFirestoreInstance();
+      const docRef = doc(db, 'services', id);
+      const docSnap = await getDoc(docRef);
+      
+      if (docSnap.exists()) {
+        const service = createServiceFromData(docSnap.id, docSnap.data());
+        // Cache the service
+        if (typeof window !== 'undefined') {
+          getCache().set(cacheKey, service);
+        }
+        return service;
+      }
+      
+      throw new Error('Service not found');
     } catch (err) {
       console.error('Error getting service:', err);
       return null;
     }
   }, [getFirestoreInstance]);
 
-  // Load all services with optimized caching and request deduplication
-  const loadServices = useCallback(async (forceRefresh = false) => {
+  // Load all services with optimized caching
+  const loadServices = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
-      
+
+      // Skip if we're on the server
+      if (typeof window === 'undefined') {
+        setLoading(false);
+        return [];
+      }
+
       const cacheKey = 'all-services';
       
-      // Use getOrCreate to handle concurrent requests and caching
-      const servicesData = await cache.getOrCreate<Service[]>(
-        cacheKey,
-        async (): Promise<Service[]> => {
-          if (!forceRefresh) {
-            const cached = cache.get(cacheKey) as Service[] | null;
-            if (cached) return cached;
-          }
-          
-          const db = getFirestoreInstance();
-          const servicesRef = collection(db, 'services');
-          
-          // Use an index that includes 'active' and 'name'
-          const q = query(
-            servicesRef, 
-            where('active', '==', true),
-            orderBy('name')
-          );
-          
-          console.log(' Executing services query...');
-          const querySnapshot = await getDocs(q);
-          console.log(` Found ${querySnapshot.docs.length} services`);
-          
-          return querySnapshot.docs.map(doc => {
-            return createServiceFromData(doc.id, doc.data());
-          });
-        },
-        5 * 60 * 1000 // 5 minute cache for services list
-      );
+      // Try to get from cache first
+      const cachedData = getCache().get<Service[]>(cacheKey);
+      if (cachedData) return cachedData;
+      
+      // If not in cache, fetch from Firestore
+      const db = getFirestoreInstance();
+      const servicesRef = collection(db, 'services');
+      const servicesSnapshot = await getDocs(servicesRef);
+      const servicesData = servicesSnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      })) as Service[];
+      
+      // Cache the services
+      if (typeof window !== 'undefined') {
+        getCache().set(cacheKey, servicesData);
+      }
       
       setServices(servicesData);
       setFilteredServices([...servicesData]);
       updateCategories(servicesData);
       
       // Load featured services if not already loaded
-      const featuredCache = cache.get('featured-services') as Service[] | null;
+      const featuredCache = getCache().get('featured-services') as Service[] | null;
       if (!featuredCache) {
         loadFeaturedServices(servicesData);
       }
@@ -412,9 +432,13 @@ export const ServicesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
   }, [getFirestoreInstance, loadFeaturedServices, updateCategories]);
 
-  // Refresh services
+  // Refresh services data
   const refreshServices = useCallback(async () => {
-    await loadServices(true);
+    // Clear cache if we're on the client
+    if (typeof window !== 'undefined') {
+      getCache().clear();
+    }
+    await loadServices();
   }, [loadServices]);
 
   // Initial load

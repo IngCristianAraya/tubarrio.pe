@@ -117,6 +117,13 @@ function AnalyticsProvider({ children }: { children: React.ReactNode }) {
       const firestore = await getFirestoreFunctions();
       if (!firestore) return;
 
+      // Get Firestore instance
+      const firestoreInstance = db?.instance || db;
+      if (!firestoreInstance) {
+        console.warn('Firestore instance not available for tracking');
+        return;
+      }
+
       const newEvent: AnalyticsEvent = {
         ...event,
         timestamp: new Date(),
@@ -125,7 +132,7 @@ function AnalyticsProvider({ children }: { children: React.ReactNode }) {
       dispatch({ type: 'ADD_EVENT', payload: newEvent });
 
       // Guardar en Firestore
-      await firestore.addDoc(firestore.collection(db, 'analytics_events'), newEvent);
+      await firestore.addDoc(firestore.collection(firestoreInstance, 'analytics'), newEvent);
     } catch (error) {
       console.error('Error tracking event:', error);
     }
@@ -163,8 +170,17 @@ function AnalyticsProvider({ children }: { children: React.ReactNode }) {
       
       // Get Firebase functions dynamically
       const firestore = await getFirestoreFunctions();
-      if (!db || !firestore) {
+      if (!firestore) {
         console.warn('Firebase not available, using empty metrics');
+        dispatch({ type: 'SET_METRICS', payload: initialState.metrics });
+        dispatch({ type: 'SET_LOADING', payload: false });
+        return;
+      }
+      
+      // Get Firestore instance
+      const firestoreInstance = db?.instance || db;
+      if (!firestoreInstance) {
+        console.warn('Firestore instance not available, using empty metrics');
         dispatch({ type: 'SET_METRICS', payload: initialState.metrics });
         dispatch({ type: 'SET_LOADING', payload: false });
         return;
@@ -173,7 +189,7 @@ function AnalyticsProvider({ children }: { children: React.ReactNode }) {
       const startDate = new Date();
       startDate.setDate(startDate.getDate() - days);
       
-      const analyticsRef = firestore.collection(db, 'analytics');
+      const analyticsRef = firestore.collection(firestoreInstance, 'analytics');
       const q = firestore.query(
         analyticsRef,
         firestore.where('timestamp', '>=', startDate),

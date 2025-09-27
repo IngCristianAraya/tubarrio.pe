@@ -1,6 +1,7 @@
 import React, { Suspense } from 'react';
 import { Service } from '@/types/service';
-import { ServiceCard, ServiceCardSkeleton } from './ServiceCard';
+import ServiceCard from './ServiceCard';
+import { ServiceCardSkeleton } from './ServiceCardSkeleton';
 import { cn } from '@/lib/utils';
 
 interface ServiceListProps {

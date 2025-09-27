@@ -2,6 +2,33 @@ import { Service } from '@/types/service';
 
 
 export const sampleServices: Record<string, Service[]> = {
+  'desarrollo-web': [
+    {
+      id: 'test-service-1',
+      slug: 'desarrollo-web-profesional',
+      name: 'Desarrollo Web Profesional',
+      category: 'Desarrollo Web',
+      categorySlug: 'desarrollo-web',
+      description: 'Creamos sitios web modernos y responsivos para tu negocio',
+      image: '/images/services/web-development.jpg',
+      images: ['/images/services/web-development.jpg'],
+      rating: 4.8,
+      reviewCount: 25,
+      featured: true,
+      location: 'Lima, Perú',
+      address: 'Av. Javier Prado 123',
+      phone: '+51 999 888 777',
+      whatsapp: '+51 999 888 777',
+      contactUrl: 'https://wa.me/51999888777',
+      detailsUrl: '/servicio/test-service-1',
+      hours: 'Lun-Vie 9:00-18:00',
+      tags: ['web', 'desarrollo', 'responsive'],
+      plan: 'premium',
+      active: true,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    }
+  ],
 
   'restaurantes-y-menus': [
     {
@@ -231,6 +258,21 @@ export const sampleServices: Record<string, Service[]> = {
       images: ['/images/gym1.jpg'],
       rating: 4.8,
       reviewCount: 156,
+      featured: true
+    },
+  ],
+  'tecnologia': [
+    {
+      id: 'creciendo-digital',
+      slug: 'creciendo-digital',
+      name: 'Creciendo Digital Cursos',
+      description: 'Cursos de programación para principiantes y avanzados. Aprende las tecnologías más demandadas del mercado.',
+      category: 'Tecnología',
+      categorySlug: 'tecnologia',
+      image: '/images/cursos_de_programacion.png',
+      images: ['/images/cursos_de_programacion.png'],
+      rating: 4.8,
+      reviewCount: 45,
       featured: true
     },
   ],

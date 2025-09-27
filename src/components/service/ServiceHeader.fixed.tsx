@@ -28,8 +28,10 @@ const ServiceHeader: React.FC<ServiceHeaderProps> = ({ service }): ReactElement 
 
   // Format schedule information
   const formatSchedule = (): string => {
+    // First check if horario is available
     if (service.horario) return service.horario;
     
+    // Handle hours which can be either string or object
     if (service.hours) {
       // If hours is a string, return it directly
       if (typeof service.hours === 'string') return service.hours;
@@ -53,10 +55,16 @@ const ServiceHeader: React.FC<ServiceHeaderProps> = ({ service }): ReactElement 
         let currentHours = '';
         
         days.forEach(day => {
-          const dayHours = (service.hours as Record<string, any>)?.[day];
+          // Safely access the day's hours with proper type checking
+          const dayHours = service.hours && typeof service.hours === 'object' && day in service.hours 
+            ? (service.hours as Record<string, any>)[day]
+            : null;
+            
           if (!dayHours || dayHours.closed) return;
           
-          const hoursStr = `${dayHours.open}-${dayHours.close}`;
+          const hoursStr = dayHours.open && dayHours.close 
+            ? `${dayHours.open}-${dayHours.close}`
+            : 'Horario no especificado';
           
           if (currentHours === hoursStr) {
             // Extend current group
@@ -77,11 +85,11 @@ const ServiceHeader: React.FC<ServiceHeaderProps> = ({ service }): ReactElement 
           result.push(`${currentGroup[0]}-${currentGroup[1]} ${currentHours}`);
         }
         
-        return result.length > 0 ? result.join(', ') : 'No especificado';
+        return result.length > 0 ? result.join(', ') : 'Horario no especificado';
       }
     }
     
-    return 'No especificado';
+    return 'Horario no especificado';
   };
 
   // Validate image URL

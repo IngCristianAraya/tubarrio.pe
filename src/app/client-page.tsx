@@ -8,6 +8,11 @@ import { featuredBanners } from '@/mocks/featuredBanners';
 import FeaturedBannersCarousel from '@/components/home/FeaturedBannersCarousel';
 
 // Cargar componentes dinámicamente
+const Header = dynamic(
+  () => import('@/components/Header'),
+  { ssr: false, loading: () => <div className="h-16 bg-white"></div> }
+);
+
 const CategorySection = dynamic(
   () => import('@/components/home/CategorySection'),
   { ssr: false, loading: () => <div>Loading categories...</div> }
@@ -58,8 +63,10 @@ export default function ClientHomePage() {
   }
 
   return (
-    <main className="min-h-screen">
-      {mounted && <UnifiedHero />}
+    <>
+      <Header />
+      <main className="min-h-screen">
+        {mounted && <UnifiedHero />}
       
       {/* ✅ CARRUSEL DE BANNERS DESTACADOS */}
       <FeaturedBannersCarousel banners={featuredBanners} interval={5000} />
@@ -96,5 +103,6 @@ export default function ClientHomePage() {
 ))}
       </div>
     </main>
+    </>
   );
 }

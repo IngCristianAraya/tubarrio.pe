@@ -25,26 +25,20 @@ import { Star, MapPin, Phone, ExternalLink } from 'lucide-react';
 import OptimizedImage from './OptimizedImage';
 import type { Service } from '../context/ServicesContext';
 import React from 'react';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { useEventTracking } from '@/hooks/usePageTracking';
 
 interface ServiceCardProps {
   service: Service;
+  className?: string;
 }
 
-const ServiceCard = ({ service }: ServiceCardProps) => {
-  const router = useRouter();
+const ServiceCard = ({ service, className = '' }: ServiceCardProps) => {
   const { trackServiceView, trackWhatsAppClick, trackPhoneClick } = useEventTracking();
   
-  const handleCardClick = (e: React.MouseEvent) => {
-    // Prevenir la navegación si se hace clic en un botón o enlace
-    const target = e.target as HTMLElement;
-    if (target.tagName === 'A' || target.tagName === 'BUTTON' || target.closest('a, button')) {
-      return;
-    }
+  const handleServiceView = () => {
     // Trackear el clic en el servicio
     trackServiceView(service.id, service.name);
-    router.push(`/servicio/${service.id}`);
   };
 
   const handleContactClick = () => {
@@ -57,12 +51,10 @@ const ServiceCard = ({ service }: ServiceCardProps) => {
   };
 
   return (
-    <div 
-      onClick={handleCardClick}
-      className="bg-white hover:bg-gray-50 transition-colors duration-200 cursor-pointer p-3"
-      role="button"
-      tabIndex={0}
-      onKeyDown={(e) => e.key === 'Enter' && handleCardClick(e as any)}
+    <Link 
+      href={`/servicio/${service.id}`}
+      className={`bg-white hover:bg-gray-50 transition-colors duration-200 block p-3 ${className}`}
+      onClick={handleServiceView}
     >
       {/* Simple Vertical Layout */}
       <div className="text-center">
@@ -93,10 +85,10 @@ const ServiceCard = ({ service }: ServiceCardProps) => {
          {/* Location */}
          <div className="flex items-center justify-center text-xs text-gray-500">
            <MapPin className="w-3 h-3 mr-1 text-gray-400 flex-shrink-0" />
-           <span className="truncate">{service.location}</span>
+           <span className="truncate">{service.location || service.address || 'Sin ubicación'}</span>
          </div>
       </div>
-    </div>
+    </Link>
   );
 };
 
