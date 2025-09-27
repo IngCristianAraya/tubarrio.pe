@@ -47,10 +47,11 @@
     "tailwind-merge": "^1.14.0",
     "undici": "5.28.2",
     "postcss-import": "^15.1.0",
-    "@tailwindcss/nesting": "0.0.0-insiders.565cd3e"
+    "@tailwindcss/nesting": "0.0.0-insiders.565cd3e",
+    "tailwindcss": "^3.3.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.28.4",
+    "@babel/core": "^7.25.9",
     "@babel/plugin-transform-runtime": "^7.28.3",
     "@babel/preset-env": "^7.28.3",
     "@netlify/plugin-nextjs": "^4.41.0",
@@ -86,7 +87,6 @@
     "string_decoder": "^1.3.0",
     "string-replace-loader": "^3.2.0",
     "style-loader": "^3.3.3",
-    "tailwindcss": "^3.3.0",
     "tailwindcss-animate": "^1.0.7",
     "typescript": "^5.9.2",
     "url": "^0.11.4",
