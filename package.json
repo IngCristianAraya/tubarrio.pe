@@ -31,7 +31,6 @@
     "lucide-react": "^0.263.1",
     "next": "13.4.19",
     "next-themes": "^0.2.1",
-    "postcss-import": "^15.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-firebase-hooks": "^5.1.1",
@@ -47,7 +46,8 @@
     "swr": "^2.2.4",
     "tailwind-merge": "^1.14.0",
     "undici": "5.28.2",
-    "postcss-import": "^15.1.0"
+    "postcss-import": "^15.1.0",
+    "@tailwindcss/nesting": "0.0.0-insiders.565cd3e"
   },
   "devDependencies": {
     "@babel/core": "^7.28.4",
@@ -55,7 +55,6 @@
     "@babel/preset-env": "^7.28.3",
     "@netlify/plugin-nextjs": "^4.41.0",
     "@next/bundle-analyzer": "^14.2.33",
-    "@tailwindcss/nesting": "0.0.0-insiders.565cd3e",
     "@tailwindcss/typography": "^0.5.19",
     "@types/node": "^20.19.17",
     "@types/react": "^18.3.24",
