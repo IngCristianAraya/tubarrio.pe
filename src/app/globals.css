@@ -98,6 +98,28 @@ html {
     color: var(--muted-foreground);
   }
 
+  /* Fix Chrome autofill dark background issue */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 30px var(--background) inset !important;
+    -webkit-text-fill-color: var(--foreground) !important;
+    background-color: var(--background) !important;
+    color: var(--foreground) !important;
+  }
+
+  /* Additional fix for search inputs */
+  input[type="search"]:-webkit-autofill,
+  input[type="search"]:-webkit-autofill:hover,
+  input[type="search"]:-webkit-autofill:focus,
+  input[type="search"]:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 30px var(--background) inset !important;
+    -webkit-text-fill-color: var(--foreground) !important;
+    background-color: var(--background) !important;
+    color: var(--foreground) !important;
+  }
+
   /* Better contrast for buttons */
   button, [role="button"], [type="button"], [type="submit"] {
     background-color: var(--primary);
