@@ -33,8 +33,8 @@ export const sampleServices: Record<string, Service[]> = {
   'restaurantes-y-menus': [
     {
       id: 'rest-1',
-      slug: 'sabor-peruano',
-      name: 'Sabor Peruano',
+      slug: 'anticuchos-bran',
+      name: 'Anticuchos Bran',
       description: 'Comida típica peruana con los mejores sabores de la costa, sierra y selva.',
       category: 'Restaurantes y menús',  // Nombre legible para mostrar
       categorySlug: 'restaurantes-y-menus',  // Para URLs y código interno
@@ -154,42 +154,16 @@ export const sampleServices: Record<string, Service[]> = {
     },
     {
       id: 'abr-2',
-      slug: 'mini-market-la-esquina',
-      name: 'Mini Market La Esquina',
-      description: 'Productos de primera necesidad a un paso de tu hogar.',
+      slug: 'mercado-don-pedrito',
+      name: 'Mercado Don Pedrito',
+      description: 'La calidad y el sabor se encuentran en cada producto. ¡Compre fresco, compre cerca! Variedad de productos de alta calidad para su hogar."',
       category: 'Abarrotes',
       categorySlug: 'abarrotes',
-      image: '/images/abarrotes2.jpg',
-      images: ['/images/abarrotes2.jpg'],
+      image: 'https://res.cloudinary.com/do2rpqupm/image/upload/v1759031874/almacen_pedrito_ixgdpb.png',
+      images: ['https://res.cloudinary.com/do2rpqupm/image/upload/v1759031874/almacen_pedrito_ixgdpb.png'],
       rating: 4.0,
       reviewCount: 42,
       featured: false
-    },
-    {
-      id: 'abr-3',
-      slug: 'lacteos-y-embutidos-ac',
-      name: 'Lácteos y Embutidos A&C ',
-      description: 'Todo lo que necesitas para tu hogar en un solo lugar.',
-      category: 'Abarrotes',
-      categorySlug: 'abarrotes',
-      image: '/images/cursos_de_programacion.png',
-      images: ['/images/cursos_de_programacion.png'],
-      rating: 4.2,
-      reviewCount: 64,
-      featured: true
-    },
-    {
-      id: 'abr-4',
-      slug: 'lacteos-y-embutidos-ac-2',
-      name: 'Lácteos y Embutidos A&C ',
-      description: 'Todo lo que necesitas para tu hogar en un solo lugar.',
-      category: 'Abarrotes',
-      categorySlug: 'abarrotes',
-      image: '/images/cursos_de_programacion.png',
-      images: ['/images/cursos_de_programacion.png'],
-      rating: 4.2,
-      reviewCount: 64,
-      featured: true
     },
   ],
   'lavanderias': [
@@ -207,7 +181,7 @@ export const sampleServices: Record<string, Service[]> = {
       featured: true
     },
   ],
-  'gimnasios': [
+  'servicios-generales': [
     {
       id: 'gym-1',
       slug: 'power-gym',
@@ -276,7 +250,7 @@ export const sampleServices: Record<string, Service[]> = {
       featured: true
     },
   ],
-  'servicios': [
+  'servicios-profesionales': [
     {
       id: 'serv-1',
       slug: 'sannaterapia',
@@ -312,19 +286,6 @@ export const sampleServices: Record<string, Service[]> = {
       categorySlug: 'servicios',
       image: '/images/mgc.webp',
       images: ['/images/mgc.webp'],
-      rating: 4.8,
-      reviewCount: 156,
-      featured: true
-    },
-    {
-      id: 'serv-4',
-      slug: 'power-gym-serv',
-      name: 'Power Gym',
-      description: 'Tu mejor versión comienza aquí. Equipos modernos y entrenadores certificados.',
-      category: 'Gimnasios',
-      categorySlug: 'gimnasios',
-      image: '/images/gym1.jpg',
-      images: ['/images/gym1.jpg'],
       rating: 4.8,
       reviewCount: 156,
       featured: true
@@ -366,19 +327,6 @@ export const sampleServices: Record<string, Service[]> = {
       categorySlug: 'gimnasios',
       image: '/images/barbudos.webp',
       images: ['/images/barbudos.webp'],
-      rating: 4.8,
-      reviewCount: 156,
-      featured: true
-    },
-    {
-      id: 'hair-4',
-      slug: 'power-gym-hair-2',
-      name: 'Power Gym',
-      description: 'Tu mejor versión comienza aquí. Equipos modernos y entrenadores certificados.',
-      category: 'Gimnasios',
-      categorySlug: 'gimnasios',
-      image: '/images/gym1.jpg',
-      images: ['/images/gym1.jpg'],
       rating: 4.8,
       reviewCount: 156,
       featured: true
