@@ -10,10 +10,11 @@ interface PageTrackerProps {
 /**
  * Componente que automáticamente trackea las vistas de página
  * Se debe usar en componentes del lado del cliente
+ * TEMPORALMENTE DESHABILITADO para evitar bucle de errores
  */
 export function PageTracker({ children }: PageTrackerProps) {
-  // Este hook automáticamente trackea la página actual
-  usePageTracking();
+  // TEMPORALMENTE DESHABILITADO: Este hook causaba bucle de errores
+  // usePageTracking();
   
   return <>{children}</>;
 }

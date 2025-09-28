@@ -113,15 +113,37 @@ export const db = {
 if (typeof window !== 'undefined') {
   try {
     console.log('🔍 Iniciando Firebase en el cliente...');
+    
+    // TEMPORALMENTE DESHABILITADO: Inicialización completa de Firebase para evitar bucle de errores
+    console.log('⚠️ Firebase temporalmente deshabilitado para evitar bucle de errores');
+    /*
     const { app, db } = initializeFirebase();
     
     if (app && db) {
       console.log('✅ Firebase inicializado correctamente en el cliente');
+      
+      // TEMPORALMENTE DESHABILITADO: Verificación de conectividad causaba bucle de errores
+      // Verificar conectividad con una consulta simple
+      import('firebase/firestore').then(({ doc, getDoc }) => {
+        const testDoc = doc(db, 'test', 'connection');
+        getDoc(testDoc).then(() => {
+          console.log('✅ Conectividad con Firestore verificada');
+        }).catch((error) => {
+          if (error.code === 'permission-denied') {
+            console.warn('⚠️ Permisos limitados en Firestore (esperado)');
+          } else if (error.code === 'unavailable') {
+            console.error('❌ Firestore no disponible - verificar conexión');
+          } else {
+            console.warn('⚠️ Error de conectividad:', error.code);
+          }
+        });
+      });
     } else {
-      console.error('❌ No se pudo inicializar Firebase en el cliente');
+      console.error('❌ Error al inicializar Firebase');
     }
+    */
   } catch (error) {
-    console.error('❌ Error al inicializar Firebase en el cliente:', error);
+    console.error('❌ Error crítico al inicializar Firebase:', error);
   }
 } else {
   console.log('🔍 Ejecutándose en el servidor - Firebase se inicializará bajo demanda');

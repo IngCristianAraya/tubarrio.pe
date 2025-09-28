@@ -122,7 +122,8 @@ export default function RootLayout({ children }: RootLayoutProps) {
       <body className={`${GeistSans.className} antialiased bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-200`}>
         <Providers>
           <div className="min-h-screen flex flex-col">
-            <AnalyticsInitializer />
+            {/* TEMPORALMENTE DESHABILITADO: AnalyticsInitializer causaba bucle de errores */}
+            {/* <AnalyticsInitializer /> */}
             <PromoBar />
             {/* Header y Footer se manejan en layouts específicos para ciertas rutas */}
             {children}

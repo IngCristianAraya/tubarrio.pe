@@ -32,7 +32,7 @@ export const sampleServices: Record<string, Service[]> = {
 
   'restaurantes-y-menus': [
     {
-      id: '1',
+      id: 'rest-1',
       slug: 'sabor-peruano',
       name: 'Sabor Peruano',
       description: 'Comida típica peruana con los mejores sabores de la costa, sierra y selva.',
@@ -45,7 +45,7 @@ export const sampleServices: Record<string, Service[]> = {
       featured: true
     },
     {
-      id: '1',
+      id: 'rest-2',
       slug: 'caldo-de-gallina',
       name: 'Caldo de gallina',
       description: 'Comida típica peruana con los mejores sabores de la costa, sierra y selva.',
@@ -58,7 +58,7 @@ export const sampleServices: Record<string, Service[]> = {
       featured: true
     },
     {
-      id: '1',
+      id: 'rest-3',
       slug: 'iro-sushi',
       name: 'Iro Sushi',
       description: 'Sushi fresco y rollos especiales.',
@@ -71,7 +71,7 @@ export const sampleServices: Record<string, Service[]> = {
       featured: true
     },
     {
-      id: '1',
+      id: 'rest-4',
       slug: 'pizzeria-toscana',
       name: 'Pizzeria Toscana',
       description: 'Te invitamos a un viaje culinario a Italia con nuestras exquisitas pizzas a la piedra estilo toscano.',
@@ -86,7 +86,7 @@ export const sampleServices: Record<string, Service[]> = {
   ],
   'comida-rapida': [
     {
-      id: '9',
+      id: 'fast-1',
       slug: 'superburger',
       name: 'Superburger',
       description: 'Las mejores hamburguesas artesanales.',
@@ -99,7 +99,7 @@ export const sampleServices: Record<string, Service[]> = {
       featured: true
     },  
     {
-      id: '9',
+      id: 'fast-2',
       slug: 'rey-del-shawarma',
       name: 'Rey del Shawarma',
       description: 'Las mejores Shawarma artesanales.',
@@ -112,7 +112,7 @@ export const sampleServices: Record<string, Service[]> = {
       featured: true
     },  
     {
-      id: '9',
+      id: 'fast-3',
       slug: 'shawarma-el-faraon',
       name: 'Shawarma El Faraon',
       description: 'Disfruta del sabor tradicional del Medio Oriente con nuestro shawarma artesanal.',
@@ -125,8 +125,8 @@ export const sampleServices: Record<string, Service[]> = {
       featured: true
     },  
     {
-      id: '9',
-      slug: 'superburger',
+      id: 'fast-4',
+      slug: 'superburger-2',
       name: 'Superburger',
       description: 'Las mejores hamburguesas artesanales.',
       category: 'Comida rápida',
@@ -140,7 +140,7 @@ export const sampleServices: Record<string, Service[]> = {
   ],
   'abarrotes': [
     {
-      id: '5',
+      id: 'abr-1',
       slug: 'lacteos-y-embutidos-ayc',
       name: 'Lácteos y Embutidos A&C ',
       description: 'Todo lo que necesitas para tu hogar en un solo lugar.',
@@ -153,7 +153,7 @@ export const sampleServices: Record<string, Service[]> = {
       featured: true
     },
     {
-      id: '6',
+      id: 'abr-2',
       slug: 'mini-market-la-esquina',
       name: 'Mini Market La Esquina',
       description: 'Productos de primera necesidad a un paso de tu hogar.',
@@ -166,7 +166,7 @@ export const sampleServices: Record<string, Service[]> = {
       featured: false
     },
     {
-      id: '7',
+      id: 'abr-3',
       slug: 'lacteos-y-embutidos-ac',
       name: 'Lácteos y Embutidos A&C ',
       description: 'Todo lo que necesitas para tu hogar en un solo lugar.',
@@ -179,8 +179,8 @@ export const sampleServices: Record<string, Service[]> = {
       featured: true
     },
     {
-      id: '8',
-      slug: 'lacteos-y-embutidos-ac',
+      id: 'abr-4',
+      slug: 'lacteos-y-embutidos-ac-2',
       name: 'Lácteos y Embutidos A&C ',
       description: 'Todo lo que necesitas para tu hogar en un solo lugar.',
       category: 'Abarrotes',
@@ -194,7 +194,7 @@ export const sampleServices: Record<string, Service[]> = {
   ],
   'lavanderias': [
     {
-      id: '9',
+      id: 'lav-1',
       slug: 'lavanderia-antares',
       name: 'Lavandería Antares',
       description: 'Servicio de lavado y planchado con los mejores productos.',
@@ -209,7 +209,7 @@ export const sampleServices: Record<string, Service[]> = {
   ],
   'gimnasios': [
     {
-      id: '10',
+      id: 'gym-1',
       slug: 'power-gym',
       name: 'Power Gym',
       description: 'Tu mejor versión comienza aquí. Equipos modernos y entrenadores certificados.',
@@ -222,8 +222,8 @@ export const sampleServices: Record<string, Service[]> = {
       featured: true
     },
     {
-      id: '10',
-      slug: 'power-gym',
+      id: 'gym-2',
+      slug: 'power-gym-2',
       name: 'Power Gym',
       description: 'Tu mejor versión comienza aquí. Equipos modernos y entrenadores certificados.',
       category: 'Gimnasios',
@@ -235,8 +235,8 @@ export const sampleServices: Record<string, Service[]> = {
       featured: true
     },
     {
-      id: '10',
-      slug: 'power-gym',
+      id: 'gym-3',
+      slug: 'power-gym-3',
       name: 'Power Gym',
       description: 'Tu mejor versión comienza aquí. Equipos modernos y entrenadores certificados.',
       category: 'Gimnasios',
@@ -248,8 +248,8 @@ export const sampleServices: Record<string, Service[]> = {
       featured: true
     },
     {
-      id: '10',
-      slug: 'power-gym',
+      id: 'gym-4',
+      slug: 'power-gym-4',
       name: 'Power Gym',
       description: 'Tu mejor versión comienza aquí. Equipos modernos y entrenadores certificados.',
       category: 'Gimnasios',
@@ -278,7 +278,7 @@ export const sampleServices: Record<string, Service[]> = {
   ],
   'servicios': [
     {
-      id: '10',
+      id: 'serv-1',
       slug: 'sannaterapia',
       name: 'SannaTerapia',
       description: 'Servicio de psicología integral que ofrece apoyo emocional y herramientas para mejorar.',
@@ -291,7 +291,7 @@ export const sampleServices: Record<string, Service[]> = {
       featured: true
     },
     {
-      id: '10',
+      id: 'serv-2',
       slug: 'imana-tu-vida',
       name: 'Imana Tu Vida',
       description: 'Utilizamos la técnica de pares biomagnéticos para restaurar el equilibrio energético ',
@@ -304,7 +304,7 @@ export const sampleServices: Record<string, Service[]> = {
       featured: true
     },
     {
-      id: '10',
+      id: 'serv-3',
       slug: 'mgc-dental-health',
       name: 'MGC Dental Health',
       description: 'Odontologia integral, estética & funcional.',
@@ -317,8 +317,8 @@ export const sampleServices: Record<string, Service[]> = {
       featured: true
     },
     {
-      id: '10',
-      slug: 'power-gym',
+      id: 'serv-4',
+      slug: 'power-gym-serv',
       name: 'Power Gym',
       description: 'Tu mejor versión comienza aquí. Equipos modernos y entrenadores certificados.',
       category: 'Gimnasios',
@@ -332,7 +332,7 @@ export const sampleServices: Record<string, Service[]> = {
   ],
   'peluquerias': [
     {
-      id: '10',
+      id: 'hair-1',
       slug: 'peluqueria-salon',
       name: 'Peluqueria salon',
       description: 'Tu mejor versión comienza aquí. Equipos modernos y entrenadores certificados.',
@@ -345,8 +345,8 @@ export const sampleServices: Record<string, Service[]> = {
       featured: true
     },
     {
-      id: '10',
-      slug: 'power-gym',
+      id: 'hair-2',
+      slug: 'power-gym-hair',
       name: 'Power Gym',
       description: 'Tu mejor versión comienza aquí. Equipos modernos y entrenadores certificados.',
       category: 'Gimnasios',
@@ -358,7 +358,7 @@ export const sampleServices: Record<string, Service[]> = {
       featured: true
     },
     {
-      id: '10',
+      id: 'hair-3',
       slug: 'barbudos',
       name: 'Barbudos',
       description: 'Tu mejor versión comienza aquí. Equipos modernos y entrenadores certificados.',
@@ -371,8 +371,8 @@ export const sampleServices: Record<string, Service[]> = {
       featured: true
     },
     {
-      id: '10',
-      slug: 'power-gym',
+      id: 'hair-4',
+      slug: 'power-gym-hair-2',
       name: 'Power Gym',
       description: 'Tu mejor versión comienza aquí. Equipos modernos y entrenadores certificados.',
       category: 'Gimnasios',

@@ -7,6 +7,7 @@ import { Category } from '@/types/service';
 import { featuredBanners } from '@/mocks/featuredBanners';
 import FeaturedBannersCarousel from '@/components/home/FeaturedBannersCarousel';
 
+
 // Cargar componentes dinámicamente
 const CategorySection = dynamic(
   () => import('@/components/home/CategorySection'),
@@ -79,6 +80,7 @@ export default function ClientHomePage() {
     <main className="min-h-screen">
         {mounted && <UnifiedHero />}
       
+
       {/* ✅ CARRUSEL DE BANNERS DESTACADOS */}
       <FeaturedBannersCarousel banners={featuredBanners} interval={5000} />
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-12">

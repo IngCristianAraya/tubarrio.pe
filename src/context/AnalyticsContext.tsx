@@ -114,6 +114,19 @@ function AnalyticsProvider({ children }: { children: React.ReactNode }) {
 
   const trackEvent = useCallback(async (event: Omit<AnalyticsEvent, 'timestamp'>) => {
     try {
+      const eventWithTimestamp: AnalyticsEvent = {
+        ...event,
+        timestamp: new Date(),
+        userAgent: typeof window !== 'undefined' ? window.navigator.userAgent : undefined,
+        referrer: typeof window !== 'undefined' ? document.referrer : undefined
+      };
+
+      // Dispatch to local state
+      dispatch({ type: 'ADD_EVENT', payload: eventWithTimestamp });
+
+      // TEMPORALMENTE DESHABILITADO: Evitar escrituras a Firestore para prevenir bucle de errores
+      // Solo guardar en estado local por ahora
+      /*
       const firestore = await getFirestoreFunctions();
       if (!firestore) return;
 
@@ -124,16 +137,31 @@ function AnalyticsProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      const newEvent: AnalyticsEvent = {
-        ...event,
-        timestamp: new Date(),
-      };
-
-      dispatch({ type: 'ADD_EVENT', payload: newEvent });
-
-      // Guardar en Firestore
-      await firestore.addDoc(firestore.collection(firestoreInstance, 'analytics'), newEvent);
-    } catch (error) {
+      // Guardar en Firestore solo si no hay errores de permisos
+      try {
+        await firestore.addDoc(firestore.collection(firestoreInstance, 'analytics'), eventWithTimestamp);
+      } catch (firestoreError: any) {
+        // Silenciar errores de permisos y conexión para evitar el bucle infinito
+        if (firestoreError.code === 'permission-denied' || 
+            firestoreError.code === 'unauthenticated' ||
+            firestoreError.code === 'unavailable' ||
+            firestoreError.code === 'cancelled' ||
+            firestoreError.message?.includes('net::ERR_BLOCKED_BY_CLIENT')) {
+          // Silenciar completamente estos errores para evitar spam en consola
+          return;
+        } else {
+          console.error('Error saving analytics event:', firestoreError);
+        }
+      }
+      */
+    } catch (error: any) {
+      // Silenciar errores de conexión y permisos
+      if (error.code === 'permission-denied' || 
+          error.code === 'unauthenticated' ||
+          error.code === 'unavailable' ||
+          error.message?.includes('net::ERR_BLOCKED_BY_CLIENT')) {
+        return;
+      }
       console.error('Error tracking event:', error);
     }
   }, []);

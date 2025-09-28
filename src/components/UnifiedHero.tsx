@@ -72,7 +72,7 @@ const Hero = () => {
         {/* Imagen de fondo */}
         <div className="absolute inset-0 z-0">
           <OptimizedImage
-            src="/images/heroyas.webp"
+            src="/images/hero_3.webp"
             alt="Tu Barrio PE - Conectando tu barrio con los mejores servicios locales"
             className="w-full h-full object-cover object-center"
             width={1920}

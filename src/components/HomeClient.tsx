@@ -120,24 +120,6 @@ const HomeClient = () => {
       {/* Servicios Destacados */}
       <FeaturedServices />
       
-      {/* Sección de Cobertura - CTA */}
-      <section className="py-16 bg-white" id="cobertura">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold text-gray-900 mb-6">
-            ¿Buscas cobertura en tu zona?
-          </h2>
-          <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-            Descubre todas las zonas que cubrimos y verifica si estamos disponibles en tu ubicación.
-          </p>
-          <a
-            href="/cobertura"
-            className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-orange-500 hover:bg-orange-600 transition-colors"
-          >
-            Ver mapa de cobertura
-          </a>
-        </div>
-      </section>
-      
       {/* Botón flotante de WhatsApp */}
       <WhatsAppButton phoneNumber="+51901426737" />
     </div>
