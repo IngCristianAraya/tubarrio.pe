@@ -99,26 +99,27 @@ const Header = () => {
   return (
     <header className="bg-white shadow-sm sticky top-0 z-40 w-full">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          {/* Logo - visible en todas las pantallas pero con diferentes estilos */}
-          <div className="flex-shrink-0">
+        {/* Layout móvil y desktop */}
+        <div className="flex items-center h-16 justify-between">
+          {/* Logo - alineado al margen izquierdo */}
+          <div className="flex-shrink-0 -ml-6 md:ml-0">
             <Link href="/" className="flex items-center" aria-label="Ir a inicio">
-              <div className="relative h-12 w-40 md:h-14 md:w-48 lg:h-16 lg:w-56">
+              <div className="relative h-14 w-44 md:h-18 md:w-60 lg:h-20 lg:w-72">
                 <Image
                   src="/images/tubarriope_logo_penegro2.webp"
                   alt="Logo TuBarrio.pe"
                   fill
                   className="object-contain"
-                  sizes="(max-width: 767px) 160px, 224px"
+                  sizes="(max-width: 767px) 176px, 288px"
                   priority
                 />
               </div>
             </Link>
           </div>
 
-          {/* Barra de búsqueda para móvil */}
-          <div className="md:hidden flex-1 mx-2 -ml-4">
-            <form onSubmit={handleSearch} className="relative">
+          {/* Barra de búsqueda para móvil - centrada */}
+          <div className="md:hidden flex-1 mx-3">
+            <form onSubmit={handleSearch} className="relative max-w-xs -ml-8">
               <input
                 type="text"
                 placeholder="Buscar"
@@ -130,8 +131,8 @@ const Header = () => {
             </form>
           </div>
 
-          {/* Botón de menú móvil */}
-          <div className="md:hidden flex-shrink-0 flex items-center">
+          {/* Botón de menú móvil - alineado al margen derecho */}
+          <div className="md:hidden flex-shrink-0 -mr-2">
             <button
               type="button"
               className="inline-flex items-center justify-center p-2 rounded-full bg-white text-orange-500 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-orange-500"

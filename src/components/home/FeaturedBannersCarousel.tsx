@@ -151,8 +151,9 @@ export default function FeaturedBannersCarousel({
   if (!banners || banners.length === 0) return null;
 
   return (
-    <div className="relative w-full" onMouseEnter={stopAutoplay} onMouseLeave={() => startAutoplay(slider.current)}>
-      <div ref={sliderRef} className="keen-slider" style={{ height: '300px' }}>
+    <div className="w-full">
+      <div className="relative w-full mb-0" onMouseEnter={stopAutoplay} onMouseLeave={() => startAutoplay(slider.current)}>
+        <div ref={sliderRef} className="keen-slider mb-0" style={{ height: '300px' }}>
         {banners.map((banner) => (
           <div key={banner.id} className="keen-slider__slide h-full">
             <div className="relative w-full h-full">
@@ -183,15 +184,15 @@ export default function FeaturedBannersCarousel({
               </div>
               
               {/* Versión móvil - solo se muestra en móviles */}
-              <div className="md:hidden w-full relative">
-                <div className="relative w-full" style={{ minHeight: '200px' }}>
-                  <div className="w-full h-full flex items-center justify-center">
+              <div className="md:hidden w-full relative mb-0">
+                <div className="relative w-full mb-0">
+                  <div className="w-full flex items-center justify-center mb-0">
                     <Image
                       src={typeof banner.image === 'string' ? banner.image : banner.image.mobile}
                       alt={banner.title || 'Banner promocional'}
                       width={800}
                       height={400}
-                      className="object-contain w-full h-auto max-h-[200px]"
+                      className="object-cover w-full h-auto"
                       priority={true}
                       loading="eager"
                       quality={85}
@@ -212,22 +213,7 @@ export default function FeaturedBannersCarousel({
         ))}
       </div>
 
-      {banners.length > 1 && (
-        <div className="absolute bottom-4 left-0 right-0 flex justify-center space-x-2">
-          {banners.map((_, idx) => (
-            <button
-              key={idx}
-              onClick={() => slider.current?.moveToIdx(idx)}
-              className={`h-1.5 rounded-full transition-all ${
-                currentSlide === idx 
-                  ? 'bg-white w-6 opacity-100' 
-                  : 'bg-white/50 w-3 hover:bg-white/75'
-              }`}
-              aria-label={`Ir al banner ${idx + 1}`}
-            />
-          ))}
-        </div>
-      )}
+
 
       {/* Navigation Arrows - Desktop */}
       {isMounted && (
@@ -265,6 +251,25 @@ export default function FeaturedBannersCarousel({
             />
           </div>
         </>
+      )}
+      </div>
+
+      {/* Pagination Indicators - Outside banner container */}
+      {banners.length > 1 && (
+        <div className="flex justify-center space-x-2 -mt-4 md:-mt-1 py-1 md:py-2">
+          {banners.map((_, idx) => (
+            <button
+              key={idx}
+              onClick={() => slider.current?.moveToIdx(idx)}
+              className={`h-1.5 rounded-full transition-all ${
+                currentSlide === idx 
+                  ? 'bg-orange-500 w-6 opacity-100' 
+                  : 'bg-orange-300 w-3 hover:bg-orange-400'
+              }`}
+              aria-label={`Ir al banner ${idx + 1}`}
+            />
+          ))}
+        </div>
       )}
     </div>
   );

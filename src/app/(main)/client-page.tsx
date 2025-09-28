@@ -80,14 +80,15 @@ export default function ClientHomePage() {
     <main className="min-h-screen">
         {mounted && <UnifiedHero />}
       
-
-      {/* ✅ CARRUSEL DE BANNERS DESTACADOS */}
+      {/* ✅ CARRUSEL DE BANNERS DESTACADOS - Sin espaciado superior */}
       <FeaturedBannersCarousel banners={featuredBanners} interval={5000} />
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-12">
+      
+      {/* Container sin padding superior para eliminar espacio con banner */}
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 pb-6 md:pb-12">
 
-        {/* ✅ CATEGORIES GRID */}
-        <div className="mb-12">
-          <h2 className="text-2xl font-bold text-orange-500 mb-8 text-center">🔎 Explora por categoría</h2>
+        {/* ✅ CATEGORIES GRID - Sin espaciado superior */}
+        <div className="mb-12 mt-0">
+          <h2 className="text-2xl font-bold text-orange-500 mb-8 text-center mt-0 pt-0 md:mt-8 md:pt-8">🔎 Explora por categoría</h2>
           <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-6">
             {categories.map((category) => (
               <a 

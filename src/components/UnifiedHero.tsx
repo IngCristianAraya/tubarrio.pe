@@ -175,8 +175,7 @@ const Hero = () => {
       <div className="h-12 sm:h-8 md:h-4"></div>
       </div>
       
-      {/* Add some spacing on mobile */}
-      <div className="h-16 md:hidden"></div>
+      {/* Remove mobile spacing to eliminate gap */}
     </>
   );
 };
