@@ -16,27 +16,51 @@ const ServiceMap: React.FC<ServiceMapProps> = ({
   height = "400px", 
   className = "" 
 }) => {
+  // Obtener la API key de Google Maps
+  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+  
   // Función para construir la URL del mapa
   const getMapUrl = () => {
     // Prioridad: coordenadas > dirección completa > dirección existente > barrio
     if (service.coordenadas && service.coordenadas.lat && service.coordenadas.lng) {
       const { lat, lng } = service.coordenadas;
-      // Usar URL simple que funciona sin API key y con coordenadas dinámicas
+      
+      // Si tenemos API key, usar la API oficial de Google Maps Embed
+      if (apiKey && apiKey !== 'tu-google-maps-api-key-aqui') {
+        return `https://www.google.com/maps/embed/v1/place?key=${apiKey}&q=${lat},${lng}&zoom=16`;
+      }
+      
+      // Fallback: usar URL simple que funciona sin API key
       return `https://www.google.com/maps?q=${lat},${lng}&output=embed&z=16`;
     }
     
     if (service.direccion_completa) {
       const query = encodeURIComponent(service.direccion_completa);
+      
+      if (apiKey && apiKey !== 'tu-google-maps-api-key-aqui') {
+        return `https://www.google.com/maps/embed/v1/place?key=${apiKey}&q=${query}&zoom=16`;
+      }
+      
       return `https://www.google.com/maps?q=${query}&output=embed`;
     }
     
     if (service.address) {
       const query = encodeURIComponent(service.address);
+      
+      if (apiKey && apiKey !== 'tu-google-maps-api-key-aqui') {
+        return `https://www.google.com/maps/embed/v1/place?key=${apiKey}&q=${query}&zoom=16`;
+      }
+      
       return `https://www.google.com/maps?q=${query}&output=embed`;
     }
     
     if (service.neighborhood) {
       const query = encodeURIComponent(service.neighborhood);
+      
+      if (apiKey && apiKey !== 'tu-google-maps-api-key-aqui') {
+        return `https://www.google.com/maps/embed/v1/place?key=${apiKey}&q=${query}&zoom=16`;
+      }
+      
       return `https://www.google.com/maps?q=${query}&output=embed`;
     }
     
