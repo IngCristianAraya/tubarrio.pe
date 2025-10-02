@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Limpiar Caché del Navegador</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #ea580c;
+            text-align: center;
+        }
+        .step {
+            background: #f8f9fa;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 4px solid #ea580c;
+            border-radius: 5px;
+        }
+        .keyboard {
+            background: #333;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-family: monospace;
+            font-weight: bold;
+        }
+        .warning {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Solución: Fondo Oscuro en Navegador Local</h1>
+        
+        <div class="warning">
+            <strong>⚠️ Problema Identificado:</strong><br>
+            Tu navegador está mostrando una versión en caché con el tema oscuro. 
+            El servidor actual está en el puerto 3001 con los cambios aplicados.
+        </div>
+
+        <h2>📋 Pasos para Solucionarlo:</h2>
+
+        <div class="step">
+            <h3>1. Accede a la Nueva URL</h3>
+            <p>El servidor ahora está corriendo en:</p>
+            <p><strong>🌐 <a href="http://localhost:3001" target="_blank">http://localhost:3001</a></strong></p>
+        </div>
+
+        <div class="step">
+            <h3>2. Limpia la Caché del Navegador</h3>
+            <p><strong>Chrome/Edge:</strong></p>
+            <ul>
+                <li>Presiona <span class="keyboard">Ctrl + Shift + R</span> (recarga forzada)</li>
+                <li>O presiona <span class="keyboard">F12</span> → clic derecho en el botón de recarga → "Vaciar caché y recargar de forma forzada"</li>
+            </ul>
+            
+            <p><strong>Firefox:</strong></p>
+            <ul>
+                <li>Presiona <span class="keyboard">Ctrl + F5</span></li>
+                <li>O <span class="keyboard">Ctrl + Shift + R</span></li>
+            </ul>
+        </div>
+
+        <div class="step">
+            <h3>3. Verifica las Herramientas de Desarrollador</h3>
+            <p>Presiona <span class="keyboard">F12</span> y ve a la pestaña <strong>Application</strong> (Chrome) o <strong>Storage</strong> (Firefox):</p>
+            <ul>
+                <li>Borra <strong>Local Storage</strong></li>
+                <li>Borra <strong>Session Storage</strong></li>
+                <li>Borra <strong>Cookies</strong> para localhost</li>
+            </ul>
+        </div>
+
+        <div class="step">
+            <h3>4. Desactiva Temporalmente las Extensiones</h3>
+            <p>Algunas extensiones pueden forzar el modo oscuro. Prueba en:</p>
+            <ul>
+                <li><strong>Modo Incógnito/Privado</strong></li>
+                <li>O desactiva extensiones relacionadas con temas oscuros</li>
+            </ul>
+        </div>
+
+        <div class="success">
+            <strong>✅ Resultado Esperado:</strong><br>
+            Después de estos pasos, deberías ver el fondo blanco correctamente en 
+            <a href="http://localhost:3001" target="_blank">http://localhost:3001</a>
+        </div>
+
+        <h2>🔍 URLs para Verificar:</h2>
+        <ul>
+            <li><strong>Desarrollo Local:</strong> <a href="http://localhost:3001" target="_blank">http://localhost:3001</a></li>
+            <li><strong>Servicios:</strong> <a href="http://localhost:3001/servicios" target="_blank">http://localhost:3001/servicios</a></li>
+            <li><strong>Producción:</strong> <a href="https://www.tubarrio.pe" target="_blank">https://www.tubarrio.pe</a></li>
+        </ul>
+
+        <div class="warning">
+            <strong>💡 Nota:</strong> Si el problema persiste, es posible que tengas configurado el modo oscuro a nivel del sistema operativo. 
+            Los cambios que hicimos deberían sobrescribir esa configuración, pero algunos navegadores pueden ser más persistentes.
+        </div>
+    </div>
+
+    <script>
+        // Auto-redirect después de 5 segundos si están en localhost:3000
+        if (window.location.hostname === 'localhost' && window.location.port === '3000') {
+            setTimeout(() => {
+                if (confirm('¿Quieres ir automáticamente al puerto 3001 donde están los cambios?')) {
+                    window.location.href = 'http://localhost:3001';
+                }
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

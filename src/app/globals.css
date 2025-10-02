@@ -30,21 +30,23 @@
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
 }
 
+/* Comentado el modo oscuro automático para mantener siempre el fondo blanco
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0f172a; /* slate-900 */
-    --foreground: #f8fafc; /* slate-50 */
-    --primary: #fb923c;    /* orange-400 for better contrast in dark mode */
-    --primary-foreground: #1e293b; /* slate-800 */
-    --muted: #1e293b;     /* slate-800 */
-    --muted-foreground: #94a3b8; /* slate-400 */
-    --border: #334155;    /* slate-700 */
-    --input: #64748b;     /* slate-500 */
-    --ring: #fb923c;      /* orange-400 */
-    --destructive: #f87171; /* red-400 */
-    --success: #34d399;    /* emerald-400 */
+    --background: #0f172a;
+    --foreground: #f8fafc;
+    --primary: #fb923c;
+    --primary-foreground: #1e293b;
+    --muted: #1e293b;
+    --muted-foreground: #94a3b8;
+    --border: #334155;
+    --input: #64748b;
+    --ring: #fb923c;
+    --destructive: #f87171;
+    --success: #34d399;
   }
 }
+*/
 
 html {
   scroll-behavior: smooth;

@@ -66,7 +66,7 @@ export default function CategorySection({ category, services }: CategorySectionP
               className="group relative bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 overflow-hidden border border-gray-100 hover:border-gray-200"
             >
               <div className="relative h-40 bg-gray-100 overflow-hidden rounded-t-xl">
-                {service.images?.[0] && (
+                {service.images?.[0] && service.images[0].length > 1 && (
                   <Image
                     src={service.images[0]}
                     alt={`Foto de ${service.name}`}
