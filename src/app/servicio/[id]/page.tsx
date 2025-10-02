@@ -64,7 +64,7 @@ import Footer from '@/components/Footer';
 import ServiceHeader from '@/components/service/ServiceHeader';
 
 import ServiceCollapsibleDetails from '@/components/service/ServiceCollapsibleDetails';
-import ServiceMap from '@/components/service/ServiceMap';
+
 import ServiceSupport from '@/components/service/ServiceSupport';
 import RecommendedServices from '@/components/service/RecommendedServices';
 
@@ -212,7 +212,7 @@ export default function ServicioDetallePage() {
         <ServiceCollapsibleDetails service={service} />
         
         {/* Nueva sección: Ubicación del Servicio */}
-        <ServiceMap service={service} />
+        
         
         {/* Nueva sección: Soporte y Contacto */}
         <ServiceSupport service={service} />

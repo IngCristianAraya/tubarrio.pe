@@ -1,45 +1,35 @@
-# Lista de Tareas - Tubarrio.pe
+# TODO - Revista Digital
 
-## Prioridad Alta (Día 1-2)
+## Funcionalidades Pendientes
 
-### Estructura Base
-- [ ] Crear componente `CategoryGrid` para mostrar categorías principales
-- [ ] Implementar `VisualFilters` con iconos de navegación
-- [ ] Configurar página de inicio con sección hero y búsqueda
+### 🔧 Mejoras Técnicas
+- [ ] Optimizar carga de imágenes con lazy loading
+- [ ] Implementar cache para consultas de Firebase
+- [ ] Mejorar SEO con metadatos dinámicos
+- [ ] Añadir sitemap.xml automático
 
-### Páginas de Categoría
-- [ ] Crear ruta dinámica `/categorias/[slug]`
-- [ ] Implementar página de categoría con grid de servicios
-- [ ] Añadir filtros laterales (ubicación, precio, etc.)
+### 📱 Experiencia de Usuario
+- [ ] Mejorar diseño responsive en móviles
+- [ ] Añadir filtros avanzados en búsqueda
+- [ ] Implementar sistema de favoritos
+- [ ] Añadir compartir en redes sociales
 
-## Prioridad Media (Día 3-4)
+### 🎨 Diseño
+- [ ] Actualizar paleta de colores
+- [ ] Mejorar tipografía
+- [ ] Añadir animaciones suaves
+- [ ] Crear componentes de loading
 
-### Experiencia de Usuario
-- [ ] Implementar sistema de guardados con localStorage
-- [ ] Añadir animaciones sutiles con Framer Motion
-- [ ] Crear componente de búsqueda con sugerencias
+### 📊 Analytics
+- [ ] Integrar Google Analytics
+- [ ] Añadir tracking de eventos
+- [ ] Crear dashboard de métricas
 
-### Optimización
-- [ ] Configurar ISR para páginas de categoría
-- [ ] Implementar carga perezosa de imágenes
-- [ ] Optimizar metadatos para SEO
+### 🔒 Seguridad
+- [ ] Implementar rate limiting
+- [ ] Añadir validación de formularios
+- [ ] Mejorar manejo de errores
 
-## Prioridad Baja (Día 5-7)
+---
 
-### Características Adicionales
-- [ ] Añadir sección de "Servicios Destacados"
-- [ ] Implementar sistema de valoraciones
-- [ ] Añadir integración con Google Maps
-
-### Pruebas
-- [ ] Configurar pruebas unitarias
-- [ ] Realizar pruebas de rendimiento
-- [ ] Probar en diferentes dispositivos
-
-## En Progreso
-- [x] Crear plan de implementación
-- [x] Documentar especificaciones técnicas
-
-## Completado ✅
-- [x] Crear estructura inicial de archivos
-- [x] Configurar herramientas de desarrollo
+*Última actualización: Enero 2025*

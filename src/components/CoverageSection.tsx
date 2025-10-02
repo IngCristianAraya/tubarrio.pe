@@ -1,45 +1,8 @@
 'use client';
 
-import dynamic from 'next/dynamic';
 import { FaMapMarkerAlt, FaStore, FaTruck } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 import { getButtonStyle, getCardStyle, getHeadingStyle, getTextStyle } from '@/lib/styleUtils';
-
-// Cargar el mapa de forma dinámica para evitar problemas con SSR
-const DynamicMapSection = dynamic(
-  () => import('@/components/MapSection').then(mod => {
-    // Add error boundary to the component
-    const MapWithErrorBoundary = (props: any) => {
-      try {
-        return <mod.default {...props} />;
-      } catch (error) {
-        console.error('Error loading map:', error);
-        return (
-          <div className="w-full h-96 bg-red-50 border border-red-200 rounded-xl flex items-center justify-center p-6 text-center">
-            <div>
-              <div className="text-red-500 text-4xl mb-4">⚠️</div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Error al cargar el mapa</h3>
-              <p className="text-gray-600 mb-4">No se pudo cargar el mapa de cobertura. Por favor, inténtalo de nuevo más tarde.</p>
-            </div>
-          </div>
-        );
-      }
-    };
-    return MapWithErrorBoundary;
-  }),
-  { 
-    ssr: false,
-    loading: () => (
-      <div className="w-full h-96 bg-gray-50 flex flex-col items-center justify-center rounded-xl">
-        <div className="animate-pulse flex flex-col items-center">
-          <div className="w-12 h-12 bg-gray-200 rounded-full mb-4"></div>
-          <div className="h-4 bg-gray-200 rounded w-48 mb-2"></div>
-          <div className="h-3 bg-gray-100 rounded w-64"></div>
-        </div>
-      </div>
-    )
-  }
-);
 
 const CoverageSection = () => {
   return (
@@ -54,14 +17,41 @@ const CoverageSection = () => {
           </p>
         </div>
         
-        <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-200 mb-12">
-          <DynamicMapSection 
-            showTitle={false}
-            height="500px"
-            showInfoPanels={false}
-            interactive={true}
-            zoom={14}
-          />
+        {/* Información de cobertura sin mapa */}
+        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl shadow-xl overflow-hidden border border-blue-200 mb-12 p-8">
+          <div className="text-center">
+            <div className="text-blue-500 text-6xl mb-6">📍</div>
+            <h3 className="text-2xl font-bold text-gray-900 mb-4">Zonas de Cobertura</h3>
+            <p className="text-lg text-gray-700 mb-6">
+              Ofrecemos nuestros servicios en las principales zonas de Lima y seguimos expandiéndonos para llegar a más distritos.
+            </p>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 text-left">
+              <div className="bg-white p-4 rounded-lg shadow-sm">
+                <h4 className="font-semibold text-gray-900 mb-2">Lima Centro</h4>
+                <p className="text-sm text-gray-600">Cercado de Lima, Breña, La Victoria</p>
+              </div>
+              <div className="bg-white p-4 rounded-lg shadow-sm">
+                <h4 className="font-semibold text-gray-900 mb-2">Lima Norte</h4>
+                <p className="text-sm text-gray-600">Los Olivos, San Martín de Porres, Independencia</p>
+              </div>
+              <div className="bg-white p-4 rounded-lg shadow-sm">
+                <h4 className="font-semibold text-gray-900 mb-2">Lima Sur</h4>
+                <p className="text-sm text-gray-600">Miraflores, San Isidro, Surco</p>
+              </div>
+              <div className="bg-white p-4 rounded-lg shadow-sm">
+                <h4 className="font-semibold text-gray-900 mb-2">Lima Este</h4>
+                <p className="text-sm text-gray-600">San Juan de Lurigancho, Ate, Santa Anita</p>
+              </div>
+              <div className="bg-white p-4 rounded-lg shadow-sm">
+                <h4 className="font-semibold text-gray-900 mb-2">Callao</h4>
+                <p className="text-sm text-gray-600">Callao, Bellavista, La Perla</p>
+              </div>
+              <div className="bg-white p-4 rounded-lg shadow-sm">
+                <h4 className="font-semibold text-gray-900 mb-2">Próximamente</h4>
+                <p className="text-sm text-gray-600">Más distritos en expansión</p>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div className="grid md:grid-cols-3 gap-8 mt-12">

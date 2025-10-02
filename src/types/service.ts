@@ -56,10 +56,7 @@ export interface Service {
   specifications?: string[];
   conditions?: string[];
   // Campos para Google Maps
-  coordenadas?: {
-    lat: number;
-    lng: number;
-  };
+
   direccion_completa?: string;
   zona?: string; // Para agrupar por zonas geográficas
   // Add any other fields that might be present in your service objects

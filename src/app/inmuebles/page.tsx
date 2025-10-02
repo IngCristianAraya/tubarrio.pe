@@ -1,10 +1,40 @@
-// src/app/inmuebles/page.tsx
-export const metadata = {
-  title: 'Inmuebles en tu barrio | Tubarrio.pe',
-  description: 'Alquileres y ventas de departamentos, casas y locales comerciales en tu zona.',
-};
+'use client';
+
+import { useState } from 'react';
+import { mockProperties } from '@/mocks/properties';
+import { Property, PropertyType } from '@/types/property';
+import PropertyFilters from '@/components/properties/PropertyFilters';
+import PropertyGrid from '@/components/properties/PropertyGrid';
 
 export default function InmueblesPage() {
+  const [selectedType, setSelectedType] = useState<PropertyType | 'all'>('all');
+  const [selectedDistrict, setSelectedDistrict] = useState<string>('all');
+  const [selectedOperation, setSelectedOperation] = useState<'all' | 'rent' | 'sale'>('all');
+  const [minPrice, setMinPrice] = useState<number>(0);
+  const [maxPrice, setMaxPrice] = useState<number>(999999999);
+
+  // Filtrar propiedades
+  const filteredProperties = mockProperties.filter(property => {
+    const typeMatch = selectedType === 'all' || property.type === selectedType;
+    const districtMatch = selectedDistrict === 'all' || property.district === selectedDistrict;
+    const operationMatch = selectedOperation === 'all' || property.operation === selectedOperation;
+    const priceMatch = property.price >= minPrice && property.price <= maxPrice;
+    return typeMatch && districtMatch && operationMatch && priceMatch;
+  });
+
+  // Obtener distritos únicos
+  const districts = Array.from(new Set(mockProperties.map(p => p.district)));
+
+  const handleViewDetails = (property: Property) => {
+    // TODO: Implementar navegación a página de detalles
+    console.log('Ver detalles de:', property.title);
+  };
+
+  const handlePriceChange = (min: number, max: number) => {
+    setMinPrice(min);
+    setMaxPrice(max);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 py-12">
@@ -12,21 +42,33 @@ export default function InmueblesPage() {
         <p className="text-lg text-gray-600 mb-8">
           Descubre departamentos, casas y locales comerciales en alquiler o venta cerca de ti.
         </p>
-        
-        {/* Aquí colocarás tu grid o carrusel de inmuebles */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* Mockup de inmuebles */}
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-              <div className="h-48 bg-gray-200"></div>
-              <div className="p-4">
-                <h3 className="font-semibold text-gray-900">Departamento {i}</h3>
-                <p className="text-gray-600">S/ 2,500 mensuales</p>
-                <p className="text-sm text-gray-500">San Isidro, Lima</p>
-              </div>
-            </div>
-          ))}
+
+        {/* Filtros */}
+        <PropertyFilters
+          selectedType={selectedType}
+          selectedDistrict={selectedDistrict}
+          selectedOperation={selectedOperation}
+          minPrice={minPrice}
+          maxPrice={maxPrice}
+          districts={districts}
+          onTypeChange={setSelectedType}
+          onDistrictChange={setSelectedDistrict}
+          onOperationChange={setSelectedOperation}
+          onPriceChange={handlePriceChange}
+        />
+
+        {/* Resultados */}
+        <div className="mb-6">
+          <p className="text-gray-600">
+            Mostrando {filteredProperties.length} inmuebles
+          </p>
         </div>
+
+        {/* Grid de inmuebles */}
+        <PropertyGrid
+          properties={filteredProperties}
+          onViewDetails={handleViewDetails}
+        />
       </div>
     </div>
   );

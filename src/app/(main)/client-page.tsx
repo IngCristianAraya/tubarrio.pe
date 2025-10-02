@@ -86,20 +86,43 @@ export default function ClientHomePage() {
       {/* Container sin padding superior para eliminar espacio con banner */}
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 pb-6 md:pb-12">
 
-        {/* ✅ CATEGORIES GRID - Sin espaciado superior */}
-        <div className="mb-12 mt-0">
-          <h2 className="text-2xl font-bold text-orange-500 mb-8 text-center mt-0 pt-0 md:mt-8 md:pt-8">🔎 Explora por categoría</h2>
-          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-6">
+        {/* ✅ CATEGORIES GRID - Optimizado para móvil */}
+        <div className="mb-8 md:mb-12 mt-0">
+          <h2 className="text-xl md:text-2xl font-bold text-orange-500 mb-4 md:mb-8 text-center mt-0 pt-0 md:mt-8 md:pt-8">🔎 Explora por categoría</h2>
+          
+          {/* Vista móvil: Carrusel horizontal */}
+          <div className="md:hidden">
+            <div className="overflow-x-auto scrollbar-hide pb-2">
+              <div className="flex gap-4 px-2" style={{ width: 'max-content' }}>
+                {categories.map((category) => (
+                  <a 
+                    key={category.slug} 
+                    href={`/todos-los-servicios?categoria=${category.slug}`}
+                    className="group flex flex-col items-center text-center hover:opacity-90 transition-opacity flex-shrink-0"
+                  >
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-orange-100 to-orange-50 flex items-center justify-center mb-2 group-hover:shadow-md transition-shadow">
+                      <span className="text-lg">{category.emoji}</span>
+                    </div>
+                    <h3 className="font-medium text-gray-800 text-xs leading-tight max-w-[60px] text-center">{category.name}</h3>
+                    <p className="text-xs text-gray-500 mt-0.5">{category.serviceCount}</p>
+                  </a>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Vista desktop: Grid normal */}
+          <div className="hidden md:grid grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-6">
             {categories.map((category) => (
               <a 
                 key={category.slug} 
                 href={`/todos-los-servicios?categoria=${category.slug}`}
                 className="group flex flex-col items-center text-center hover:opacity-90 transition-opacity"
               >
-                <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-gradient-to-br from-orange-100 to-orange-50 flex items-center justify-center mb-3 group-hover:shadow-md transition-shadow">
-                  <span className="text-2xl md:text-3xl">{category.emoji}</span>
+                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-orange-100 to-orange-50 flex items-center justify-center mb-3 group-hover:shadow-md transition-shadow">
+                  <span className="text-3xl">{category.emoji}</span>
                 </div>
-                <h3 className="font-medium text-gray-800 text-sm md:text-base">{category.name}</h3>
+                <h3 className="font-medium text-gray-800 text-base">{category.name}</h3>
                 <p className="text-xs text-gray-500 mt-1">{category.serviceCount} lugares</p>
               </a>
             ))}

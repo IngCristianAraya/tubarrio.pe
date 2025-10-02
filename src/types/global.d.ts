@@ -4,31 +4,25 @@
 // NOTE: This file should not be edited
 // see https://nextjs.org/docs/basic-features/typescript for more information.
 
-// Extender la interfaz Window para incluir mapboxgl
+// Extender la interfaz Window para incluir propiedades globales
 declare global {
   interface Window {
-    mapboxgl: typeof import('mapbox-gl');
+    // Agregar propiedades globales aquí si es necesario
   }
 }
 
+// Extender la interfaz NodeJS.ProcessEnv para incluir variables de entorno
 declare namespace NodeJS {
   interface ProcessEnv {
+    // Firebase
+    NEXT_PUBLIC_FIREBASE_PROJECT_ID: string
     NEXT_PUBLIC_FIREBASE_API_KEY: string
     NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: string
-    NEXT_PUBLIC_FIREBASE_PROJECT_ID: string
     NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: string
     NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: string
     NEXT_PUBLIC_FIREBASE_APP_ID: string
-    NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID?: string
-    NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN: string
+    NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID: string
   }
-}
-
-// Definir módulo para mapbox-gl
-// eslint-disable-next-line @typescript-eslint/no-namespace
-declare module 'mapbox-gl' {
-  // Aquí puedes agregar las definiciones de tipos específicas si es necesario
-  export * from 'mapbox-gl/dist/mapbox-gl';
 }
 
 // Add type declarations for modules without types

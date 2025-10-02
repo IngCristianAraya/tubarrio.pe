@@ -1,9 +1,6 @@
 import { GeistSans } from 'geist/font/sans';
 import React from 'react';
 import "./globals.css";
-import "leaflet/dist/leaflet.css";
-import "@/styles/leaflet.css";
-import "@/styles/leaflet-fixes.css";
 import { Providers } from '@/app/providers';
 import { JsonLd } from '@/components/seo/JsonLd';
 import { Skeleton } from '@/components/ui/Skeleton';
@@ -119,7 +116,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
         }} />
 
       </head>
-      <body className={`${GeistSans.className} antialiased bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-200`}>
+      <body className={`${GeistSans.className} antialiased bg-white text-gray-900 transition-colors duration-200`}>
         <Providers>
           <div className="min-h-screen flex flex-col">
             {/* TEMPORALMENTE DESHABILITADO: AnalyticsInitializer causaba bucle de errores */}
