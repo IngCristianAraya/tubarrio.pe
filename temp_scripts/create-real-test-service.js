@@ -36,6 +36,22 @@ async function createTestService() {
       reference: 'Av. Principal 123, Lima', // Referencia igual a la dirección (problema)
       location: 'Av. Principal 123, Lima', // Location también igual
       
+      // NUEVOS CAMPOS: Especificaciones y condiciones dinámicas
+      specifications: [
+        'Servicio profesional garantizado',
+        'Atención personalizada las 24 horas',
+        'Materiales de primera calidad',
+        'Personal capacitado y certificado',
+        'Garantía de satisfacción al 100%'
+      ],
+      conditions: [
+        'Servicio disponible en horario comercial de 9:00 AM a 6:00 PM',
+        'Se requiere cita previa con 24 horas de anticipación',
+        'Aplican términos y condiciones generales de la plataforma',
+        'Precios sujetos a cambios sin previo aviso',
+        'Política de cancelación: 48 horas antes del servicio'
+      ],
+      
       // Otros datos
       phone: '+51987654321',
       whatsapp: '+51987654321',
@@ -84,6 +100,22 @@ async function createTestService() {
       address: 'Jr. Los Panes 456, Lima',
       reference: 'Frente al parque central',
       location: 'Jr. Los Panes 456, Lima',
+      
+      // Especificaciones y condiciones específicas para panadería
+      specifications: [
+        'Pan fresco horneado diariamente',
+        'Ingredientes naturales sin preservantes',
+        'Variedad de productos dulces y salados',
+        'Atención desde las 6:00 AM',
+        'Delivery disponible en la zona'
+      ],
+      conditions: [
+        'Horario de atención: Lunes a Domingo de 6:00 AM a 8:00 PM',
+        'Pedidos especiales requieren 48 horas de anticipación',
+        'Delivery gratuito por compras mayores a S/30',
+        'Productos frescos del día, sujetos a disponibilidad',
+        'Aceptamos efectivo y tarjetas de débito/crédito'
+      ],
       
       phone: '+51912345678',
       whatsapp: '+51912345678',

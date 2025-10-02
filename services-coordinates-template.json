@@ -1,0 +1,294 @@
+[
+  {
+    "id": "agente-bcp",
+    "name": "Agente BCP",
+    "address": "Calle Sta Nicerata 334",
+    "zona": "San Miguel",
+    "current_coordinates": {
+      "lat": -12.0774,
+      "lng": -77.0863
+    },
+    "correct_lat": null,
+    "correct_lng": null,
+    "notes": ""
+  },
+  {
+    "id": "anticuchos-bran",
+    "name": "Anticuchos Bran ",
+    "address": "Avenida Universitaria 1625",
+    "zona": "San Miguel",
+    "current_coordinates": [
+      -12.0660658,
+      -77.0776155
+    ],
+    "correct_lat": null,
+    "correct_lng": null,
+    "notes": ""
+  },
+  {
+    "id": "bobocha-bubble-tea-shop",
+    "name": "Bobocha Bubble Tea Shop",
+    "address": "cafe tacuba",
+    "zona": "San Miguel",
+    "current_coordinates": {
+      "lat": -12.079,
+      "lng": -77.088
+    },
+    "correct_lat": null,
+    "correct_lng": null,
+    "notes": ""
+  },
+  {
+    "id": "caldo-de-gallina",
+    "name": "Caldo de gallina",
+    "address": "Santa Mariana 520",
+    "neighborhood": "Pando 3ra Etapa",
+    "zona": "San Miguel",
+    "current_coordinates": {
+      "lat": -12.0785,
+      "lng": -77.0875
+    },
+    "correct_lat": null,
+    "correct_lng": null,
+    "notes": ""
+  },
+  {
+    "id": "carniceria-el-buen-corte",
+    "name": "Carnicería El Buen Corte",
+    "address": "Carnicería El Buen Corte, San Miguel, Lima, Perú",
+    "zona": "San Miguel",
+    "current_coordinates": {
+      "lat": -12.078,
+      "lng": -77.087
+    },
+    "correct_lat": null,
+    "correct_lng": null,
+    "notes": ""
+  },
+  {
+    "id": "clock-box",
+    "name": "CLOCK BOX",
+    "address": "CLOCK BOX, San Miguel, Lima, Perú",
+    "zona": "San Miguel",
+    "current_coordinates": {
+      "lat": -12.0782,
+      "lng": -77.0872
+    },
+    "correct_lat": null,
+    "correct_lng": null,
+    "notes": ""
+  },
+  {
+    "id": "creciendo-digital",
+    "name": "Creciendo Digital",
+    "address": "Santa Paula 471",
+    "neighborhood": "Pando 3ra etapa",
+    "zona": "San Miguel",
+    "current_coordinates": {
+      "lat": -12.0775,
+      "lng": -77.086
+    },
+    "correct_lat": null,
+    "correct_lng": null,
+    "notes": ""
+  },
+  {
+    "id": "escuela-ads",
+    "name": "Escuela ADS",
+    "address": "Escuela ADS, San Miguel, Lima, Perú",
+    "zona": "San Miguel",
+    "current_coordinates": {
+      "lat": -12.0784,
+      "lng": -77.0874
+    },
+    "correct_lat": null,
+    "correct_lng": null,
+    "notes": ""
+  },
+  {
+    "id": "imana-tu-vida",
+    "name": "Imana Tu Vida",
+    "address": "Imana Tu Vida, San Miguel, Lima, Perú",
+    "zona": "San Miguel",
+    "current_coordinates": {
+      "lat": -12.0786,
+      "lng": -77.0876
+    },
+    "correct_lat": null,
+    "correct_lng": null,
+    "notes": ""
+  },
+  {
+    "id": "iro-sushi",
+    "name": "IRO Sushi",
+    "address": "Av. Universitaria 1743",
+    "zona": "San Miguel",
+    "current_coordinates": {
+      "lat": -12.0852,
+      "lng": -77.0952
+    },
+    "correct_lat": null,
+    "correct_lng": null,
+    "notes": ""
+  },
+  {
+    "id": "lacteos-y-embutidos-ayc",
+    "name": "Lácteos y Embutidos A&C",
+    "address": "Lácteos y Embutidos A&C, San Miguel, Lima, Perú",
+    "zona": "San Miguel",
+    "current_coordinates": {
+      "lat": -12.0788,
+      "lng": -77.0878
+    },
+    "correct_lat": null,
+    "correct_lng": null,
+    "notes": ""
+  },
+  {
+    "id": "lavanderia-antares",
+    "name": "Lavandería Antares",
+    "address": "Lavandería Antares, San Miguel, Lima, Perú",
+    "zona": "San Miguel",
+    "current_coordinates": {
+      "lat": -12.078800000000001,
+      "lng": -77.08779999999999
+    },
+    "correct_lat": null,
+    "correct_lng": null,
+    "notes": ""
+  },
+  {
+    "id": "mercado-don-pedrito",
+    "name": "Mercado Don Pedrito",
+    "address": "Los Pinos 339 ",
+    "neighborhood": "Pando 9na Etapa",
+    "zona": "San Miguel",
+    "current_coordinates": {
+      "lat": -12.0792,
+      "lng": -77.0882
+    },
+    "correct_lat": null,
+    "correct_lng": null,
+    "notes": ""
+  },
+  {
+    "id": "mgc-dental-health",
+    "name": "Mgc Dental Health",
+    "address": "Santa Nicerata 372",
+    "neighborhood": "San Miguel",
+    "zona": "San Miguel",
+    "current_coordinates": {
+      "lat": -12.0776,
+      "lng": -77.0865
+    },
+    "correct_lat": null,
+    "correct_lng": null,
+    "notes": ""
+  },
+  {
+    "id": "panaderia-el-molino",
+    "name": "Panaderia El Molino",
+    "address": "Panaderia El Molino, San Miguel, Lima, Perú",
+    "zona": "San Miguel",
+    "current_coordinates": {
+      "lat": -12.0794,
+      "lng": -77.0884
+    },
+    "correct_lat": null,
+    "correct_lng": null,
+    "notes": ""
+  },
+  {
+    "id": "panaderia-el-molinos",
+    "name": "Panaderia El Molinos",
+    "address": "Panaderia El Molinos, San Miguel, Lima, Perú",
+    "zona": "San Miguel",
+    "current_coordinates": {
+      "lat": -12.0796,
+      "lng": -77.0886
+    },
+    "correct_lat": null,
+    "correct_lng": null,
+    "notes": ""
+  },
+  {
+    "id": "peluqueria-estilo",
+    "name": "Peluquería Estilo",
+    "address": "Peluquería Estilo, San Miguel, Lima, Perú",
+    "zona": "San Miguel",
+    "current_coordinates": {
+      "lat": -12.0798,
+      "lng": -77.0888
+    },
+    "correct_lat": null,
+    "correct_lng": null,
+    "notes": ""
+  },
+  {
+    "id": "pizzeria-toscana",
+    "name": "Pizzería Toscana",
+    "address": "Pizzería Toscana, San Miguel, Lima, Perú",
+    "zona": "San Miguel",
+    "current_coordinates": {
+      "lat": -12.08,
+      "lng": -77.089
+    },
+    "correct_lat": null,
+    "correct_lng": null,
+    "notes": ""
+  },
+  {
+    "id": "rey-del-shawarma",
+    "name": "Rey del Shawarma",
+    "address": "Rey del Shawarma, San Miguel, Lima, Perú",
+    "zona": "San Miguel",
+    "current_coordinates": {
+      "lat": -12.0802,
+      "lng": -77.0892
+    },
+    "correct_lat": null,
+    "correct_lng": null,
+    "notes": ""
+  },
+  {
+    "id": "sannaterapia",
+    "name": "Sanna terapia",
+    "address": "Santa Teodosia #471",
+    "neighborhood": "Pando 3ra Etapa",
+    "zona": "San Miguel",
+    "current_coordinates": {
+      "lat": -12.0778,
+      "lng": -77.0868
+    },
+    "correct_lat": null,
+    "correct_lng": null,
+    "notes": ""
+  },
+  {
+    "id": "shawarma-el-faraon",
+    "name": "Shawarma El Faraón",
+    "address": "Shawarma El Faraón, San Miguel, Lima, Perú",
+    "zona": "San Miguel",
+    "current_coordinates": {
+      "lat": -12.0804,
+      "lng": -77.0894
+    },
+    "correct_lat": null,
+    "correct_lng": null,
+    "notes": ""
+  },
+  {
+    "id": "superburger",
+    "name": "Superburger",
+    "address": "Sta. Teodosia 573",
+    "neighborhood": "Pando 3ra etaoa",
+    "zona": "San Miguel",
+    "current_coordinates": {
+      "lat": -12.0779,
+      "lng": -77.0869
+    },
+    "correct_lat": null,
+    "correct_lng": null,
+    "notes": ""
+  }
+]

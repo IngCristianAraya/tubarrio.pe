@@ -62,6 +62,10 @@ const formatBusinessHours = (hours: Record<string, any>): string[] => {
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import ServiceHeader from '@/components/service/ServiceHeader';
+
+import ServiceCollapsibleDetails from '@/components/service/ServiceCollapsibleDetails';
+import ServiceMap from '@/components/service/ServiceMap';
+import ServiceSupport from '@/components/service/ServiceSupport';
 import RecommendedServices from '@/components/service/RecommendedServices';
 
 export default function ServicioDetallePage() {
@@ -203,6 +207,15 @@ export default function ServicioDetallePage() {
       <div className="flex-1 w-full">
         {/* Contenido del servicio */}
         <ServiceHeader service={service} />
+        
+        {/* Nueva sección: Detalles colapsables (Especificaciones y Condiciones) */}
+        <ServiceCollapsibleDetails service={service} />
+        
+        {/* Nueva sección: Ubicación del Servicio */}
+        <ServiceMap service={service} />
+        
+        {/* Nueva sección: Soporte y Contacto */}
+        <ServiceSupport service={service} />
         
         {/* Divider */}
         <div className="border-t border-gray-200 max-w-7xl mx-auto" />

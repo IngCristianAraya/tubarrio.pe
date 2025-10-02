@@ -51,6 +51,17 @@ export interface Service {
   location?: string;
   contactUrl?: string;
   tags?: string[];
+  precio?: number;
+  // Especificaciones y condiciones dinámicas
+  specifications?: string[];
+  conditions?: string[];
+  // Campos para Google Maps
+  coordenadas?: {
+    lat: number;
+    lng: number;
+  };
+  direccion_completa?: string;
+  zona?: string; // Para agrupar por zonas geográficas
   // Add any other fields that might be present in your service objects
   [key: string]: any; // This allows for additional properties
 }

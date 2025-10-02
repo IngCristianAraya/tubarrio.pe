@@ -23,7 +23,7 @@ const steps = [
       icon: MagnifyingGlassIcon,
       color: 'from-blue-500 to-blue-600',
       bgColor: 'bg-blue-50',
-      image: '/images/step-1-search.jpg'
+      image: 'https://res.cloudinary.com/do2rpqupm/image/upload/v1759375447/Rosa_Pareja_Collage_de_Foto_Almohada_cuadrada_dzinj2.png'
     },
     {
       number: '2',
@@ -53,7 +53,7 @@ const steps = [
       icon: HandThumbUpIcon,
       color: 'from-orange-500 to-orange-600',
       bgColor: 'bg-orange-50',
-      image: '/images/step-3-hire.jpg'
+      image: 'https://res.cloudinary.com/do2rpqupm/image/upload/v1759375809/benefit_1.es-419-0dc79d954b62c1f0aa0521a562b9248584884d426ead76caada86161e93fcece_mrrhps.png'
     },
     {
       number: '4',
@@ -95,7 +95,7 @@ export default function ProcessSteps() {
           {steps.map((step, index) => (
             <motion.div
               key={step.number}
-              initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50 }}
+              initial={{ opacity: 100, x: index % 2 === 0 ? -50 : 50 }}
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8, delay: index * 0.2 }}
               viewport={{ once: true }}
