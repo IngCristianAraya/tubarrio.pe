@@ -8,7 +8,6 @@ import ServiceCardSkeleton from '../../components/ServiceCardSkeleton';
 import EmptyState from '../../components/EmptyState';
 import CategoryChips from '../../components/CategoryChips';
 import { useSearchParams } from 'next/navigation';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 type AnyService = Service | ContextService;
 
@@ -58,19 +57,7 @@ export default function TodosLosServicios({
     searchTerm,
     selectedCategory,
     setSearchTerm,
-    setSelectedCategory,
-    // Pagination properties
-    currentPage,
-    totalPages,
-    hasNextPage,
-    hasPreviousPage,
-    pageSize,
-    totalServices,
-    // Pagination methods
-    loadPage,
-    loadNextPage,
-    loadPreviousPage,
-    resetPagination
+    setSelectedCategory
   } = useServices();
 
   // Update search term in context when local search changes
@@ -82,56 +69,6 @@ export default function TodosLosServicios({
   useEffect(() => {
     setSelectedCategory(category);
   }, [category, setSelectedCategory]);
-
-  // Reset to first page when search or category changes
-  useEffect(() => {
-    if (search !== searchTerm || category !== selectedCategory) {
-      resetPagination();
-    }
-  }, [search, category, searchTerm, selectedCategory, resetPagination]);
-
-  // Handle page navigation
-  const handlePageChange = useCallback((page: number) => {
-    loadPage(page);
-  }, [loadPage]);
-
-  // Generate page numbers for pagination
-  const getPageNumbers = useMemo(() => {
-    const pages = [];
-    const maxVisiblePages = 5;
-    
-    if (totalPages <= maxVisiblePages) {
-      // Show all pages if total is small
-      for (let i = 1; i <= totalPages; i++) {
-        pages.push(i);
-      }
-    } else {
-      // Show smart pagination
-      const start = Math.max(1, currentPage - 2);
-      const end = Math.min(totalPages, start + maxVisiblePages - 1);
-      
-      for (let i = start; i <= end; i++) {
-        pages.push(i);
-      }
-      
-      // Add ellipsis and first/last pages if needed
-      if (start > 1) {
-        if (start > 2) {
-          pages.unshift('...');
-        }
-        pages.unshift(1);
-      }
-      
-      if (end < totalPages) {
-        if (end < totalPages - 1) {
-          pages.push('...');
-        }
-        pages.push(totalPages);
-      }
-    }
-    
-    return pages;
-  }, [currentPage, totalPages]);
 
   if (loading && services.length === 0) {
     return (
@@ -168,9 +105,9 @@ export default function TodosLosServicios({
               {category ? `Servicios: ${category}` : 'Todos Nuestros Servicios'}
             </h1>
             <p className="text-gray-600">
-              {totalServices > 0 && (
+              {filteredServices.length > 0 && (
                 <>
-                  Mostrando {((currentPage - 1) * pageSize) + 1}-{Math.min(currentPage * pageSize, totalServices)} de {totalServices} servicios
+                  Mostrando {filteredServices.length} servicios
                   {(search || category) && ' filtrados'}
                 </>
               )}
@@ -225,76 +162,13 @@ export default function TodosLosServicios({
             } 
           />
         ) : (
-          <>
-            <div className="grid gap-4 sm:gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {filteredServices.map((service) => (
-                <div key={service.id} className="w-full transform transition-all hover:scale-[1.02] hover:shadow-lg">
-                  <ServiceCard service={service} />
-                </div>
-              ))}
-            </div>
-            
-            {/* Pagination Controls */}
-            {totalPages > 1 && !isHome && (
-              <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-                {/* Page Info */}
-                <div className="text-sm text-gray-600">
-                  Página {currentPage} de {totalPages}
-                </div>
-                
-                {/* Pagination Buttons */}
-                <div className="flex items-center gap-2">
-                  {/* Previous Button */}
-                  <button
-                    onClick={loadPreviousPage}
-                    disabled={!hasPreviousPage}
-                    className={`p-2 rounded-lg border ${
-                      hasPreviousPage 
-                        ? 'border-gray-300 hover:bg-gray-50 text-gray-700' 
-                        : 'border-gray-200 text-gray-400 cursor-not-allowed'
-                    }`}
-                  >
-                    <ChevronLeft className="w-4 h-4" />
-                  </button>
-                  
-                  {/* Page Numbers */}
-                  <div className="flex items-center gap-1">
-                    {getPageNumbers.map((page, index) => (
-                      <React.Fragment key={index}>
-                        {page === '...' ? (
-                          <span className="px-3 py-2 text-gray-400">...</span>
-                        ) : (
-                          <button
-                            onClick={() => handlePageChange(page as number)}
-                            className={`px-3 py-2 rounded-lg border text-sm ${
-                              currentPage === page
-                                ? 'bg-orange-500 text-white border-orange-500'
-                                : 'border-gray-300 hover:bg-gray-50 text-gray-700'
-                            }`}
-                          >
-                            {page}
-                          </button>
-                        )}
-                      </React.Fragment>
-                    ))}
-                  </div>
-                  
-                  {/* Next Button */}
-                  <button
-                    onClick={loadNextPage}
-                    disabled={!hasNextPage}
-                    className={`p-2 rounded-lg border ${
-                      hasNextPage 
-                        ? 'border-gray-300 hover:bg-gray-50 text-gray-700' 
-                        : 'border-gray-200 text-gray-400 cursor-not-allowed'
-                    }`}
-                  >
-                    <ChevronRight className="w-4 h-4" />
-                  </button>
-                </div>
+          <div className="grid gap-4 sm:gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {filteredServices.map((service) => (
+              <div key={service.id} className="w-full transform transition-all hover:scale-[1.02] hover:shadow-lg">
+                <ServiceCard service={service} />
               </div>
-            )}
-          </>
+            ))}
+          </div>
         )}
       </div>
     </div>

@@ -538,13 +538,19 @@ const ServiceHeader = ({ service }: ServiceHeaderProps): ReactElement => {
                     <div className="flex-1">
                       <h4 className="font-semibold text-orange-900 mb-1">Contacto</h4>
                       {service.phone && (
-                        <div className="flex items-center gap-2 mb-3">
-                          <a 
-                            href={`tel:${service.phone}`} 
-                            className="text-gray-700 text-sm font-medium hover:text-orange-600 transition-colors"
-                          >
-                            {service.phone}
-                          </a>
+                        <div className="flex flex-wrap items-center gap-2 mb-3">
+                          {service.phone.split('-').map((phone, index) => {
+                            const cleanPhone = phone.trim();
+                            return (
+                              <a 
+                                key={index}
+                                href={`tel:${cleanPhone}`} 
+                                className="text-gray-700 text-sm font-medium hover:text-orange-600 transition-colors"
+                              >
+                                {cleanPhone}
+                              </a>
+                            );
+                          })}
                         </div>
                       )}
                     </div>

@@ -81,13 +81,6 @@ interface ServicesContextType {
   searchTerm: string;
   selectedCategory: string;
   categories: string[];
-  // Pagination properties
-  currentPage: number;
-  totalPages: number;
-  hasNextPage: boolean;
-  hasPreviousPage: boolean;
-  pageSize: number;
-  totalServices: number;
   setSearchTerm: (term: string) => void;
   setSelectedCategory: (category: string) => void;
   getServiceById: (id: string) => Promise<Service | null>;
@@ -95,11 +88,6 @@ interface ServicesContextType {
   resetSearch: () => void;
   isSearching: boolean;
   refreshServices: () => Promise<void>;
-  // Pagination methods
-  loadPage: (page: number) => Promise<void>;
-  loadNextPage: () => Promise<void>;
-  loadPreviousPage: () => Promise<void>;
-  resetPagination: () => void;
 }
 
 const ServicesContext = createContext<ServicesContextType | undefined>(undefined);
@@ -277,17 +265,6 @@ export const ServicesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [categories, setCategories] = useState<string[]>([]);
-  
-  // Pagination state
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const [pageSize] = useState<number>(12); // Fixed page size of 12 services
-  const [allServices, setAllServices] = useState<Service[]>([]); // Store all services for pagination
-  const [totalServices, setTotalServices] = useState<number>(0);
-
-  // Calculate pagination values
-  const totalPages = Math.ceil(totalServices / pageSize);
-  const hasNextPage = currentPage < totalPages;
-  const hasPreviousPage = currentPage > 1;
 
   // Use the Firestore instance
   const firestore = getFirestoreInstance();
@@ -424,9 +401,9 @@ export const ServicesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       console.error('Error getting service:', err);
       return null;
     }
-  }, [getFirestoreInstance]);
+  }, []); // Removed getFirestoreInstance dependency
 
-  // Load all services with optimized caching
+  // Load all services
   const loadServices = useCallback(async () => {
     try {
       setLoading(true);
@@ -475,21 +452,18 @@ export const ServicesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         getCache().set(cacheKey, servicesData);
       }
       
-      // Store all services for pagination
-      setAllServices(servicesData);
-      setTotalServices(servicesData.length);
-      
-      // Set initial page of services (first 12)
-      const initialPageServices = servicesData.slice(0, pageSize);
-      setServices(initialPageServices);
-      setFilteredServices([...initialPageServices]);
-      
+      setServices(servicesData);
+      setFilteredServices(servicesData);
       updateCategories(servicesData);
       
       // Load featured services if not already loaded
       const featuredCache = getCache().get('featured-services') as Service[] | null;
       if (!featuredCache) {
-        loadFeaturedServices(servicesData);
+        const featured = servicesData
+          .filter(service => service.rating && service.rating >= 4)
+          .slice(0, 6);
+        setFeaturedServices(featured);
+        getCache().set('featured-services', featured);
       }
     } catch (err) {
       console.error('Error loading services:', err);
@@ -497,56 +471,7 @@ export const ServicesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     } finally {
       setLoading(false);
     }
-  }, [getFirestoreInstance, loadFeaturedServices, updateCategories, pageSize]);
-
-  // Load specific page of services
-  const loadPage = useCallback(async (page: number) => {
-    if (page < 1 || page > totalPages) return;
-    
-    setCurrentPage(page);
-    
-    // Calculate start and end indices for the page
-    const startIndex = (page - 1) * pageSize;
-    const endIndex = startIndex + pageSize;
-    
-    // Get services for the current page from allServices
-    const pageServices = allServices.slice(startIndex, endIndex);
-    setServices(pageServices);
-    
-    // Apply current filters to the page services
-    if (searchTerm || selectedCategory) {
-      searchServices(searchTerm, selectedCategory || undefined);
-    } else {
-      setFilteredServices([...pageServices]);
-    }
-  }, [allServices, pageSize, totalPages, searchTerm, selectedCategory]);
-
-  // Load next page
-  const loadNextPage = useCallback(async () => {
-    if (hasNextPage) {
-      await loadPage(currentPage + 1);
-    }
-  }, [hasNextPage, currentPage, loadPage]);
-
-  // Load previous page
-  const loadPreviousPage = useCallback(async () => {
-    if (hasPreviousPage) {
-      await loadPage(currentPage - 1);
-    }
-  }, [hasPreviousPage, currentPage, loadPage]);
-
-  // Reset pagination
-  const resetPagination = useCallback(() => {
-    setCurrentPage(1);
-    loadPage(1);
-  }, [loadPage]);
-
-  // Update pagination when current page changes
-  useEffect(() => {
-    if (allServices.length > 0) {
-      loadPage(currentPage);
-    }
-  }, [currentPage, allServices, loadPage]);
+  }, []); // Removed all dependencies to prevent circular updates
 
   // Refresh services data
   const refreshServices = useCallback(async () => {
@@ -557,10 +482,10 @@ export const ServicesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     await loadServices();
   }, [loadServices]);
 
-  // Initial load
+  // Initial load - only run once on mount
   useEffect(() => {
     loadServices();
-  }, [loadServices]);
+  }, []); // Empty dependency array to run only once
 
   // Update filtered services when search term or category changes
   useEffect(() => {
@@ -582,35 +507,13 @@ export const ServicesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         searchTerm,
         selectedCategory,
         categories,
-        currentPage,
-        totalPages,
-        hasNextPage,
-        hasPreviousPage,
-        pageSize,
-        totalServices,
         setSearchTerm,
         setSelectedCategory,
         getServiceById,
         searchServices,
         resetSearch,
         isSearching,
-        refreshServices,
-        loadPage: async (page: number) => {
-          setCurrentPage(page);
-        },
-        loadNextPage: async () => {
-          if (hasNextPage) {
-            setCurrentPage(prev => prev + 1);
-          }
-        },
-        loadPreviousPage: async () => {
-          if (hasPreviousPage) {
-            setCurrentPage(prev => prev - 1);
-          }
-        },
-        resetPagination: () => {
-          setCurrentPage(1);
-        }
+        refreshServices
       }}
     >
       {children}

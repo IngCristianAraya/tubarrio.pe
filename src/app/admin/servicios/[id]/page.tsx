@@ -33,7 +33,7 @@ const CATEGORIES = [
   'Abarrotes',
   'Panaderías',
   'Servicios',
-  'Cafeteria',
+  'Juguerias y cafeterias',
   'Carnicería',
   'Salud',
   'Lavanderías',
@@ -505,7 +505,7 @@ export default function EditServicePage({ params }: EditServicePageProps) {
                 value={formData.phone}
                 onChange={handleInputChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Ej: +51 999 888 777"
+                placeholder="Ej: +51 999 888 777 o +51 999 888 777 - +51 888 777 666"
               />
             </div>
             
@@ -519,7 +519,7 @@ export default function EditServicePage({ params }: EditServicePageProps) {
                 value={formData.whatsapp}
                 onChange={handleInputChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Ej: +51 999 888 777"
+                placeholder="Ej: +51 999 888 777 o +51 999 888 777 - +51 888 777 666"
               />
             </div>
           </div>

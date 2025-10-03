@@ -99,10 +99,38 @@ const ServiceDetails = ({ service }: ServiceDetailsProps) => {
     // Si no hay contactUrl con WhatsApp, usar el campo whatsapp tradicional
     if (!service.whatsapp || service.whatsapp === 'none') return 'No especificado';
     
-    // Limpiar el número de teléfono (solo dígitos)
-    const cleanNumber = service.whatsapp.replace(/\D/g, '');
+    // Manejar múltiples números separados por guión
+    const phoneNumbers = service.whatsapp.split('-').map(phone => phone.trim());
     
-    // Siempre usar web.whatsapp.com
+    if (phoneNumbers.length > 1) {
+      // Si hay múltiples números, mostrar todos con enlaces individuales
+      return (
+        <div className="flex flex-col gap-1">
+          {phoneNumbers.map((phone, index) => {
+            const cleanNumber = phone.replace(/\D/g, '');
+            const whatsappUrl = `https://web.whatsapp.com/send?phone=${cleanNumber}`;
+            
+            return (
+              <a 
+                key={index}
+                href={whatsappUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-green-600 hover:underline flex items-center gap-1"
+              >
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M17.5 2h-11C4.02 2 2 4.02 2 6.5v11C2 19.98 4.02 22 6.5 22h11c2.48 0 4.5-2.02 4.5-4.5v-11C22 4.02 19.98 2 17.5 2zm-8.75 15.5c-.41 0-.75-.34-.75-.75s.34-.75.75-.75h1.5c.41 0 .75.34.75.75s-.34.75-.75.75h-1.5zm4.5 0c-.41 0-.75-.34-.75-.75s.34-.75.75-.75h1.5c.41 0 .75.34.75.75s-.34.75-.75.75h-1.5zm-6-3c-.41 0-.75-.34-.75-.75v-7c0-.41.34-.75.75-.75h9c.41 0 .75.34.75.75v7c0 .41-.34.75-.75.75h-9z"/>
+                </svg>
+                {phone}
+              </a>
+            );
+          })}
+        </div>
+      );
+    }
+    
+    // Si es un solo número, comportamiento original
+    const cleanNumber = service.whatsapp.replace(/\D/g, '');
     const whatsappUrl = `https://web.whatsapp.com/send?phone=${cleanNumber}`;
     
     return (
@@ -115,7 +143,7 @@ const ServiceDetails = ({ service }: ServiceDetailsProps) => {
         <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
           <path d="M17.5 2h-11C4.02 2 2 4.02 2 6.5v11C2 19.98 4.02 22 6.5 22h11c2.48 0 4.5-2.02 4.5-4.5v-11C22 4.02 19.98 2 17.5 2zm-8.75 15.5c-.41 0-.75-.34-.75-.75s.34-.75.75-.75h1.5c.41 0 .75.34.75.75s-.34.75-.75.75h-1.5zm4.5 0c-.41 0-.75-.34-.75-.75s.34-.75.75-.75h1.5c.41 0 .75.34.75.75s-.34.75-.75.75h-1.5zm-6-3c-.41 0-.75-.34-.75-.75v-7c0-.41.34-.75.75-.75h9c.41 0 .75.34.75.75v7c0 .41-.34.75-.75.75h-9z"/>
         </svg>
-        +{service.whatsapp}
+        {service.whatsapp}
       </a>
     );
   };

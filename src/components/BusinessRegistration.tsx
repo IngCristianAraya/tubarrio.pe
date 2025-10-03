@@ -82,19 +82,35 @@ function BusinessRegistration({
       return;
     }
     
-    // Phone number validation (only numbers, 9-15 digits)
-    const phoneRegex = /^[0-9]{9,15}$/;
-    const cleanPhone = formData.phone.replace(/\D/g, '');
+    // Phone number validation - supports multiple numbers separated by dash
+    const validatePhoneNumbers = (phoneString: string) => {
+      // Split by dash and trim spaces
+      const phoneNumbers = phoneString.split('-').map(phone => phone.trim());
+      
+      // Validate each phone number
+      for (const phone of phoneNumbers) {
+        const cleanPhone = phone.replace(/\D/g, '');
+        const phoneRegex = /^[0-9]{9,15}$/;
+        
+        if (!phoneRegex.test(cleanPhone)) {
+          return false;
+        }
+      }
+      return true;
+    };
     
-    if (!phoneRegex.test(cleanPhone)) {
+    if (!validatePhoneNumbers(formData.phone)) {
       setStatus({
         submitting: false,
         success: false,
         error: true,
-        message: 'Por favor ingresa un número de teléfono válido (mínimo 9 dígitos).'
+        message: 'Por favor ingresa número(s) de teléfono válido(s). Ejemplo: +51951654852 o +51951654852 - +51586452587'
       });
       return;
     }
+    
+    // Clean phone numbers for storage (keep original format with dashes)
+    const cleanPhone = formData.phone;
     
     // Email validation if provided
     if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
@@ -336,7 +352,7 @@ function BusinessRegistration({
                     value={formData.phone}
                     onChange={handleChange}
                     className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm"
-                    placeholder="+51 906 684 284"
+                    placeholder="+51 906 684 284 o +51 906 684 284 - +51 999 888 777"
                     disabled={status.submitting}
                   />
                 </div>
