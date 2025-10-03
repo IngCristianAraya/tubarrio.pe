@@ -196,6 +196,18 @@ const servicesFetcher = async ([_, options]: [string, UseServicesOptions]): Prom
     const querySnapshot = await getDocs(q);
     const services = querySnapshot.docs.map(doc => {
       const data = doc.data();
+      
+      // Debug log para verificar los tags
+      console.log(`🔍 useServices - Service ${data.name}:`, {
+        id: doc.id,
+        hasTag: !!data.tag,
+        hasTags: !!data.tags,
+        tagValue: data.tag,
+        tagsValue: data.tags,
+        tagType: typeof data.tag,
+        tagsType: typeof data.tags
+      });
+      
       return {
         id: doc.id,
         name: data.name || 'Servicio sin nombre',
@@ -206,6 +218,7 @@ const servicesFetcher = async ([_, options]: [string, UseServicesOptions]): Prom
         location: data.location || 'Ubicación no especificada',
         contactUrl: data.contactUrl || '',
         detailsUrl: data.detailsUrl || '',
+        tags: data.tag || [],
         createdAt: data.createdAt?.toDate?.() || new Date(),
         updatedAt: data.updatedAt?.toDate?.() || new Date(),
         featured: data.featured || false,
@@ -217,7 +230,8 @@ const servicesFetcher = async ([_, options]: [string, UseServicesOptions]): Prom
     const filteredServices = search && search.trim() !== ''
       ? services.filter(service => 
           (service.name?.toLowerCase().includes(search.toLowerCase()) ||
-          service.description?.toLowerCase().includes(search.toLowerCase()))
+          service.description?.toLowerCase().includes(search.toLowerCase()) ||
+          service.tags?.some((tag: string) => tag.toLowerCase().includes(search.toLowerCase())))
         )
       : services;
       

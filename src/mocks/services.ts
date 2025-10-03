@@ -22,7 +22,7 @@ export const sampleServices: Record<string, Service[]> = {
       contactUrl: 'https://wa.me/51999888777',
       detailsUrl: '/servicio/test-service-1',
       hours: 'Lun-Vie 9:00-18:00',
-      tags: ['web', 'desarrollo', 'responsive'],
+      tags: ['web', 'desarrollo', 'responsive', 'diseño', 'programación', 'sitios web'],
       plan: 'premium',
       active: true,
       createdAt: new Date(),
@@ -42,7 +42,8 @@ export const sampleServices: Record<string, Service[]> = {
       images: ['/Anticuchos.webp'],
       rating: 4.5,
       reviewCount: 128,
-      featured: true
+      featured: true,
+      tags: ['anticuchos', 'comida peruana', 'parrilla', 'carne', 'típico', 'tradicional']
     },
     {
       id: 'rest-2',
@@ -55,7 +56,8 @@ export const sampleServices: Record<string, Service[]> = {
       images: ['/images/caldo_gallina.webp'],
       rating: 4.5,
       reviewCount: 128,
-      featured: true
+      featured: true,
+      tags: ['caldo', 'gallina', 'sopa', 'comida peruana', 'tradicional', 'casero']
     },
     {
       id: 'rest-3',
@@ -68,7 +70,8 @@ export const sampleServices: Record<string, Service[]> = {
       images: ['https://images.pexels.com/photos/357756/pexels-photo-357756.jpeg?auto=compress&cs=tinysrgb&w=400'],
       rating: 4.5,
       reviewCount: 128,
-      featured: true
+      featured: true,
+      tags: ['sushi', 'japonés', 'pescado', 'rollos', 'fresco', 'asiático']
     },
     {
       id: 'rest-4',
@@ -81,7 +84,8 @@ export const sampleServices: Record<string, Service[]> = {
       images: ['https://images.pexels.com/photos/315755/pexels-photo-315755.jpeg?auto=compress&cs=tinysrgb&w=400'],
       rating: 4.5,
       reviewCount: 128,
-      featured: true
+      featured: true,
+      tags: ['pizza', 'italiano', 'toscano', 'piedra', 'masa artesanal', 'queso']
     },
   ],
   'comida-rapida': [
@@ -96,7 +100,8 @@ export const sampleServices: Record<string, Service[]> = {
       images: ['https://images.pexels.com/photos/1639557/pexels-photo-1639557.jpeg?auto=compress&cs=tinysrgb&w=800'],
       rating: 4.7,
       reviewCount: 89,
-      featured: true
+      featured: true,
+      tags: ['hamburguesas', 'artesanal', 'carne', 'papas', 'comida rápida', 'gourmet']
     },  
     {
       id: 'fast-2',
@@ -109,7 +114,8 @@ export const sampleServices: Record<string, Service[]> = {
       images: ['https://images.pexels.com/photos/4958792/pexels-photo-4958792.jpeg?auto=compress&cs=tinysrgb&w=400'],
       rating: 4.7,
       reviewCount: 89,
-      featured: true
+      featured: true,
+      tags: ['shawarma', 'árabe', 'medio oriente', 'carne', 'pollo', 'pan pita']
     },  
     {
       id: 'fast-3',
@@ -122,7 +128,8 @@ export const sampleServices: Record<string, Service[]> = {
       images: ['https://images.pexels.com/photos/4394613/pexels-photo-4394613.jpeg?auto=compress&cs=tinysrgb&w=800'],
       rating: 4.7,
       reviewCount: 89,
-      featured: true
+      featured: true,
+      tags: ['shawarma', 'faraón', 'tradicional', 'medio oriente', 'especias', 'artesanal']
     },  
     {
       id: 'fast-4',
@@ -135,7 +142,8 @@ export const sampleServices: Record<string, Service[]> = {
       images: ['https://res.cloudinary.com/do2rpqupm/image/upload/v1759465696/WhatsApp_Image_2025-10-02_at_10.52.05_PM_aaghbd.jpg'],
       rating: 5,
       reviewCount: 89,
-      featured: true
+      featured: true,
+      tags: ['anticuchos', 'corazón', 'parrilla', 'aderezo casero', 'peruano', 'cariño']
     },  
   ],
   'abarrotes': [
@@ -150,7 +158,8 @@ export const sampleServices: Record<string, Service[]> = {
       images: ['https://images.pexels.com/photos/1005638/pexels-photo-1005638.jpeg?auto=compress&cs=tinysrgb&w=400'],
       rating: 4.2,
       reviewCount: 64,
-      featured: true
+      featured: true,
+      tags: ['lácteos', 'embutidos', 'queso', 'jamón', 'yogurt', 'leche']
     },
     {
       id: 'abr-2',
@@ -163,7 +172,8 @@ export const sampleServices: Record<string, Service[]> = {
       images: ['https://res.cloudinary.com/do2rpqupm/image/upload/v1759031874/almacen_pedrito_ixgdpb.png'],
       rating: 4.0,
       reviewCount: 42,
-      featured: false
+      featured: false,
+      tags: ['mercado', 'abarrotes', 'fresco', 'calidad', 'productos', 'hogar']
     },
   ],
   'lavanderias': [
@@ -178,7 +188,8 @@ export const sampleServices: Record<string, Service[]> = {
       images: ['https://cdn.pixabay.com/photo/2017/09/14/19/34/laundry-2750158_1280.jpg'],
       rating: 4.7,
       reviewCount: 89,
-      featured: true
+      featured: true,
+      tags: ['lavandería', 'lavado', 'planchado', 'ropa', 'limpieza', 'servicio']
     },
   ],
   'servicios-generales': [
@@ -193,7 +204,8 @@ export const sampleServices: Record<string, Service[]> = {
       images: ['/images/gym1.jpg'],
       rating: 4.8,
       reviewCount: 156,
-      featured: true
+      featured: true,
+      tags: ['gimnasio', 'fitness', 'ejercicio', 'entrenamiento', 'pesas', 'cardio']
     },
     {
       id: 'gym-2',
@@ -206,7 +218,8 @@ export const sampleServices: Record<string, Service[]> = {
       images: ['/images/gym1.jpg'],
       rating: 4.8,
       reviewCount: 156,
-      featured: true
+      featured: true,
+      tags: ['gimnasio', 'fitness', 'ejercicio', 'entrenamiento', 'pesas', 'cardio']
     },
     {
       id: 'gym-3',
@@ -219,7 +232,8 @@ export const sampleServices: Record<string, Service[]> = {
       images: ['/images/gym1.jpg'],
       rating: 4.8,
       reviewCount: 156,
-      featured: true
+      featured: true,
+      tags: ['gimnasio', 'fitness', 'ejercicio', 'entrenamiento', 'pesas', 'cardio']
     },
     {
       id: 'gym-4',
@@ -232,7 +246,8 @@ export const sampleServices: Record<string, Service[]> = {
       images: ['/images/gym1.jpg'],
       rating: 4.8,
       reviewCount: 156,
-      featured: true
+      featured: true,
+      tags: ['gimnasio', 'fitness', 'ejercicio', 'entrenamiento', 'pesas', 'cardio']
     },
   ],
   'tecnologia': [
@@ -247,7 +262,8 @@ export const sampleServices: Record<string, Service[]> = {
       images: ['/images/cursos_de_programacion.png'],
       rating: 4.8,
       reviewCount: 45,
-      featured: true
+      featured: true,
+      tags: ['programación', 'cursos', 'tecnología', 'desarrollo', 'digital', 'aprendizaje']
     },
   ],
   'servicios-profesionales': [
@@ -262,7 +278,8 @@ export const sampleServices: Record<string, Service[]> = {
       images: ['/images/sannaterapia.webp'],
       rating: 4.8,
       reviewCount: 156,
-      featured: true
+      featured: true,
+      tags: ['psicología', 'terapia', 'salud mental', 'apoyo emocional', 'bienestar', 'consulta']
     },
     {
       id: 'serv-2',
@@ -275,7 +292,8 @@ export const sampleServices: Record<string, Service[]> = {
       images: ['/images/biomagnetismo.webp'],
       rating: 4.8,
       reviewCount: 156,
-      featured: true
+      featured: true,
+      tags: ['biomagnetismo', 'pares biomagnéticos', 'equilibrio energético', 'terapia alternativa', 'salud', 'bienestar']
     },
     {
       id: 'serv-3',
@@ -288,7 +306,8 @@ export const sampleServices: Record<string, Service[]> = {
       images: ['/images/mgc.webp'],
       rating: 4.8,
       reviewCount: 156,
-      featured: true
+      featured: true,
+      tags: ['odontología', 'dental', 'estética dental', 'funcional', 'dientes', 'salud bucal']
     },
   ],
   'peluquerias': [
@@ -303,7 +322,8 @@ export const sampleServices: Record<string, Service[]> = {
       images: ['/images/peluqueria_salon.webp'],
       rating: 4.8,
       reviewCount: 156,
-      featured: true
+      featured: true,
+      tags: ['peluquería', 'corte', 'peinado', 'belleza', 'estilo', 'cabello']
     },
     {
       id: 'hair-2',
@@ -316,7 +336,8 @@ export const sampleServices: Record<string, Service[]> = {
       images: ['/images/prueba_prueba.webp'],
       rating: 4.8,
       reviewCount: 156,
-      featured: true
+      featured: true,
+      tags: ['gimnasio', 'fitness', 'ejercicio', 'entrenamiento', 'pesas', 'cardio']
     },
     {
       id: 'hair-3',
@@ -329,7 +350,8 @@ export const sampleServices: Record<string, Service[]> = {
       images: ['/images/barbudos.webp'],
       rating: 4.8,
       reviewCount: 156,
-      featured: true
+      featured: true,
+      tags: ['barbería', 'barba', 'corte masculino', 'afeitado', 'estilo', 'hombre']
     },
   ]
 };

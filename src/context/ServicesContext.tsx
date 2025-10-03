@@ -81,6 +81,13 @@ interface ServicesContextType {
   searchTerm: string;
   selectedCategory: string;
   categories: string[];
+  // Pagination properties
+  currentPage: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+  pageSize: number;
+  totalServices: number;
   setSearchTerm: (term: string) => void;
   setSelectedCategory: (category: string) => void;
   getServiceById: (id: string) => Promise<Service | null>;
@@ -88,6 +95,11 @@ interface ServicesContextType {
   resetSearch: () => void;
   isSearching: boolean;
   refreshServices: () => Promise<void>;
+  // Pagination methods
+  loadPage: (page: number) => Promise<void>;
+  loadNextPage: () => Promise<void>;
+  loadPreviousPage: () => Promise<void>;
+  resetPagination: () => void;
 }
 
 const ServicesContext = createContext<ServicesContextType | undefined>(undefined);
@@ -213,6 +225,27 @@ const createServiceFromData = (id: string, data: any): Service => {
   const slug = data.slug || generateSlug(data.name) || id;
   const categorySlug = data.categorySlug || generateSlug(data.category) || '';
   
+  // Handle both 'tag' and 'tags' fields from Firebase
+  let serviceTags: string[] = [];
+  
+  if (data.tag && Array.isArray(data.tag)) {
+    serviceTags = data.tag;
+  } else if (data.tags && Array.isArray(data.tags)) {
+    serviceTags = data.tags;
+  }
+  
+  // Debug log para verificar los tags
+  console.log(`🔍 Service ${data.name}:`, {
+    id,
+    hasTag: !!data.tag,
+    hasTags: !!data.tags,
+    tagValue: data.tag,
+    tagsValue: data.tags,
+    finalTags: serviceTags,
+    tagType: typeof data.tag,
+    tagsType: typeof data.tags
+  });
+  
   return {
     id,
     slug,
@@ -226,8 +259,7 @@ const createServiceFromData = (id: string, data: any): Service => {
     description: data.description || '',
     contactUrl: data.contactUrl || '',
     detailsUrl: data.detailsUrl || '',
-    horario: data.horario || '',
-    tags: data.tags || [],
+    tags: serviceTags,
     hours: data.hours || '',
     social: data.social || '',
     whatsapp: data.whatsapp || '',
@@ -245,6 +277,17 @@ export const ServicesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [categories, setCategories] = useState<string[]>([]);
+  
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [pageSize] = useState<number>(12); // Fixed page size of 12 services
+  const [allServices, setAllServices] = useState<Service[]>([]); // Store all services for pagination
+  const [totalServices, setTotalServices] = useState<number>(0);
+
+  // Calculate pagination values
+  const totalPages = Math.ceil(totalServices / pageSize);
+  const hasNextPage = currentPage < totalPages;
+  const hasPreviousPage = currentPage > 1;
 
   // Use the Firestore instance
   const firestore = getFirestoreInstance();
@@ -391,32 +434,56 @@ export const ServicesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
       // Skip if we're on the server
       if (typeof window === 'undefined') {
+        console.log('🚫 Skipping service load - running on server');
         setLoading(false);
         return [];
       }
 
+      // Clear cache to force fresh data
+      getCache().clear();
+      console.log('🧹 Cache cleared - loading fresh data from Firebase');
+
       const cacheKey = 'all-services';
       
-      // Try to get from cache first
-      const cachedData = getCache().get<Service[]>(cacheKey);
-      if (cachedData) return cachedData;
-      
       // If not in cache, fetch from Firestore
+      console.log('📡 Fetching services from Firestore...');
       const db = getFirestoreInstance();
       const servicesRef = collection(db, 'services');
       const servicesSnapshot = await getDocs(servicesRef);
-      const servicesData = servicesSnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      })) as Service[];
+      
+      console.log(`📊 Found ${servicesSnapshot.docs.length} documents in Firestore`);
+      
+      const servicesData = servicesSnapshot.docs.map(doc => {
+        const data = doc.data();
+        console.log(`📄 Processing document ${doc.id}:`, {
+          name: data.name,
+          hasTag: !!data.tag,
+          hasTags: !!data.tags,
+          tagValue: data.tag,
+          tagsValue: data.tags,
+          rawData: data
+        });
+        
+        return createServiceFromData(doc.id, data);
+      });
+      
+      console.log(`✅ Processed ${servicesData.length} services`);
+      console.log('🔍 Sample service:', servicesData[0]);
       
       // Cache the services
       if (typeof window !== 'undefined') {
         getCache().set(cacheKey, servicesData);
       }
       
-      setServices(servicesData);
-      setFilteredServices([...servicesData]);
+      // Store all services for pagination
+      setAllServices(servicesData);
+      setTotalServices(servicesData.length);
+      
+      // Set initial page of services (first 12)
+      const initialPageServices = servicesData.slice(0, pageSize);
+      setServices(initialPageServices);
+      setFilteredServices([...initialPageServices]);
+      
       updateCategories(servicesData);
       
       // Load featured services if not already loaded
@@ -430,7 +497,56 @@ export const ServicesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     } finally {
       setLoading(false);
     }
-  }, [getFirestoreInstance, loadFeaturedServices, updateCategories]);
+  }, [getFirestoreInstance, loadFeaturedServices, updateCategories, pageSize]);
+
+  // Load specific page of services
+  const loadPage = useCallback(async (page: number) => {
+    if (page < 1 || page > totalPages) return;
+    
+    setCurrentPage(page);
+    
+    // Calculate start and end indices for the page
+    const startIndex = (page - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    
+    // Get services for the current page from allServices
+    const pageServices = allServices.slice(startIndex, endIndex);
+    setServices(pageServices);
+    
+    // Apply current filters to the page services
+    if (searchTerm || selectedCategory) {
+      searchServices(searchTerm, selectedCategory || undefined);
+    } else {
+      setFilteredServices([...pageServices]);
+    }
+  }, [allServices, pageSize, totalPages, searchTerm, selectedCategory]);
+
+  // Load next page
+  const loadNextPage = useCallback(async () => {
+    if (hasNextPage) {
+      await loadPage(currentPage + 1);
+    }
+  }, [hasNextPage, currentPage, loadPage]);
+
+  // Load previous page
+  const loadPreviousPage = useCallback(async () => {
+    if (hasPreviousPage) {
+      await loadPage(currentPage - 1);
+    }
+  }, [hasPreviousPage, currentPage, loadPage]);
+
+  // Reset pagination
+  const resetPagination = useCallback(() => {
+    setCurrentPage(1);
+    loadPage(1);
+  }, [loadPage]);
+
+  // Update pagination when current page changes
+  useEffect(() => {
+    if (allServices.length > 0) {
+      loadPage(currentPage);
+    }
+  }, [currentPage, allServices, loadPage]);
 
   // Refresh services data
   const refreshServices = useCallback(async () => {
@@ -466,6 +582,12 @@ export const ServicesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         searchTerm,
         selectedCategory,
         categories,
+        currentPage,
+        totalPages,
+        hasNextPage,
+        hasPreviousPage,
+        pageSize,
+        totalServices,
         setSearchTerm,
         setSelectedCategory,
         getServiceById,
@@ -473,6 +595,22 @@ export const ServicesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         resetSearch,
         isSearching,
         refreshServices,
+        loadPage: async (page: number) => {
+          setCurrentPage(page);
+        },
+        loadNextPage: async () => {
+          if (hasNextPage) {
+            setCurrentPage(prev => prev + 1);
+          }
+        },
+        loadPreviousPage: async () => {
+          if (hasPreviousPage) {
+            setCurrentPage(prev => prev - 1);
+          }
+        },
+        resetPagination: () => {
+          setCurrentPage(1);
+        }
       }}
     >
       {children}
