@@ -77,9 +77,9 @@ const ServiceCard = ({ service, className = '' }: ServiceCardProps) => {
         </h3>
         
         {/* Descripción */}
-        <p className="text-sm text-gray-600 mb-3 flex-grow line-clamp-3">
+        <div className="text-sm text-gray-600 mb-3 flex-grow line-clamp-3 whitespace-pre-line">
           {service.description}
-        </p>
+        </div>
         
         {/* Ubicación */}
         <div className="flex items-center text-sm text-gray-500 mt-auto">

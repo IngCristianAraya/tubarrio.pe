@@ -221,9 +221,9 @@ const ServiceDetails = ({ service }: ServiceDetailsProps) => {
       {service.description && (
         <div className="mt-4 pt-4 border-t border-gray-200">
           <h3 className="font-semibold text-gray-900 mb-2">Acerca de {service.name}</h3>
-          <p className="text-gray-700 leading-relaxed">
+          <div className="text-gray-700 leading-relaxed whitespace-pre-line">
             {service.description}
-          </p>
+          </div>
         </div>
       )}
     </div>

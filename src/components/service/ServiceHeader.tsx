@@ -385,9 +385,9 @@ const ServiceHeader = ({ service }: ServiceHeaderProps): ReactElement => {
                 whileHover={{ y: -2 }}
               >
                 <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2 sm:mb-3">Descripción</h3>
-                <p className="text-gray-700 leading-relaxed text-sm sm:text-base">
+                <div className="text-gray-700 leading-relaxed text-sm sm:text-base whitespace-pre-line">
                   {service.description}
-                </p>
+                </div>
               </motion.div>
             )}
 
