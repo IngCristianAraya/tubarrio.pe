@@ -43,153 +43,224 @@ const ServiceImages = ({
 
   // Función para cambiar imagen directamente
   const goToImage = useCallback((index: number): void => {
-    setCurrentImageIndex(index);
-  }, []);
+    if (index >= 0 && index < images.length) {
+      setCurrentImageIndex(index);
+    }
+  }, [images.length]);
 
-  // Funciones para manejar el swipe en móvil
-  const handleTouchStart = (e: React.TouchEvent) => {
+  // Manejo de gestos táctiles para móvil
+  const handleTouchStart = (e: React.TouchEvent): void => {
     touchStartX.current = e.targetTouches[0].clientX;
   };
 
-  const handleTouchMove = (e: React.TouchEvent) => {
+  const handleTouchMove = (e: React.TouchEvent): void => {
     touchEndX.current = e.targetTouches[0].clientX;
   };
 
-  const handleTouchEnd = () => {
+  const handleTouchEnd = (): void => {
     if (!touchStartX.current || !touchEndX.current) return;
     
     const distance = touchStartX.current - touchEndX.current;
     const isLeftSwipe = distance > 50;
     const isRightSwipe = distance < -50;
 
-    if (isLeftSwipe && images.length > 1) {
+    if (isLeftSwipe) {
       nextImage();
-    }
-    if (isRightSwipe && images.length > 1) {
+    } else if (isRightSwipe) {
       prevImage();
     }
   };
 
+  // Manejo de teclado
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent): void => {
+      if (e.key === 'ArrowLeft') {
+        prevImage();
+      } else if (e.key === 'ArrowRight') {
+        nextImage();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [nextImage, prevImage]);
+
   if (!images || images.length === 0) {
-    return <div className={className} />;
+    return (
+      <div className={`w-full aspect-square bg-gray-200 rounded-lg flex items-center justify-center ${className}`}>
+        <span className="text-gray-500">No hay imágenes disponibles</span>
+      </div>
+    );
   }
 
   return (
-    <div className={`relative ${className}`}>
-      {/* Imagen principal con transición */}
-      <div 
-        className="relative aspect-square w-full overflow-hidden rounded-2xl shadow-xl bg-gray-100"
-        onTouchStart={isMobile ? handleTouchStart : undefined}
-        onTouchMove={isMobile ? handleTouchMove : undefined}
-        onTouchEnd={isMobile ? handleTouchEnd : undefined}
-      >
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={currentImageIndex}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className="absolute inset-0"
+    <div className={`w-full ${className}`}>
+      {isMobile ? (
+        // Vista móvil - Carrusel con swipe
+        <div className="relative">
+          <div 
+            className="relative w-full aspect-square rounded-lg overflow-hidden bg-gray-100"
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
           >
-            <Image
-              src={images[currentImageIndex]}
-              alt={`${name} - Imagen ${currentImageIndex + 1}`}
-              fill
-              className="object-cover"
-              priority
-              sizes="(max-width: 768px) 100vw, 50vw"
-              onError={(e) => {
-                const target = e.target as HTMLImageElement;
-                target.src = '/images/placeholder-service.jpg';
-              }}
-            />
-          </motion.div>
-        </AnimatePresence>
-        
-        {/* Controles de navegación - Solo en desktop */}
-        {images.length > 1 && !isMobile && (
-          <>
-            <button
-              onClick={prevImage}
-              onKeyDown={(e) => e.key === 'Enter' && prevImage()}
-              tabIndex={0}
-              className="absolute left-3 top-1/2 -translate-y-1/2 bg-white/90 backdrop-blur-sm p-2 rounded-full shadow-lg hover:bg-white transition-colors duration-200 z-10"
-              aria-label="Imagen anterior"
-            >
-              <ChevronLeft className="w-5 h-5 text-gray-700" />
-            </button>
-            <button
-              onClick={nextImage}
-              onKeyDown={(e) => e.key === 'Enter' && nextImage()}
-              tabIndex={0}
-              className="absolute right-3 top-1/2 -translate-y-1/2 bg-white/90 backdrop-blur-sm p-2 rounded-full shadow-lg hover:bg-white transition-colors duration-200 z-10"
-              aria-label="Siguiente imagen"
-            >
-              <ChevronRight className="w-5 h-5 text-gray-700" />
-            </button>
-          </>
-        )}
-        
-        {/* Indicadores - Solo si hay múltiples imágenes */}
-        {images.length > 1 && (
-          <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2">
-            {images.map((_, index) => (
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={currentImageIndex}
+                initial={{ opacity: 0, x: 300 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -300 }}
+                transition={{ duration: 0.3 }}
+                className="absolute inset-0"
+              >
+                <Image
+                  src={images[currentImageIndex]}
+                  alt={`${name} - Imagen ${currentImageIndex + 1}`}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                  priority={currentImageIndex === 0}
+                />
+              </motion.div>
+            </AnimatePresence>
+
+            {/* Controles de navegación móvil */}
+            {images.length > 1 && (
+              <>
+                <button
+                  onClick={prevImage}
+                  className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors z-10"
+                  aria-label="Imagen anterior"
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                </button>
+                <button
+                  onClick={nextImage}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors z-10"
+                  aria-label="Siguiente imagen"
+                >
+                  <ChevronRight className="w-5 h-5" />
+                </button>
+              </>
+            )}
+
+            {/* Indicadores móvil */}
+            {images.length > 1 && (
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+                {images.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      goToImage(index);
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        goToImage(index);
+                      }
+                    }}
+                    className={`w-2 h-2 rounded-full transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/50 ${
+                      index === currentImageIndex 
+                        ? 'bg-white scale-125' 
+                        : 'bg-white/50 hover:bg-white/75'
+                    }`}
+                    aria-label={`Ir a imagen ${index + 1}`}
+                    title={`Imagen ${index + 1}`}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      ) : (
+        // Vista desktop - Estilo MercadoLibre
+        <div className="flex gap-4">
+          {/* Thumbnails a la izquierda */}
+          <div className="flex flex-col gap-2 w-20">
+            {images.map((image, index) => (
               <button
                 key={index}
-                onClick={() => goToImage(index)}
-                onKeyDown={(e) => e.key === 'Enter' && goToImage(index)}
-                tabIndex={0}
-                className={`h-2 rounded-full transition-all duration-300 ${
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  goToImage(index);
+                }}
+                className={`relative w-20 h-20 rounded-lg overflow-hidden border-2 transition-all duration-200 hover:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 ${
                   index === currentImageIndex 
-                    ? 'w-6 bg-white' 
-                    : 'w-2 bg-white/50 hover:bg-white/80'
+                    ? 'border-blue-500 ring-2 ring-blue-500/30' 
+                    : 'border-gray-200 hover:border-gray-300'
                 }`}
-                aria-label={`Ir a imagen ${index + 1}`}
-              />
+                aria-label={`Ver imagen ${index + 1}`}
+                title={`Imagen ${index + 1}`}
+              >
+                <Image
+                  src={image}
+                  alt={`${name} - Miniatura ${index + 1}`}
+                  fill
+                  className="object-cover"
+                  sizes="80px"
+                />
+                {/* Overlay para imagen activa */}
+                {index === currentImageIndex && (
+                  <div className="absolute inset-0 bg-blue-500/10" />
+                )}
+              </button>
             ))}
           </div>
-        )}
-      </div>
-      
-      {/* Miniaturas optimizadas - Solo en desktop */}
-      {images.length > 1 && !isMobile && (
-        <div className="mt-3 flex gap-1.5 overflow-x-auto pb-1.5 scrollbar-hide">
-          {images.map((image, index) => (
-            <button
-              key={index}
-              onClick={() => {
-                console.log(`Clicking thumbnail ${index}`); // Debug log
-                goToImage(index);
-              }}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  console.log(`Enter pressed on thumbnail ${index}`); // Debug log
-                  goToImage(index);
-                }
-              }}
-              tabIndex={0}
-              className={`flex-shrink-0 w-14 h-14 rounded-md overflow-hidden border-2 transition-all duration-200 cursor-pointer ${
-                index === currentImageIndex 
-                  ? 'border-blue-500 ring-2 ring-blue-200 shadow-md scale-105' 
-                  : 'border-gray-200 hover:border-gray-400 hover:scale-102'
-              }`}
-              aria-label={`Ver imagen ${index + 1}`}
-            >
-              <Image
-                src={image}
-                alt={`${name} - Miniatura ${index + 1}`}
-                width={56}
-                height={56}
-                className="w-full h-full object-cover pointer-events-none"
-                loading={index === 0 ? 'eager' : 'lazy'}
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  target.src = '/images/placeholder-service.jpg';
-                }}
-              />
-            </button>
-          ))}
+
+          {/* Imagen principal */}
+          <div className="flex-1 relative">
+            <div className="relative w-full aspect-square rounded-lg overflow-hidden bg-gray-100">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={currentImageIndex}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="absolute inset-0"
+                >
+                  <Image
+                    src={images[currentImageIndex]}
+                    alt={`${name} - Imagen ${currentImageIndex + 1}`}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    priority={currentImageIndex === 0}
+                  />
+                </motion.div>
+              </AnimatePresence>
+
+              {/* Controles de navegación desktop */}
+              {images.length > 1 && (
+                <>
+                  <button
+                    onClick={prevImage}
+                    className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 text-gray-800 p-3 rounded-full shadow-lg hover:bg-white hover:shadow-xl transition-all duration-200 z-10 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                    aria-label="Imagen anterior"
+                  >
+                    <ChevronLeft className="w-6 h-6" />
+                  </button>
+                  <button
+                    onClick={nextImage}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 text-gray-800 p-3 rounded-full shadow-lg hover:bg-white hover:shadow-xl transition-all duration-200 z-10 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                    aria-label="Siguiente imagen"
+                  >
+                    <ChevronRight className="w-6 h-6" />
+                  </button>
+                </>
+              )}
+
+              {/* Contador de imágenes */}
+              {images.length > 1 && (
+                <div className="absolute bottom-4 right-4 bg-black/70 text-white px-3 py-1 rounded-full text-sm font-medium">
+                  {currentImageIndex + 1} / {images.length}
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       )}
     </div>
