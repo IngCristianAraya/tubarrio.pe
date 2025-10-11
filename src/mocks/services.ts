@@ -47,13 +47,13 @@ export const sampleServices: Record<string, Service[]> = {
     },
     {
       id: 'rest-2',
-      slug: 'caldo-de-gallina',
-      name: 'Caldo de gallina',
-      description: 'Comida típica peruana con los mejores sabores de la costa, sierra y selva.',
+      slug: 'la-cabanita',
+      name: 'La cabañita',
+      description: 'En La Cabañita, te invitamos a disfrutar de nuestra comida criolla tradicional y comida marina.',
       category: 'Restaurantes y menús',  // Nombre legible para mostrar
       categorySlug: 'restaurantes-y-menus',  // Para URLs y código interno
-      image: '/images/caldo_gallina.webp',
-      images: ['/images/caldo_gallina.webp'],
+      image: 'https://res.cloudinary.com/do2rpqupm/image/upload/v1759646900/unnamed_fhepha.png',
+      images: ['https://res.cloudinary.com/do2rpqupm/image/upload/v1759646900/unnamed_fhepha.png'],
       rating: 4.5,
       reviewCount: 128,
       featured: true,
@@ -61,13 +61,13 @@ export const sampleServices: Record<string, Service[]> = {
     },
     {
       id: 'rest-3',
-      slug: 'iro-sushi',
-      name: 'Iro Sushi',
-      description: 'Sushi fresco y rollos especiales.',
+      slug: 'el-point',
+      name: 'El Point',
+      description: 'El Point Restobar es el lugar perfecto para disfrutar buena comida, tragos y una excelente atención.',
       category: 'Restaurantes y menús',  // Nombre legible para mostrar
       categorySlug: 'restaurantes-y-menus',  // Para URLs y código interno
-      image: 'https://images.pexels.com/photos/357756/pexels-photo-357756.jpeg?auto=compress&cs=tinysrgb&w=400',
-      images: ['https://images.pexels.com/photos/357756/pexels-photo-357756.jpeg?auto=compress&cs=tinysrgb&w=400'],
+      image: 'https://res.cloudinary.com/do2rpqupm/image/upload/v1760147330/WhatsApp_Image_2025-10-10_at_8.28.02_PM_lmpg6l.jpg',
+      images: ['https://res.cloudinary.com/do2rpqupm/image/upload/v1760147330/WhatsApp_Image_2025-10-10_at_8.28.02_PM_lmpg6l.jpg'],
       rating: 4.5,
       reviewCount: 128,
       featured: true,
