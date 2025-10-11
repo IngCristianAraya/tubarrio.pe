@@ -292,6 +292,76 @@ const ServiceHeader = ({ service }: ServiceHeaderProps): ReactElement => {
       </motion.div>
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative">
+        {/* Encabezado fuera del grid para alinear imagen y descripción en desktop */}
+        <motion.div 
+          className="space-y-6 mb-6 lg:mb-8"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          {/* 1. Título */}
+          <motion.h1 
+            className="text-4xl lg:text-5xl font-bold text-gray-900 leading-tight bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent"
+            variants={itemVariants}
+          >
+            {service.name}
+          </motion.h1>
+          
+          {/* Categoría, Ubicación y Rating */}
+          <motion.div 
+            className="w-full"
+            variants={itemVariants}
+          >
+            <div className="grid grid-cols-3 gap-2 sm:flex sm:flex-wrap sm:gap-3">
+              {/* Categoría */}
+              <motion.div className="flex-1 min-w-[100px]">
+                <motion.span 
+                  className="inline-flex items-center justify-center w-full px-2 py-2 bg-white/80 backdrop-blur-sm text-gray-800 text-xs sm:text-sm font-semibold rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300 whitespace-nowrap overflow-hidden text-ellipsis"
+                  whileHover={{ y: -2 }}
+                  title={service.category}
+                >
+                  <span className="mr-1 sm:mr-2">
+                    {service.category === 'Restaurantes' && '🍽️'}
+                    {service.category === 'Abarrotes' && '🛒'}
+                    {service.category === 'Lavanderías' && '🧺'}
+                    {service.category === 'Gimnasios' && '💪'}
+                    {service.category === 'Servicios' && '🔧'}
+                    {service.category === 'Peluquerías' && '✂️'}
+                    {!['Restaurantes', 'Abarrotes', 'Lavanderías', 'Gimnasios', 'Servicios', 'Peluquerías'].includes(service.category || '') && '🏷️'}
+                  </span>
+                  <span className="truncate">{service.category}</span>
+                </motion.span>
+              </motion.div>
+              
+              {/* Barrio */}
+              {service.neighborhood?.trim() && (
+                <motion.div className="flex-1 min-w-[100px]">
+                  <motion.span 
+                    className="inline-flex items-center justify-center w-full px-2 py-2 bg-blue-50/80 backdrop-blur-sm text-blue-800 text-xs sm:text-sm font-medium rounded-xl border border-blue-100 shadow-sm hover:shadow-md transition-all duration-300 whitespace-nowrap overflow-hidden text-ellipsis"
+                    whileHover={{ y: -2 }}
+                    title={service.neighborhood.trim()}
+                  >
+                    <MapPin className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 flex-shrink-0 text-blue-500" />
+                    <span className="truncate">{service.neighborhood.trim()}</span>
+                  </motion.span>
+                </motion.div>
+              )}
+              
+              {/* Rating */}
+              {service.rating && service.rating > 0 && (
+                <motion.div className="flex-1 min-w-[100px]">
+                  <motion.div 
+                    className="flex items-center justify-center w-full h-full px-2 py-2 bg-white/80 backdrop-blur-sm rounded-xl border border-gray-200 shadow-sm"
+                    whileHover={{ scale: 1.03 }}
+                  >
+                    {renderRating(service.rating)}
+                  </motion.div>
+                </motion.div>
+              )}
+            </div>
+          </motion.div>
+        </motion.div>
+
         <motion.div 
           className="lg:grid lg:grid-cols-2 lg:gap-8"
           initial={{ opacity: 0, y: 20 }}
@@ -300,7 +370,7 @@ const ServiceHeader = ({ service }: ServiceHeaderProps): ReactElement => {
         >
           {/* Columna izquierda - Galería de imágenes (solo desktop) */}
           <motion.div 
-            className="hidden lg:block"
+            className="hidden lg:block lg:mt-2"
             variants={containerVariants}
             initial="hidden"
             animate="visible"
@@ -321,69 +391,7 @@ const ServiceHeader = ({ service }: ServiceHeaderProps): ReactElement => {
             initial="hidden"
             animate="visible"
           >
-            {/* 1. Título */}
-            <motion.h1 
-              className="text-4xl lg:text-5xl font-bold text-gray-900 leading-tight bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent"
-              variants={itemVariants}
-            >
-              {service.name}
-            </motion.h1>
-            
-            {/* Categoría, Ubicación y Rating */}
-            <motion.div 
-              className="w-full"
-              variants={itemVariants}
-            >
-              <div className="grid grid-cols-3 gap-2 sm:flex sm:flex-wrap sm:gap-3">
-                {/* Categoría */}
-                <motion.div className="flex-1 min-w-[100px]">
-                  <motion.span 
-                    className="inline-flex items-center justify-center w-full px-2 py-2 bg-white/80 backdrop-blur-sm text-gray-800 text-xs sm:text-sm font-semibold rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300 whitespace-nowrap overflow-hidden text-ellipsis"
-                    whileHover={{ y: -2 }}
-                    title={service.category}
-                  >
-                    <span className="mr-1 sm:mr-2">
-                      {service.category === 'Restaurantes' && '🍽️'}
-                      {service.category === 'Abarrotes' && '🛒'}
-                      {service.category === 'Lavanderías' && '🧺'}
-                      {service.category === 'Gimnasios' && '💪'}
-                      {service.category === 'Servicios' && '🔧'}
-                      {service.category === 'Peluquerías' && '✂️'}
-                      {!['Restaurantes', 'Abarrotes', 'Lavanderías', 'Gimnasios', 'Servicios', 'Peluquerías'].includes(service.category || '') && '🏷️'}
-                    </span>
-                    <span className="truncate">{service.category}</span>
-                  </motion.span>
-                </motion.div>
-                
-                {/* Barrio */}
-                {service.neighborhood?.trim() && (
-                  <motion.div className="flex-1 min-w-[100px]">
-                    <motion.span 
-                      className="inline-flex items-center justify-center w-full px-2 py-2 bg-blue-50/80 backdrop-blur-sm text-blue-800 text-xs sm:text-sm font-medium rounded-xl border border-blue-100 shadow-sm hover:shadow-md transition-all duration-300 whitespace-nowrap overflow-hidden text-ellipsis"
-                      whileHover={{ y: -2 }}
-                      title={service.neighborhood.trim()}
-                    >
-                      <MapPin className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 flex-shrink-0 text-blue-500" />
-                      <span className="truncate">{service.neighborhood.trim()}</span>
-                    </motion.span>
-                  </motion.div>
-                )}
-                
-                {/* Rating */}
-                {service.rating && service.rating > 0 && (
-                  <motion.div className="flex-1 min-w-[100px]">
-                    <motion.div 
-                      className="flex items-center justify-center w-full h-full px-2 py-2 bg-white/80 backdrop-blur-sm rounded-xl border border-gray-200 shadow-sm"
-                      whileHover={{ scale: 1.03 }}
-                    >
-                      {renderRating(service.rating)}
-                    </motion.div>
-                  </motion.div>
-                )}
-              </div>
-              
-              {/* Se eliminó la sección de dirección duplicada en móvil */}
-            </motion.div>
+            {/* Título y chips movidos al encabezado superior fuera del grid */}
 
             {/* Galería de imágenes (solo móvil) */}
             <motion.div 
