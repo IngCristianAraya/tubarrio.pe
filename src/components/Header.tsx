@@ -28,7 +28,7 @@ const Header = () => {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      window.location.href = `/todos-los-servicios?busqueda=${encodeURIComponent(searchQuery.trim())}`;
+      window.location.href = `/servicios?busqueda=${encodeURIComponent(searchQuery.trim())}`;
     }
   };
 
@@ -151,7 +151,7 @@ const Header = () => {
           {/* Navegación desktop */}
           <nav className="hidden md:flex gap-3 lg:gap-6 items-center mx-4">
             <NavItem href="/">Inicio</NavItem>
-            <NavItem href="/todos-los-servicios">Todos los servicios</NavItem>
+        <NavItem href="/servicios">Todos los servicios</NavItem>
             <NavItem href="/inmuebles">Inmuebles</NavItem>
             <NavItem href="/blog">Blog</NavItem>
           </nav>
@@ -178,7 +178,7 @@ const Header = () => {
                 <NavItem href="/">Inicio</NavItem>
               </div>
               <div className="py-3 px-4 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors duration-150 min-h-[48px] flex items-center">
-                <NavItem href="/todos-los-servicios">Todos los servicios</NavItem>
+        <NavItem href="/servicios">Todos los servicios</NavItem>
               </div>
               <div className="py-3 px-4 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors duration-150 min-h-[48px] flex items-center">
                 <NavItem href="/inmuebles">Inmuebles</NavItem>

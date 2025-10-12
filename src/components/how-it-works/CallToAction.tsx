@@ -38,7 +38,7 @@ export default function CallToAction() {
               whileTap={{ scale: 0.95 }}
             >
               <Link
-                href="/todos-los-servicios"
+        href="/servicios"
                 className="bg-white text-orange-600 hover:bg-orange-50 px-10 py-4 rounded-full font-bold text-lg shadow-xl transition-all inline-block"
               >
                 Explorar Servicios

@@ -8,7 +8,7 @@ const exec = promisify(execCallback);
 // List of important pages to test
 const PAGES_TO_TEST = [
   '/',
-  '/todos-los-servicios',
+  '/servicios',
   '/politica-privacidad',
   '/terminos-condiciones',
   // Add more pages as needed

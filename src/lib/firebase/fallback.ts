@@ -253,7 +253,23 @@ export const fallbackServices: Service[] = [
 ];
 
 // Función para filtrar servicios de respaldo
+// Función auxiliar para convertir nombres en slugs (remueve acentos correctamente)
+const slugify = (name?: string) => {
+  if (!name) return '';
+  return name
+    .toString()
+    .trim()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '') // quitar diacríticos
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-+|-+$/g, '');
+};
+
 export const filterFallbackServices = (options: {
+  // Interpretar `category` como slug de categoría
   category?: string;
   barrio?: string;
   search?: string;
@@ -265,7 +281,11 @@ export const filterFallbackServices = (options: {
 
   // Filtrar por categoría
   if (options.category && options.category !== 'Todas' && options.category !== 'Todos') {
-    filtered = filtered.filter(service => service.category === options.category);
+    const catSlug = options.category;
+    filtered = filtered.filter(service => {
+      const serviceSlug = service.categorySlug || slugify(service.category);
+      return serviceSlug === catSlug;
+    });
   }
 
   // Filtrar por barrio
@@ -279,7 +299,8 @@ export const filterFallbackServices = (options: {
     filtered = filtered.filter(service => 
       service.name.toLowerCase().includes(searchLower) ||
       service.description.toLowerCase().includes(searchLower) ||
-      service.category.toLowerCase().includes(searchLower)
+      service.category.toLowerCase().includes(searchLower) ||
+      (service.categorySlug || slugify(service.category)).includes(searchLower)
     );
   }
 

@@ -157,7 +157,7 @@ export default function ServicioDetallePage() {
   // Generar breadcrumbs
   const breadcrumbs = [
     { name: 'Inicio', item: SITE_URL },
-    { name: 'Servicios', item: `${SITE_URL}/todos-los-servicios` },
+    { name: 'Servicios', item: `${SITE_URL}/servicios` },
     { name: service.name, item: canonicalUrl },
   ];
 

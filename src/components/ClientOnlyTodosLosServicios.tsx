@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import TodosLosServiciosPage from '../app/todos-los-servicios/TodosLosServicios';
+import TodosLosServiciosPage from '../app/servicios/TodosLosServicios';
 
 /**
  * Wrapper component que asegura que TodosLosServicios solo se renderice en el cliente

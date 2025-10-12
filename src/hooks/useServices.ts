@@ -78,6 +78,30 @@ const servicesFetcher = async ([_, options]: [string, UseServicesOptions]): Prom
   // Verificar caché primero
   
   // 1. Verificar caché primero
+  // Helper to generate a slug from a category name (handles accents)
+  const slugify = (name?: string) => {
+    if (!name) return '';
+    return name
+      .toString()
+      .trim()
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '') // remove diacritics
+      .replace(/[^a-z0-9\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-+|-+$/g, '');
+  };
+
+  // Alias map for category slugs to handle legacy inconsistencies
+  const CATEGORY_ALIAS: Record<string, string[]> = {
+    'restaurantes-y-menus': ['restaurantes-y-menus', 'restaurantes-y-mens'],
+    'comida-rapida': ['comida-rapida', 'comida-rpida'],
+    'lavanderias': ['lavanderias', 'lavanderas'],
+    'peluquerias': ['peluquerias', 'peluqueras']
+  };
+  const getCategoryAliases = (slug: string) => CATEGORY_ALIAS[slug] || [slug];
+
   try {
     // Si es una consulta de servicios destacados, verificar primero ese caché
     if (featured) {
@@ -169,7 +193,13 @@ const servicesFetcher = async ([_, options]: [string, UseServicesOptions]): Prom
     
     // Otros filtros según sea necesario
     if (category && category !== 'Todas' && category !== 'Todos') {
-      constraints.push(where('category', '==', category));
+      // Interpret `category` option as a slug, include aliases when available
+      const aliases = getCategoryAliases(category);
+      if (aliases.length > 1) {
+        constraints.push(where('categorySlug', 'in', aliases));
+      } else {
+        constraints.push(where('categorySlug', '==', category));
+      }
     }
     
     if (barrio) {
@@ -213,6 +243,7 @@ const servicesFetcher = async ([_, options]: [string, UseServicesOptions]): Prom
         name: data.name || 'Servicio sin nombre',
         description: data.description || 'Sin descripción',
         category: data.category || 'Sin categoría',
+        categorySlug: data.categorySlug || slugify(data.category) || '',
         image: data.image || '/images/placeholder-service.jpg',
         rating: data.rating || 0,
         location: data.location || 'Ubicación no especificada',
@@ -418,7 +449,13 @@ export const useServicesPaginated = (options: UseServicesOptions = {}): Paginate
       }
       
       if (category && category !== 'Todas' && category !== 'Todos') {
-        q = query(q, where('category', '==', category));
+        // Interpret `category` option as a slug, include aliases when available
+        const aliases = getCategoryAliases(category);
+        if (aliases.length > 1) {
+          q = query(q, where('categorySlug', 'in', aliases));
+        } else {
+          q = query(q, where('categorySlug', '==', category));
+        }
       }
       
       if (barrio) {
@@ -437,6 +474,7 @@ export const useServicesPaginated = (options: UseServicesOptions = {}): Paginate
           name: data.name || 'Servicio sin nombre',
           description: data.description || 'Sin descripción',
           category: data.category || 'Sin categoría',
+          categorySlug: data.categorySlug || slugify(data.category) || '',
           image: data.image || '/images/placeholder-service.jpg',
           rating: data.rating || 0,
           location: data.location || 'Ubicación no especificada',
@@ -492,7 +530,8 @@ export const useServicesPaginated = (options: UseServicesOptions = {}): Paginate
       }
       
       if (category && category !== 'Todas' && category !== 'Todos') {
-        q = query(q, where('category', '==', category));
+        // Interpret `category` option as a slug
+        q = query(q, where('categorySlug', '==', category));
       }
       
       if (barrio) {
@@ -516,6 +555,7 @@ export const useServicesPaginated = (options: UseServicesOptions = {}): Paginate
           name: data.name || 'Servicio sin nombre',
           description: data.description || 'Sin descripción',
           category: data.category || 'Sin categoría',
+          categorySlug: data.categorySlug || slugify(data.category) || '',
           image: data.image || '/images/placeholder-service.jpg',
           rating: data.rating || 0,
           location: data.location || 'Ubicación no especificada',

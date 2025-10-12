@@ -88,7 +88,7 @@ const Footer = () => {
               {[
                 { href: "/", label: "Inicio" },
                 { href: "/blog", label: "Blog" },
-                { href: "/todos-los-servicios", label: "Todos los servicios" },
+      { href: "/servicios", label: "Todos los servicios" },
                 { href: "/inmuebles", label: "Inmuebles" },
                 { href: "#registro", label: "Registrar Negocio" },
               ].map((item, index) => (

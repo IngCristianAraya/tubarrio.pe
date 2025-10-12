@@ -46,7 +46,7 @@ export default function HowItWorksHero() {
 
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-16">
               <motion.a
-                href="/todos-los-servicios"
+        href="/servicios"
                 whileHover={{ scale: 1.05, y: -2 }}
                 whileTap={{ scale: 0.95 }}
                 className="bg-orange-600 hover:bg-orange-700 text-white px-10 py-5 rounded-full font-semibold text-lg shadow-xl hover:shadow-2xl transition-all duration-300 inline-block"

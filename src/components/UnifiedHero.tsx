@@ -52,7 +52,7 @@ const Hero = () => {
     }
     
     // Redirigir a la página de resultados de búsqueda
-    const url = `/todos-los-servicios${params.toString() ? '?' + params.toString() : ''}`;
+  const url = `/servicios${params.toString() ? '?' + params.toString() : ''}`;
     window.location.href = url;
   };
 
@@ -143,7 +143,7 @@ const Hero = () => {
                 <button
                   key={item.name}
                   onClick={() => {
-                    window.location.href = `/todos-los-servicios?categoria=${encodeURIComponent(item.category)}`;
+  window.location.href = `/servicios?categoria=${encodeURIComponent(item.category)}`;
                   }}
                   className={`flex items-center gap-2 px-5 py-3 rounded-full shadow-sm hover:shadow-md transition-all duration-200 font-medium min-h-[44px] touch-manipulation active:scale-95 ${
                     selectedCategory === item.category
@@ -157,7 +157,7 @@ const Hero = () => {
               ))}
               
               <Link 
-                href="/todos-los-servicios" 
+  href="/servicios"
                 className="flex items-center gap-2 px-5 py-3 rounded-full bg-white text-gray-700 border border-gray-200 hover:border-orange-200 hover:text-orange-600 font-medium transition-colors"
               >
                 <span>Ver todos los servicios</span>

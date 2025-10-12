@@ -80,7 +80,7 @@ interface ServicesContextType {
   error: string | null;
   searchTerm: string;
   selectedCategory: string;
-  categories: string[];
+  categories: { slug: string; name: string }[];
   setSearchTerm: (term: string) => void;
   setSelectedCategory: (category: string) => void;
   getServiceById: (id: string) => Promise<Service | null>;
@@ -199,13 +199,18 @@ export function getCache() {
   return cache;
 }
 
-// Función para generar un slug a partir de un texto
+// Función para generar un slug a partir de un texto (remueve acentos)
 const generateSlug = (text: string): string => {
   if (!text) return '';
   return text
     .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/(^-|-$)/g, '');
+    .trim()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '') // quitar diacríticos
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-+|-+$/g, '');
 };
 
 // Función para crear un objeto de servicio con valores predeterminados
@@ -264,16 +269,26 @@ export const ServicesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [isSearching, setIsSearching] = useState<boolean>(false);
-  const [categories, setCategories] = useState<string[]>([]);
+  const [categories, setCategories] = useState<{ slug: string; name: string }[]>([]);
 
   // Use the Firestore instance
   const firestore = getFirestoreInstance();
 
   // Update categories from services
   const updateCategories = useCallback((servicesData: Service[]) => {
-    const uniqueCategories = Array.from(
-      new Set(servicesData.map(service => service.category).filter(Boolean))
-    ) as string[];
+    const map = new Map<string, string>();
+    servicesData.forEach(service => {
+      const slug = service.categorySlug || '';
+      const name = service.category || '';
+      if (slug) {
+        if (!map.has(slug)) {
+          map.set(slug, name || slug);
+        }
+      }
+    });
+    const uniqueCategories = Array.from(map.entries()).map(([slug, name]) => ({ slug, name }));
+    // Sort by name for consistent display
+    uniqueCategories.sort((a, b) => a.name.localeCompare(b.name));
     setCategories(uniqueCategories);
   }, []);
 
@@ -284,17 +299,37 @@ export const ServicesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       
       let results = [...services];
       
+      // Helper para normalizar textos: minúsculas, sin acentos y sin caracteres especiales
+      const normalize = (text?: string) =>
+        (text || '')
+          .toString()
+          .toLowerCase()
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .replace(/[^a-z0-9\s-]/g, '')
+          .replace(/\s+/g, ' ')
+          .trim();
+
       if (query) {
-        const searchLower = query.toLowerCase();
-        results = results.filter(service => 
-          service.name.toLowerCase().includes(searchLower) ||
-          service.description?.toLowerCase().includes(searchLower) ||
-          service.tags?.some((tag: string) => tag.toLowerCase().includes(searchLower))
-        );
+        const q = normalize(query).replace(/-/g, ' '); // tratar guiones como espacios
+        results = results.filter(service => {
+          const name = normalize(service.name);
+          const desc = normalize(service.description || '');
+          const catName = normalize(service.category || '');
+          const catSlug = normalize(service.categorySlug || '');
+          const tags = (service.tags || []).map((t: string) => normalize(t));
+          return (
+            name.includes(q) ||
+            desc.includes(q) ||
+            catName.includes(q) ||
+            catSlug.includes(q) ||
+            tags.some(t => t.includes(q))
+          );
+        });
       }
       
       if (category) {
-        results = results.filter(service => service.category === category);
+        results = results.filter(service => service.categorySlug === category);
       }
       
       setFilteredServices(results);

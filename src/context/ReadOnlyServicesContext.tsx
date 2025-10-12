@@ -31,6 +31,7 @@ export interface Service {
   id: string;
   name: string;
   category: string;
+  categorySlug?: string;
   image: string;
   images?: string[];
   rating: number;
@@ -54,7 +55,7 @@ interface ServicesContextType {
   error: string | null;
   searchTerm: string;
   selectedCategory: string;
-  categories: string[];
+  categories: { slug: string; name: string }[];
   isSearching: boolean;
   setSearchTerm: (term: string) => void;
   setSelectedCategory: (category: string) => void;
@@ -136,7 +137,7 @@ export const ServicesProvider: React.FC<ServicesProviderProps> = ({ children }) 
     services: [] as Service[],
     filteredServices: [] as Service[],
     featuredServices: [] as Service[],
-    categories: [] as string[],
+    categories: [] as { slug: string; name: string }[],
     loading: true,
     error: null as string | null,
     searchTerm: '',
@@ -165,9 +166,30 @@ export const ServicesProvider: React.FC<ServicesProviderProps> = ({ children }) 
   // Update categories from services
   const updateCategories = useCallback((servicesData: Service[]) => {
     try {
-      const uniqueCategories = Array.from(
-        new Set(servicesData.map(service => service.category).filter(Boolean))
-      ) as string[];
+      // Helper to slugify category names when categorySlug is missing
+      const slugify = (text: string) =>
+        (text || '')
+          .toString()
+          .toLowerCase()
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/^-+|-+$/g, '');
+
+      const map = new Map<string, string>();
+      servicesData.forEach(service => {
+        const name = service.category || '';
+        const slug = service.categorySlug || (name ? slugify(name) : '');
+        if (slug) {
+          if (!map.has(slug)) {
+            map.set(slug, name || slug);
+          }
+        }
+      });
+
+      const uniqueCategories = Array.from(map.entries()).map(([slug, name]) => ({ slug, name }));
+      // Sort by name for consistent display
+      uniqueCategories.sort((a, b) => a.name.localeCompare(b.name));
       updateState({ categories: uniqueCategories });
     } catch (error) {
       console.error('Error updating categories:', error);
@@ -316,20 +338,39 @@ export const ServicesProvider: React.FC<ServicesProviderProps> = ({ children }) 
     
     let results = [...state.services];
     
+    // Normalizador: minúsculas, sin acentos, caracteres simples
+    const normalize = (text?: string) =>
+      (text || '')
+        .toString()
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9\s-]/g, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+
     // Filter by search term
     if (searchQuery) {
-      const searchLower = searchQuery.toLowerCase();
-      results = results.filter(service => 
-        service.name.toLowerCase().includes(searchLower) ||
-        service.description?.toLowerCase().includes(searchLower) ||
-        service.category.toLowerCase().includes(searchLower) ||
-        service.tags?.some(tag => tag.toLowerCase().includes(searchLower))
-      );
+      const q = normalize(searchQuery).replace(/-/g, ' ');
+      results = results.filter(service => {
+        const name = normalize(service.name);
+        const desc = normalize(service.description || '');
+        const catName = normalize(service.category || '');
+        const catSlug = normalize(service.categorySlug || '');
+        const tags = (service.tags || []).map(tag => normalize(tag));
+        return (
+          name.includes(q) ||
+          desc.includes(q) ||
+          catName.includes(q) ||
+          catSlug.includes(q) ||
+          tags.some(t => t.includes(q))
+        );
+      });
     }
     
     // Filter by category
     if (category) {
-      results = results.filter(service => service.category === category);
+      results = results.filter(service => (service.categorySlug || '') === category);
     }
     
     updateState({ filteredServices: results });

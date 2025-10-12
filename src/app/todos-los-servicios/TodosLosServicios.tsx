@@ -11,23 +11,7 @@ import { useSearchParams } from 'next/navigation';
 
 type AnyService = Service | ContextService;
 
-const getUniqueCategories = (services: AnyService[]): string[] => {
-  const categories = new Map<string, string>();
-  
-  services.forEach(service => {
-    if (service.category) {
-      // Usamos el nombre de la categoría en minúsculas como clave
-      const lowerCaseCategory = service.category.toLowerCase();
-      // Almacenamos el nombre original de la categoría
-      if (!categories.has(lowerCaseCategory)) {
-        categories.set(lowerCaseCategory, service.category);
-      }
-    }
-  });
-  
-  // Devolvemos los nombres originales de las categorías, ordenados
-  return Array.from(categories.values()).sort();
-};
+// Las categorías ahora vienen del contexto como `{ slug, name }`.
 
 interface TodosLosServiciosProps {
   initialCategory?: string;
@@ -102,7 +86,9 @@ export default function TodosLosServicios({
         {!isHome && (
           <div className="mb-6">
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              {category ? `Servicios: ${category}` : 'Todos Nuestros Servicios'}
+              {category 
+                ? `Servicios: ${categories.find(c => c.slug === category)?.name || category}` 
+                : 'Todos Nuestros Servicios'}
             </h1>
             <p className="text-gray-600">
               {filteredServices.length > 0 && (
@@ -141,8 +127,8 @@ export default function TodosLosServicios({
           >
             <option value="">Todas las categorías</option>
             {categories.map((cat) => (
-              <option key={cat} value={cat}>
-                {cat}
+              <option key={cat.slug} value={cat.slug}>
+                {cat.name}
               </option>
             ))}
           </select>
