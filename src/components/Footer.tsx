@@ -139,9 +139,9 @@ const Footer = () => {
             </h3>
             <div className="flex space-x-4">
               {[
-                { icon: <FiFacebook size={20} />, label: 'Facebook', href: '#' },
-                { icon: <FiInstagram size={20} />, label: 'Instagram', href: '#' },
-                { icon: <FaWhatsapp size={20} />, label: 'WhatsApp', href: '#' },
+                { icon: <FiFacebook size={20} />, label: 'Facebook', href: 'https://www.facebook.com/tubarrio.pe' },
+                { icon: <FiInstagram size={20} />, label: 'Instagram', href: 'https://www.instagram.com/tubarrio.pe' },
+                { icon: <FaWhatsapp size={20} />, label: 'WhatsApp', href: 'https://wa.me/51901426737' },
               ].map((social, index) => (
                 <motion.a
                   key={index}
