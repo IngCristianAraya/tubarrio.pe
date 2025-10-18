@@ -83,8 +83,13 @@ interface ServicesContextType {
   categories: { slug: string; name: string }[];
   setSearchTerm: (term: string) => void;
   setSelectedCategory: (category: string) => void;
+  // Nuevos filtros geográficos
+  selectedNeighborhood: string;
+  selectedDistrict: string;
+  setSelectedNeighborhood: (neighborhood: string) => void;
+  setSelectedDistrict: (district: string) => void;
   getServiceById: (id: string) => Promise<Service | null>;
-  searchServices: (query: string, category?: string) => void;
+  searchServices: (query: string, category?: string, neighborhood?: string, district?: string) => void;
   resetSearch: () => void;
   isSearching: boolean;
   refreshServices: () => Promise<void>;
@@ -256,6 +261,9 @@ const createServiceFromData = (id: string, data: any): Service => {
     hours: data.hours || '',
     social: data.social || '',
     whatsapp: data.whatsapp || '',
+    // Nuevos campos de filtrado geográfico
+    neighborhood: data.neighborhood || data.barrio || '',
+    district: data.district || '',
     active: data.active !== undefined ? data.active : true
   };
 };
@@ -268,6 +276,9 @@ export const ServicesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [selectedCategory, setSelectedCategory] = useState<string>('');
+  // Nuevos estados de filtro
+  const [selectedNeighborhood, setSelectedNeighborhood] = useState<string>('');
+  const [selectedDistrict, setSelectedDistrict] = useState<string>('');
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [categories, setCategories] = useState<{ slug: string; name: string }[]>([]);
 
@@ -294,7 +305,7 @@ export const ServicesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   // Debounced search implementation
   const searchServices = useCallback(
-    debounce((query: string, category?: string) => {
+    debounce((query: string, category?: string, neighborhood?: string, district?: string) => {
       setIsSearching(true);
       
       let results = [...services];
@@ -331,10 +342,20 @@ export const ServicesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       if (category) {
         results = results.filter(service => service.categorySlug === category);
       }
+
+      if (neighborhood) {
+        const n = normalize(neighborhood);
+        results = results.filter(service => normalize(service.neighborhood || '') === n);
+      }
+
+      if (district) {
+        const d = normalize(district);
+        results = results.filter(service => normalize(service.district || '') === d);
+      }
       
       setFilteredServices(results);
       setIsSearching(false);
-    }, 300), // 300ms debounce
+    }, 300),
     [services]
   );
   
@@ -349,6 +370,8 @@ export const ServicesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const resetSearch = useCallback(() => {
     setSearchTerm('');
     setSelectedCategory('');
+    setSelectedNeighborhood('');
+    setSelectedDistrict('');
     setFilteredServices(services);
   }, [services]);
 
@@ -524,12 +547,17 @@ export const ServicesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   // Update filtered services when search term or category changes
   useEffect(() => {
-    if (searchTerm || selectedCategory) {
-      searchServices(searchTerm, selectedCategory || undefined);
+    if (searchTerm || selectedCategory || selectedNeighborhood || selectedDistrict) {
+      searchServices(
+        searchTerm,
+        selectedCategory || undefined,
+        selectedNeighborhood || undefined,
+        selectedDistrict || undefined
+      );
     } else {
       setFilteredServices(services);
     }
-  }, [searchTerm, selectedCategory, services, searchServices]);
+  }, [searchTerm, selectedCategory, selectedNeighborhood, selectedDistrict, services, searchServices]);
 
   return (
     <ServicesContext.Provider
@@ -544,6 +572,11 @@ export const ServicesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         categories,
         setSearchTerm,
         setSelectedCategory,
+        // Nuevos filtros geográficos
+        selectedNeighborhood,
+        selectedDistrict,
+        setSelectedNeighborhood,
+        setSelectedDistrict,
         getServiceById,
         searchServices,
         resetSearch,

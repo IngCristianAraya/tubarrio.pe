@@ -27,9 +27,13 @@ export default function TodosLosServicios({
   const searchParams = useSearchParams();
   const categoriaParam = searchParams?.get('categoria') || '';
   const busquedaParam = searchParams?.get('busqueda') || '';
+  const barrioParam = searchParams?.get('barrio') || '';
+  const distritoParam = searchParams?.get('distrito') || '';
 
   const [search, setSearch] = useState(initialSearch || busquedaParam || '');
   const [category, setCategory] = useState(initialCategory || categoriaParam || '');
+  const [neighborhood, setNeighborhood] = useState(barrioParam || '');
+  const [district, setDistrict] = useState(distritoParam || '');
 
   const { 
     services, 
@@ -41,8 +45,29 @@ export default function TodosLosServicios({
     searchTerm,
     selectedCategory,
     setSearchTerm,
-    setSelectedCategory
+    setSelectedCategory,
+    // Nuevos filtros geográficos
+    selectedNeighborhood,
+    selectedDistrict,
+    setSelectedNeighborhood,
+    setSelectedDistrict
   } = useServices();
+
+  const neighborhoods = useMemo(() => {
+    const set = new Set<string>();
+    services.forEach(s => {
+      if (s.neighborhood) set.add(s.neighborhood);
+    });
+    return Array.from(set).sort((a, b) => a.localeCompare(b));
+  }, [services]);
+
+  const districts = useMemo(() => {
+    const set = new Set<string>();
+    services.forEach(s => {
+      if (s.district) set.add(s.district);
+    });
+    return Array.from(set).sort((a, b) => a.localeCompare(b));
+  }, [services]);
 
   // Update search term in context when local search changes
   useEffect(() => {
@@ -53,6 +78,15 @@ export default function TodosLosServicios({
   useEffect(() => {
     setSelectedCategory(category);
   }, [category, setSelectedCategory]);
+
+  // Update selected neighborhood/district in context
+  useEffect(() => {
+    setSelectedNeighborhood(neighborhood);
+  }, [neighborhood, setSelectedNeighborhood]);
+
+  useEffect(() => {
+    setSelectedDistrict(district);
+  }, [district, setSelectedDistrict]);
 
   if (loading && services.length === 0) {
     return (
@@ -94,7 +128,7 @@ export default function TodosLosServicios({
               {filteredServices.length > 0 && (
                 <>
                   Mostrando {filteredServices.length} servicios
-                  {(search || category) && ' filtrados'}
+                  {(search || category || neighborhood || district) && ' filtrados'}
                 </>
               )}
             </p>
@@ -132,6 +166,32 @@ export default function TodosLosServicios({
               </option>
             ))}
           </select>
+
+          <select
+            value={neighborhood}
+            onChange={(e) => setNeighborhood(e.target.value)}
+            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white"
+          >
+            <option value="">Todos los barrios</option>
+            {neighborhoods.map((b) => (
+              <option key={b} value={b}>
+                {b}
+              </option>
+            ))}
+          </select>
+
+          <select
+            value={district}
+            onChange={(e) => setDistrict(e.target.value)}
+            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white"
+          >
+            <option value="">Todos los distritos</option>
+            {districts.map((d) => (
+              <option key={d} value={d}>
+                {d}
+              </option>
+            ))}
+          </select>
         </div>
         
         <CategoryChips 
@@ -142,8 +202,8 @@ export default function TodosLosServicios({
         
         {filteredServices.length === 0 ? (
           <EmptyState 
-            message={search || category 
-              ? "No se encontraron servicios para tu búsqueda o categoría seleccionada." 
+            message={search || category || neighborhood || district
+              ? "No se encontraron servicios para tu búsqueda o filtros seleccionados." 
               : "No hay servicios disponibles por el momento."
             } 
           />
