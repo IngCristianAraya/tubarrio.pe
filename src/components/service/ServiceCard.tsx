@@ -37,6 +37,25 @@ const ServiceCard: React.FC<ServiceCardProps> = ({ service, className, isLoading
     );
   }
 
+  // Validar imagen
+  const isValidImage = (imageUrl: string | null | undefined): boolean => {
+    return !!imageUrl &&
+      imageUrl !== 'none' &&
+      imageUrl !== '' &&
+      imageUrl !== 'null' &&
+      imageUrl !== 'undefined' &&
+      (imageUrl.startsWith('http') || imageUrl.startsWith('/'));
+  };
+
+  const candidates = Array.isArray(service.images) && service.images.length > 0
+    ? service.images
+    : service.image
+      ? [service.image]
+      : [];
+
+  const firstValid = candidates.find((img) => typeof img === 'string' && isValidImage(img));
+  const imageSrc = firstValid || '/images/default-service.jpg';
+
   return (
     <Link 
       href={`/servicio/${service.id}`}
@@ -49,7 +68,7 @@ const ServiceCard: React.FC<ServiceCardProps> = ({ service, className, isLoading
     >
       <div className="relative h-48 w-full">
         <Image
-          src={(service.images && service.images.length > 0 ? service.images[0] : service.image) || '/images/default-service.jpg'}
+          src={imageSrc}
           alt={service.name}
           fill
           className="object-cover"

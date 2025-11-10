@@ -49,8 +49,25 @@ const OptimizedImage = ({
   isMobile = false,
   style,
 }: OptimizedImageProps) => {
+  // Validar la fuente de la imagen para evitar pasar valores inválidos a next/image
+  const isValidImage = (imageUrl: string | null | undefined): boolean => {
+    const s = typeof imageUrl === 'string' ? imageUrl.trim() : '';
+    return !!s &&
+      s !== 'none' &&
+      s !== '' &&
+      s !== 'null' &&
+      s !== 'undefined' &&
+      (s.startsWith('http') || s.startsWith('/'));
+  };
+
+  const resolveInitialSrc = (): string => {
+    if (isValidImage(src)) return (src as string).trim();
+    if (isValidImage(fallbackSrc)) return fallbackSrc;
+    return '/images/placeholder.jpg';
+  };
+
   const [isClient, setIsClient] = useState(false);
-  const [currentSrc, setCurrentSrc] = useState(fallbackSrc);
+  const [currentSrc, setCurrentSrc] = useState<string>(resolveInitialSrc());
   const [hasError, setHasError] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [currentBlurDataURL, setCurrentBlurDataURL] = useState<string | undefined>(blurDataURL);
@@ -125,11 +142,16 @@ const OptimizedImage = ({
 
   // Actualizar la fuente cuando cambie la prop src
   useEffect(() => {
-    if (src) {
-      setCurrentSrc(src);
+    // Al cambiar el src, validar antes de asignar
+    if (isValidImage(src)) {
+      setCurrentSrc((src as string).trim());
       setHasError(false);
-    } else if (fallbackSrc) {
+    } else if (isValidImage(fallbackSrc)) {
       setCurrentSrc(fallbackSrc);
+      setHasError(false);
+    } else {
+      setCurrentSrc('/images/placeholder.jpg');
+      setHasError(true);
     }
   }, [src, fallbackSrc]);
 

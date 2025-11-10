@@ -1,27 +1,10 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
-import { 
-  collection, 
-  getDocs, 
-  getDoc, 
-  doc, 
-  query, 
-  orderBy, 
-  where, 
-  limit, 
-  startAfter, 
-  Firestore,
-  DocumentData,
-  QueryDocumentSnapshot
-} from 'firebase/firestore';
-import { db } from '@/lib/firebase/config';
 import { toast } from 'react-hot-toast';
+import { fetchAllServiceData, fetchServiceById } from '@/lib/repositories/servicesRepository';
 
-// Get Firestore instance with error handling
-function getFirestoreInstance(): Firestore {
-  return db.instance;
-}
+// Eliminado: acceso directo a Firestore. Ahora usamos el repositorio multi-origen.
 
 // Simple debounce implementation for search
 function debounce<T extends (...args: any[]) => void>(
@@ -257,6 +240,8 @@ const createServiceFromData = (id: string, data: any): Service => {
     description: data.description || '',
     contactUrl: data.contactUrl || '',
     detailsUrl: data.detailsUrl || '',
+    // Incluir redes sociales desde supabase/firebase en camelCase (y variante lowercase)
+    socialMedia: data.socialMedia || data.socialmedia || undefined,
     tags: serviceTags,
     hours: data.hours || '',
     social: data.social || '',
@@ -281,9 +266,6 @@ export const ServicesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [selectedDistrict, setSelectedDistrict] = useState<string>('');
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [categories, setCategories] = useState<{ slug: string; name: string }[]>([]);
-
-  // Use the Firestore instance
-  const firestore = getFirestoreInstance();
 
   // Update categories from services
   const updateCategories = useCallback((servicesData: Service[]) => {
@@ -384,12 +366,12 @@ export const ServicesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const loadFeaturedServices = useCallback(async (servicesData?: Service[]) => {
     try {
       const cacheKey = 'featured-services';
-      
+
       // Skip if we're on the server
       if (typeof window === 'undefined') {
         return Promise.resolve([]);
       }
-      
+
       // If services data is provided, filter for featured
       if (servicesData) {
         const featured = servicesData
@@ -398,35 +380,22 @@ export const ServicesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         getCache().set(cacheKey, featured);
         return Promise.resolve(featured);
       }
-      
-      // Otherwise, use cache or fetch from Firestore
-      return getCache().getOrCreate<Service[]>(
-        cacheKey,
-        async (): Promise<Service[]> => {
-          const db = getFirestoreInstance();
-          const servicesRef = collection(db, 'services');
-          const q = query(
-            servicesRef, 
-            where('active', '==', true),
-            where('rating', '>=', 4),
-            orderBy('rating', 'desc'),
-            limit(6)
-          );
-          
-          const querySnapshot = await getDocs(q);
-          const featuredServices = querySnapshot.docs.map(doc => ({
-            id: doc.id,
-            ...createServiceFromData(doc.id, doc.data())
-          }));
-          
-          return featuredServices;
-        }
-      );
+
+      // Otherwise, try cache or compute from current services state
+      const cached = getCache().get<Service[]>(cacheKey);
+      if (cached) return Promise.resolve(cached);
+
+      const base = services.length ? services : [];
+      const featured = base
+        .filter(service => service.rating && service.rating >= 4)
+        .slice(0, 6);
+      getCache().set(cacheKey, featured);
+      return Promise.resolve(featured);
     } catch (err) {
       console.error('Error loading featured services:', err);
       return Promise.resolve([]);
     }
-  }, []);
+  }, [services]);
 
   // Get service by ID with optimized caching
   const getServiceById = useCallback(async (id: string): Promise<Service | null> => {
@@ -440,20 +409,15 @@ export const ServicesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       const cachedService = getCache().get<Service>(cacheKey);
       if (cachedService) return cachedService;
       
-      // If not in cache, fetch from Firestore
-      const db = getFirestoreInstance();
-      const docRef = doc(db, 'services', id);
-      const docSnap = await getDoc(docRef);
-      
-      if (docSnap.exists()) {
-        const service = createServiceFromData(docSnap.id, docSnap.data());
-        // Cache the service
+      // If not in cache, fetch via repository
+      const raw = await fetchServiceById(id);
+      if (raw) {
+        const service = createServiceFromData(raw.id, raw.data);
         if (typeof window !== 'undefined') {
           getCache().set(cacheKey, service);
         }
         return service;
       }
-      
       throw new Error('Service not found');
     } catch (err) {
       console.error('Error getting service:', err);
@@ -476,43 +440,45 @@ export const ServicesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
       // Clear cache to force fresh data
       getCache().clear();
-      console.log('🧹 Cache cleared - loading fresh data from Firebase');
+      console.log('🧹 Cache cleared - loading fresh data from repositorio multi-origen');
 
       const cacheKey = 'all-services';
       
-      // If not in cache, fetch from Firestore
-      console.log('📡 Fetching services from Firestore...');
-      const db = getFirestoreInstance();
-      const servicesRef = collection(db, 'services');
-      const servicesSnapshot = await getDocs(servicesRef);
-      
-      console.log(`📊 Found ${servicesSnapshot.docs.length} documents in Firestore`);
-      
-      const servicesData = servicesSnapshot.docs.map(doc => {
-        const data = doc.data();
-        console.log(`📄 Processing document ${doc.id}:`, {
-          name: data.name,
-          hasTag: !!data.tag,
-          hasTags: !!data.tags,
-          tagValue: data.tag,
-          tagsValue: data.tags,
-          rawData: data
-        });
-        
-        return createServiceFromData(doc.id, data);
-      });
+      // Fetch using repository (Firebase o Supabase según flag)
+      console.log('📡 Fetching services desde repositorio...');
+      const rawList = await fetchAllServiceData();
+      console.log(`📊 Encontrados ${rawList.length} registros en el origen de datos`);
+      const servicesData = rawList.map(({ id, data }) => createServiceFromData(id, data));
+
+      // Deduplicar por id para evitar servicios repetidos cuando la fuente devuelve duplicados
+      const uniqueById = (list: Service[]) => {
+        const seen = new Set<string>();
+        const result: Service[] = [];
+        for (const item of list) {
+          const key = String(item.id);
+          if (!seen.has(key)) {
+            seen.add(key);
+            result.push(item);
+          }
+        }
+        return result;
+      };
+      const dedupedServices = uniqueById(servicesData);
+      if (dedupedServices.length !== servicesData.length) {
+        console.warn(`🧹 Deduplicados ${servicesData.length - dedupedServices.length} servicios (por id)`);
+      }
       
       console.log(`✅ Processed ${servicesData.length} services`);
       console.log('🔍 Sample service:', servicesData[0]);
       
       // Cache the services
       if (typeof window !== 'undefined') {
-        getCache().set(cacheKey, servicesData);
+        getCache().set(cacheKey, dedupedServices);
       }
       
-      setServices(servicesData);
-      setFilteredServices(servicesData);
-      updateCategories(servicesData);
+      setServices(dedupedServices);
+      setFilteredServices(dedupedServices);
+      updateCategories(dedupedServices);
       
       // Load featured services if not already loaded
       const featuredCache = getCache().get('featured-services') as Service[] | null;

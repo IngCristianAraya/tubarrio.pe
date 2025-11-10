@@ -43,6 +43,8 @@ const productionCsp: CspDirectives = {
     "data:",
     "blob:",
     "https:",
+    // Permitir imágenes servidas desde Supabase (storage/public)
+    "https://*.supabase.co",
     "https://*.googleapis.com",
     "https://*.gstatic.com",
     "https://*.firebaseio.com",
@@ -65,6 +67,9 @@ const productionCsp: CspDirectives = {
   ],
   connectSrc: [
     "'self'",
+    // Supabase: REST, Auth y Storage API (HTTPS y WebSocket para tiempo real si fuera necesario)
+    "https://*.supabase.co",
+    "wss://*.supabase.co",
     "https://*.google-analytics.com",
     "https://*.analytics.google.com",
     "https://*.firebaseio.com",

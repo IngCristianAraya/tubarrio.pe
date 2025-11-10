@@ -8,11 +8,18 @@
     "start": "node server.js",
     "lint": "next lint",
     "analyze": "ANALYZE=true next build",
-    "vercel-build": "npm run build"
+    "vercel-build": "npm run build",
+    "seed:supabase": "node scripts/seed_supabase_services.js",
+    "migrate:firebase-to-supabase": "node scripts/migrate_firebase_to_supabase.js",
+    "export:firebase-services": "node scripts/export-firestore-services.js",
+    "supabase:delete-all-services": "node scripts/delete_all_supabase_services.js",
+    "supabase:convert-ids-to-slugs": "node scripts/convert_supabase_ids_to_slugs.js",
+    "supabase:import-from-export": "node scripts/import_services_from_export.js"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
     "@radix-ui/react-slot": "^1.0.2",
+    "@supabase/supabase-js": "^2.80.0",
     "@tailwindcss/nesting": "0.0.0-insiders.565cd3e",
     "@tailwindcss/typography": "^0.5.19",
     "@types/react-responsive": "^8.0.8",

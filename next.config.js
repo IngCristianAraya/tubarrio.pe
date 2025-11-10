@@ -22,6 +22,8 @@ const nextConfig = {
       'lh3.googleusercontent.com',
       'picsum.photos',
       'via.placeholder.com',
+      // Supabase storage bucket (ajustar al dominio de tu proyecto)
+      'fyekrdhzerjagradhxvv.supabase.co',
       'source.unsplash.com'
     ],
   },

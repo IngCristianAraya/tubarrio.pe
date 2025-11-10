@@ -51,6 +51,23 @@ export default function ClientCarousel({ services = [], categoryName = '' }: Cli
     );
   }
 
+  const isValidImage = (imageUrl?: string) => {
+    if (!imageUrl) return false;
+    const trimmed = imageUrl.trim().toLowerCase();
+    if (!trimmed || trimmed === 'none' || trimmed === 'null' || trimmed === 'undefined' || trimmed === 'invalid') {
+      return false;
+    }
+    return trimmed.startsWith('http') || trimmed.startsWith('/');
+  };
+
+  const getServiceImage = (service: Service) => {
+    const candidates = Array.isArray(service.images) ? service.images : [];
+    const firstValidFromArray = candidates.find((img) => isValidImage(img));
+    if (isValidImage(firstValidFromArray)) return firstValidFromArray as string;
+    if (isValidImage(service.image)) return service.image as string;
+    return '/images/placeholder-service.jpg';
+  };
+
   return (
     <div className="relative py-4">
       <div className="px-4 mb-3">
@@ -65,15 +82,13 @@ export default function ClientCarousel({ services = [], categoryName = '' }: Cli
           <div key={service.id} className="keen-slider__slide min-w-[280px] max-w-[280px]">
             <div className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow overflow-hidden border border-gray-100 h-full flex flex-col">
               <div className="relative h-40 bg-gray-100">
-                {(service.images?.[0] || service.image) && (
-                  <Image
-                    src={service.images?.[0] || service.image || ''}
-                    alt={service.name}
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 640px) 100vw, 50vw"
-                  />
-                )}
+                <Image
+                  src={getServiceImage(service)}
+                  alt={service.name}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 640px) 100vw, 50vw"
+                />
               </div>
               <div className="p-4 flex-1 flex flex-col">
                 <h4 className="font-semibold text-gray-900 mb-1 line-clamp-1">

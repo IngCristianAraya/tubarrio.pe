@@ -15,6 +15,7 @@ import {
 } from 'firebase/firestore';
 import { cache } from 'react';
 import { db } from './firebase/config';
+import { getDataSource, getCountry } from './featureFlags';
 
 // Helper type for cached data
 interface CachedData<T> {
@@ -101,6 +102,35 @@ export async function getServicesByCategory(
     servicesCache,
     async (): Promise<ServicesResult> => {
       try {
+        // Rama Supabase: consultar servicios activos por slug de categoría
+        if (getDataSource() === 'supabase') {
+          const { getSupabaseClient } = await import('@/lib/supabase/client');
+          const supabase = await getSupabaseClient();
+          console.log('[lib/services] 📡 Supabase getServicesByCategory:', categorySlug);
+          let qb = supabase
+            .from('services')
+            .select('*')
+            .eq('active', true)
+            .eq('categorySlug', categorySlug)
+            .order('featured', { ascending: false })
+            .order('name', { ascending: true })
+            .limit(limitCount);
+          const country = getCountry();
+          if (country) {
+            qb = qb.eq('country', country);
+          }
+          const { data, error } = await qb;
+          if (error) {
+            throw error;
+          }
+          const services = (data || []).map((row: any) => ({
+            id: row.id?.toString?.() || row.uid,
+            ...row,
+          })) as Service[];
+          // Supabase no usa lastVisible; retornar null
+          return { services, lastVisible: null };
+        }
+
         const servicesRef = collection(db.instance, 'services');
         let q: Query<DocumentData> = query(
           servicesRef,
@@ -143,6 +173,27 @@ export const getAllCategories = cache(async (): Promise<Category[]> => {
     categoriesListCache,
     async (): Promise<Category[]> => {
       try {
+        if (getDataSource() === 'supabase') {
+          const { getSupabaseClient } = await import('@/lib/supabase/client');
+          const supabase = await getSupabaseClient();
+          console.log('[lib/services] 📡 Supabase getAllCategories');
+          const { data, error } = await supabase
+            .from('categories')
+            .select('*')
+            .eq('status', 'active')
+            .order('name', { ascending: true });
+          if (error) throw error;
+          const categories = (data || []).map((row: any) => ({
+            id: row.id?.toString?.() || row.uid,
+            ...row,
+          })) as Category[];
+          categories.forEach(category => {
+            if (category.id) {
+              categoryCache.set(`category_id_${category.id}`, { data: category, timestamp: Date.now() });
+            }
+          });
+          return categories;
+        }
         const categoriesRef = collection(db.instance, 'categories');
         const q = query(
           categoriesRef, 
@@ -188,6 +239,25 @@ export const getCategoryBySlug = cache(async (slug: string): Promise<Category | 
     categoryCache,
     async (): Promise<Category | null> => {
       try {
+        if (getDataSource() === 'supabase') {
+          const { getSupabaseClient } = await import('@/lib/supabase/client');
+          const supabase = await getSupabaseClient();
+          console.log('[lib/services] 📡 Supabase getCategoryBySlug:', slug);
+          const { data, error } = await supabase
+            .from('categories')
+            .select('*')
+            .eq('slug', slug)
+            .eq('status', 'active')
+            .limit(1);
+          if (error) throw error;
+          const row = (data || [])[0];
+          if (!row) return null;
+          const categoryData: Category = { id: row.id?.toString?.() || row.uid, ...row } as Category;
+          if (categoryData.id) {
+            categoryCache.set(`category_id_${categoryData.id}`, { data: categoryData, timestamp: Date.now() });
+          }
+          return categoryData;
+        }
         const categoriesRef = collection(db.instance, 'categories');
         const q = query(
           categoriesRef,

@@ -71,6 +71,23 @@ export default function FeaturedBannersCarousel({
     },
   });
 
+  const isValidImage = (imageUrl?: string) => {
+    if (!imageUrl) return false;
+    const trimmed = imageUrl.trim().toLowerCase();
+    if (!trimmed || trimmed === 'none' || trimmed === 'null' || trimmed === 'undefined' || trimmed === 'invalid') {
+      return false;
+    }
+    return trimmed.startsWith('http') || trimmed.startsWith('/');
+  };
+
+  const getBannerSrc = (banner: Banner, variant: 'desktop' | 'mobile') => {
+    if (typeof banner.image === 'string') {
+      return isValidImage(banner.image) ? banner.image : '/images/placeholder.jpg';
+    }
+    const src = variant === 'desktop' ? banner.image.desktop : banner.image.mobile;
+    return isValidImage(src) ? src : '/images/placeholder.jpg';
+  };
+
   const startAutoplay = (s: any) => {
     stopAutoplay();
     if (interval > 0 && s) {
@@ -162,7 +179,7 @@ export default function FeaturedBannersCarousel({
                 <div className="w-full h-full bg-gray-100 flex items-center justify-center">
                   <div className="w-full h-full flex items-center justify-center">
                     <Image
-                      src={typeof banner.image === 'string' ? banner.image : banner.image.desktop}
+                      src={getBannerSrc(banner, 'desktop')}
                       alt={banner.title || 'Banner promocional'}
                       width={1200}
                       height={300}
@@ -188,7 +205,7 @@ export default function FeaturedBannersCarousel({
                 <div className="relative w-full mb-0">
                   <div className="w-full flex items-center justify-center mb-0">
                     <Image
-                      src={typeof banner.image === 'string' ? banner.image : banner.image.mobile}
+                      src={getBannerSrc(banner, 'mobile')}
                       alt={banner.title || 'Banner promocional'}
                       width={800}
                       height={400}

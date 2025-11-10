@@ -18,6 +18,7 @@ import {
 import { db } from '@/lib/firebase/config';
 import { Service } from '@/context/ServicesContext';
 import { fallbackServices, filterFallbackServices, getFallbackServiceById } from '../lib/firebase/fallback';
+import { getDataSource, getCountry } from '@/lib/featureFlags';
 
 // Tipos para el hook
 interface UseServicesOptions {
@@ -148,6 +149,79 @@ const servicesFetcher = async ([_, options]: [string, UseServicesOptions]): Prom
     // Continuar con la carga normal en caso de error
   }
   
+  // Si el origen de datos es Supabase, consultar directamente desde Supabase
+  if (getDataSource() === 'supabase') {
+    const { getSupabaseClient } = await import('@/lib/supabase/client');
+    const supabase = await getSupabaseClient();
+    console.log('[useServices] 📡 Leyendo servicios desde Supabase');
+    let queryBuilder = supabase
+      .from('services')
+      .select('*')
+      .eq('active', true);
+
+    const country = getCountry();
+    if (country) {
+      queryBuilder = queryBuilder.eq('country', country);
+    }
+
+    if (featured) {
+      queryBuilder = queryBuilder.eq('featured', true);
+    }
+    if (category && category !== 'Todas' && category !== 'Todos') {
+      queryBuilder = queryBuilder.eq('categorySlug', category);
+    }
+    if (barrio) {
+      queryBuilder = queryBuilder.eq('barrio', barrio);
+    }
+    if (userId) {
+      queryBuilder = queryBuilder.eq('userId', userId);
+    }
+    if (search && search.trim() !== '') {
+      // Búsqueda básica por nombre/descripción
+      const term = `%${search.trim()}%`;
+      queryBuilder = queryBuilder.or(`name.ilike.${term},description.ilike.${term}`);
+    }
+
+    const { data, error } = await queryBuilder
+      .order('createdAt', { ascending: false })
+      .limit(pageSize);
+    if (error) {
+      console.error('[useServices] ❌ Error leyendo Supabase:', error);
+      throw error;
+    }
+    const services = (data || []).map((row: any) => ({
+      id: row.id?.toString?.() || row.uid,
+      name: row.name || 'Servicio sin nombre',
+      description: row.description || 'Sin descripción',
+      category: row.category || 'Sin categoría',
+      categorySlug: row.categorySlug || row.category_slug || '',
+      image: row.image || '/images/placeholder-service.jpg',
+      rating: row.rating || 0,
+      location: row.location || row.address || 'Ubicación no especificada',
+      contactUrl: row.contactUrl || row.contact_url || '',
+      detailsUrl: row.detailsUrl || row.details_url || '',
+      featured: row.featured || false,
+      active: row.active !== false,
+      createdAt: row.createdAt ? new Date(row.createdAt) : new Date(),
+      updatedAt: row.updatedAt ? new Date(row.updatedAt) : new Date(),
+      ...row,
+    })) as Service[];
+
+    try {
+      if (services.length > 0) {
+        setAllServicesCache(services);
+        if (featured) {
+          const featuredData = services.filter(s => s.featured === true);
+          if (featuredData.length > 0) {
+            setFeaturedServicesCache(featuredData);
+          }
+        }
+      }
+    } catch {}
+
+    return services;
+  }
+
   // Si Firebase no está disponible, usar datos de respaldo
   if (!db) {
     console.warn('🔄 Firebase no disponible, usando datos de respaldo');
@@ -265,21 +339,36 @@ const servicesFetcher = async ([_, options]: [string, UseServicesOptions]): Prom
           service.tags?.some((tag: string) => tag.toLowerCase().includes(search.toLowerCase())))
         )
       : services;
+    
+    // Deduplicar por id para evitar servicios repetidos
+    const uniqueById = (list: Service[]) => {
+      const seen = new Set<string>();
+      const result: Service[] = [];
+      for (const item of list) {
+        const key = String(item.id);
+        if (!seen.has(key)) {
+          seen.add(key);
+          result.push(item);
+        }
+      }
+      return result;
+    };
+    const deduped = uniqueById(filteredServices);
       
     // Aplicar paginación
     const paginatedServices = pageSize 
-      ? filteredServices.slice(0, pageSize)
-      : filteredServices;
+      ? deduped.slice(0, pageSize)
+      : deduped;
       
     // Actualizar cachés
     try {
       // Actualizar caché de servicios completos si no hay búsqueda
-      if (filteredServices.length > 0 && (!search || search.trim() === '')) {
-        setAllServicesCache(filteredServices);
+      if (deduped.length > 0 && (!search || search.trim() === '')) {
+        setAllServicesCache(deduped);
         
         // Actualizar caché de servicios destacados si corresponde
-        if (featured || filteredServices.some(s => s.featured)) {
-          const featuredServices = filteredServices.filter(s => s.featured);
+        if (featured || deduped.some(s => s.featured)) {
+          const featuredServices = deduped.filter(s => s.featured);
           if (featuredServices.length > 0) {
             setFeaturedServicesCache(featuredServices);
           }
@@ -287,7 +376,7 @@ const servicesFetcher = async ([_, options]: [string, UseServicesOptions]): Prom
       }
       
       // Actualizar caché de servicios individuales
-      filteredServices.forEach(service => {
+      deduped.forEach(service => {
         serviceByIdCache.set(service.id, { 
           data: service, 
           timestamp: now 
@@ -436,10 +525,10 @@ export const useServicesPaginated = (options: UseServicesOptions = {}): Paginate
     setError(null);
     
     try {
-      // Verificar si Firebase está inicializado
-      if (!db) {
-        throw new Error('Firebase no está inicializado');
-      }
+  // Verificar si Firebase está inicializado
+  if (!db) {
+    throw new Error('Firebase no está inicializado');
+  }
       
       let q = query(collection(db, 'services'));
       
@@ -486,7 +575,20 @@ export const useServicesPaginated = (options: UseServicesOptions = {}): Paginate
         } as Service;
       });
       
-      setAllServices(newServices);
+      // Deduplicar por id en carga inicial
+      const uniqueById = (list: Service[]) => {
+        const seen = new Set<string>();
+        const result: Service[] = [];
+        for (const item of list) {
+          const key = String(item.id);
+          if (!seen.has(key)) {
+            seen.add(key);
+            result.push(item);
+          }
+        }
+        return result;
+      };
+      setAllServices(uniqueById(newServices));
       setLastDoc(snapshot.docs[snapshot.docs.length - 1] || null);
       setHasMore(snapshot.docs.length === pageSize);
       setInitialized(true);
@@ -567,7 +669,20 @@ export const useServicesPaginated = (options: UseServicesOptions = {}): Paginate
         } as Service;
       });
       
-      setAllServices(prev => [...prev, ...newServices]);
+      // Deduplicar al anexar nuevas páginas
+      const uniqueByIdAppend = (list: Service[]) => {
+        const seen = new Set<string>();
+        const result: Service[] = [];
+        for (const item of list) {
+          const key = String(item.id);
+          if (!seen.has(key)) {
+            seen.add(key);
+            result.push(item);
+          }
+        }
+        return result;
+      };
+      setAllServices(prev => uniqueByIdAppend([...prev, ...newServices]));
       setLastDoc(snapshot.docs[snapshot.docs.length - 1] || null);
       setHasMore(snapshot.docs.length === pageSize);
       

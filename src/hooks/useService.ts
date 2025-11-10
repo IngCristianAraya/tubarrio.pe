@@ -5,6 +5,7 @@ import { db } from '@/lib/firebase/config';
 import { Service } from '@/types/service';
 import { getFallbackServiceById } from '../lib/firebase/fallback';
 import { logger } from '@/lib/utils/logger';
+import { getDataSource, getCountry } from '@/lib/featureFlags';
 
 interface UseServiceResult {
   service: Service | null;
@@ -25,8 +26,8 @@ export const useService = (serviceId?: string): UseServiceResult => {
     // Verificar si estamos offline
     const isOffline = typeof navigator !== 'undefined' && !navigator.onLine;
     
-    // Intentar usar datos de fallback primero si estamos offline o Firebase no está disponible
-    const shouldUseFallback = isOffline || !db;
+    // Intentar usar datos de fallback primero si estamos offline
+    const shouldUseFallback = isOffline;
     
     if (shouldUseFallback) {
       const message = isOffline ? 'Modo offline' : 'Firebase no disponible';
@@ -43,6 +44,53 @@ export const useService = (serviceId?: string): UseServiceResult => {
     }
     
     try {
+      // Si el origen de datos es Supabase, buscar primero allí (por slug o ID)
+      if (getDataSource() === 'supabase') {
+        const { getSupabaseClient } = await import('@/lib/supabase/client');
+        const supabase = await getSupabaseClient();
+        console.log(`🔍 [Supabase] Buscando servicio por slug/ID: ${id}`);
+        let qb = supabase
+          .from('services')
+          .select('*')
+          .or(`slug.eq.${id},id.eq.${id}`)
+          .limit(1);
+        const country = getCountry();
+        if (country) {
+          qb = qb.eq('country', country);
+        }
+        const { data, error } = await qb;
+        if (error) {
+          throw error;
+        }
+        const row = (data || [])[0];
+        if (!row) {
+          throw { code: 'not-found', message: `Servicio ${id} no encontrado en Supabase` };
+        }
+        const serviceData: Service = {
+          id: row.id?.toString?.() || row.uid || id,
+          slug: row.slug || row.id?.toString?.() || id,
+          name: row.name || 'Servicio sin nombre',
+          description: row.description || 'Sin descripción disponible',
+          category: row.category || 'Sin categoría',
+          categorySlug: row.categorySlug || row.category_slug || row.category?.toLowerCase?.().replace?.(/\s+/g, '-') || 'sin-categoria',
+          image: row.image || '/images/placeholder-service.jpg',
+          images: row.images || [row.image || '/images/placeholder-service.jpg'],
+          rating: row.rating || 0,
+          location: row.location || row.address || 'Ubicación no especificada',
+          contactUrl: row.contactUrl || row.contact_url || '',
+          detailsUrl: row.detailsUrl || row.details_url || '',
+          whatsapp: row.whatsapp || '',
+          social: row.social || '',
+          featured: row.featured || false,
+          active: row.active !== false,
+          createdAt: row.createdAt ? new Date(row.createdAt) : new Date(),
+          updatedAt: row.updatedAt ? new Date(row.updatedAt) : new Date(),
+          ...row,
+        } as Service;
+        setIsFallbackData(false);
+        return serviceData;
+      }
+
       console.log(`🔍 Buscando servicio con ID: ${id}`);
       
       // Asegurarse de que db esté inicializado

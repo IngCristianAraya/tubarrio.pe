@@ -6,6 +6,7 @@ import { JsonLd } from '@/components/seo/JsonLd';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { AnalyticsInitializer } from '@/components/analytics/AnalyticsInitializer';
 import { SITE_URL } from '@/lib/constants';
+import { getThemeCssFromEnv } from '@/lib/designSystem';
 import { generateMetadata } from "@/lib/seo";
 import dynamic from 'next/dynamic';
 
@@ -114,6 +115,11 @@ export default function RootLayout({ children }: RootLayoutProps) {
             }
           `
         }} />
+        {/* Override de tema por país (colores/radio) usando envs del proyecto */}
+        {(() => {
+          const css = getThemeCssFromEnv();
+          return css ? <style dangerouslySetInnerHTML={{ __html: css }} /> : null;
+        })()}
 
       </head>
       <body className={`${GeistSans.className} antialiased bg-white text-gray-900 transition-colors duration-200`}>

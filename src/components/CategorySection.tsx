@@ -28,6 +28,23 @@ export default function CategorySection({
   const isMobile = useMediaQuery({ maxWidth: 767 });
   const previewServices = services.slice(0, 4);
 
+  const isValidImage = (imageUrl?: string) => {
+    if (!imageUrl) return false;
+    const trimmed = imageUrl.trim().toLowerCase();
+    if (!trimmed || trimmed === 'none' || trimmed === 'null' || trimmed === 'undefined' || trimmed === 'invalid') {
+      return false;
+    }
+    return trimmed.startsWith('http') || trimmed.startsWith('/');
+  };
+
+  const getServiceImage = (service: Service) => {
+    const candidates = Array.isArray(service.images) ? service.images : [];
+    const firstValidFromArray = candidates.find((img) => isValidImage(img));
+    if (isValidImage(firstValidFromArray)) return firstValidFromArray as string;
+    if (isValidImage(service.image)) return service.image as string;
+    return '/images/placeholder-service.jpg';
+  };
+
   return (
     <section className="mb-12">
       <div className="container mx-auto px-4">
@@ -53,7 +70,7 @@ export default function CategorySection({
                 <Link href={`/servicio/${service.slug}`} className="block"> {/* ← ¡Cambia a service.slug! */}
                   <div className="relative h-48 w-full">
                     <Image
-                      src={service.image || '/images/placeholder-service.jpg'}
+                      src={getServiceImage(service)}
                       alt={service.name}
                       fill
                       className="object-cover"

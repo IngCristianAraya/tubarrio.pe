@@ -85,7 +85,20 @@ const ServiceImages = ({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [nextImage, prevImage]);
 
-  if (!images || images.length === 0) {
+  // Validación de imágenes y fallback
+  const isValidImage = (imageUrl: string | null | undefined): boolean => {
+    return !!imageUrl &&
+      imageUrl !== 'none' &&
+      imageUrl !== '' &&
+      imageUrl !== 'null' &&
+      imageUrl !== 'undefined' &&
+      (imageUrl.startsWith('http') || imageUrl.startsWith('/'));
+  };
+
+  const validImages = Array.isArray(images) ? images.filter((img) => isValidImage(img)) : [];
+  const displayImages = validImages.length > 0 ? validImages : ['/images/default-service.jpg'];
+
+  if (!displayImages || displayImages.length === 0) {
     return (
       <div className={`w-full aspect-square bg-gray-200 rounded-lg flex items-center justify-center ${className}`}>
         <span className="text-gray-500">No hay imágenes disponibles</span>
@@ -114,7 +127,7 @@ const ServiceImages = ({
                 className="absolute inset-0"
               >
                 <Image
-                  src={images[currentImageIndex]}
+                  src={displayImages[currentImageIndex]}
                   alt={`${name} - Imagen ${currentImageIndex + 1}`}
                   fill
                   className="object-cover"
@@ -125,7 +138,7 @@ const ServiceImages = ({
             </AnimatePresence>
 
             {/* Controles de navegación móvil */}
-            {images.length > 1 && (
+            {displayImages.length > 1 && (
               <>
                 <button
                   onClick={prevImage}
@@ -145,9 +158,9 @@ const ServiceImages = ({
             )}
 
             {/* Indicadores móvil */}
-            {images.length > 1 && (
+            {displayImages.length > 1 && (
               <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
-                {images.map((_, index) => (
+                {displayImages.map((_, index) => (
                   <button
                     key={index}
                     onClick={(e) => {
@@ -179,7 +192,7 @@ const ServiceImages = ({
         <div className="flex gap-4">
           {/* Thumbnails a la izquierda */}
           <div className="flex flex-col gap-2 w-20">
-            {images.map((image, index) => (
+            {displayImages.map((image, index) => (
               <button
                 key={index}
                 onClick={(e) => {
@@ -223,7 +236,7 @@ const ServiceImages = ({
                   className="absolute inset-0"
                 >
                   <Image
-                    src={images[currentImageIndex]}
+                    src={displayImages[currentImageIndex]}
                     alt={`${name} - Imagen ${currentImageIndex + 1}`}
                     fill
                     className="object-cover"

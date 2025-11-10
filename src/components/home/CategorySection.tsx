@@ -26,6 +26,23 @@ export default function CategorySection({ category, services }: CategorySectionP
   const isMobile = typeof window !== 'undefined' ? useIsMobile() : false;
   const previewServices = services.slice(0, 4);
 
+  const isValidImage = (imageUrl?: string) => {
+    if (!imageUrl) return false;
+    const trimmed = imageUrl.trim().toLowerCase();
+    if (!trimmed || trimmed === 'none' || trimmed === 'null' || trimmed === 'undefined' || trimmed === 'invalid') {
+      return false;
+    }
+    return trimmed.startsWith('http') || trimmed.startsWith('/');
+  };
+
+  const getServiceImage = (service: Service) => {
+    const candidates = Array.isArray(service.images) ? service.images : [];
+    const firstValidFromArray = candidates.find((img) => isValidImage(img));
+    if (isValidImage(firstValidFromArray)) return firstValidFromArray as string;
+    if (isValidImage(service.image)) return service.image as string;
+    return '/images/placeholder-service.jpg';
+  };
+
   return (
     <section className="mb-12">
       <div className="flex justify-between items-center mb-4">
@@ -66,15 +83,13 @@ export default function CategorySection({ category, services }: CategorySectionP
               className="group relative bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 overflow-hidden border border-gray-100 hover:border-gray-200"
             >
               <div className="relative h-40 bg-gray-100 overflow-hidden rounded-t-xl">
-                {service.images?.[0] && service.images[0].length > 1 && (
-                  <Image
-                    src={service.images[0]}
-                    alt={`Foto de ${service.name}`}
-                    fill
-                    className="object-cover transition-transform duration-500 group-hover:scale-105"
-                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                  />
-                )}
+                <Image
+                  src={getServiceImage(service)}
+                  alt={`Foto de ${service.name}`}
+                  fill
+                  className="object-cover transition-transform duration-500 group-hover:scale-105"
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                />
               </div>
               <div className="p-4">
                 <h3 className="font-semibold text-gray-900 mb-1 line-clamp-1 group-hover:text-primary-700 transition-colors">

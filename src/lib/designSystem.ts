@@ -237,3 +237,22 @@ export type ColorPalette = keyof typeof colors;
 export type ColorShade = '50' | '100' | '200' | '300' | '400' | '500' | '600' | '700' | '800' | '900';
 export type TypographySize = keyof typeof typography.fontSize;
 export type SpacingScale = keyof typeof spacing;
+
+// Helpers de tema con variables de entorno
+// Genera CSS para sobrescribir variables globales basadas en envs por proyecto
+// Uso: insertar en <head> con un <style> para personalización por país
+export function getThemeCssFromEnv(): string {
+  const primary = (process.env.NEXT_PUBLIC_PRIMARY_COLOR || '').trim();
+  const primaryFg = (process.env.NEXT_PUBLIC_PRIMARY_FOREGROUND || '').trim();
+  const ring = (process.env.NEXT_PUBLIC_RING_COLOR || '').trim();
+  const radius = (process.env.NEXT_PUBLIC_RADIUS || '').trim();
+
+  const vars: string[] = [];
+  if (primary) vars.push(`--primary: ${primary}`);
+  if (primaryFg) vars.push(`--primary-foreground: ${primaryFg}`);
+  if (ring) vars.push(`--ring: ${ring}`);
+  if (radius) vars.push(`--radius: ${radius}`);
+
+  if (vars.length === 0) return '';
+  return `:root{${vars.join(';')}}`;
+}

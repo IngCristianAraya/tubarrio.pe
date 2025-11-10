@@ -28,6 +28,8 @@ export interface Service {
   description: string;
   category: string;
   categorySlug: string;
+  // País (ISO-3166 alpha-2 en minúscula, p.ej. 'pe', 'de')
+  country?: string;
   // Ubicación específica (barrio/urbanización)
   neighborhood?: string;
   // Dirección específica (opcional)

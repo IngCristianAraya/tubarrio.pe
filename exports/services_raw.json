@@ -1,0 +1,1596 @@
+[
+  {
+    "id": "agente-bcp",
+    "name": "Agente BCP",
+    "category": "Agentes bancarios",
+    "image": "https://images.pexels.com/photos/7706434/pexels-photo-7706434.jpeg?auto=compress&cs=tinysrgb&w=400",
+    "rating": 4.4,
+    "location": "Calle Sta Nicerata 334",
+    "description": "Entregas en menos de 30 minutos",
+    "contactUrl": "https://www.mensajeriaveloz.com",
+    "detailsUrl": "https://www.mensajeriaveloz.com",
+    "tags": [
+      "banco",
+      "depósito",
+      "retiro",
+      "transferencia",
+      "pagos",
+      "servicios",
+      "agente",
+      "bcp",
+      "recargas",
+      "cuenta",
+      "dinero"
+    ],
+    "plan": "básico",
+    "images": [
+      "https://images.pexels.com/photos/7706434/pexels-photo-7706434.jpeg?auto=compress&cs=tinysrgb&w=400"
+    ],
+    "localImages": [],
+    "active": true,
+    "phone": "+51901426737",
+    "whatsapp": "+51901426737",
+    "horario": "08:00 a 21:00 hrs",
+    "conditions": [
+      "Horarios de atención flexibles",
+      "Consultas y presupuestos gratuitos",
+      "Aceptamos diferentes formas de pago",
+      "Términos y condiciones generales aplican",
+      "Contactar para más información"
+    ],
+    "specifications": [
+      "Servicio profesional de calidad",
+      "Atención personalizada",
+      "Experiencia comprobada",
+      "Compromiso con la excelencia",
+      "Satisfacción garantizada"
+    ],
+    "updatedAt": {
+      "_seconds": 1759383388,
+      "_nanoseconds": 179000000
+    },
+    "lastCoordinateUpdate": {
+      "_seconds": 1759418546,
+      "_nanoseconds": 714000000
+    },
+    "lastUpdated": "2025-10-02T15:38:44.117Z",
+    "zona": "San Miguel",
+    "district": "San Miguel",
+    "direccion_completa": "Calle Sta Nicerata 334, San Miguel, Lima, Perú",
+    "coordenadas": [
+      -12.063458,
+      -77.0776606
+    ],
+    "cacheBreaker": 1759429236379,
+    "address": "Santa Mariana 548",
+    "reference": "Parque Carlos Lisson"
+  },
+  {
+    "id": "anticucheria-angie-corazon",
+    "name": "Anticuchería Angie's Corazón",
+    "active": true,
+    "address": "Santa Teodiosia 573",
+    "category": "Comida rápida",
+    "conditions": [
+      "Horarios de atención de 18:00 a 00:00",
+      "Consultas a nuestro whatsapp 990 075 557",
+      "Aceptamos diferentes formas de pago"
+    ],
+    "contactUrl": "https://wa.link/mch6op",
+    "detailsUrl": "https://www.instagram.com/angiescorazon",
+    "horario": "Desde las 18:00 a 00:00",
+    "image": "https://res.cloudinary.com/do2rpqupm/image/upload/v1759465696/WhatsApp_Image_2025-10-02_at_10.52.05_PM_aaghbd.jpg",
+    "neighborhood": "Pando 3ra Etapa",
+    "rating": 5,
+    "description": "Nuestros anticuchos son preparados con cariño, aderezo casero y la frescura de los mejores ingredientes. \n🥩 Anticuchos jugosos a la parrilla \n🌽 Con acompañamientos típicos: papa, choclo y salsas artesanales \n🍢 Ambiente familiar y acogedor\n 💖 Sabor hecho con corazón",
+    "images": [
+      "https://res.cloudinary.com/do2rpqupm/image/upload/v1759465696/WhatsApp_Image_2025-10-02_at_10.52.05_PM_aaghbd.jpg",
+      "https://res.cloudinary.com/do2rpqupm/image/upload/v1759466603/WhatsApp_Image_2025-10-02_at_10.53.12_PM_ch1akk.jpg",
+      "https://res.cloudinary.com/do2rpqupm/image/upload/v1759466603/WhatsApp_Image_2025-10-02_at_10.53.12_PM_2_slvjnl.jpg",
+      "https://res.cloudinary.com/do2rpqupm/image/upload/v1759466603/WhatsApp_Image_2025-10-02_at_10.53.13_PM_bzqskj.jpg",
+      "https://res.cloudinary.com/do2rpqupm/image/upload/v1759466603/WhatsApp_Image_2025-10-02_at_10.53.11_PM_s7horf.jpg"
+    ],
+    "reference": "Frente al Parque Carlos Lisson",
+    "phone": "+51 990 075 557",
+    "tag": [
+      "anticuchos",
+      "parrilla",
+      "carne",
+      "corazón",
+      "comida peruana",
+      "tradicional",
+      "aderezo casero",
+      "brochetas",
+      "delivery",
+      "rachi"
+    ],
+    "location": "Santa teodiosia 573"
+  },
+  {
+    "id": "anticuchos-bran",
+    "name": "Anticuchos Bran ",
+    "category": "Restaurantes y menús",
+    "rating": 5,
+    "image": "https://res.cloudinary.com/do2rpqupm/image/upload/v1759034122/images_iw6q9k.jpg",
+    "horario": "De martes a domingo, de 5:30 p.m. a 11:00 p.m. ",
+    "address": "Avenida Universitaria 1625",
+    "reference": "Frente a la Universidad Católica ",
+    "detailsUrl": "https://www.facebook.com/anticuchosbran/?locale=es_LA",
+    "contactUrl": "https://wa.link/z4z8k9",
+    "images": [
+      "https://res.cloudinary.com/do2rpqupm/image/upload/v1759034122/images_iw6q9k.jpg",
+      "https://res.cloudinary.com/do2rpqupm/image/upload/v1759035186/https___cdn.jwplayer.com_v2_media_jYRwFjuR_poster_u9hsgw.avif"
+    ],
+    "conditions": [
+      "Horario: Lunes a Domingo 11:00 AM - 10:00 PM",
+      "Reservas recomendadas para grupos grandes",
+      "Aceptamos efectivo y tarjetas",
+      "Delivery gratuito en pedidos mayores a $20.000",
+      "Consultar disponibilidad de platos especiales"
+    ],
+    "specifications": [
+      "Cocina tradicional con ingredientes frescos",
+      "Ambiente familiar y acogedor",
+      "Servicio de delivery disponible",
+      "Menú variado para todos los gustos",
+      "Atención personalizada"
+    ],
+    "updatedAt": {
+      "_seconds": 1759383388,
+      "_nanoseconds": 433000000
+    },
+    "lastCoordinateUpdate": {
+      "_seconds": 1759418546,
+      "_nanoseconds": 714000000
+    },
+    "lastUpdated": "2025-10-02T15:34:47.545Z",
+    "zona": "San Miguel",
+    "district": "San Miguel",
+    "direccion_completa": "Avenida Universitaria 1625, San Miguel, Lima, Perú",
+    "coordenadas": [
+      -12.0660658,
+      -77.0776155
+    ],
+    "cacheBreaker": 1759428503405,
+    "active": true,
+    "description": "🔥 Anticuchos Bran 🔥\nEl sabor criollo que enamora. Disfruta de anticuchos jugosos, al carbón y con el aderezo tradicional que nos distingue, acompañados de papa, choclo y salsas caseras. ¡Ven y prueba el verdadero corazón del Perú en cada bocado! 💖🍢",
+    "phone": "+51 992 280 169",
+    "location": "Avenida Universitaria 1625"
+  },
+  {
+    "id": "asesor-inmobiliario-julio-rold-n",
+    "contactUrl": "https://wa.link/snc9sg",
+    "neighborhood": "San Isidro",
+    "rating": 5,
+    "tag": [
+      "inmueble",
+      "asesor",
+      "agente inmobiliario",
+      "alquiler",
+      "venta de casas"
+    ],
+    "horario": "Desde las 09:00 hasta las 18:00",
+    "detailsUrl": "https://wa.link/snc9sg",
+    "plan": "Básico",
+    "phone": "+51949248249",
+    "category": "Inmueble",
+    "address": "Rivera Navarrete 757",
+    "active": true,
+    "createdAt": {
+      "_seconds": 1762012208,
+      "_nanoseconds": 17000000
+    },
+    "image": "https://res.cloudinary.com/do2rpqupm/image/upload/v1762012404/tubarrio/services/acyfdrlbhaycducfriak.jpg",
+    "images": [
+      "https://res.cloudinary.com/do2rpqupm/image/upload/v1762012404/tubarrio/services/acyfdrlbhaycducfriak.jpg"
+    ],
+    "schedules": [
+      "Desde las 09:00 hasta las 18:00"
+    ],
+    "updatedAt": {
+      "_seconds": 1762012405,
+      "_nanoseconds": 93000000
+    },
+    "socialMedia": {
+      "instagram": "https://www.instagram.com/julioroldanalayo/",
+      "facebook": "https://www.facebook.com/julioroldanalayo/",
+      "tiktok": "https://www.tiktok.com/@julioroldanalayo"
+    },
+    "name": "Asesor Inmobiliario Julio Roldán",
+    "description": "Soy Asesor Inmobiliario en RE/MAX y ayudo a familias e inversionistas que desean comprar, vender o alquilar una propiedad.\n\nBrindo una atención personalizada y confiable, acompañando a mis clientes en cada etapa del proceso: desde la evaluación del inmueble y el análisis del mercado, hasta la negociación y el cierre exitoso.\n\n¡Permíteme ayudarte a cumplir tus objetivos inmobiliarios! 🔑",
+    "reference": "San isidro, Lima",
+    "location": "Rivera Navarrete 757"
+  },
+  {
+    "id": "bobocha-bubble-tea-shop",
+    "name": "Bobocha Bubble Tea Shop",
+    "rating": 4.6,
+    "location": "Av. Universitaria 1795",
+    "contactUrl": "https://www.cafecentral.com",
+    "tags": [
+      "bubble tea",
+      "té",
+      "bebidas",
+      "perlas",
+      "fruta",
+      "cafetería",
+      "postres",
+      "dulces",
+      "snacks",
+      "leche"
+    ],
+    "plan": "básico",
+    "horario": "No especificado",
+    "localImages": [],
+    "active": true,
+    "whatsapp": "+51 906906906",
+    "phone": "+51 906906906",
+    "conditions": [
+      "Horarios de atención flexibles",
+      "Consultas y presupuestos gratuitos",
+      "Aceptamos diferentes formas de pago",
+      "Términos y condiciones generales aplican",
+      "Contactar para más información"
+    ],
+    "specifications": [
+      "Servicio profesional de calidad",
+      "Atención personalizada",
+      "Experiencia comprobada",
+      "Compromiso con la excelencia",
+      "Satisfacción garantizada"
+    ],
+    "updatedAt": {
+      "_seconds": 1759383388,
+      "_nanoseconds": 570000000
+    },
+    "lastCoordinateUpdate": {
+      "_seconds": 1759418546,
+      "_nanoseconds": 714000000
+    },
+    "lastUpdated": "2025-10-02T15:34:47.821Z",
+    "zona": "San Miguel",
+    "district": "San Miguel",
+    "direccion_completa": "cafe tacuba, San Miguel, Lima, Perú",
+    "cacheBreaker": 1759419927847,
+    "address": "Av. Universitaria 1795, Lima ",
+    "reference": "Frente a la Universidad Católica ",
+    "coordenadas": [
+      -12.07379349183345,
+      -77.08670882210596
+    ],
+    "category": "Juguerías y Cafeterías",
+    "description": "Bobocha Bubble Tea Shop es la cadena de tiendas de Bubble Tea más grande de Perú.",
+    "detailsUrl": "https://bobocha.com.pe/",
+    "image": "https://res.cloudinary.com/do2rpqupm/image/upload/v1760144784/Atmosfera1_wtqjg9.jpg",
+    "images": [
+      "https://res.cloudinary.com/do2rpqupm/image/upload/v1760144784/Atmosfera1_wtqjg9.jpg"
+    ]
+  },
+  {
+    "id": "boutique-july",
+    "name": "Boutique July",
+    "active": true,
+    "phone": "+51 978 044 210",
+    "address": "Alejandro Bertello 890",
+    "reference": "Mercado 1ro de Mayo ",
+    "horario": "De las 10:00 hasta las 19:00 hrs",
+    "description": "👗 Boutique July te ofrece las mejores prendas para toda la familia.\nEncuentra ropa moderna, cómoda y de calidad para damas, caballeros y niños, con estilos que se adaptan a cada ocasión.\n\n🛍️ Ofrecemos:\n✨ Ropa casual y elegante\n👕 Prendas para toda la familia\n👗 Novedades en moda y temporada\n💸 Excelentes precios y atención personalizada\n\nVisítanos y renueva tu estilo con Boutique July, donde vestir bien es parte de tu día a día.",
+    "tag": [
+      "tienda de ropa",
+      "ropa para damas",
+      "ropa para caballeros",
+      "ropa para niños",
+      "tienda de moda",
+      "blusas",
+      "pantalones",
+      "ropa infantil",
+      "Boutique July",
+      "ropa de temporada",
+      "ropa",
+      "textil",
+      "textilería"
+    ],
+    "category": "Tienda de ropa",
+    "rating": 5,
+    "neighborhood": "Pando 3ra Etapa",
+    "detailsUrl": "https://wa.link/r6as9t",
+    "contactUrl": "https://wa.link/r6as9t",
+    "location": "Alejandro Bertello 890"
+  },
+  {
+    "id": "caldo-de-gallina",
+    "name": "Caldo de gallina",
+    "active": true,
+    "address": "Santa Mariana 520",
+    "category": "Restaurantes y menús",
+    "description": "El mejor caldo de gallina de la zona ",
+    "image": "https://res.cloudinary.com/do2rpqupm/image/upload/v1759073572/caldo_gallina_kf30si.webp",
+    "rating": 4,
+    "horario": "Desde las 19:00 a 21:30 ",
+    "phone": "+51999555999",
+    "neighborhood": "Pando 3ra Etapa",
+    "conditions": [
+      "Horario: Lunes a Domingo 11:00 AM - 10:00 PM",
+      "Reservas recomendadas para grupos grandes",
+      "Aceptamos efectivo y tarjetas",
+      "Delivery gratuito en pedidos mayores a $20.000",
+      "Consultar disponibilidad de platos especiales"
+    ],
+    "specifications": [
+      "Cocina tradicional con ingredientes frescos",
+      "Ambiente familiar y acogedor",
+      "Servicio de delivery disponible",
+      "Menú variado para todos los gustos",
+      "Atención personalizada"
+    ],
+    "updatedAt": {
+      "_seconds": 1759383388,
+      "_nanoseconds": 818000000
+    },
+    "lastCoordinateUpdate": {
+      "_seconds": 1759418546,
+      "_nanoseconds": 714000000
+    },
+    "lastUpdated": "2025-10-02T15:34:47.977Z",
+    "zona": "San Miguel",
+    "district": "San Miguel",
+    "direccion_completa": "Santa Mariana 520, San Miguel, Lima, Perú",
+    "cacheBreaker": 1759419927997,
+    "coordenadas": [
+      -12.077263645219734,
+      -77.08804479064838
+    ],
+    "location": "Santa Mariana 520"
+  },
+  {
+    "id": "centro-psicologico-kelly-villafuerte",
+    "name": "Centro Psicológico Kelly Villafuerte",
+    "active": true,
+    "phone": "+51 920 011 166",
+    "category": "Servicios Profesionales",
+    "location": "Jiron Crespo y Castillo 2633",
+    "image": "https://res.cloudinary.com/do2rpqupm/image/upload/v1760142188/WhatsApp_Image_2025-10-10_at_6.52.40_PM_fd18as.jpg",
+    "rating": 4.8,
+    "description": "Centro Psicológico Kelly Villafuerte es un espacio dedicado al bienestar emocional, con un enfoque humano, ético y profesional. Ofrecemos acompañamiento psicológico especializado en población infantil, adolescente y adulta, priorizando la escucha empática, la atención personalizada y el crecimiento integral de cada persona. Nuestro propósito es brindar un servicio accesible y de calidad, promoviendo la salud mental como parte esencial de la vida.",
+    "horario": "Lunes a Sábado de 09:00 a 20:30 hrs\nPresencial (solo con cita)",
+    "contactUrl": "https://wa.link/d4snw6",
+    "socialMedia": {
+      "instagram": "https://www.instagram.com/psic.kellyvluna"
+    },
+    "address": "Jiron Crespo y Castillo 2633, Cercado de Lima",
+    "detailsUrl": "https://calendly.com/psic-kellyvluna",
+    "images": [
+      "https://res.cloudinary.com/do2rpqupm/image/upload/v1760142188/WhatsApp_Image_2025-10-10_at_6.52.40_PM_fd18as.jpg",
+      "https://res.cloudinary.com/do2rpqupm/image/upload/v1760142188/WhatsApp_Image_2025-10-10_at_6.52.41_PM_2_fuwzlc.jpg",
+      "https://res.cloudinary.com/do2rpqupm/image/upload/v1760142188/WhatsApp_Image_2025-10-10_at_6.52.41_PM_jdyylf.jpg",
+      "https://res.cloudinary.com/do2rpqupm/image/upload/v1760142188/WhatsApp_Image_2025-10-10_at_6.52.41_PM_3_jhndc0.jpg",
+      "https://res.cloudinary.com/do2rpqupm/image/upload/v1760142188/WhatsApp_Image_2025-10-10_at_6.52.41_PM_1_ucgysg.jpg",
+      "https://res.cloudinary.com/do2rpqupm/image/upload/v1760142188/WhatsApp_Image_2025-10-10_at_6.52.40_PM_1_x589no.jpg"
+    ]
+  },
+  {
+    "id": "creciendo-digital",
+    "name": "Creciendo Digital",
+    "category": "Servicios",
+    "description": "Creciendo Digital es una empresa dedicada a impulsar a pequeños emprendedores y minipymes en su transformación digital, ofreciéndoles soluciones accesibles, prácticas y adaptadas a sus necesidades. Nuestro objetivo es que cualquier negocio, sin importar su tamaño, pueda ganar visibilidad, atraer clientes y gestionar mejor sus operaciones.",
+    "phone": "+51 901 426 737",
+    "whatsapp": "+51 901 426 737",
+    "images": [
+      "/uploads/services/1756138364114-tuvhlwm16y8.png"
+    ],
+    "active": true,
+    "rating": 5,
+    "contactUrl": "https://wa.link/837cfb",
+    "detailsUrl": "https://creciendodigitalweb.vercel.app/",
+    "horario": "Todos los días: 09:00 - 23:00",
+    "tags": [
+      "digital",
+      "paginaweb",
+      "marketing",
+      "diseño web",
+      "app",
+      "aplicacion movil",
+      "landingpage",
+      "web",
+      "diseño"
+    ],
+    "plan": "básico",
+    "image": "/uploads/services/1756138364114-tuvhlwm16y8.png",
+    "socialMedia": {
+      "facebook": "https://www.facebook.com/CreciendoDigital.tv",
+      "instagram": "https://www.instagram.com/creciendodigital.tv",
+      "tiktok": "https://www.tiktok.com/@cristian_emprendedor"
+    },
+    "address": "Santa Paula 471",
+    "neighborhood": "Pando 3ra etapa",
+    "reference": "Cerca de la parroquia Buen remedio",
+    "conditions": [
+      "Horarios de atención flexibles",
+      "Consultas y presupuestos gratuitos",
+      "Aceptamos diferentes formas de pago",
+      "Términos y condiciones generales aplican",
+      "Contactar para más información"
+    ],
+    "specifications": [
+      "Servicio profesional de calidad",
+      "Atención personalizada",
+      "Experiencia comprobada",
+      "Compromiso con la excelencia",
+      "Satisfacción garantizada"
+    ],
+    "updatedAt": {
+      "_seconds": 1759383389,
+      "_nanoseconds": 339000000
+    },
+    "lastCoordinateUpdate": {
+      "_seconds": 1759418546,
+      "_nanoseconds": 714000000
+    },
+    "lastUpdated": "2025-10-02T15:34:48.642Z",
+    "coordenadas": {
+      "lat": -12.0775,
+      "lng": -77.086
+    },
+    "zona": "San Miguel",
+    "district": "San Miguel",
+    "direccion_completa": "Santa Paula 471, San Miguel, Lima, Perú",
+    "cacheBreaker": 1759419928615,
+    "location": "Pando 3ra Etapa"
+  },
+  {
+    "id": "dra-fiorella-herrera",
+    "name": "Dra. Fiorella Herrera",
+    "address": "Av. Sucre 110, dpto 201 - pueblo libre ",
+    "active": true,
+    "category": "Servicios Profesionales",
+    "description": "Dra. Fiorella Herrera - Odontología integral\n\n\"Somos un consultorio dental en Pueblo Libre, dedicado a ofrecer atención integral y personalizada. Nuestra prioridad es tu bienestar, por eso combinamos experiencia, tecnología y un trato humano para que disfrutes de una sonrisa sana y segura.\"",
+    "horario": "Lunes - Miércoles - Viernes de 10:00 a 19:00",
+    "phone": "+51 970 694 325",
+    "reference": "Al frente de la puerta de emergencias del hospital Santa Rosa",
+    "rating": 4.5,
+    "contactUrl": "https://wa.link/r4vlyz",
+    "detailsUrl": "https://www.instagram.com/dra.fiorella.herrera/",
+    "socialMedia": {
+      "instagram": "https://www.instagram.com/dra.fiorella.herrera/"
+    },
+    "image": "https://res.cloudinary.com/do2rpqupm/image/upload/v1759529827/WhatsApp_Image_2025-10-03_at_4.52.51_PM_u1bhu4.jpg",
+    "images": [
+      "https://res.cloudinary.com/do2rpqupm/image/upload/v1759529827/WhatsApp_Image_2025-10-03_at_4.52.51_PM_u1bhu4.jpg",
+      "https://res.cloudinary.com/do2rpqupm/image/upload/v1759529974/WhatsApp_Image_2025-10-03_at_4.44.51_PM_3_oqqaws.jpg",
+      "https://res.cloudinary.com/do2rpqupm/image/upload/v1759529974/WhatsApp_Image_2025-10-03_at_4.44.51_PM_2_nnqguy.jpg",
+      "https://res.cloudinary.com/do2rpqupm/image/upload/v1759529975/WhatsApp_Image_2025-10-03_at_4.44.51_PM_1_liqsek.jpg",
+      "https://res.cloudinary.com/do2rpqupm/image/upload/v1759529975/WhatsApp_Image_2025-10-03_at_4.44.51_PM_mvgb4t.jpg"
+    ],
+    "location": "Av. Sucre 110, dpto 201",
+    "tag": [
+      "dentista",
+      "frenillos",
+      "profilaxia",
+      "dientes",
+      "blanqueamiento",
+      "blanqueamiento dental",
+      "implantes dentales",
+      "odontologos"
+    ]
+  },
+  {
+    "id": "el-point",
+    "name": "El Point",
+    "active": true,
+    "address": "Av universitaria 1635",
+    "reference": "Frente a la Universidad Católica ",
+    "location": "Av universitaria 1635",
+    "horario": "De las 10:00 hasta 23:30 hrs",
+    "phone": "+51 969 381 148",
+    "neighborhood": "Santa Emma",
+    "rating": 4.5,
+    "contactUrl": "https://wa.link/e1z7d5",
+    "detailsUrl": "https://wa.link/e1z7d5",
+    "image": "https://res.cloudinary.com/do2rpqupm/image/upload/v1760147330/WhatsApp_Image_2025-10-10_at_8.28.02_PM_lmpg6l.jpg",
+    "description": "El Point Restobar es el lugar perfecto para disfrutar buena comida, tragos y momentos inolvidables. 🍽️🍹\nOfrecemos una variedad de platos a la carta, menús del día y una amplia selección de tragos y bebidas para todos los gustos.\n\n✨ Te ofrecemos:\n🍛 Platos criollos y tradicionales\n🥩 Menús completos y bien servidos\n🍸 Cocteles, cervezas y bebidas refrescantes\n🎶 Un ambiente agradable para compartir con amigos o familia\n\nVen a El Point, donde la buena comida y el buen ambiente se encuentran.",
+    "tag": [
+      "comida",
+      "comida criolla",
+      "churrasco a lo pobre",
+      "restaurante",
+      "para comer",
+      "El pont"
+    ],
+    "images": [
+      "https://res.cloudinary.com/do2rpqupm/image/upload/v1760147330/WhatsApp_Image_2025-10-10_at_8.28.02_PM_lmpg6l.jpg",
+      "https://res.cloudinary.com/do2rpqupm/image/upload/v1760153693/WhatsApp_Image_2025-10-10_at_10.21.29_PM_gxqsa5.jpg",
+      "https://res.cloudinary.com/do2rpqupm/image/upload/v1760153693/WhatsApp_Image_2025-10-10_at_10.21.47_PM_m5qff2.jpg",
+      "https://res.cloudinary.com/do2rpqupm/image/upload/v1760153958/WhatsApp_Image_2025-10-10_at_10.21.37_PM_pfz1ng.jpg",
+      "https://res.cloudinary.com/do2rpqupm/image/upload/v1760153693/WhatsApp_Image_2025-10-10_at_10.21.38_PM_2_zzus22.jpg"
+    ],
+    "socialMedia": {
+      "facebook": "https://www.facebook.com/profile.php?id=61575811661632",
+      "instagram": "https://www.instagram.com/elpoint.restaurantbar/",
+      "tiktok": "https://www.tiktok.com/@elpoint_restaurant.bar"
+    },
+    "category": "Restaurantes y menús"
+  },
+  {
+    "id": "entequenate",
+    "name": "Entequeñate",
+    "rating": 4.5,
+    "phone": "+51 914 308 697",
+    "active": true,
+    "reference": "Parque Carlos Lisson",
+    "address": "Santa Martina 548",
+    "category": "Comida rápida",
+    "horario": "Desde las 18:00 a 23:00 hrs",
+    "contactUrl": "https://wa.link/ydz1t8",
+    "detailsUrl": "https://wa.link/ydz1t8",
+    "description": "🥟 Entequeñate 🥟\nSabor, crocancia y tradición en cada bocado.\nDeléitate con nuestros tequeños dorados, pastelitos rellenos y postres artesanales, elaborados con ingredientes de calidad y el auténtico toque de la fusión peruano-venezolana.\n\n🧀 Tequeños crujientes y llenos de sabor\n🥧 Pastelitos rellenos al estilo casero\n🍮 Postres que conquistan paladares\n🇵🇪🇻🇪 Fusión de lo mejor del Perú y Venezuela",
+    "image": "https://res.cloudinary.com/do2rpqupm/image/upload/v1759637654/Rosa_Pareja_Collage_de_Foto_Almohada_cuadrada_2_hcbwgx.png",
+    "location": "Santa Martina 548"
+  },
+  {
+    "id": "escuela-ads",
+    "name": "Escuela ADS",
+    "rating": 4.7,
+    "location": "Calle Eugenio Paredes 2471",
+    "description": "Descubre el ritmo que llevas dentro. Clases para todos los niveles",
+    "contactUrl": "https://www.salsabachatera.com",
+    "detailsUrl": "https://escuela-ads.vercel.app/",
+    "tags": [
+      "baile",
+      "salsa",
+      "bachata",
+      "clases",
+      "danza",
+      "música",
+      "academia",
+      "show",
+      "ritmo",
+      "pareja"
+    ],
+    "plan": "básico",
+    "whatsapp": "none",
+    "horario": "No especificado",
+    "localImages": [],
+    "active": true,
+    "image": "https://res.cloudinary.com/do2rpqupm/image/upload/v1758764044/una_imagen_de_un_due_o_de_un_nvnl20.jpg",
+    "images": [
+      "https://res.cloudinary.com/do2rpqupm/image/upload/v1758764044/una_imagen_de_un_due_o_de_un_nvnl20.jpg"
+    ],
+    "conditions": [
+      "Horarios de atención flexibles",
+      "Consultas y presupuestos gratuitos",
+      "Aceptamos diferentes formas de pago",
+      "Términos y condiciones generales aplican",
+      "Contactar para más información"
+    ],
+    "specifications": [
+      "Servicio profesional de calidad",
+      "Atención personalizada",
+      "Experiencia comprobada",
+      "Compromiso con la excelencia",
+      "Satisfacción garantizada"
+    ],
+    "updatedAt": {
+      "_seconds": 1759383389,
+      "_nanoseconds": 566000000
+    },
+    "lastCoordinateUpdate": {
+      "_seconds": 1759418546,
+      "_nanoseconds": 714000000
+    },
+    "lastUpdated": "2025-10-02T15:38:44.638Z",
+    "zona": "San Miguel",
+    "district": "San Miguel",
+    "direccion_completa": "Escuela ADS, San Miguel, Lima, Perú",
+    "coordenadas": {
+      "lat": -12.0784,
+      "lng": -77.0874
+    },
+    "cacheBreaker": 1759419928801,
+    "category": "Escuela de baile"
+  },
+  {
+    "id": "estudio-chilet-principe-abogados",
+    "name": "Estudio Chilet & Principe Abogados",
+    "active": true,
+    "rating": 4.7,
+    "horario": "Desde las 08:00 a 16:00 hrs",
+    "phone": "+51 939 909 647",
+    "category": "Servicios Profesionales",
+    "description": "🏛️ Chilet & Príncipe Abogados\n\nSoluciones legales con empatía y acción.\n\nEn Chilet & Príncipe Abogados, brindamos asesoría y defensa legal especializada en Derecho de Familia y Derecho Laboral, con un enfoque humano, ético y comprometido con los resultados.\n\nNos destacamos por ofrecer una atención personalizada y accesible, comprendiendo las necesidades reales de cada cliente. Nuestra experiencia abarca casos de alimentos, tenencia, régimen de visitas, filiación y pensiones alimentarias, así como reclamos laborales, despidos injustificados, beneficios sociales y derechos del trabajador.\n\nNuestro propósito es proteger tus derechos y acompañarte en cada paso del proceso legal, brindando orientación clara, soluciones rápidas y estrategias efectivas.\n\n📞 Agenda tu cita al 939 909 647\n⚖️ Confianza, compromiso y resultados reales.",
+    "address": "La esperanza",
+    "image": "https://res.cloudinary.com/do2rpqupm/image/upload/v1760203670/WhatsApp_Image_2025-10-11_at_11.49.30_-_Geraldine_Chilet_oz21gq.jpg",
+    "neighborhood": "La Esperanza",
+    "contactUrl": "https://wa.link/8zscbc",
+    "detailsUrl": "https://www.facebook.com/p/Abog-Chilet-Leiva-61566859962620/",
+    "socialMedia": {
+      "facebook": "https://www.facebook.com/p/Abog-Chilet-Leiva-61566859962620/"
+    },
+    "location": "La Esperanza"
+  },
+  {
+    "id": "grupo-omna-eirl",
+    "location": "San Fernando, Callao",
+    "horario": "8.00 am / 5.00 pm.",
+    "address": "San Fernando, Callao",
+    "category": "Servicios Generales",
+    "phone": "980994339",
+    "active": true,
+    "name": "Grupo OMNA eirl",
+    "contactUrl": "https://wa.link/lymk0d",
+    "reference": "Callao",
+    "detailsUrl": "https://www.omnaservicios.com/",
+    "plan": "básico",
+    "rating": 5,
+    "tags": [
+      "limpieza",
+      "servicios"
+    ],
+    "createdAt": {
+      "_seconds": 1761319030,
+      "_nanoseconds": 406000000
+    },
+    "updatedAt": {
+      "_seconds": 1761319030,
+      "_nanoseconds": 406000000
+    },
+    "image": "https://res.cloudinary.com/do2rpqupm/image/upload/v1761321552/Omna_Servicios_RECUPERACION_TRATAMIENTO_MANTENIMIENTO_de_pisos_y_superficies_en_general._Todo_sobre_el_rubro_limpieza_Servicios_especializados_li3vh9.png",
+    "neighborhood": "San Fernando",
+    "images": [
+      "https://res.cloudinary.com/do2rpqupm/image/upload/v1761321552/Omna_Servicios_RECUPERACION_TRATAMIENTO_MANTENIMIENTO_de_pisos_y_superficies_en_general._Todo_sobre_el_rubro_limpieza_Servicios_especializados_li3vh9.png",
+      "https://res.cloudinary.com/do2rpqupm/image/upload/v1761318868/20250131_192122-COLLAGE_2_-_Marcelo_Alvarez_Rodriguez_dcqt2u.jpg",
+      "https://res.cloudinary.com/do2rpqupm/image/upload/v1761318867/20250213_213818-COLLAGE_2_-_Marcelo_Alvarez_Rodriguez_xqir8a.jpg",
+      "https://res.cloudinary.com/do2rpqupm/image/upload/v1761318866/20251017_175503-COLLAGE_2_-_Marcelo_Alvarez_Rodriguez_krkzgb.jpg",
+      "https://res.cloudinary.com/do2rpqupm/image/upload/v1761318866/20250213_214032-COLLAGE_2_-_Marcelo_Alvarez_Rodriguez_bhug2b.jpg"
+    ],
+    "description": "Grupo OMNA somos especialistas en limpieza profunda y tratamiento profesional de pisos y superficies en general. Contamos con personal capacitado y equipos especializados para devolverle a tus espacios su brillo, limpieza y elegancia original. ✨\n\n🧩 Nuestros servicios incluyen:\n\nLimpieza profunda de pisos y superficies\n\nPulido, desmanchado y despercudido\n\nSellado, abrillantado y cristalizado\n\nResanes y vitrificados\n\nImpermeabilización y coloreado\n\nVaceado en terrazo y granito\n\nCon Grupo OMNA, tus pisos recuperan su mejor versión. 💪 Confía en profesionales con experiencia y compromiso con la excelencia."
+  },
+  {
+    "id": "imana-tu-vida",
+    "name": "Imana Tu Vida",
+    "image": "/images/biomagnetismo.webp",
+    "rating": 4.7,
+    "location": "Santa paula 470",
+    "description": "Tratamientos con imanes",
+    "contactUrl": "https://www.imanatuvida.com",
+    "detailsUrl": "https://www.imanatuvida.com",
+    "tags": [
+      "biomagnetismo",
+      "tratamientos",
+      "medicina complementaria",
+      "terapia",
+      "terapia",
+      "terapia",
+      "terapia",
+      "terapia",
+      "terapia",
+      "terapia",
+      "terapia",
+      "terapia"
+    ],
+    "plan": "básico",
+    "whatsapp": "none",
+    "images": [
+      "/images/biomagnetismo.webp"
+    ],
+    "horario": "No especificado",
+    "localImages": [],
+    "active": true,
+    "conditions": [
+      "Citas programadas con anticipación",
+      "Horario: Lunes a Viernes 8:00 AM - 6:00 PM",
+      "Sábados 8:00 AM - 2:00 PM",
+      "Aceptamos seguros médicos",
+      "Cancelaciones con 2 horas de anticipación"
+    ],
+    "specifications": [
+      "Profesionales certificados y especializados",
+      "Equipos médicos de última tecnología",
+      "Atención personalizada y confidencial",
+      "Instalaciones modernas y sanitizadas",
+      "Seguimiento post-consulta"
+    ],
+    "updatedAt": {
+      "_seconds": 1759383389,
+      "_nanoseconds": 715000000
+    },
+    "lastCoordinateUpdate": {
+      "_seconds": 1759418546,
+      "_nanoseconds": 714000000
+    },
+    "lastUpdated": "2025-10-02T15:38:44.921Z",
+    "zona": "San Miguel",
+    "district": "San Miguel",
+    "direccion_completa": "Imana Tu Vida, San Miguel, Lima, Perú",
+    "coordenadas": {
+      "lat": -12.0786,
+      "lng": -77.0876
+    },
+    "cacheBreaker": 1759419929006,
+    "category": "Salud Integral"
+  },
+  {
+    "id": "instalaciones-edduar-colmenarez",
+    "location": "Lima",
+    "horario": "Desde las 09:00 hasta las 21:00",
+    "address": "Lima",
+    "category": "Servicios Generales",
+    "phone": "+51 901001690",
+    "active": true,
+    "name": "Instalaciones EDDUAR COLMENAREZ",
+    "contactUrl": "https://wa.link/hjro4e",
+    "reference": "LIma",
+    "detailsUrl": "https://wa.link/hjro4e",
+    "plan": "básico",
+    "rating": 5,
+    "tags": [
+      "electricidad",
+      "tecnico",
+      "hidroneumatico",
+      "servicio",
+      "ingenieria electrica",
+      "bomba de agua"
+    ],
+    "description": "Instalaciones de Bombas de agua\nInstalaciones de hidroneumaticos\nElectricidad en general domestico e industrial\nCableado y recableado",
+    "createdAt": {
+      "_seconds": 1761324087,
+      "_nanoseconds": 293000000
+    },
+    "updatedAt": {
+      "_seconds": 1761324087,
+      "_nanoseconds": 293000000
+    }
+  },
+  {
+    "id": "iro-sushi",
+    "name": "IRO Sushi",
+    "image": "https://images.pexels.com/photos/357756/pexels-photo-357756.jpeg?auto=compress&cs=tinysrgb&w=400",
+    "location": "Av. Universitaria 1743",
+    "description": "Sushi fresco y rollos especiales",
+    "contactUrl": "https://www.sushiexpress.com",
+    "detailsUrl": "https://www.sushiexpress.com",
+    "whatsapp": "51906684287",
+    "tags": [
+      "sushi",
+      "japonés",
+      "makis",
+      "rollos",
+      "pescado",
+      "arroz",
+      "soya",
+      "wasabi",
+      "delivery",
+      "comida oriental"
+    ],
+    "plan": "básico",
+    "images": [
+      "https://images.pexels.com/photos/357756/pexels-photo-357756.jpeg?auto=compress&cs=tinysrgb&w=400"
+    ],
+    "localImages": [],
+    "active": true,
+    "horario": "12:00 a 21:00",
+    "address": "Av. Universitaria 1743",
+    "reference": "Frente a la Universidad Católica ",
+    "phone": "999 999 999",
+    "rating": 4.9,
+    "category": "Restaurantes y menús",
+    "conditions": [
+      "Horario: Lunes a Domingo 11:00 AM - 10:00 PM",
+      "Reservas recomendadas para grupos grandes",
+      "Aceptamos efectivo y tarjetas",
+      "Delivery gratuito en pedidos mayores a $20.000",
+      "Consultar disponibilidad de platos especiales"
+    ],
+    "specifications": [
+      "Cocina tradicional con ingredientes frescos",
+      "Ambiente familiar y acogedor",
+      "Servicio de delivery disponible",
+      "Menú variado para todos los gustos",
+      "Atención personalizada"
+    ],
+    "updatedAt": {
+      "_seconds": 1759383389,
+      "_nanoseconds": 940000000
+    },
+    "lastCoordinateUpdate": {
+      "_seconds": 1759418546,
+      "_nanoseconds": 714000000
+    },
+    "lastUpdated": "2025-10-02T15:38:45.062Z",
+    "zona": "San Miguel",
+    "district": "San Miguel",
+    "direccion_completa": "Av. Universitaria 1743, San Miguel, Lima, Perú",
+    "coordenadas": {
+      "lat": -12.0852,
+      "lng": -77.0952
+    },
+    "cacheBreaker": 1759419929199
+  },
+  {
+    "id": "jugueria-tomasita",
+    "active": true,
+    "address": "Av alejandro bertello 880",
+    "rating": 4.5,
+    "category": "Juguerías y Cafeterías",
+    "horario": "Desde las 07:00 a 18:00 horas",
+    "contactUrl": "https://wa.link/iqm98f",
+    "detailsUrl": "https://wa.link/iqm98f",
+    "tag": [
+      "jugos verdes",
+      "juguería",
+      "jugos",
+      "postres",
+      "queque",
+      "keke",
+      "jugo natural",
+      "extractos",
+      "jugos saludables",
+      "sándwiches",
+      "saludable"
+    ],
+    "image": "https://res.cloudinary.com/do2rpqupm/image/upload/v1759512751/Gemini_Generated_Image_fnmtmnfnmtmnfnmt_gbo7uh.png",
+    "images": [
+      "https://res.cloudinary.com/do2rpqupm/image/upload/v1759512751/Gemini_Generated_Image_fnmtmnfnmtmnfnmt_gbo7uh.png",
+      "https://res.cloudinary.com/do2rpqupm/image/upload/v1759516390/Gemini_Generated_Image_n5pw31n5pw31n5pw_1_e1s5wy.gif"
+    ],
+    "reference": "En el mercado 1ro de Mayo Pto 57",
+    "name": "Juguería Tomasita",
+    "phone": "+51990032685",
+    "description": "🍹 Juguería Tomasita Pto 57 🍹\n\nFrescura, sabor y energía en cada vaso.\nDisfruta de nuestros jugos y extractos preparados con las mejores frutas y verduras, llenos de fibra, vitaminas y antioxidantes que cuidan tu salud.\n\n🥤 Jugos naturales recién hechos\n🥬 Extractos nutritivos y energizantes\n🥪 Sándwiches deliciosos\n🍰 Postres caseros \n\nSe aceptan pagos por:\n\nYape / Plin\nTarjetas de Crédito / débito \n\n990032685  - 995296403",
+    "location": "Av alejandro bertello 880",
+    "neighborhood": "Pando 3ra Etapa"
+  },
+  {
+    "id": "la-cabanita",
+    "name": "La Cabañita",
+    "active": true,
+    "rating": 4.5,
+    "address": "Av. Universitaria 1637",
+    "phone": "+51 945 152 916",
+    "image": "https://res.cloudinary.com/do2rpqupm/image/upload/v1759646900/unnamed_fhepha.png",
+    "description": "La Cabañita – Tu paladar nuestra inspiración 🦐\n\nEl auténtico sabor peruano en un solo lugar.\nEn La Cabañita, te invitamos a disfrutar de nuestra comida criolla tradicional y comida marina preparados con ingredientes de primera calidad y el toque casero que nos distingue.\n\n🥘 Platos criollos llenos de sabor\n🦑 Ceviches frescos y tiraditos al instante\n🍛 Arroces, chicharrones y guisos tradicionales\n🍹 Ambiente familiar y atención con cariño",
+    "horario": "desde las 12:00 a 22:00 hrs  (Delivery  12:00 a 16:00 hrs)",
+    "category": "Restaurantes y menús",
+    "neighborhood": "Santa Emma",
+    "reference": "Frente a la PUCP ",
+    "contactUrl": "https://wa.link/6m0du1",
+    "detailsUrl": "https://www.facebook.com/lacabanitapucp",
+    "location": "Av. Universitaria 1637 ",
+    "tag": [
+      "restaurante de comida criolla",
+      "restaurante criollo",
+      "cevichería",
+      "comida criolla peruana",
+      "menu",
+      "restaurante",
+      "comida",
+      "almuerzo",
+      "comida peruana",
+      "lomo saltado",
+      "ceviche",
+      "cebiche",
+      "causa de marisco",
+      "pescado",
+      "comida de mar",
+      "la cabañita",
+      "cabañita"
+    ],
+    "socialMedia": {
+      "facebook": "https://www.facebook.com/lacabanitapucp"
+    },
+    "images": [
+      "https://res.cloudinary.com/do2rpqupm/image/upload/v1759646900/unnamed_fhepha.png",
+      "https://res.cloudinary.com/do2rpqupm/image/upload/v1759741096/ceviche_kyi3ms.jpg",
+      "https://res.cloudinary.com/do2rpqupm/image/upload/v1759741158/497881188_17903678916174963_8559036541120316305_n_xi4sbj.jpg",
+      "https://res.cloudinary.com/do2rpqupm/image/upload/v1759741159/501811441_17905109958174963_237321564694776575_n_i4jetg.jpg",
+      "https://res.cloudinary.com/do2rpqupm/image/upload/v1759741159/501685178_17905003092174963_5391187708146498771_n_kc7qgc.jpg"
+    ]
+  },
+  {
+    "id": "lacteos-y-embutidos-ayc",
+    "name": "Lácteos y Embutidos A&C",
+    "category": "Abarrotes",
+    "rating": 4.7,
+    "detailsUrl": "https://www.lacteosayc.com",
+    "tags": [
+      "queso",
+      "leche",
+      "yogurt",
+      "embutidos",
+      "mantequilla",
+      "jamón",
+      "salchicha",
+      "pan",
+      "arroz"
+    ],
+    "plan": "básico",
+    "localImages": [],
+    "active": true,
+    "location": "Calle Sta Nicerata 354",
+    "horario": "Todos los días de 09:00 a 23:00",
+    "reference": "Frente al Parque Carlos Lisson",
+    "phone": "+51996901493",
+    "whatsapp": "996901493",
+    "conditions": [
+      "Horarios de atención flexibles",
+      "Consultas y presupuestos gratuitos",
+      "Aceptamos diferentes formas de pago",
+      "Términos y condiciones generales aplican",
+      "Contactar para más información"
+    ],
+    "specifications": [
+      "Servicio profesional de calidad",
+      "Atención personalizada",
+      "Experiencia comprobada",
+      "Compromiso con la excelencia",
+      "Satisfacción garantizada"
+    ],
+    "updatedAt": {
+      "_seconds": 1759383390,
+      "_nanoseconds": 92000000
+    },
+    "lastCoordinateUpdate": {
+      "_seconds": 1759418546,
+      "_nanoseconds": 714000000
+    },
+    "lastUpdated": "2025-10-02T15:38:45.342Z",
+    "zona": "San Miguel",
+    "district": "San Miguel",
+    "direccion_completa": "Lácteos y Embutidos A&C, San Miguel, Lima, Perú",
+    "coordenadas": {
+      "lat": -12.0788,
+      "lng": -77.0878
+    },
+    "cacheBreaker": 1759419962783,
+    "image": "https://res.cloudinary.com/do2rpqupm/image/upload/v1760366181/WhatsApp_Image_2025-10-12_at_8.12.40_PM_lgjsab.jpg",
+    "images": [
+      "https://res.cloudinary.com/do2rpqupm/image/upload/v1760366181/WhatsApp_Image_2025-10-12_at_8.12.40_PM_lgjsab.jpg"
+    ],
+    "contactUrl": "https://wa.link/s063xa",
+    "description": "Ofrecemos  los mejores productos para tu mesa, con variedad, frescura y calidad garantizada. 🛒✨\n\n🥛 Ofrecemos:\n🧈 Lácteos frescos: leche, yogures, quesos y mantequilla\n🥓 Embutidos de las mejores marcas: jamón, salchichas, chorizos y más\n🍞 Productos de abarrotes y alimentos de primera necesidad\n\nVen y encuentra todo lo que necesitas para tu hogar en Lácteos y Embutidos A&C, tu tienda de confianza en el barrio.",
+    "address": "Santa Nicerata 354",
+    "neighborhood": "Pando 3ra Etapa"
+  },
+  {
+    "id": "lavanderia-antares",
+    "name": "Lavandería Antares",
+    "category": "Lavanderías",
+    "image": "https://cdn.pixabay.com/photo/2017/09/14/19/34/laundry-2750158_1280.jpg",
+    "rating": 4.7,
+    "location": "Av. Universitaria 1733",
+    "description": "Lavado y planchado profesional",
+    "contactUrl": "https://www.lavanderiaantares.com",
+    "detailsUrl": "https://www.lavanderiaantares.com",
+    "tags": [
+      "lavandería",
+      "lavado",
+      "planchado",
+      "ropa",
+      "servicio a domicilio",
+      "secado",
+      "limpieza",
+      "blanco",
+      "camisas",
+      "uniforme"
+    ],
+    "plan": "básico",
+    "whatsapp": "none",
+    "images": [
+      "https://cdn.pixabay.com/photo/2017/09/14/19/34/laundry-2750158_1280.jpg"
+    ],
+    "horario": "No especificado",
+    "localImages": [],
+    "active": true,
+    "conditions": [
+      "Horarios de atención flexibles",
+      "Consultas y presupuestos gratuitos",
+      "Aceptamos diferentes formas de pago",
+      "Términos y condiciones generales aplican",
+      "Contactar para más información"
+    ],
+    "specifications": [
+      "Servicio profesional de calidad",
+      "Atención personalizada",
+      "Experiencia comprobada",
+      "Compromiso con la excelencia",
+      "Satisfacción garantizada"
+    ],
+    "updatedAt": {
+      "_seconds": 1759383390,
+      "_nanoseconds": 310000000
+    },
+    "lastCoordinateUpdate": {
+      "_seconds": 1759418546,
+      "_nanoseconds": 714000000
+    },
+    "lastUpdated": "2025-10-02T15:38:45.474Z",
+    "zona": "San Miguel",
+    "district": "San Miguel",
+    "direccion_completa": "Lavandería Antares, San Miguel, Lima, Perú",
+    "coordenadas": {
+      "lat": -12.078800000000001,
+      "lng": -77.08779999999999
+    },
+    "cacheBreaker": 1759419963334
+  },
+  {
+    "id": "lebasi-distribuidor-lima-peru",
+    "name": "Lebasi Distribuidor Lima Perú",
+    "active": true,
+    "category": "Salud Integral",
+    "description": "Alimento de origen de exportación Suiza ,100% natural que contiene 41 nutrientes, 11 vitaminas, 11 minerales y 19 aminoácidos ",
+    "detailsUrl": "https://www.facebook.com/LebasiDistribuidorLimaPeru",
+    "contactUrl": "https://wa.link/vomxi3",
+    "horario": "Todos los días de 08:00 a 18:00 ",
+    "reference": "A pasos del parque Santa Florencia",
+    "rating": 4.5,
+    "neighborhood": "Santa Florencia",
+    "address": "Calle Miguel de Unamuno 232, San Miguel",
+    "phone": "+51 937 070 464",
+    "socialMedia": {
+      "facebook": "https://www.facebook.com/LebasiDistribuidorLimaPeru"
+    },
+    "image": "https://res.cloudinary.com/do2rpqupm/image/upload/v1759463511/WhatsApp_Image_2025-10-02_at_9.55.52_PM_za09lp.jpg",
+    "images": [
+      "https://res.cloudinary.com/do2rpqupm/image/upload/v1759463511/WhatsApp_Image_2025-10-02_at_9.55.52_PM_za09lp.jpg",
+      "https://res.cloudinary.com/do2rpqupm/image/upload/v1759463573/WhatsApp_Image_2025-10-02_at_9.55.52_PM_1_ttymlm.jpg",
+      "https://res.cloudinary.com/do2rpqupm/image/upload/v1759463573/WhatsApp_Image_2025-10-02_at_9.55.51_PM_2_kcldxo.jpg",
+      "https://res.cloudinary.com/do2rpqupm/image/upload/v1759463573/WhatsApp_Image_2025-10-02_at_9.55.51_PM_1_pwnezs.jpg",
+      "https://res.cloudinary.com/do2rpqupm/image/upload/v1759463572/WhatsApp_Image_2025-10-02_at_9.55.53_PM_z1qdnp.jpg"
+    ],
+    "location": "Calle Miguel de Unamuno 232, San Miguel"
+  },
+  {
+    "id": "mercado-don-pedrito",
+    "name": "Mercado Don Pedrito",
+    "active": true,
+    "address": "Los Pinos 339 ",
+    "category": "Abarrotes",
+    "rating": 4,
+    "description": "La calidad y el sabor se encuentran en cada producto. ¡Compre fresco, compre cerca! Variedad de productos de alta calidad para su hogar.",
+    "image": "https://res.cloudinary.com/do2rpqupm/image/upload/v1759031874/almacen_pedrito_ixgdpb.png",
+    "detailsUrl": "https://www.tubarrio.pe/",
+    "phone": "+51 982 406 716",
+    "reference": "Entre los eucaliptos y los cedros",
+    "contactUrl": "https://wa.link/fbypem",
+    "district": "San Miguel",
+    "horario": "Todos los días desde 09:00 a 21:00",
+    "neighborhood": "Pando 9na Etapa",
+    "images": [
+      "https://res.cloudinary.com/do2rpqupm/image/upload/v1759031874/almacen_pedrito_ixgdpb.png"
+    ],
+    "conditions": [
+      "Horarios de atención flexibles",
+      "Consultas y presupuestos gratuitos",
+      "Aceptamos diferentes formas de pago",
+      "Términos y condiciones generales aplican",
+      "Contactar para más información"
+    ],
+    "specifications": [
+      "Servicio profesional de calidad",
+      "Atención personalizada",
+      "Experiencia comprobada",
+      "Compromiso con la excelencia",
+      "Satisfacción garantizada"
+    ],
+    "updatedAt": {
+      "_seconds": 1759383390,
+      "_nanoseconds": 449000000
+    },
+    "lastCoordinateUpdate": {
+      "_seconds": 1759418546,
+      "_nanoseconds": 714000000
+    },
+    "lastUpdated": "2025-10-02T15:38:45.717Z",
+    "zona": "San Miguel",
+    "direccion_completa": "Los Pinos 339 , San Miguel, Lima, Perú",
+    "coordenadas": {
+      "lat": -12.0792,
+      "lng": -77.0882
+    },
+    "cacheBreaker": 1759419929590,
+    "location": "Los Pinos 339"
+  },
+  {
+    "id": "mgc-dental-health",
+    "name": "Mgc Dental Health",
+    "reference": "Frente al parque Carlos Lisson",
+    "phone": "+51991238631",
+    "horario": "Atención previa cita",
+    "image": "https://res.cloudinary.com/do2rpqupm/image/upload/v1759078111/mgc_yw0xyp.webp",
+    "description": "Odontologia integral, estética & funcional.",
+    "active": true,
+    "rating": 4.5,
+    "contactUrl": "https://wa.link/3mvim4",
+    "detailsUrl": "https://www.tubarrio.pe/servicio/mgc-dental-health",
+    "tag": [
+      "dentista",
+      "frenillos",
+      "profilaxia",
+      "dientes",
+      "blanqueamiento",
+      "blanqueamiento dental",
+      "implantes dentales",
+      "odontologos"
+    ],
+    "category": "Servicios Profesionales",
+    "conditions": [
+      "Evaluación gratuita del proyecto",
+      "Horarios flexibles según disponibilidad",
+      "Pago 50% adelanto, 50% al finalizar",
+      "Garantía de 6 meses en trabajos realizados",
+      "Materiales incluidos en el presupuesto"
+    ],
+    "specifications": [
+      "Profesionales con experiencia comprobada",
+      "Servicio personalizado según necesidades",
+      "Presupuestos sin compromiso",
+      "Garantía en todos los trabajos",
+      "Atención rápida y eficiente"
+    ],
+    "updatedAt": {
+      "_seconds": 1759383390,
+      "_nanoseconds": 562000000
+    },
+    "direccion": "Santa Nicerata 372",
+    "address": "Santa Nicerata 372",
+    "distrito": "San Miguel",
+    "zona": "San Miguel",
+    "direccion_completa": "Santa Nicerata 372, San Miguel, Lima, Perú",
+    "locationFixed": 1759418329631,
+    "neighborhood": "San Miguel",
+    "lastCoordinateUpdate": {
+      "_seconds": 1759418546,
+      "_nanoseconds": 714000000
+    },
+    "lastUpdated": "2025-10-02T15:34:49.989Z",
+    "coordenadas": {
+      "lat": -12.0776,
+      "lng": -77.0865
+    },
+    "cacheBreaker": 1759419929797,
+    "location": "Santa Nicerata 372"
+  },
+  {
+    "id": "peluqueria-estilo",
+    "name": "Peluquería Estilo",
+    "category": "Servicios",
+    "image": "https://images.pexels.com/photos/3993449/pexels-photo-3993449.jpeg?auto=compress&cs=tinysrgb&w=400",
+    "rating": 4.7,
+    "location": "Sta. Paula 567",
+    "description": "Cortes y peinados modernos",
+    "contactUrl": "https://www.peluqueriaestilo.com",
+    "detailsUrl": "https://www.peluqueriaestilo.com",
+    "tags": [
+      "peluquería",
+      "corte",
+      "cabello",
+      "peinado",
+      "tinte",
+      "barbería",
+      "secado",
+      "alisado",
+      "niños",
+      "damas",
+      "caballeros"
+    ],
+    "plan": "básico",
+    "whatsapp": "none",
+    "images": [
+      "https://images.pexels.com/photos/3993449/pexels-photo-3993449.jpeg?auto=compress&cs=tinysrgb&w=400"
+    ],
+    "horario": "No especificado",
+    "localImages": [],
+    "active": true,
+    "conditions": [
+      "Horarios de atención flexibles",
+      "Consultas y presupuestos gratuitos",
+      "Aceptamos diferentes formas de pago",
+      "Términos y condiciones generales aplican",
+      "Contactar para más información"
+    ],
+    "specifications": [
+      "Servicio profesional de calidad",
+      "Atención personalizada",
+      "Experiencia comprobada",
+      "Compromiso con la excelencia",
+      "Satisfacción garantizada"
+    ],
+    "updatedAt": {
+      "_seconds": 1759383390,
+      "_nanoseconds": 896000000
+    },
+    "lastCoordinateUpdate": {
+      "_seconds": 1759418546,
+      "_nanoseconds": 714000000
+    },
+    "lastUpdated": "2025-10-02T15:38:46.265Z",
+    "zona": "San Miguel",
+    "district": "San Miguel",
+    "direccion_completa": "Peluquería Estilo, San Miguel, Lima, Perú",
+    "coordenadas": {
+      "lat": -12.0798,
+      "lng": -77.0888
+    },
+    "cacheBreaker": 1759419930349
+  },
+  {
+    "id": "pizzeria-toscana",
+    "name": "Pizzería Toscana",
+    "image": "https://images.pexels.com/photos/315755/pexels-photo-315755.jpeg?auto=compress&cs=tinysrgb&w=400",
+    "rating": 4.7,
+    "location": "Av. Universitaria 1697",
+    "detailsUrl": "https://www.pizzaitaliana.com",
+    "plan": "básico",
+    "images": [
+      "https://images.pexels.com/photos/315755/pexels-photo-315755.jpeg?auto=compress&cs=tinysrgb&w=400"
+    ],
+    "localImages": [],
+    "whatsapp": "51981901000",
+    "horario": "Lunes a Domingo: 12:00 - 23:00",
+    "description": "En Pizzería Toscana, te invitamos a un viaje culinario a Italia con nuestras exquisitas pizzas a la piedra estilo toscano. Nuestra pasión es la tradición y la calidad.",
+    "contactUrl": "https://web.whatsapp.com/send?phone=51981901000",
+    "tags": [
+      "pizza",
+      "italiana",
+      "queso",
+      "pasta",
+      "horno",
+      "comida italiana",
+      "familiar",
+      "delivery",
+      "mozarella",
+      "tomate",
+      "pizza a la piedra"
+    ],
+    "active": true,
+    "category": "Restaurantes y menús",
+    "conditions": [
+      "Horario: Lunes a Domingo 11:00 AM - 10:00 PM",
+      "Reservas recomendadas para grupos grandes",
+      "Aceptamos efectivo y tarjetas",
+      "Delivery gratuito en pedidos mayores a $20.000",
+      "Consultar disponibilidad de platos especiales"
+    ],
+    "specifications": [
+      "Cocina tradicional con ingredientes frescos",
+      "Ambiente familiar y acogedor",
+      "Servicio de delivery disponible",
+      "Menú variado para todos los gustos",
+      "Atención personalizada"
+    ],
+    "updatedAt": {
+      "_seconds": 1759383391,
+      "_nanoseconds": 6000000
+    },
+    "lastCoordinateUpdate": {
+      "_seconds": 1759418546,
+      "_nanoseconds": 714000000
+    },
+    "lastUpdated": "2025-10-02T15:38:46.462Z",
+    "zona": "San Miguel",
+    "district": "San Miguel",
+    "direccion_completa": "Pizzería Toscana, San Miguel, Lima, Perú",
+    "coordenadas": {
+      "lat": -12.08,
+      "lng": -77.089
+    },
+    "cacheBreaker": 1759419930466
+  },
+  {
+    "id": "podologia-anita",
+    "name": "Podología Anita",
+    "rating": 5,
+    "category": "Servicios Profesionales",
+    "address": "Av Mariano Cornejo 1782, Pueblo Libre",
+    "horario": "Lunes a Sábado de 10:00 a 19:00 y Domingo Previa cita  de  09:00 a 14:00",
+    "active": true,
+    "contactUrl": "https://wa.link/vkgoee",
+    "socialMedia": {
+      "instagram": "https://www.instagram.com/anitapodologia/",
+      "facebook": "https://www.facebook.com/AnitaPodologia/"
+    },
+    "detailsUrl": "https://podologiaanita.com/",
+    "tag": [
+      "podología",
+      "servicio de podología",
+      "podólogo",
+      "clínica podológica",
+      "centro de podología",
+      "cuidado de pies",
+      "uñas",
+      "callos",
+      "tratamiento",
+      "pies",
+      "dedos",
+      "hongos",
+      "salud",
+      ""
+    ],
+    "neighborhood": "Urb. La Luz",
+    "phone": "+51 910 560 210 - +51 997 195 318",
+    "description": "Servicio de podología profesional cuidamos la salud y bienestar de tus pies con atención personalizada y tratamientos especializados. 👣\n\n✨ Ofrecemos:\n👧 Podología infantil\n🦶 Extracción de uñeros\n💉 Podología para pie diabético\n💅 Tratamiento de onicomicosis (hongos en uñas)\n\nTu salud comienza por tus pies. Confía en manos expertas para mantenerlos sanos, limpios y sin dolor.",
+    "location": "Av Mariano Cornejo 1782, Pueblo libre",
+    "image": "https://res.cloudinary.com/do2rpqupm/image/upload/v1760203544/WhatsApp_Image_2025-10-11_at_12.24.42_PM_cagc44.jpg",
+    "images": [
+      "https://res.cloudinary.com/do2rpqupm/image/upload/v1760203544/WhatsApp_Image_2025-10-11_at_12.24.42_PM_cagc44.jpg",
+      "https://res.cloudinary.com/do2rpqupm/image/upload/v1760203927/0ea134e1-1088-42c5-a9d7-ec1623a71c1b_e8hpgb.jpg",
+      "https://res.cloudinary.com/do2rpqupm/image/upload/v1760203928/61dc92b1-7300-4a06-9947-e247f855212f_xcayqe.jpg",
+      "https://res.cloudinary.com/do2rpqupm/image/upload/v1760203927/554c273a-221b-45ea-8edd-6cdce5af35c4_aursil.jpg",
+      "https://res.cloudinary.com/do2rpqupm/image/upload/v1760203928/14cefa7f-fbe7-492f-aecb-384e9bf49e81_whlwgh.jpg"
+    ]
+  },
+  {
+    "id": "rey-del-shawarma",
+    "name": "Rey del Shawarma",
+    "image": "https://images.pexels.com/photos/4958792/pexels-photo-4958792.jpeg?auto=compress&cs=tinysrgb&w=400",
+    "rating": 4.5,
+    "location": "jr. Santa Nicerata 334",
+    "description": "Tacos tradicionales y quesadillas",
+    "contactUrl": "https://www.tacoselguero.com",
+    "detailsUrl": "https://www.tacoselguero.com",
+    "whatsapp": "51906684286",
+    "tags": [
+      "shawarma",
+      "taco",
+      "quesadilla",
+      "mexicana",
+      "árabe",
+      "pollo",
+      "carne",
+      "wrap",
+      "comida rápida",
+      "delivery"
+    ],
+    "plan": "básico",
+    "images": [
+      "https://images.pexels.com/photos/4958792/pexels-photo-4958792.jpeg?auto=compress&cs=tinysrgb&w=400"
+    ],
+    "horario": "No especificado",
+    "localImages": [],
+    "active": true,
+    "category": "Comida rápida",
+    "conditions": [
+      "Horarios de atención flexibles",
+      "Consultas y presupuestos gratuitos",
+      "Aceptamos diferentes formas de pago",
+      "Términos y condiciones generales aplican",
+      "Contactar para más información"
+    ],
+    "specifications": [
+      "Servicio profesional de calidad",
+      "Atención personalizada",
+      "Experiencia comprobada",
+      "Compromiso con la excelencia",
+      "Satisfacción garantizada"
+    ],
+    "updatedAt": {
+      "_seconds": 1759383391,
+      "_nanoseconds": 122000000
+    },
+    "lastCoordinateUpdate": {
+      "_seconds": 1759418546,
+      "_nanoseconds": 714000000
+    },
+    "lastUpdated": "2025-10-02T15:38:46.658Z",
+    "zona": "San Miguel",
+    "district": "San Miguel",
+    "direccion_completa": "Rey del Shawarma, San Miguel, Lima, Perú",
+    "coordenadas": {
+      "lat": -12.0802,
+      "lng": -77.0892
+    },
+    "cacheBreaker": 1759419930567
+  },
+  {
+    "id": "sanna-terapia",
+    "active": true,
+    "address": "Santa Teodosia #471",
+    "description": "Servicio de psicología integral que ofrece apoyo emocional y herramientas para mejorar.",
+    "horario": "Todos los días de 07:00 a 22:00",
+    "name": "Sanna terapia",
+    "image": "https://res.cloudinary.com/do2rpqupm/image/upload/v1758771641/sannaterapia_tt4zwh.png",
+    "localImages": "",
+    "location": "Santa Teodosia 471",
+    "phone": "+51947135588",
+    "plan": "básico",
+    "rating": 4.5,
+    "reference": "Frente al Parque Carlos Lisson",
+    "whatsapp": "+51947135588",
+    "tag": [
+      "terapia",
+      "psicologa",
+      "psicologo",
+      "mental",
+      "salud"
+    ],
+    "neighborhood": "Pando 3ra Etapa",
+    "socialMedia": {
+      "facebook": "https://www.facebook.com/sannaterapia",
+      "instagram": "https://www.instagram.com/_sannaterapia"
+    },
+    "contactUrl": "https://wa.link/53ifd3",
+    "detailsUrl": "https://www.facebook.com/sannaterapia",
+    "images": [
+      "https://res.cloudinary.com/do2rpqupm/image/upload/v1758771641/sannaterapia_tt4zwh.png"
+    ],
+    "conditions": [
+      "Horarios de atención flexibles",
+      "Consultas y presupuestos gratuitos",
+      "Aceptamos diferentes formas de pago",
+      "Términos y condiciones generales aplican",
+      "Contactar para más información"
+    ],
+    "specifications": [
+      "Servicio profesional de calidad",
+      "Atención personalizada",
+      "Experiencia comprobada",
+      "Compromiso con la excelencia",
+      "Satisfacción garantizada"
+    ],
+    "updatedAt": {
+      "_seconds": 1759383391,
+      "_nanoseconds": 234000000
+    },
+    "lastCoordinateUpdate": {
+      "_seconds": 1759418546,
+      "_nanoseconds": 714000000
+    },
+    "lastUpdated": "2025-10-02T15:34:50.846Z",
+    "zona": "San Miguel",
+    "district": "San Miguel",
+    "direccion_completa": "Santa Teodosia #471, San Miguel, Lima, Perú",
+    "coordenadas": {
+      "lat": -12.0778,
+      "lng": -77.0868
+    },
+    "cacheBreaker": 1759419963612,
+    "category": "Servicios Profesionales"
+  },
+  {
+    "id": "servicio-tecnico-galaxia",
+    "name": "Servicio técnico Galaxia",
+    "active": true,
+    "rating": 4.5,
+    "category": "Servicios Generales",
+    "address": "Coop. Andahuaylas  Av. Los Chancas, Santa Anita",
+    "location": "Coop.Andahuaylas los, Av. Chancas, Santa Anita",
+    "phone": "+51 944 183 643",
+    "horario": "De las 09:00 a 21:00 hrs",
+    "image": "https://res.cloudinary.com/do2rpqupm/image/upload/v1760202226/375796981_122095257500041508_8417277859689659654_n_pgmcna.jpg",
+    "neighborhood": "Santa Anita",
+    "reference": "Mercado Andahuaylas, Santa Anita",
+    "contactUrl": "https://wa.link/9sx9cf",
+    "detailsUrl": "https://www.facebook.com/profile.php?id=61551245242992",
+    "images": [
+      "https://res.cloudinary.com/do2rpqupm/image/upload/v1760202226/375796981_122095257500041508_8417277859689659654_n_pgmcna.jpg",
+      "https://res.cloudinary.com/do2rpqupm/image/upload/v1760202227/468301493_122185464008041508_5835559375153594020_n_spykoo.jpg",
+      "https://res.cloudinary.com/do2rpqupm/image/upload/v1760202227/b26b3ed8-a82e-4101-9b17-199eeb59855d_i0neou.jpg",
+      "https://res.cloudinary.com/do2rpqupm/image/upload/v1760202227/468507766_122185463690041508_8996231399974979878_n_qwzhms.jpg",
+      "https://res.cloudinary.com/do2rpqupm/image/upload/v1760202227/468329062_122185449008041508_1885701243495779174_n_xcwqry.jpg"
+    ],
+    "description": "Servicio Técnico Galaxia 🌌\nEspecialistas en la reparación y mantenimiento de electrodomésticos del hogar. Contamos con técnicos capacitados y servicio rápido, confiable y garantizado.\n\n⚙️ Atendemos:\n🧊 Refrigeradoras\n🧺 Lavadoras\n🔥 Microondas\n\n🔋 Diagnóstico preciso, repuestos originales y atención a domicilio."
+  },
+  {
+    "id": "shawarma-el-faraon",
+    "name": "Shawarma El Faraón",
+    "image": "https://images.pexels.com/photos/4394613/pexels-photo-4394613.jpeg?auto=compress&cs=tinysrgb&w=800",
+    "rating": 4.9,
+    "location": "Av. Universitaria 1687",
+    "contactUrl": "https://www.shawarmpalace.com",
+    "detailsUrl": "https://www.shawarmpalace.com",
+    "tags": [
+      "shawarma",
+      "árabe",
+      "pollo",
+      "carne",
+      "wrap",
+      "pan pita",
+      "delivery",
+      "comida rápida",
+      "kebab",
+      "ensalada"
+    ],
+    "plan": "básico",
+    "whatsapp": "none",
+    "images": [
+      "https://images.pexels.com/photos/4394613/pexels-photo-4394613.jpeg?auto=compress&cs=tinysrgb&w=800"
+    ],
+    "horario": "No especificado",
+    "localImages": [],
+    "description": "Disfruta del sabor tradicional del Medio Oriente con nuestro shawarma fresco, jugoso y lleno de especias aromáticas. Preparado con carne de res, pollo o mezcla de ambos, marinados durante horas en una mezcla secreta de especias y asados lentamente para un sabor irresistible.",
+    "active": true,
+    "category": "Comida rápida",
+    "conditions": [
+      "Horarios de atención flexibles",
+      "Consultas y presupuestos gratuitos",
+      "Aceptamos diferentes formas de pago",
+      "Términos y condiciones generales aplican",
+      "Contactar para más información"
+    ],
+    "specifications": [
+      "Servicio profesional de calidad",
+      "Atención personalizada",
+      "Experiencia comprobada",
+      "Compromiso con la excelencia",
+      "Satisfacción garantizada"
+    ],
+    "updatedAt": {
+      "_seconds": 1759383391,
+      "_nanoseconds": 347000000
+    },
+    "lastCoordinateUpdate": {
+      "_seconds": 1759418546,
+      "_nanoseconds": 714000000
+    },
+    "lastUpdated": "2025-10-02T15:38:46.887Z",
+    "zona": "San Miguel",
+    "district": "San Miguel",
+    "direccion_completa": "Shawarma El Faraón, San Miguel, Lima, Perú",
+    "coordenadas": {
+      "lat": -12.0804,
+      "lng": -77.0894
+    },
+    "cacheBreaker": 1759419930686
+  },
+  {
+    "id": "superburger",
+    "name": "Superburger",
+    "rating": 4.8,
+    "location": "Sta. Teodosia 573",
+    "detailsUrl": "https://delifoods-gamma.vercel.app/",
+    "tags": [
+      "hamburguesa",
+      "comida rápida",
+      "carne",
+      "papas",
+      "queso"
+    ],
+    "plan": "básico",
+    "localImages": [],
+    "active": true,
+    "address": "Sta. Teodosia 573",
+    "reference": "Frente al Parque Carlos Lisson",
+    "horario": "Todos los días de : 19:00 - 23:00",
+    "phone": "+51996901493",
+    "whatsapp": "51996901493",
+    "category": "Comida rápida",
+    "neighborhood": "Pando 3ra etaoa",
+    "conditions": [
+      "Horarios de atención flexibles",
+      "Consultas y presupuestos gratuitos",
+      "Aceptamos diferentes formas de pago",
+      "Términos y condiciones generales aplican",
+      "Contactar para más información"
+    ],
+    "specifications": [
+      "Servicio profesional de calidad",
+      "Atención personalizada",
+      "Experiencia comprobada",
+      "Compromiso con la excelencia",
+      "Satisfacción garantizada"
+    ],
+    "updatedAt": {
+      "_seconds": 1759383391,
+      "_nanoseconds": 457000000
+    },
+    "lastCoordinateUpdate": {
+      "_seconds": 1759418546,
+      "_nanoseconds": 714000000
+    },
+    "lastUpdated": "2025-10-02T15:34:51.082Z",
+    "zona": "San Miguel",
+    "district": "San Miguel",
+    "direccion_completa": "Sta. Teodosia 573, San Miguel, Lima, Perú",
+    "coordenadas": {
+      "lat": -12.0779,
+      "lng": -77.0869
+    },
+    "cacheBreaker": 1759420275375,
+    "image": "https://res.cloudinary.com/do2rpqupm/image/upload/v1760366227/WhatsApp_Image_2025-10-12_at_9.56.16_PM_vfpnbk.jpg",
+    "images": [
+      "https://res.cloudinary.com/do2rpqupm/image/upload/v1760366227/WhatsApp_Image_2025-10-12_at_9.56.16_PM_vfpnbk.jpg"
+    ],
+    "description": "El auténtico sabor de las hamburguesas venezolanas, con combinaciones irresistibles y porciones generosas que te harán volver por más. \n\n🔥 Ofrecemos:\n🍔 Hamburguesas artesanales al estilo venezolano\n🍟 Papas fritas y acompañamientos deliciosos\n🥤 Bebidas refrescantes\n🌭 Opciones especiales y combos para todos los gustos\n\nEn SuperBurguer cada bocado es una explosión de sabor. ¡Ven y disfruta del verdadero toque venezolano en cada hamburguesa! 🇻🇪❤️",
+    "contactUrl": "https://wa.link/jlcxjf"
+  }
+]

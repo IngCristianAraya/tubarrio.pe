@@ -1,0 +1,154 @@
+id,slug,name,description,category,categorySlug,neighborhood,district,address,phone,whatsapp,email,website,image,images,rating,reviewCount,featured,active,createdAt,updatedAt
+"agente-bcp","agente-bcp","Agente BCP","Entregas en menos de 30 minutos","Agentes bancarios",,,"San Miguel","Santa Mariana 548","+51901426737","+51901426737",,,"https://images.pexels.com/photos/7706434/pexels-photo-7706434.jpeg?auto=compress&cs=tinysrgb&w=400","[""https://images.pexels.com/photos/7706434/pexels-photo-7706434.jpeg?auto=compress&cs=tinysrgb&w=400""]","4.4",,"false","true",,"2025-10-02T05:36:28.179Z"
+"anticucheria-angie-corazon","anticucheria-angie-corazon","Anticuchería Angie's Corazón","Nuestros anticuchos son preparados con cariño, aderezo casero y la frescura de los mejores ingredientes. 
+🥩 Anticuchos jugosos a la parrilla 
+🌽 Con acompañamientos típicos: papa, choclo y salsas artesanales 
+🍢 Ambiente familiar y acogedor
+ 💖 Sabor hecho con corazón","Comida rápida",,"Pando 3ra Etapa",,"Santa Teodiosia 573","+51 990 075 557",,,,"https://res.cloudinary.com/do2rpqupm/image/upload/v1759465696/WhatsApp_Image_2025-10-02_at_10.52.05_PM_aaghbd.jpg","[""https://res.cloudinary.com/do2rpqupm/image/upload/v1759465696/WhatsApp_Image_2025-10-02_at_10.52.05_PM_aaghbd.jpg"",""https://res.cloudinary.com/do2rpqupm/image/upload/v1759466603/WhatsApp_Image_2025-10-02_at_10.53.12_PM_ch1akk.jpg"",""https://res.cloudinary.com/do2rpqupm/image/upload/v1759466603/WhatsApp_Image_2025-10-02_at_10.53.12_PM_2_slvjnl.jpg"",""https://res.cloudinary.com/do2rpqupm/image/upload/v1759466603/WhatsApp_Image_2025-10-02_at_10.53.13_PM_bzqskj.jpg"",""https://res.cloudinary.com/do2rpqupm/image/upload/v1759466603/WhatsApp_Image_2025-10-02_at_10.53.11_PM_s7horf.jpg""]","5",,"false","true",,
+"anticuchos-bran","anticuchos-bran","Anticuchos Bran ","🔥 Anticuchos Bran 🔥
+El sabor criollo que enamora. Disfruta de anticuchos jugosos, al carbón y con el aderezo tradicional que nos distingue, acompañados de papa, choclo y salsas caseras. ¡Ven y prueba el verdadero corazón del Perú en cada bocado! 💖🍢","Restaurantes y menús",,,"San Miguel","Avenida Universitaria 1625","+51 992 280 169",,,,"https://res.cloudinary.com/do2rpqupm/image/upload/v1759034122/images_iw6q9k.jpg","[""https://res.cloudinary.com/do2rpqupm/image/upload/v1759034122/images_iw6q9k.jpg"",""https://res.cloudinary.com/do2rpqupm/image/upload/v1759035186/https___cdn.jwplayer.com_v2_media_jYRwFjuR_poster_u9hsgw.avif""]","5",,"false","true",,"2025-10-02T05:36:28.433Z"
+"asesor-inmobiliario-julio-rold-n","asesor-inmobiliario-julio-rold-n","Asesor Inmobiliario Julio Roldán","Soy Asesor Inmobiliario en RE/MAX y ayudo a familias e inversionistas que desean comprar, vender o alquilar una propiedad.
+
+Brindo una atención personalizada y confiable, acompañando a mis clientes en cada etapa del proceso: desde la evaluación del inmueble y el análisis del mercado, hasta la negociación y el cierre exitoso.
+
+¡Permíteme ayudarte a cumplir tus objetivos inmobiliarios! 🔑","Inmueble",,"San Isidro",,"Rivera Navarrete 757","+51949248249",,,,"https://res.cloudinary.com/do2rpqupm/image/upload/v1762012404/tubarrio/services/acyfdrlbhaycducfriak.jpg","[""https://res.cloudinary.com/do2rpqupm/image/upload/v1762012404/tubarrio/services/acyfdrlbhaycducfriak.jpg""]","5",,"false","true","2025-11-01T15:50:08.017Z","2025-11-01T15:53:25.093Z"
+"bobocha-bubble-tea-shop","bobocha-bubble-tea-shop","Bobocha Bubble Tea Shop","Bobocha Bubble Tea Shop es la cadena de tiendas de Bubble Tea más grande de Perú.","Juguerías y Cafeterías",,,"San Miguel","Av. Universitaria 1795, Lima ","+51 906906906","+51 906906906",,,"https://res.cloudinary.com/do2rpqupm/image/upload/v1760144784/Atmosfera1_wtqjg9.jpg","[""https://res.cloudinary.com/do2rpqupm/image/upload/v1760144784/Atmosfera1_wtqjg9.jpg""]","4.6",,"false","true",,"2025-10-02T05:36:28.570Z"
+"boutique-july","boutique-july","Boutique July","👗 Boutique July te ofrece las mejores prendas para toda la familia.
+Encuentra ropa moderna, cómoda y de calidad para damas, caballeros y niños, con estilos que se adaptan a cada ocasión.
+
+🛍️ Ofrecemos:
+✨ Ropa casual y elegante
+👕 Prendas para toda la familia
+👗 Novedades en moda y temporada
+💸 Excelentes precios y atención personalizada
+
+Visítanos y renueva tu estilo con Boutique July, donde vestir bien es parte de tu día a día.","Tienda de ropa",,"Pando 3ra Etapa",,"Alejandro Bertello 890","+51 978 044 210",,,,,"[]","5",,"false","true",,
+"caldo-de-gallina","caldo-de-gallina","Caldo de gallina","El mejor caldo de gallina de la zona ","Restaurantes y menús",,"Pando 3ra Etapa","San Miguel","Santa Mariana 520","+51999555999",,,,"https://res.cloudinary.com/do2rpqupm/image/upload/v1759073572/caldo_gallina_kf30si.webp","[""https://res.cloudinary.com/do2rpqupm/image/upload/v1759073572/caldo_gallina_kf30si.webp""]","4",,"false","true",,"2025-10-02T05:36:28.818Z"
+"centro-psicologico-kelly-villafuerte","centro-psicologico-kelly-villafuerte","Centro Psicológico Kelly Villafuerte","Centro Psicológico Kelly Villafuerte es un espacio dedicado al bienestar emocional, con un enfoque humano, ético y profesional. Ofrecemos acompañamiento psicológico especializado en población infantil, adolescente y adulta, priorizando la escucha empática, la atención personalizada y el crecimiento integral de cada persona. Nuestro propósito es brindar un servicio accesible y de calidad, promoviendo la salud mental como parte esencial de la vida.","Servicios Profesionales",,,,"Jiron Crespo y Castillo 2633, Cercado de Lima","+51 920 011 166",,,,"https://res.cloudinary.com/do2rpqupm/image/upload/v1760142188/WhatsApp_Image_2025-10-10_at_6.52.40_PM_fd18as.jpg","[""https://res.cloudinary.com/do2rpqupm/image/upload/v1760142188/WhatsApp_Image_2025-10-10_at_6.52.40_PM_fd18as.jpg"",""https://res.cloudinary.com/do2rpqupm/image/upload/v1760142188/WhatsApp_Image_2025-10-10_at_6.52.41_PM_2_fuwzlc.jpg"",""https://res.cloudinary.com/do2rpqupm/image/upload/v1760142188/WhatsApp_Image_2025-10-10_at_6.52.41_PM_jdyylf.jpg"",""https://res.cloudinary.com/do2rpqupm/image/upload/v1760142188/WhatsApp_Image_2025-10-10_at_6.52.41_PM_3_jhndc0.jpg"",""https://res.cloudinary.com/do2rpqupm/image/upload/v1760142188/WhatsApp_Image_2025-10-10_at_6.52.41_PM_1_ucgysg.jpg"",""https://res.cloudinary.com/do2rpqupm/image/upload/v1760142188/WhatsApp_Image_2025-10-10_at_6.52.40_PM_1_x589no.jpg""]","4.8",,"false","true",,
+"creciendo-digital","creciendo-digital","Creciendo Digital","Creciendo Digital es una empresa dedicada a impulsar a pequeños emprendedores y minipymes en su transformación digital, ofreciéndoles soluciones accesibles, prácticas y adaptadas a sus necesidades. Nuestro objetivo es que cualquier negocio, sin importar su tamaño, pueda ganar visibilidad, atraer clientes y gestionar mejor sus operaciones.","Servicios",,"Pando 3ra etapa","San Miguel","Santa Paula 471","+51 901 426 737","+51 901 426 737",,,"/uploads/services/1756138364114-tuvhlwm16y8.png","[""/uploads/services/1756138364114-tuvhlwm16y8.png""]","5",,"false","true",,"2025-10-02T05:36:29.339Z"
+"dra-fiorella-herrera","dra-fiorella-herrera","Dra. Fiorella Herrera","Dra. Fiorella Herrera - Odontología integral
+
+""Somos un consultorio dental en Pueblo Libre, dedicado a ofrecer atención integral y personalizada. Nuestra prioridad es tu bienestar, por eso combinamos experiencia, tecnología y un trato humano para que disfrutes de una sonrisa sana y segura.""","Servicios Profesionales",,,,"Av. Sucre 110, dpto 201 - pueblo libre ","+51 970 694 325",,,,"https://res.cloudinary.com/do2rpqupm/image/upload/v1759529827/WhatsApp_Image_2025-10-03_at_4.52.51_PM_u1bhu4.jpg","[""https://res.cloudinary.com/do2rpqupm/image/upload/v1759529827/WhatsApp_Image_2025-10-03_at_4.52.51_PM_u1bhu4.jpg"",""https://res.cloudinary.com/do2rpqupm/image/upload/v1759529974/WhatsApp_Image_2025-10-03_at_4.44.51_PM_3_oqqaws.jpg"",""https://res.cloudinary.com/do2rpqupm/image/upload/v1759529974/WhatsApp_Image_2025-10-03_at_4.44.51_PM_2_nnqguy.jpg"",""https://res.cloudinary.com/do2rpqupm/image/upload/v1759529975/WhatsApp_Image_2025-10-03_at_4.44.51_PM_1_liqsek.jpg"",""https://res.cloudinary.com/do2rpqupm/image/upload/v1759529975/WhatsApp_Image_2025-10-03_at_4.44.51_PM_mvgb4t.jpg""]","4.5",,"false","true",,
+"el-point","el-point","El Point","El Point Restobar es el lugar perfecto para disfrutar buena comida, tragos y momentos inolvidables. 🍽️🍹
+Ofrecemos una variedad de platos a la carta, menús del día y una amplia selección de tragos y bebidas para todos los gustos.
+
+✨ Te ofrecemos:
+🍛 Platos criollos y tradicionales
+🥩 Menús completos y bien servidos
+🍸 Cocteles, cervezas y bebidas refrescantes
+🎶 Un ambiente agradable para compartir con amigos o familia
+
+Ven a El Point, donde la buena comida y el buen ambiente se encuentran.","Restaurantes y menús",,"Santa Emma",,"Av universitaria 1635","+51 969 381 148",,,,"https://res.cloudinary.com/do2rpqupm/image/upload/v1760147330/WhatsApp_Image_2025-10-10_at_8.28.02_PM_lmpg6l.jpg","[""https://res.cloudinary.com/do2rpqupm/image/upload/v1760147330/WhatsApp_Image_2025-10-10_at_8.28.02_PM_lmpg6l.jpg"",""https://res.cloudinary.com/do2rpqupm/image/upload/v1760153693/WhatsApp_Image_2025-10-10_at_10.21.29_PM_gxqsa5.jpg"",""https://res.cloudinary.com/do2rpqupm/image/upload/v1760153693/WhatsApp_Image_2025-10-10_at_10.21.47_PM_m5qff2.jpg"",""https://res.cloudinary.com/do2rpqupm/image/upload/v1760153958/WhatsApp_Image_2025-10-10_at_10.21.37_PM_pfz1ng.jpg"",""https://res.cloudinary.com/do2rpqupm/image/upload/v1760153693/WhatsApp_Image_2025-10-10_at_10.21.38_PM_2_zzus22.jpg""]","4.5",,"false","true",,
+"entequenate","entequenate","Entequeñate","🥟 Entequeñate 🥟
+Sabor, crocancia y tradición en cada bocado.
+Deléitate con nuestros tequeños dorados, pastelitos rellenos y postres artesanales, elaborados con ingredientes de calidad y el auténtico toque de la fusión peruano-venezolana.
+
+🧀 Tequeños crujientes y llenos de sabor
+🥧 Pastelitos rellenos al estilo casero
+🍮 Postres que conquistan paladares
+🇵🇪🇻🇪 Fusión de lo mejor del Perú y Venezuela","Comida rápida",,,,"Santa Martina 548","+51 914 308 697",,,,"https://res.cloudinary.com/do2rpqupm/image/upload/v1759637654/Rosa_Pareja_Collage_de_Foto_Almohada_cuadrada_2_hcbwgx.png","[""https://res.cloudinary.com/do2rpqupm/image/upload/v1759637654/Rosa_Pareja_Collage_de_Foto_Almohada_cuadrada_2_hcbwgx.png""]","4.5",,"false","true",,
+"escuela-ads","escuela-ads","Escuela ADS","Descubre el ritmo que llevas dentro. Clases para todos los niveles","Escuela de baile",,,"San Miguel",,,"none",,,"https://res.cloudinary.com/do2rpqupm/image/upload/v1758764044/una_imagen_de_un_due_o_de_un_nvnl20.jpg","[""https://res.cloudinary.com/do2rpqupm/image/upload/v1758764044/una_imagen_de_un_due_o_de_un_nvnl20.jpg""]","4.7",,"false","true",,"2025-10-02T05:36:29.566Z"
+"estudio-chilet-principe-abogados","estudio-chilet-principe-abogados","Estudio Chilet & Principe Abogados","🏛️ Chilet & Príncipe Abogados
+
+Soluciones legales con empatía y acción.
+
+En Chilet & Príncipe Abogados, brindamos asesoría y defensa legal especializada en Derecho de Familia y Derecho Laboral, con un enfoque humano, ético y comprometido con los resultados.
+
+Nos destacamos por ofrecer una atención personalizada y accesible, comprendiendo las necesidades reales de cada cliente. Nuestra experiencia abarca casos de alimentos, tenencia, régimen de visitas, filiación y pensiones alimentarias, así como reclamos laborales, despidos injustificados, beneficios sociales y derechos del trabajador.
+
+Nuestro propósito es proteger tus derechos y acompañarte en cada paso del proceso legal, brindando orientación clara, soluciones rápidas y estrategias efectivas.
+
+📞 Agenda tu cita al 939 909 647
+⚖️ Confianza, compromiso y resultados reales.","Servicios Profesionales",,"La Esperanza",,"La esperanza","+51 939 909 647",,,,"https://res.cloudinary.com/do2rpqupm/image/upload/v1760203670/WhatsApp_Image_2025-10-11_at_11.49.30_-_Geraldine_Chilet_oz21gq.jpg","[""https://res.cloudinary.com/do2rpqupm/image/upload/v1760203670/WhatsApp_Image_2025-10-11_at_11.49.30_-_Geraldine_Chilet_oz21gq.jpg""]","4.7",,"false","true",,
+"grupo-omna-eirl","grupo-omna-eirl","Grupo OMNA eirl","Grupo OMNA somos especialistas en limpieza profunda y tratamiento profesional de pisos y superficies en general. Contamos con personal capacitado y equipos especializados para devolverle a tus espacios su brillo, limpieza y elegancia original. ✨
+
+🧩 Nuestros servicios incluyen:
+
+Limpieza profunda de pisos y superficies
+
+Pulido, desmanchado y despercudido
+
+Sellado, abrillantado y cristalizado
+
+Resanes y vitrificados
+
+Impermeabilización y coloreado
+
+Vaceado en terrazo y granito
+
+Con Grupo OMNA, tus pisos recuperan su mejor versión. 💪 Confía en profesionales con experiencia y compromiso con la excelencia.","Servicios Generales",,"San Fernando",,"San Fernando, Callao","980994339",,,,"https://res.cloudinary.com/do2rpqupm/image/upload/v1761321552/Omna_Servicios_RECUPERACION_TRATAMIENTO_MANTENIMIENTO_de_pisos_y_superficies_en_general._Todo_sobre_el_rubro_limpieza_Servicios_especializados_li3vh9.png","[""https://res.cloudinary.com/do2rpqupm/image/upload/v1761321552/Omna_Servicios_RECUPERACION_TRATAMIENTO_MANTENIMIENTO_de_pisos_y_superficies_en_general._Todo_sobre_el_rubro_limpieza_Servicios_especializados_li3vh9.png"",""https://res.cloudinary.com/do2rpqupm/image/upload/v1761318868/20250131_192122-COLLAGE_2_-_Marcelo_Alvarez_Rodriguez_dcqt2u.jpg"",""https://res.cloudinary.com/do2rpqupm/image/upload/v1761318867/20250213_213818-COLLAGE_2_-_Marcelo_Alvarez_Rodriguez_xqir8a.jpg"",""https://res.cloudinary.com/do2rpqupm/image/upload/v1761318866/20251017_175503-COLLAGE_2_-_Marcelo_Alvarez_Rodriguez_krkzgb.jpg"",""https://res.cloudinary.com/do2rpqupm/image/upload/v1761318866/20250213_214032-COLLAGE_2_-_Marcelo_Alvarez_Rodriguez_bhug2b.jpg""]","5",,"false","true","2025-10-24T15:17:10.406Z","2025-10-24T15:17:10.406Z"
+"imana-tu-vida","imana-tu-vida","Imana Tu Vida","Tratamientos con imanes","Salud Integral",,,"San Miguel",,,"none",,,"/images/biomagnetismo.webp","[""/images/biomagnetismo.webp""]","4.7",,"false","true",,"2025-10-02T05:36:29.715Z"
+"instalaciones-edduar-colmenarez","instalaciones-edduar-colmenarez","Instalaciones EDDUAR COLMENAREZ","Instalaciones de Bombas de agua
+Instalaciones de hidroneumaticos
+Electricidad en general domestico e industrial
+Cableado y recableado","Servicios Generales",,,,"Lima","+51 901001690",,,,,"[]","5",,"false","true","2025-10-24T16:41:27.293Z","2025-10-24T16:41:27.293Z"
+"iro-sushi","iro-sushi","IRO Sushi","Sushi fresco y rollos especiales","Restaurantes y menús",,,"San Miguel","Av. Universitaria 1743","999 999 999","51906684287",,,"https://images.pexels.com/photos/357756/pexels-photo-357756.jpeg?auto=compress&cs=tinysrgb&w=400","[""https://images.pexels.com/photos/357756/pexels-photo-357756.jpeg?auto=compress&cs=tinysrgb&w=400""]","4.9",,"false","true",,"2025-10-02T05:36:29.940Z"
+"jugueria-tomasita","jugueria-tomasita","Juguería Tomasita","🍹 Juguería Tomasita Pto 57 🍹
+
+Frescura, sabor y energía en cada vaso.
+Disfruta de nuestros jugos y extractos preparados con las mejores frutas y verduras, llenos de fibra, vitaminas y antioxidantes que cuidan tu salud.
+
+🥤 Jugos naturales recién hechos
+🥬 Extractos nutritivos y energizantes
+🥪 Sándwiches deliciosos
+🍰 Postres caseros 
+
+Se aceptan pagos por:
+
+Yape / Plin
+Tarjetas de Crédito / débito 
+
+990032685  - 995296403","Juguerías y Cafeterías",,"Pando 3ra Etapa",,"Av alejandro bertello 880","+51990032685",,,,"https://res.cloudinary.com/do2rpqupm/image/upload/v1759512751/Gemini_Generated_Image_fnmtmnfnmtmnfnmt_gbo7uh.png","[""https://res.cloudinary.com/do2rpqupm/image/upload/v1759512751/Gemini_Generated_Image_fnmtmnfnmtmnfnmt_gbo7uh.png"",""https://res.cloudinary.com/do2rpqupm/image/upload/v1759516390/Gemini_Generated_Image_n5pw31n5pw31n5pw_1_e1s5wy.gif""]","4.5",,"false","true",,
+"la-cabanita","la-cabanita","La Cabañita","La Cabañita – Tu paladar nuestra inspiración 🦐
+
+El auténtico sabor peruano en un solo lugar.
+En La Cabañita, te invitamos a disfrutar de nuestra comida criolla tradicional y comida marina preparados con ingredientes de primera calidad y el toque casero que nos distingue.
+
+🥘 Platos criollos llenos de sabor
+🦑 Ceviches frescos y tiraditos al instante
+🍛 Arroces, chicharrones y guisos tradicionales
+🍹 Ambiente familiar y atención con cariño","Restaurantes y menús",,"Santa Emma",,"Av. Universitaria 1637","+51 945 152 916",,,,"https://res.cloudinary.com/do2rpqupm/image/upload/v1759646900/unnamed_fhepha.png","[""https://res.cloudinary.com/do2rpqupm/image/upload/v1759646900/unnamed_fhepha.png"",""https://res.cloudinary.com/do2rpqupm/image/upload/v1759741096/ceviche_kyi3ms.jpg"",""https://res.cloudinary.com/do2rpqupm/image/upload/v1759741158/497881188_17903678916174963_8559036541120316305_n_xi4sbj.jpg"",""https://res.cloudinary.com/do2rpqupm/image/upload/v1759741159/501811441_17905109958174963_237321564694776575_n_i4jetg.jpg"",""https://res.cloudinary.com/do2rpqupm/image/upload/v1759741159/501685178_17905003092174963_5391187708146498771_n_kc7qgc.jpg""]","4.5",,"false","true",,
+"lacteos-y-embutidos-ayc","lacteos-y-embutidos-ayc","Lácteos y Embutidos A&C","Ofrecemos  los mejores productos para tu mesa, con variedad, frescura y calidad garantizada. 🛒✨
+
+🥛 Ofrecemos:
+🧈 Lácteos frescos: leche, yogures, quesos y mantequilla
+🥓 Embutidos de las mejores marcas: jamón, salchichas, chorizos y más
+🍞 Productos de abarrotes y alimentos de primera necesidad
+
+Ven y encuentra todo lo que necesitas para tu hogar en Lácteos y Embutidos A&C, tu tienda de confianza en el barrio.","Abarrotes",,"Pando 3ra Etapa","San Miguel","Santa Nicerata 354","+51996901493","996901493",,,"https://res.cloudinary.com/do2rpqupm/image/upload/v1760366181/WhatsApp_Image_2025-10-12_at_8.12.40_PM_lgjsab.jpg","[""https://res.cloudinary.com/do2rpqupm/image/upload/v1760366181/WhatsApp_Image_2025-10-12_at_8.12.40_PM_lgjsab.jpg""]","4.7",,"false","true",,"2025-10-02T05:36:30.092Z"
+"lavanderia-antares","lavanderia-antares","Lavandería Antares","Lavado y planchado profesional","Lavanderías",,,"San Miguel",,,"none",,,"https://cdn.pixabay.com/photo/2017/09/14/19/34/laundry-2750158_1280.jpg","[""https://cdn.pixabay.com/photo/2017/09/14/19/34/laundry-2750158_1280.jpg""]","4.7",,"false","true",,"2025-10-02T05:36:30.310Z"
+"lebasi-distribuidor-lima-peru","lebasi-distribuidor-lima-peru","Lebasi Distribuidor Lima Perú","Alimento de origen de exportación Suiza ,100% natural que contiene 41 nutrientes, 11 vitaminas, 11 minerales y 19 aminoácidos ","Salud Integral",,"Santa Florencia",,"Calle Miguel de Unamuno 232, San Miguel","+51 937 070 464",,,,"https://res.cloudinary.com/do2rpqupm/image/upload/v1759463511/WhatsApp_Image_2025-10-02_at_9.55.52_PM_za09lp.jpg","[""https://res.cloudinary.com/do2rpqupm/image/upload/v1759463511/WhatsApp_Image_2025-10-02_at_9.55.52_PM_za09lp.jpg"",""https://res.cloudinary.com/do2rpqupm/image/upload/v1759463573/WhatsApp_Image_2025-10-02_at_9.55.52_PM_1_ttymlm.jpg"",""https://res.cloudinary.com/do2rpqupm/image/upload/v1759463573/WhatsApp_Image_2025-10-02_at_9.55.51_PM_2_kcldxo.jpg"",""https://res.cloudinary.com/do2rpqupm/image/upload/v1759463573/WhatsApp_Image_2025-10-02_at_9.55.51_PM_1_pwnezs.jpg"",""https://res.cloudinary.com/do2rpqupm/image/upload/v1759463572/WhatsApp_Image_2025-10-02_at_9.55.53_PM_z1qdnp.jpg""]","4.5",,"false","true",,
+"mercado-don-pedrito","mercado-don-pedrito","Mercado Don Pedrito","La calidad y el sabor se encuentran en cada producto. ¡Compre fresco, compre cerca! Variedad de productos de alta calidad para su hogar.","Abarrotes",,"Pando 9na Etapa","San Miguel","Los Pinos 339 ","+51 982 406 716",,,,"https://res.cloudinary.com/do2rpqupm/image/upload/v1759031874/almacen_pedrito_ixgdpb.png","[""https://res.cloudinary.com/do2rpqupm/image/upload/v1759031874/almacen_pedrito_ixgdpb.png""]","4",,"false","true",,"2025-10-02T05:36:30.449Z"
+"mgc-dental-health","mgc-dental-health","Mgc Dental Health","Odontologia integral, estética & funcional.","Servicios Profesionales",,"San Miguel",,"Santa Nicerata 372","+51991238631",,,,"https://res.cloudinary.com/do2rpqupm/image/upload/v1759078111/mgc_yw0xyp.webp","[""https://res.cloudinary.com/do2rpqupm/image/upload/v1759078111/mgc_yw0xyp.webp""]","4.5",,"false","true",,"2025-10-02T05:36:30.562Z"
+"peluqueria-estilo","peluqueria-estilo","Peluquería Estilo","Cortes y peinados modernos","Servicios",,,"San Miguel",,,"none",,,"https://images.pexels.com/photos/3993449/pexels-photo-3993449.jpeg?auto=compress&cs=tinysrgb&w=400","[""https://images.pexels.com/photos/3993449/pexels-photo-3993449.jpeg?auto=compress&cs=tinysrgb&w=400""]","4.7",,"false","true",,"2025-10-02T05:36:30.896Z"
+"pizzeria-toscana","pizzeria-toscana","Pizzería Toscana","En Pizzería Toscana, te invitamos a un viaje culinario a Italia con nuestras exquisitas pizzas a la piedra estilo toscano. Nuestra pasión es la tradición y la calidad.","Restaurantes y menús",,,"San Miguel",,,"51981901000",,,"https://images.pexels.com/photos/315755/pexels-photo-315755.jpeg?auto=compress&cs=tinysrgb&w=400","[""https://images.pexels.com/photos/315755/pexels-photo-315755.jpeg?auto=compress&cs=tinysrgb&w=400""]","4.7",,"false","true",,"2025-10-02T05:36:31.006Z"
+"podologia-anita","podologia-anita","Podología Anita","Servicio de podología profesional cuidamos la salud y bienestar de tus pies con atención personalizada y tratamientos especializados. 👣
+
+✨ Ofrecemos:
+👧 Podología infantil
+🦶 Extracción de uñeros
+💉 Podología para pie diabético
+💅 Tratamiento de onicomicosis (hongos en uñas)
+
+Tu salud comienza por tus pies. Confía en manos expertas para mantenerlos sanos, limpios y sin dolor.","Servicios Profesionales",,"Urb. La Luz",,"Av Mariano Cornejo 1782, Pueblo Libre","+51 910 560 210 - +51 997 195 318",,,,"https://res.cloudinary.com/do2rpqupm/image/upload/v1760203544/WhatsApp_Image_2025-10-11_at_12.24.42_PM_cagc44.jpg","[""https://res.cloudinary.com/do2rpqupm/image/upload/v1760203544/WhatsApp_Image_2025-10-11_at_12.24.42_PM_cagc44.jpg"",""https://res.cloudinary.com/do2rpqupm/image/upload/v1760203927/0ea134e1-1088-42c5-a9d7-ec1623a71c1b_e8hpgb.jpg"",""https://res.cloudinary.com/do2rpqupm/image/upload/v1760203928/61dc92b1-7300-4a06-9947-e247f855212f_xcayqe.jpg"",""https://res.cloudinary.com/do2rpqupm/image/upload/v1760203927/554c273a-221b-45ea-8edd-6cdce5af35c4_aursil.jpg"",""https://res.cloudinary.com/do2rpqupm/image/upload/v1760203928/14cefa7f-fbe7-492f-aecb-384e9bf49e81_whlwgh.jpg""]","5",,"false","true",,
+"rey-del-shawarma","rey-del-shawarma","Rey del Shawarma","Tacos tradicionales y quesadillas","Comida rápida",,,"San Miguel",,,"51906684286",,,"https://images.pexels.com/photos/4958792/pexels-photo-4958792.jpeg?auto=compress&cs=tinysrgb&w=400","[""https://images.pexels.com/photos/4958792/pexels-photo-4958792.jpeg?auto=compress&cs=tinysrgb&w=400""]","4.5",,"false","true",,"2025-10-02T05:36:31.122Z"
+"sannaterapia","sannaterapia","Sanna terapia","Servicio de psicología integral que ofrece apoyo emocional y herramientas para mejorar.","Servicios Profesionales",,"Pando 3ra Etapa","San Miguel","Santa Teodosia #471","+51947135588","+51947135588",,,"https://res.cloudinary.com/do2rpqupm/image/upload/v1758771641/sannaterapia_tt4zwh.png","[""https://res.cloudinary.com/do2rpqupm/image/upload/v1758771641/sannaterapia_tt4zwh.png""]","4.5",,"false","true",,"2025-10-02T05:36:31.234Z"
+"servicio-tecnico-galaxia","servicio-tecnico-galaxia","Servicio técnico Galaxia","Servicio Técnico Galaxia 🌌
+Especialistas en la reparación y mantenimiento de electrodomésticos del hogar. Contamos con técnicos capacitados y servicio rápido, confiable y garantizado.
+
+⚙️ Atendemos:
+🧊 Refrigeradoras
+🧺 Lavadoras
+🔥 Microondas
+
+🔋 Diagnóstico preciso, repuestos originales y atención a domicilio.","Servicios Generales",,"Santa Anita",,"Coop. Andahuaylas  Av. Los Chancas, Santa Anita","+51 944 183 643",,,,"https://res.cloudinary.com/do2rpqupm/image/upload/v1760202226/375796981_122095257500041508_8417277859689659654_n_pgmcna.jpg","[""https://res.cloudinary.com/do2rpqupm/image/upload/v1760202226/375796981_122095257500041508_8417277859689659654_n_pgmcna.jpg"",""https://res.cloudinary.com/do2rpqupm/image/upload/v1760202227/468301493_122185464008041508_5835559375153594020_n_spykoo.jpg"",""https://res.cloudinary.com/do2rpqupm/image/upload/v1760202227/b26b3ed8-a82e-4101-9b17-199eeb59855d_i0neou.jpg"",""https://res.cloudinary.com/do2rpqupm/image/upload/v1760202227/468507766_122185463690041508_8996231399974979878_n_qwzhms.jpg"",""https://res.cloudinary.com/do2rpqupm/image/upload/v1760202227/468329062_122185449008041508_1885701243495779174_n_xcwqry.jpg""]","4.5",,"false","true",,
+"shawarma-el-faraon","shawarma-el-faraon","Shawarma El Faraón","Disfruta del sabor tradicional del Medio Oriente con nuestro shawarma fresco, jugoso y lleno de especias aromáticas. Preparado con carne de res, pollo o mezcla de ambos, marinados durante horas en una mezcla secreta de especias y asados lentamente para un sabor irresistible.","Comida rápida",,,"San Miguel",,,"none",,,"https://images.pexels.com/photos/4394613/pexels-photo-4394613.jpeg?auto=compress&cs=tinysrgb&w=800","[""https://images.pexels.com/photos/4394613/pexels-photo-4394613.jpeg?auto=compress&cs=tinysrgb&w=800""]","4.9",,"false","true",,"2025-10-02T05:36:31.347Z"
+"superburger","superburger","Superburger","El auténtico sabor de las hamburguesas venezolanas, con combinaciones irresistibles y porciones generosas que te harán volver por más. 
+
+🔥 Ofrecemos:
+🍔 Hamburguesas artesanales al estilo venezolano
+🍟 Papas fritas y acompañamientos deliciosos
+🥤 Bebidas refrescantes
+🌭 Opciones especiales y combos para todos los gustos
+
+En SuperBurguer cada bocado es una explosión de sabor. ¡Ven y disfruta del verdadero toque venezolano en cada hamburguesa! 🇻🇪❤️","Comida rápida",,"Pando 3ra etaoa","San Miguel","Sta. Teodosia 573","+51996901493","51996901493",,,"https://res.cloudinary.com/do2rpqupm/image/upload/v1760366227/WhatsApp_Image_2025-10-12_at_9.56.16_PM_vfpnbk.jpg","[""https://res.cloudinary.com/do2rpqupm/image/upload/v1760366227/WhatsApp_Image_2025-10-12_at_9.56.16_PM_vfpnbk.jpg""]","4.8",,"false","true",,"2025-10-02T05:36:31.457Z"

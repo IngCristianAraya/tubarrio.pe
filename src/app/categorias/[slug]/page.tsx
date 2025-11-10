@@ -35,6 +35,23 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
 
   const { services } = await getServicesByCategory(category.slug, 20);
 
+  const isValidImage = (imageUrl?: string) => {
+    if (!imageUrl) return false;
+    const trimmed = imageUrl.trim().toLowerCase();
+    if (!trimmed || trimmed === 'none' || trimmed === 'null' || trimmed === 'undefined' || trimmed === 'invalid') {
+      return false;
+    }
+    return trimmed.startsWith('http') || trimmed.startsWith('/');
+  };
+
+  const getServiceImage = (service: Service) => {
+    const candidates = Array.isArray(service.images) ? service.images : [];
+    const firstValidFromArray = candidates.find((img) => isValidImage(img));
+    if (isValidImage(firstValidFromArray)) return firstValidFromArray as string;
+    if (isValidImage(service.image)) return service.image as string;
+    return '/images/placeholder-service.jpg';
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="bg-white shadow">
@@ -62,15 +79,13 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
               className="bg-white rounded-lg shadow overflow-hidden hover:shadow-md transition-shadow"
             >
               <div className="relative h-48 bg-gray-100">
-                {service.images?.[0] && (
-                  <Image
-                    src={service.images[0]}
-                    alt={service.name}
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                  />
-                )}
+                <Image
+                  src={getServiceImage(service)}
+                  alt={service.name}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                />
                 {service.featured && (
                   <span className="absolute top-2 left-2 bg-yellow-400 text-yellow-900 text-xs font-semibold px-2 py-1 rounded">
                     Destacado
