@@ -1,53 +1,45 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { db as firebaseDb } from '@/lib/firebase-admin';
-import type { Firestore } from 'firebase-admin/firestore';
 
-// Definir interfaz para el tipo de datos del servicio
-interface ServiceData {
-  id: string;
-  name?: string;
-  [key: string]: any; // Para otras propiedades dinámicas
+async function getSupabaseAnon() {
+  const { getSupabaseClient } = await import('@/lib/supabase/client');
+  return getSupabaseClient();
 }
 
-// Configuración de Firebase Admin SDK
-const initializeFirebaseAdmin = (): Firestore => {
-  try {
-    // La inicialización ya se maneja en firebase-admin.ts
-    return firebaseDb;
-  } catch (error) {
-    console.error('Error initializing Firebase Admin:', error);
-    throw error;
+function getSupabaseServer() {
+  const url = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!url || !key) {
+    throw new Error('Missing Supabase env vars for writes: SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY.');
   }
-};
+  // @ts-ignore
+  const modPromise = import('@supabase/supabase-js');
+  return modPromise.then(({ createClient }) => createClient(url, key));
+}
 
-// Inicializar Firebase Admin
-const db = initializeFirebaseAdmin();
-
-// GET - Obtener servicio específico por ID
+// GET - Obtener servicio específico por ID o slug
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
-    const { id } = params;
-    console.log('📖 Consultando servicio con Firebase Admin:', id);
-    
-    const serviceRef = db.collection('services').doc(id);
-    const serviceDoc = await serviceRef.get();
-    
-    if (!serviceDoc.exists) {
+    const supabase = await getSupabaseAnon();
+    const country = (process.env.NEXT_PUBLIC_COUNTRY || 'pe').trim();
+    const targetId = params.id;
+    console.log('📖 Consultando servicio (Supabase):', targetId, 'country=', country);
+
+    let qb = supabase
+      .from('services')
+      .select('*')
+      .or(`id.eq.${targetId},slug.eq.${targetId}`)
+      .limit(1);
+    if (country) qb = qb.eq('country', country);
+    const { data, error } = await qb;
+    if (error) throw error;
+    const row = (data || [])[0];
+    if (!row) {
       return NextResponse.json({ error: 'Servicio no encontrado' }, { status: 404 });
     }
-    
-    const serviceData: ServiceData = {
-      id: serviceDoc.id,
-      ...serviceDoc.data()
-    };
-    
-    console.log(`✅ Servicio encontrado: ${serviceData.name || 'Sin nombre'}`);
-    
-    return NextResponse.json(serviceData);
-    
+    return NextResponse.json(row);
   } catch (error) {
     console.error('❌ Error al obtener servicio:', error);
     return NextResponse.json(
@@ -63,38 +55,18 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
-    const { id } = params;
+    const supabase = await getSupabaseServer();
+    const id = params.id;
     const body = await request.json();
-    
-    console.log('🔄 Actualizando servicio con Firebase Admin:', id);
-    
-    // Verificar que el servicio existe
-    const serviceRef = db.collection('services').doc(id);
-    const serviceDoc = await serviceRef.get();
-    
-    if (!serviceDoc.exists) {
+    const now = new Date().toISOString();
+    const patch = { ...body, updatedAt: now } as any;
+    const { data, error } = await supabase.from('services').update(patch).eq('id', id).select('*');
+    if (error) throw error;
+    const updated = (data || [])[0];
+    if (!updated) {
       return NextResponse.json({ error: 'Servicio no encontrado' }, { status: 404 });
     }
-    
-    // Actualizar con timestamp
-    const updatedData = {
-      ...body,
-      updatedAt: new Date().toISOString()
-    };
-    
-    await serviceRef.update(updatedData);
-    
-    console.log(`✅ Servicio ${id} actualizado`);
-    
-    // Obtener datos actualizados
-    const updatedDoc = await serviceRef.get();
-    const result = {
-      id: updatedDoc.id,
-      ...updatedDoc.data()
-    };
-    
-    return NextResponse.json(result);
-    
+    return NextResponse.json(updated);
   } catch (error) {
     console.error('❌ Error al actualizar servicio:', error);
     return NextResponse.json(
@@ -110,23 +82,11 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    const { id } = params;
-    console.log('🗑️ Eliminando servicio con Firebase Admin:', id);
-    
-    // Verificar que el servicio existe
-    const serviceRef = db.collection('services').doc(id);
-    const serviceDoc = await serviceRef.get();
-    
-    if (!serviceDoc.exists) {
-      return NextResponse.json({ error: 'Servicio no encontrado' }, { status: 404 });
-    }
-    
-    await serviceRef.delete();
-    
-    console.log(`✅ Servicio ${id} eliminado`);
-    
+    const supabase = await getSupabaseServer();
+    const id = params.id;
+    const { data, error } = await supabase.from('services').delete().eq('id', id).select('id');
+    if (error) throw error;
     return NextResponse.json({ message: 'Servicio eliminado correctamente', id });
-    
   } catch (error) {
     console.error('❌ Error al eliminar servicio:', error);
     return NextResponse.json(
