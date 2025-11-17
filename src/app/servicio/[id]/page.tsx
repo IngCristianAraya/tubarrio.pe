@@ -10,6 +10,9 @@ import { LocalBusinessJsonLd, BreadcrumbJsonLd } from '@/components/seo/JsonLd';
 import { SocialMeta } from '@/components/seo/SocialMeta';
 import { SITE_URL } from '@/lib/constants';
 
+// Forzar renderizado dinámico para evitar 404 por generateStaticParams incompleto
+export const dynamic = 'force-dynamic';
+
 // Utility function to format business hours for JSON-LD
 const formatBusinessHours = (hours: Record<string, any>): string[] => {
   if (!hours) return ['Mo-Sa 09:00-18:00'];

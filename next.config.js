@@ -24,6 +24,7 @@ const nextConfig = {
       'via.placeholder.com',
       // Supabase storage bucket (ajustar al dominio de tu proyecto)
       'fyekrdhzerjagradhxvv.supabase.co',
+      'faumtjrpyyzxhrvtwwkj.supabase.co',
       'source.unsplash.com'
     ],
   },

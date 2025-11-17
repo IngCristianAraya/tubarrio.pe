@@ -1,8 +1,9 @@
 export type DataSource = 'firebase' | 'supabase';
 
 export function getDataSource(): DataSource {
-  const val = (process.env.NEXT_PUBLIC_DATA_SOURCE || 'firebase').toLowerCase();
-  return val === 'supabase' ? 'supabase' : 'firebase';
+  // Default a Supabase para evitar dependencias de Firebase
+  const val = (process.env.NEXT_PUBLIC_DATA_SOURCE || 'supabase').toLowerCase();
+  return val === 'firebase' ? 'firebase' : 'supabase';
 }
 
 export function isSupabaseEnabled(): boolean {

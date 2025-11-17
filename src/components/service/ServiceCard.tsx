@@ -53,8 +53,13 @@ const ServiceCard: React.FC<ServiceCardProps> = ({ service, className, isLoading
       ? [service.image]
       : [];
 
+  const sanitizeImageUrl = (url: string): string => {
+    // Eliminar espacios y paréntesis de cierre al final (errores comunes)
+    return url.trim().replace(/[)]+$/g, '');
+  };
+
   const firstValid = candidates.find((img) => typeof img === 'string' && isValidImage(img));
-  const imageSrc = firstValid || '/images/default-service.jpg';
+  const imageSrc = firstValid ? sanitizeImageUrl(firstValid as string) : '/images/default-service.jpg';
 
   return (
     <Link 

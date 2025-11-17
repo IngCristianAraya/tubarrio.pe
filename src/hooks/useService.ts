@@ -44,38 +44,23 @@ export const useService = (serviceId?: string): UseServiceResult => {
     try {
       // Si el origen de datos es Supabase, buscar primero allí (por slug o ID)
       if (getDataSource() === 'supabase') {
-        const { getSupabaseClient } = await import('@/lib/supabase/client');
-        const supabase = await getSupabaseClient();
-        console.log(`🔍 [Supabase] Buscando servicio por slug/ID: ${id}`);
-        let qb = supabase
-          .from('services')
-          .select('*')
-          .or(`slug.eq.${id},id.eq.${id},uid.eq.${id}`)
-          .limit(1);
-        const country = getCountry();
-        if (country) {
-          qb = qb.eq('country', country);
+        // Usar la API del proyecto para centralizar lógica de filtros/país
+        console.log(`🔍 [API] Buscando servicio por slug/ID: ${id}`);
+        const res = await fetch(`/api/services/${encodeURIComponent(id)}`, {
+          method: 'GET',
+          headers: { 'Accept': 'application/json' },
+          cache: 'no-store',
+        });
+        if (res.status === 404) {
+          throw { code: 'not-found', message: `Servicio ${id} no encontrado` };
         }
-        let { data, error } = await qb;
-        if (error) {
-          throw error;
+        if (!res.ok) {
+          const text = await res.text();
+          throw { code: 'api-error', message: `Error API: ${text}` };
         }
-        let row = (data || [])[0];
-        
-        // Si no se encontró con filtro de país, intentar sin filtro
-        if (!row && country) {
-          console.log(`🔎 [Supabase] Reintentando búsqueda sin filtro de país para: ${id}`);
-          const { data: dataNoCountry, error: errNoCountry } = await supabase
-            .from('services')
-            .select('*')
-            .or(`slug.eq.${id},id.eq.${id},uid.eq.${id}`)
-            .limit(1);
-          if (errNoCountry) throw errNoCountry;
-          row = (dataNoCountry || [])[0];
-        }
-        
+        const row: any = await res.json();
         if (!row) {
-          throw { code: 'not-found', message: `Servicio ${id} no encontrado en Supabase` };
+          throw { code: 'not-found', message: `Servicio ${id} no encontrado` };
         }
         const serviceData: Service = {
           id: row.id?.toString?.() || row.uid || id,

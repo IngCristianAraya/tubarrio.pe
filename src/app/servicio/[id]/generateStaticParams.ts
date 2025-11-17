@@ -1,16 +1,22 @@
-import { collection, getDocs } from 'firebase/firestore';
-import { db } from '@/lib/firebase/config';
+// Supabase-based static params generation for service pages
+import { getSupabaseClient } from '@/lib/supabase/client';
+import { getCountry } from '@/lib/featureFlags';
 
 export async function generateStaticParams() {
   try {
-    // Obtener todos los servicios de Firestore
-    const firestore = db.instance;
-    const servicesRef = collection(firestore, 'services');
-    const querySnapshot = await getDocs(servicesRef);
-    
-    // Mapear los IDs de los servicios para generar las rutas estáticas
-    const paths = querySnapshot.docs.map((doc) => ({
-      id: doc.id,
+    const supabase = await getSupabaseClient();
+    const country = getCountry();
+    let qb = supabase
+      .from('services')
+      .select('id, slug, active, country')
+      .eq('active', true);
+    if (country) qb = qb.eq('country', country);
+    const { data, error } = await qb;
+    if (error) throw error;
+
+    // Mapear slugs o ids para generar rutas estáticas
+    const paths = (data || []).map((row: any) => ({
+      id: row.slug || (row.id?.toString?.() ?? row.id),
     }));
 
     console.log(`Generating static paths for ${paths.length} services`);
