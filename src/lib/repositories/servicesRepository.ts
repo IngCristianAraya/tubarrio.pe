@@ -1,22 +1,18 @@
-import { collection, getDocs, doc, getDoc } from 'firebase/firestore';
-import { db } from '@/lib/firebase/config';
 import { getDataSource } from '@/lib/featureFlags';
+import { filterFallbackServices, getFallbackServiceById } from '@/lib/fallback';
 
 type RawServiceData = { id: string; data: any };
 
-async function fetchAllFromFirebase(): Promise<RawServiceData[]> {
-  const firestore = db.instance;
-  const servicesRef = collection(firestore, 'services');
-  const servicesSnapshot = await getDocs(servicesRef);
-  return servicesSnapshot.docs.map((d) => ({ id: d.id, data: d.data() }));
+// Fallback (local JSON) helpers
+async function fetchAllFromFallback(): Promise<RawServiceData[]> {
+  const items = filterFallbackServices({});
+  return items.map((row: any) => ({ id: row.id, data: row }));
 }
 
-async function fetchByIdFromFirebase(id: string): Promise<RawServiceData | null> {
-  const firestore = db.instance;
-  const docRef = doc(firestore, 'services', id);
-  const docSnap = await getDoc(docRef);
-  if (!docSnap.exists()) return null;
-  return { id: docSnap.id, data: docSnap.data() };
+async function fetchByIdFromFallback(id: string): Promise<RawServiceData | null> {
+  const row = getFallbackServiceById(id);
+  if (!row) return null;
+  return { id: row.id, data: row };
 }
 
 async function fetchAllFromSupabase(): Promise<RawServiceData[]> {
@@ -48,14 +44,17 @@ export async function fetchAllServiceData(): Promise<RawServiceData[]> {
   if (source === 'supabase') {
     try {
       const supa = await fetchAllFromSupabase();
-      // Si la fuente es Supabase, NO hacer fallback a Firebase
       return supa;
     } catch (err) {
       console.error('[servicesRepository] ❌ Error consultando Supabase:', err);
-      throw err;
+      // Fallback local si Supabase falla
+      const fallback = await fetchAllFromFallback();
+      console.warn(`[servicesRepository] ↪️ Usando fallback local: ${fallback.length} elementos`);
+      return fallback;
     }
   }
-  return fetchAllFromFirebase();
+  // Si la fuente no es Supabase, usar fallback local
+  return fetchAllFromFallback();
 }
 
 export async function fetchServiceById(id: string): Promise<RawServiceData | null> {
@@ -63,12 +62,17 @@ export async function fetchServiceById(id: string): Promise<RawServiceData | nul
   if (source === 'supabase') {
     try {
       const supa = await fetchByIdFromSupabase(id);
-      // Si la fuente es Supabase, NO hacer fallback a Firebase
       return supa;
     } catch (err) {
       console.error('Error consultando Supabase por ID:', err);
-      throw err;
+      // Fallback local si Supabase falla
+      const fallback = await fetchByIdFromFallback(id);
+      if (fallback) {
+        console.warn('[servicesRepository] ↪️ Usando fallback local por ID');
+      }
+      return fallback;
     }
   }
-  return fetchByIdFromFirebase(id);
+  // Si la fuente no es Supabase, usar fallback local
+  return fetchByIdFromFallback(id);
 }

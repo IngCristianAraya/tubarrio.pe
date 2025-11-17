@@ -1,9 +1,7 @@
 import { useState, useCallback } from 'react';
 import useSWR from 'swr';
-import { doc, getDoc } from 'firebase/firestore';
-import { db } from '@/lib/firebase/config';
 import { Service } from '@/types/service';
-import { getFallbackServiceById } from '../lib/firebase/fallback';
+import { getFallbackServiceById } from '@/lib/fallback';
 import { logger } from '@/lib/utils/logger';
 import { getDataSource, getCountry } from '@/lib/featureFlags';
 
@@ -52,17 +50,30 @@ export const useService = (serviceId?: string): UseServiceResult => {
         let qb = supabase
           .from('services')
           .select('*')
-          .or(`slug.eq.${id},id.eq.${id}`)
+          .or(`slug.eq.${id},id.eq.${id},uid.eq.${id}`)
           .limit(1);
         const country = getCountry();
         if (country) {
           qb = qb.eq('country', country);
         }
-        const { data, error } = await qb;
+        let { data, error } = await qb;
         if (error) {
           throw error;
         }
-        const row = (data || [])[0];
+        let row = (data || [])[0];
+        
+        // Si no se encontró con filtro de país, intentar sin filtro
+        if (!row && country) {
+          console.log(`🔎 [Supabase] Reintentando búsqueda sin filtro de país para: ${id}`);
+          const { data: dataNoCountry, error: errNoCountry } = await supabase
+            .from('services')
+            .select('*')
+            .or(`slug.eq.${id},id.eq.${id},uid.eq.${id}`)
+            .limit(1);
+          if (errNoCountry) throw errNoCountry;
+          row = (dataNoCountry || [])[0];
+        }
+        
         if (!row) {
           throw { code: 'not-found', message: `Servicio ${id} no encontrado en Supabase` };
         }
@@ -91,96 +102,13 @@ export const useService = (serviceId?: string): UseServiceResult => {
         return serviceData;
       }
 
-      console.log(`🔍 Buscando servicio con ID: ${id}`);
-      
-      // Asegurarse de que db esté inicializado
-      let firestoreDb;
-      try {
-        firestoreDb = db.instance;
-        logger.debug('Firestore está disponible');
-      } catch (error) {
-        logger.error('Error al obtener la instancia de Firestore:', error);
-        throw { 
-          code: 'db-not-initialized', 
-          message: 'No se pudo inicializar Firestore',
-          originalError: error 
-        };
+      // Si no es Supabase, usar datos de fallback como última opción
+      const fallbackService = getFallbackServiceById(id);
+      if (fallbackService) {
+        setIsFallbackData(true);
+        return fallbackService;
       }
-      
-      // Usar la colección 'services' (en inglés) como principal
-      const docRef = doc(firestoreDb, 'services', id);
-      logger.debug(`Buscando servicio en colección 'services': ${id}`);
-      
-      logger.debug('Obteniendo documento de Firestore...');
-      let docSnap = await getDoc(docRef);
-      logger.debug('Documento obtenido:', { 
-        exists: docSnap.exists(), 
-        id: docSnap.id 
-      });
-      
-      if (!docSnap.exists()) {
-        logger.warn(`Servicio ${id} no encontrado en 'services', intentando con 'servicios'...`);
-        
-        // Intentar con la colección 'servicios' (español) si no se encuentra en 'services'
-        const spanishDocRef = doc(firestoreDb, 'servicios', id);
-        logger.debug(`Buscando servicio en colección 'servicios': ${id}`);
-        const spanishDocSnap = await getDoc(spanishDocRef);
-        
-        if (!spanishDocSnap.exists()) {
-          logger.warn(`Servicio ${id} no encontrado en Firestore, buscando en respaldo local...`);
-          const fallbackService = getFallbackServiceById(id);
-          
-          if (!fallbackService) {
-            const error = { 
-              code: 'not-found', 
-              message: `Servicio ${id} no encontrado` 
-            };
-            logger.error('Error al buscar servicio:', error);
-            throw error;
-          }
-          
-          logger.debug(`Usando datos de respaldo local para el servicio ${id}`);
-          setIsFallbackData(true);
-          return fallbackService;
-        }
-        
-        // Usar el documento de la colección 'servicios' si se encuentra allí
-        logger.debug(`Servicio ${id} encontrado en colección 'servicios'`);
-        docSnap = spanishDocSnap;
-      }
-      
-      const data = docSnap.data();
-      if (!data) {
-        const error = { 
-          code: 'no-data', 
-          message: 'Datos del servicio no disponibles' 
-        };
-        logger.error(`Datos del servicio ${id} están vacíos`, error);
-        throw error;
-      }
-      
-      logger.debug(`Servicio cargado: ${data.name || 'Sin nombre'} (ID: ${id})`);
-      setIsFallbackData(false);
-      
-      const serviceData: Service = {
-        id: docSnap.id,
-        slug: data.slug || docSnap.id, // Use provided slug or fallback to ID
-        name: data.name || 'Servicio sin nombre',
-        description: data.description || 'Sin descripción disponible',
-        category: data.category || 'Sin categoría',
-        categorySlug: data.categorySlug || data.category?.toLowerCase().replace(/\s+/g, '-') || 'sin-categoria',
-        image: data.image || '/images/placeholder-service.jpg',
-        images: data.images || [data.image || '/images/placeholder-service.jpg'],
-        rating: data.rating || 0,
-        location: data.location || 'Ubicación no especificada',
-        contactUrl: data.contactUrl || '',
-        detailsUrl: data.detailsUrl || '',
-        ...data,
-        createdAt: data.createdAt?.toDate?.() || new Date(),
-        updatedAt: data.updatedAt?.toDate?.() || new Date()
-      };
-      
-      return serviceData;
+      throw { code: 'not-found', message: `Servicio ${id} no encontrado` };
       
     } catch (error: any) {
       logger.error(`Error al cargar el servicio ${serviceId}:`, {
@@ -190,7 +118,7 @@ export const useService = (serviceId?: string): UseServiceResult => {
         stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
       });
       
-      // Siempre intentar con datos de respaldo en caso de cualquier error
+      // Intentar con datos de respaldo en caso de error
       if (serviceId) {
         const fallbackService = getFallbackServiceById(serviceId);
         if (fallbackService) {

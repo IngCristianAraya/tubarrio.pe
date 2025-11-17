@@ -2,22 +2,8 @@ import useSWR from 'swr';
 import { useState, useCallback, useMemo, useEffect } from 'react';
 import { useService } from './useService';
 import { useServiceCache } from './useServiceCache';
-import { 
-  collection, 
-  query, 
-  where, 
-  orderBy, 
-  limit, 
-  startAfter, 
-  getDocs, 
-  getDoc,
-  doc,
-  DocumentSnapshot,
-  Firestore
-} from 'firebase/firestore';
-import { db } from '@/lib/firebase/config';
 import { Service } from '@/context/ServicesContext';
-import { fallbackServices, filterFallbackServices, getFallbackServiceById } from '../lib/firebase/fallback';
+import { fallbackServices, filterFallbackServices, getFallbackServiceById } from '@/lib/fallback';
 import { getDataSource, getCountry } from '@/lib/featureFlags';
 
 // Tipos para el hook
@@ -494,7 +480,7 @@ export const useServicesByCategory = (category?: string): ServicesResult => {
 export const useServicesPaginated = (options: UseServicesOptions = {}): PaginatedResult => {
   const { category, barrio, userId, pageSize = 12, search } = options;
   const [allServices, setAllServices] = useState<Service[]>([]);
-  const [lastDoc, setLastDoc] = useState<DocumentSnapshot | null>(null);
+  const [offset, setOffset] = useState(0);
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<any>(null);
@@ -504,7 +490,7 @@ export const useServicesPaginated = (options: UseServicesOptions = {}): Paginate
   // Reset function for filter changes
   const resetPagination = useCallback(() => {
     setAllServices([]);
-    setLastDoc(null);
+    setOffset(0);
     setHasMore(true);
     setError(null);
     setInitialized(false);
@@ -525,74 +511,80 @@ export const useServicesPaginated = (options: UseServicesOptions = {}): Paginate
     setError(null);
     
     try {
-  // Verificar si Firebase está inicializado
-  if (!db) {
-    throw new Error('Firebase no está inicializado');
-  }
-      
-      let q = query(collection(db, 'services'));
-      
-      // Aplicar filtros
-      if (userId) {
-        q = query(q, where('userId', '==', userId));
-      }
-      
-      if (category && category !== 'Todas' && category !== 'Todos') {
-        // Interpret `category` option as a slug, include aliases when available
-        const aliases = getCategoryAliases(category);
-        if (aliases.length > 1) {
-          q = query(q, where('categorySlug', 'in', aliases));
-        } else {
-          q = query(q, where('categorySlug', '==', category));
+      // Si el origen de datos es Supabase, usar paginación por rango
+      if (getDataSource() === 'supabase') {
+        const { getSupabaseClient } = await import('@/lib/supabase/client');
+        const supabase = await getSupabaseClient();
+        let qb = supabase
+          .from('services')
+          .select('*')
+          .eq('active', true);
+
+        const country = getCountry();
+        if (country) qb = qb.eq('country', country);
+        if (userId) qb = qb.eq('userId', userId);
+        if (category && category !== 'Todas' && category !== 'Todos') qb = qb.eq('categorySlug', category);
+        if (barrio) qb = qb.eq('barrio', barrio);
+        if (search && search.trim() !== '') {
+          const term = `%${search.trim()}%`;
+          qb = qb.or(`name.ilike.${term},description.ilike.${term}`);
         }
-      }
-      
-      if (barrio) {
-        q = query(q, where('barrio', '==', barrio));
-      }
-      
-      q = query(q, where('active', '==', true));
-      q = query(q, orderBy('createdAt', 'desc'), limit(pageSize));
-      
-      const snapshot = await getDocs(q);
-      
-      const newServices = snapshot.docs.map(doc => {
-        const data = doc.data();
-        return {
-          id: doc.id,
-          name: data.name || 'Servicio sin nombre',
-          description: data.description || 'Sin descripción',
-          category: data.category || 'Sin categoría',
-          categorySlug: data.categorySlug || slugify(data.category) || '',
-          image: data.image || '/images/placeholder-service.jpg',
-          rating: data.rating || 0,
-          location: data.location || 'Ubicación no especificada',
-          contactUrl: data.contactUrl || '',
-          detailsUrl: data.detailsUrl || '',
-          ...data,
-          createdAt: data.createdAt?.toDate?.() || new Date(),
-          updatedAt: data.updatedAt?.toDate?.() || new Date()
-        } as Service;
-      });
-      
-      // Deduplicar por id en carga inicial
-      const uniqueById = (list: Service[]) => {
-        const seen = new Set<string>();
-        const result: Service[] = [];
-        for (const item of list) {
-          const key = String(item.id);
-          if (!seen.has(key)) {
-            seen.add(key);
-            result.push(item);
+
+        const { data, error } = await qb
+          .order('createdAt', { ascending: false })
+          .range(offset, offset + pageSize - 1);
+        if (error) throw error;
+
+        const newServices = (data || []).map((row: any) => ({
+          id: row.id?.toString?.() || row.uid,
+          name: row.name || 'Servicio sin nombre',
+          description: row.description || 'Sin descripción',
+          category: row.category || 'Sin categoría',
+          categorySlug: row.categorySlug || row.category_slug || '',
+          image: row.image || '/images/placeholder-service.jpg',
+          rating: row.rating || 0,
+          location: row.location || row.address || 'Ubicación no especificada',
+          contactUrl: row.contactUrl || row.contact_url || '',
+          detailsUrl: row.detailsUrl || row.details_url || '',
+          featured: row.featured || false,
+          active: row.active !== false,
+          createdAt: row.createdAt ? new Date(row.createdAt) : new Date(),
+          updatedAt: row.updatedAt ? new Date(row.updatedAt) : new Date(),
+          ...row,
+        })) as Service[];
+
+        // Deduplicar por id en carga inicial
+        const uniqueById = (list: Service[]) => {
+          const seen = new Set<string>();
+          const result: Service[] = [];
+          for (const item of list) {
+            const key = String(item.id);
+            if (!seen.has(key)) {
+              seen.add(key);
+              result.push(item);
+            }
           }
-        }
-        return result;
-      };
-      setAllServices(uniqueById(newServices));
-      setLastDoc(snapshot.docs[snapshot.docs.length - 1] || null);
-      setHasMore(snapshot.docs.length === pageSize);
-      setInitialized(true);
-      
+          return result;
+        };
+        setAllServices(uniqueById(newServices));
+        setHasMore(newServices.length === pageSize);
+        setOffset((prev) => prev + newServices.length);
+        setInitialized(true);
+      } else {
+        // Fallback: datos locales cuando el origen no es Supabase
+        const fallbackData = filterFallbackServices({
+          category,
+          barrio,
+          search,
+          limit: pageSize,
+          offset: 0,
+        });
+        setAllServices(fallbackData);
+        setHasMore(fallbackData.length === pageSize);
+        setOffset(fallbackData.length);
+        setInitialized(true);
+      }
+
     } catch (err) {
       console.error('Error cargando servicios:', err);
       setError(err);
@@ -602,11 +594,12 @@ export const useServicesPaginated = (options: UseServicesOptions = {}): Paginate
         category,
         barrio,
         search,
-        limit: pageSize
+        limit: pageSize,
+        offset: 0,
       });
       
       setAllServices(fallbackData);
-      setHasMore(false);
+      setHasMore(fallbackData.length === pageSize);
     } finally {
       setLoading(false);
     }
@@ -614,61 +607,52 @@ export const useServicesPaginated = (options: UseServicesOptions = {}): Paginate
   
   // Cargar más datos
   const loadMore = useCallback(async () => {
-    if (!hasMore || loading || !lastDoc) return;
+    if (!hasMore || loading) return;
     
     setLoading(true);
     
     try {
-      // Verificar si Firebase está inicializado
-      if (!db) {
-        throw new Error('Firebase no está inicializado');
-      }
-      
-      let q = query(collection(db, 'services'));
-      
-      // Aplicar filtros
-      if (userId) {
-        q = query(q, where('userId', '==', userId));
-      }
-      
-      if (category && category !== 'Todas' && category !== 'Todos') {
-        // Interpret `category` option as a slug
-        q = query(q, where('categorySlug', '==', category));
-      }
-      
-      if (barrio) {
-        q = query(q, where('barrio', '==', barrio));
-      }
-      
-      q = query(q, where('active', '==', true));
-      q = query(q, orderBy('createdAt', 'desc'));
-      
-      // Paginación
-      if (lastDoc) {
-        q = query(q, startAfter(lastDoc), limit(pageSize));
-      }
-      
-      const snapshot = await getDocs(q);
-      
-      const newServices = snapshot.docs.map(doc => {
-        const data = doc.data();
-        return {
-          id: doc.id,
-          name: data.name || 'Servicio sin nombre',
-          description: data.description || 'Sin descripción',
-          category: data.category || 'Sin categoría',
-          categorySlug: data.categorySlug || slugify(data.category) || '',
-          image: data.image || '/images/placeholder-service.jpg',
-          rating: data.rating || 0,
-          location: data.location || 'Ubicación no especificada',
-          contactUrl: data.contactUrl || '',
-          detailsUrl: data.detailsUrl || '',
-          ...data,
-          createdAt: data.createdAt?.toDate?.() || new Date(),
-          updatedAt: data.updatedAt?.toDate?.() || new Date()
-        } as Service;
-      });
-      
+      if (getDataSource() === 'supabase') {
+        const { getSupabaseClient } = await import('@/lib/supabase/client');
+        const supabase = await getSupabaseClient();
+        let qb = supabase
+          .from('services')
+          .select('*')
+          .eq('active', true);
+
+        const country = getCountry();
+        if (country) qb = qb.eq('country', country);
+        if (userId) qb = qb.eq('userId', userId);
+        if (category && category !== 'Todas' && category !== 'Todos') qb = qb.eq('categorySlug', category);
+        if (barrio) qb = qb.eq('barrio', barrio);
+        if (search && search.trim() !== '') {
+          const term = `%${search.trim()}%`;
+          qb = qb.or(`name.ilike.${term},description.ilike.${term}`);
+        }
+
+        const { data, error } = await qb
+          .order('createdAt', { ascending: false })
+          .range(offset, offset + pageSize - 1);
+        if (error) throw error;
+
+        const newServices = (data || []).map((row: any) => ({
+          id: row.id?.toString?.() || row.uid,
+          name: row.name || 'Servicio sin nombre',
+          description: row.description || 'Sin descripción',
+          category: row.category || 'Sin categoría',
+          categorySlug: row.categorySlug || row.category_slug || '',
+          image: row.image || '/images/placeholder-service.jpg',
+          rating: row.rating || 0,
+          location: row.location || row.address || 'Ubicación no especificada',
+          contactUrl: row.contactUrl || row.contact_url || '',
+          detailsUrl: row.detailsUrl || row.details_url || '',
+          featured: row.featured || false,
+          active: row.active !== false,
+          createdAt: row.createdAt ? new Date(row.createdAt) : new Date(),
+          updatedAt: row.updatedAt ? new Date(row.updatedAt) : new Date(),
+          ...row,
+        })) as Service[];
+
       // Deduplicar al anexar nuevas páginas
       const uniqueByIdAppend = (list: Service[]) => {
         const seen = new Set<string>();
@@ -683,8 +667,21 @@ export const useServicesPaginated = (options: UseServicesOptions = {}): Paginate
         return result;
       };
       setAllServices(prev => uniqueByIdAppend([...prev, ...newServices]));
-      setLastDoc(snapshot.docs[snapshot.docs.length - 1] || null);
-      setHasMore(snapshot.docs.length === pageSize);
+      setHasMore(newServices.length === pageSize);
+      setOffset((prev) => prev + newServices.length);
+      } else {
+        // Fallback: datos locales con paginación por offset
+        const newServices = filterFallbackServices({
+          category,
+          barrio,
+          search,
+          limit: pageSize,
+          offset,
+        });
+        setAllServices(prev => [...prev, ...newServices]);
+        setHasMore(newServices.length === pageSize);
+        setOffset((prev) => prev + newServices.length);
+      }
       
     } catch (err) {
       console.error('Error cargando más servicios:', err);
@@ -692,7 +689,7 @@ export const useServicesPaginated = (options: UseServicesOptions = {}): Paginate
     } finally {
       setLoading(false);
     }
-  }, [category, barrio, userId, search, pageSize, hasMore, loading, lastDoc]);
+  }, [category, barrio, userId, search, pageSize, hasMore, loading, offset]);
   
   // Efecto para manejar el estado del cliente
   useEffect(() => {

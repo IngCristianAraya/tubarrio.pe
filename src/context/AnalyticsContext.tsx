@@ -2,30 +2,6 @@
 
 import * as React from 'react';
 const { createContext, useContext, useReducer, useEffect, useCallback, useMemo } = React;
-import { db } from '../lib/firebase/config';
-
-// Función para obtener funciones de Firebase dinámicamente
-const getFirestoreFunctions = async () => {
-  if (!db) {
-    return null;
-  }
-  
-  try {
-    const firestore = await import('firebase/firestore');
-    return {
-      collection: firestore.collection,
-      addDoc: firestore.addDoc,
-      query: firestore.query,
-      where: firestore.where,
-      getDocs: firestore.getDocs,
-      orderBy: firestore.orderBy,
-      limit: firestore.limit
-    };
-  } catch (error) {
-    console.warn('Firebase/firestore no disponible:', error);
-    return null;
-  }
-};
 
 interface AnalyticsEvent {
   id?: string;
@@ -192,44 +168,11 @@ function AnalyticsProvider({ children }: { children: React.ReactNode }) {
     try {
       dispatch({ type: 'SET_LOADING', payload: true });
       
-      // No se requiere autenticación para ver métricas
-      console.log('Cargando métricas de analíticas...');
-      
-      
-      // Get Firebase functions dynamically
-      const firestore = await getFirestoreFunctions();
-      if (!firestore) {
-        console.warn('Firebase not available, using empty metrics');
-        dispatch({ type: 'SET_METRICS', payload: initialState.metrics });
-        dispatch({ type: 'SET_LOADING', payload: false });
-        return;
-      }
-      
-      // Get Firestore instance
-      const firestoreInstance = db?.instance || db;
-      if (!firestoreInstance) {
-        console.warn('Firestore instance not available, using empty metrics');
-        dispatch({ type: 'SET_METRICS', payload: initialState.metrics });
-        dispatch({ type: 'SET_LOADING', payload: false });
-        return;
-      }
-      
+      // Calcular métricas desde eventos locales (sin Firebase)
+      console.log('Cargando métricas de analíticas (local) ...');
       const startDate = new Date();
       startDate.setDate(startDate.getDate() - days);
-      
-      const analyticsRef = firestore.collection(firestoreInstance, 'analytics');
-      const q = firestore.query(
-        analyticsRef,
-        firestore.where('timestamp', '>=', startDate),
-        firestore.orderBy('timestamp', 'desc')
-      );
-      
-      const querySnapshot = await firestore.getDocs(q);
-      const events = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-        timestamp: doc.data().timestamp.toDate()
-      })) as AnalyticsEvent[];
+      const events = state.events.filter(e => e.timestamp >= startDate);
 
       // Calcular métricas
       const metrics: AnalyticsMetrics = {
@@ -247,13 +190,6 @@ function AnalyticsProvider({ children }: { children: React.ReactNode }) {
       dispatch({ type: 'SET_METRICS', payload: metrics });
     } catch (error: any) {
       console.error('Error getting metrics:', error);
-      
-      // Manejar errores de Firebase
-      if (error.code === 'permission-denied') {
-        console.warn('⚠️ Analytics: No se tienen permisos para acceder a las métricas.');
-      } else {
-        console.error('Error al cargar métricas:', error);
-      }
       
       // En caso de error, usar métricas vacías
       dispatch({ type: 'SET_METRICS', payload: initialState.metrics });
