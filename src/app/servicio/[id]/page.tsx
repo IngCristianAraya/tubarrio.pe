@@ -70,6 +70,7 @@ import ServiceCollapsibleDetails from '@/components/service/ServiceCollapsibleDe
 
 import ServiceSupport from '@/components/service/ServiceSupport';
 import RecommendedServices from '@/components/service/RecommendedServices';
+import ServiceMap from '@/components/service/ServiceMap';
 
 export default function ServicioDetallePage() {
   // Obtener todos los servicios del contexto (esto solo funciona en Client Components)
@@ -190,8 +191,8 @@ export default function ServicioDetallePage() {
           postalCode: '15001',
         }}
         geo={{
-          latitude: '-12.0464',
-          longitude: '-77.0428',
+          latitude: String(typeof service.latitude === 'number' ? service.latitude : -12.0464),
+          longitude: String(typeof service.longitude === 'number' ? service.longitude : -77.0428),
         }}
         telephone={service.whatsapp || service.social || '+51999999999'}
         openingHours={
@@ -215,6 +216,10 @@ export default function ServicioDetallePage() {
         <ServiceCollapsibleDetails service={service} />
         
         {/* Nueva sección: Ubicación del Servicio */}
+        <div className="max-w-7xl mx-auto px-3 py-4 sm:px-6 sm:py-8 md:px-8">
+          <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-3">Ubicación</h2>
+          <ServiceMap service={service as Service} />
+        </div>
         
         
         {/* Nueva sección: Soporte y Contacto */}

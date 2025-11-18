@@ -81,11 +81,11 @@ const ServiceCard = ({ service, className = '' }: ServiceCardProps) => {
           {service.description}
         </div>
         
-        {/* Ubicación */}
+        {/* Ubicación (prioriza address sobre location) */}
         <div className="flex items-center text-sm text-gray-500 mt-auto">
           <MapPin className="w-4 h-4 mr-1.5 text-gray-400 flex-shrink-0" />
           <span className="truncate">
-            {service.location || service.address || 'Ubicación no especificada'}
+            {service.address || service.location || 'Ubicación no especificada'}
           </span>
         </div>
       </div>

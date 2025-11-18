@@ -38,6 +38,9 @@ export interface Service {
   reference?: string;
   // Ciudad o distrito (opcional, para búsquedas más amplias)
   district?: string;
+  // Coordenadas geográficas (opcional)
+  latitude?: number;
+  longitude?: number;
   rating: number;
   image: string;
   images: string[];
@@ -53,6 +56,10 @@ export interface Service {
   location?: string;
   contactUrl?: string;
   tags?: string[];
+  // Público objetivo simple (texto; puede evolucionar a rango)
+  publico_objetivo?: string;
+  // Distancia calculada en km para recomendaciones
+  distanceKm?: number | null;
   precio?: number;
   // Especificaciones y condiciones dinámicas
   specifications?: string[];

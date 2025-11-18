@@ -35,6 +35,12 @@ export default function TodosLosServicios({
   const [neighborhood, setNeighborhood] = useState(barrioParam || '');
   const [district, setDistrict] = useState(distritoParam || '');
 
+  // Estado para recomendaciones por ubicación
+  const [recommended, setRecommended] = useState<Service[]>([]);
+  const [recommending, setRecommending] = useState<boolean>(false);
+  const [recommendError, setRecommendError] = useState<string | null>(null);
+  const [radiusKm, setRadiusKm] = useState<number>(5);
+
   const { 
     services, 
     filteredServices,
@@ -88,6 +94,66 @@ export default function TodosLosServicios({
     setSelectedDistrict(district);
   }, [district, setSelectedDistrict]);
 
+  // Solicitar ubicación y obtener recomendaciones
+  const requestLocationAndRecommend = async () => {
+    setRecommendError(null);
+    setRecommending(true);
+    try {
+      if (!('geolocation' in navigator)) {
+        setRecommendError('La geolocalización no está soportada en este navegador');
+        setRecommending(false);
+        return;
+      }
+      // Pedir ubicación sólo al hacer clic
+      await new Promise<void>((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(
+          (pos) => {
+            const lat = pos.coords.latitude;
+            const lon = pos.coords.longitude;
+            fetch('/api/services/recommended', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ lat, lon, radiusKm })
+            })
+              .then(async (r) => {
+                if (!r.ok) throw new Error(`Error ${r.status}`);
+                const json = await r.json();
+                const items = Array.isArray(json.items) ? json.items : [];
+                setRecommended(items as Service[]);
+                resolve();
+              })
+              .catch((err) => {
+                setRecommendError('No se pudieron cargar recomendaciones cercanas');
+                reject(err);
+              })
+              .finally(() => {
+                setRecommending(false);
+              });
+          },
+          (err) => {
+            setRecommendError(
+              err.code === err.PERMISSION_DENIED
+                ? 'Permiso de ubicación denegado'
+                : err.code === err.POSITION_UNAVAILABLE
+                ? 'Ubicación no disponible'
+                : 'Tiempo de espera agotado'
+            );
+            setRecommending(false);
+            reject(err);
+          },
+          { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 }
+        );
+      });
+    } catch (e) {
+      // ya manejado en callbacks
+    }
+  };
+
+  const clearRecommendations = () => {
+    setRecommended([]);
+    setRecommendError(null);
+  };
+
   if (loading && services.length === 0) {
     return (
       <div className="grid gap-4 sm:gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -132,6 +198,39 @@ export default function TodosLosServicios({
                 </>
               )}
             </p>
+            {/* Controles de recomendación por ubicación */}
+            <div className="mt-3 flex flex-wrap items-center gap-2">
+              <button
+                onClick={requestLocationAndRecommend}
+                disabled={recommending}
+                className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 disabled:opacity-50"
+              >
+                {recommending ? 'Obteniendo ubicación…' : 'Usar mi ubicación'}
+              </button>
+              <select
+                value={radiusKm}
+                onChange={(e) => setRadiusKm(Number(e.target.value))}
+                className="px-3 py-2 border border-gray-300 rounded-lg bg-white"
+              >
+                <option value={3}>Radio 3 km</option>
+                <option value={5}>Radio 5 km</option>
+                <option value={10}>Radio 10 km</option>
+              </select>
+              {recommended.length > 0 && (
+                <button
+                  onClick={clearRecommendations}
+                  className="px-3 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
+                >
+                  Limpiar recomendaciones
+                </button>
+              )}
+              {recommendError && (
+                <span className="text-sm text-red-600 ml-2">{recommendError}</span>
+              )}
+            </div>
+            {recommended.length > 0 && (
+              <p className="text-sm text-gray-600 mt-2">Mostrando servicios cerca de tu ubicación (hasta {radiusKm} km)</p>
+            )}
           </div>
         )}
         
@@ -200,7 +299,7 @@ export default function TodosLosServicios({
           onSelect={setCategory}
         />
         
-        {filteredServices.length === 0 ? (
+        {(recommended.length === 0 ? filteredServices.length === 0 : recommended.length === 0) ? (
           <EmptyState 
             message={search || category || neighborhood || district
               ? "No se encontraron servicios para tu búsqueda o filtros seleccionados." 
@@ -209,7 +308,7 @@ export default function TodosLosServicios({
           />
         ) : (
           <div className="grid gap-4 sm:gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {filteredServices.map((service) => (
+            {(recommended.length > 0 ? recommended : filteredServices).map((service) => (
               <div key={service.id} className="w-full transform transition-all hover:scale-[1.02] hover:shadow-lg">
                 <ServiceCard service={service} />
               </div>

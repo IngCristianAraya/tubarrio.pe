@@ -28,6 +28,7 @@ const productionCsp: CspDirectives = {
     "'self'",
     "'unsafe-inline'",
     "'unsafe-eval'",
+    "https://unpkg.com",
     "https://www.googletagmanager.com",
     "https://www.google-analytics.com",
     "https://maps.googleapis.com",
@@ -36,6 +37,7 @@ const productionCsp: CspDirectives = {
   styleSrc: [
     "'self'",
     "'unsafe-inline'",
+    "https://unpkg.com",
     "https://fonts.googleapis.com",
   ],
   imgSrc: [
@@ -99,7 +101,8 @@ const developmentCsp: CspDirectives = {
   scriptSrc: [
     "'self'",
     "'unsafe-inline'",
-    "'unsafe-eval'"
+    "'unsafe-eval'",
+    "https://unpkg.com"
   ],
   connectSrc: [
     "'self'",

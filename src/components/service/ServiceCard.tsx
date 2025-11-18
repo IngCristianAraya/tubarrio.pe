@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils';
 import { Skeleton } from '../ui/Skeleton';
 import { Service } from '@/types/service';
 import { FaGlobe, FaWhatsapp } from 'react-icons/fa';
+import { formatDistance } from '@/hooks/useGeolocation';
 
 // Helper function to get ARIA attributes for loading state
 function getAriaLoadingProps(isLoading: boolean) {
@@ -90,13 +91,13 @@ const ServiceCard: React.FC<ServiceCardProps> = ({ service, className, isLoading
         {service.category && (
           <p className="text-sm text-gray-600 mb-2">{service.category}</p>
         )}
-        
+
         {service.description && (
           <p className="text-sm text-gray-600 line-clamp-2 mb-3">
             {service.description}
           </p>
         )}
-        
+
         <div className="flex justify-between items-center mt-4">
           {service.price && (
             <span className="text-sm font-medium text-gray-900">
@@ -104,7 +105,12 @@ const ServiceCard: React.FC<ServiceCardProps> = ({ service, className, isLoading
             </span>
           )}
           
-          <div className="flex items-center">
+          <div className="flex items-center gap-2">
+            {typeof service.distanceKm === 'number' && (
+              <span className="text-xs px-2 py-1 rounded-full bg-orange-100 text-orange-700">
+                a {formatDistance(service.distanceKm)}
+              </span>
+            )}
             {service.rating !== undefined && (
               <div className="flex items-center">
                 <span className="text-yellow-400 mr-1">★</span>

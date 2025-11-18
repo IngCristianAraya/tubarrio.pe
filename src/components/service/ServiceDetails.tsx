@@ -54,10 +54,13 @@ const ServiceDetails = ({ service }: ServiceDetailsProps) => {
     return 'No especificado';
   };
 
-  // Función para formatear la dirección
+  // Función para formatear la dirección (prioriza address sobre location)
   const formatLocation = () => {
-    if (!service.location || service.location === 'none') return 'No especificada';
-    return service.location;
+    const address = service.address?.trim();
+    const location = service.location?.trim();
+    if (address && address !== 'none') return address;
+    if (location && location !== 'none') return location;
+    return 'No especificada';
   };
 
   // Función para formatear el contacto

@@ -4,7 +4,7 @@ import dynamic from 'next/dynamic';
 
 // Componentes con carga perezosa y estados de carga personalizados
 const TodosLosServiciosWrapper = dynamic(
-() => import('../app/servicios/TodosLosServicios'),
+() => import('../app/todos-los-servicios/TodosLosServicios'),
   { 
     loading: () => (
       <div className="py-12">
