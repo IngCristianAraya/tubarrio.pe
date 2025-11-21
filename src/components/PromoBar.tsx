@@ -17,13 +17,13 @@ export default function PromoBar() {
         >
           <span className="text-sm md:text-base font-medium mb-1 sm:mb-0 sm:mr-2"></span>
           <a
-            href="https://forms.gle/3xQW18uhaiM4CDzE7"
+            href="https://registro.tubarrio.pe"
             target="_blank"
             rel="noopener noreferrer"
             className="text-sm md:text-base font-bold text-yellow-400 hover:underline transition-all duration-300 group flex flex-col sm:flex-row items-center"
           >
             <span className="group-hover:text-yellow-200 transition-colors">
-            📢 ¿Tienes un negocio? ¡Regístrate en TuBarrio.pe! 
+              📢 ¿Tienes un negocio? ¡Regístrate en TuBarrio.pe!
             </span>
           </a>
         </motion.div>
