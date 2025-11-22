@@ -1,3 +1,4 @@
+// En el archivo: AnalyticsContext.tsx (definiciones de tipos y provider)
 'use client';
 
 import * as React from 'react';
@@ -5,13 +6,15 @@ const { createContext, useContext, useReducer, useEffect, useCallback, useMemo }
 
 interface AnalyticsEvent {
   id?: string;
-  type: 'page_view' | 'service_click' | 'contact_click' | 'whatsapp_click' | 'phone_click';
+  type: 'page_view' | 'service_click' | 'contact_click' | 'whatsapp_click' | 'phone_click' | 'use_location' | 'recommendation_results';
   serviceId?: string;
   serviceName?: string;
   page?: string;
   timestamp: Date;
   userAgent?: string;
   referrer?: string;
+  radiusKm?: number;
+  resultsCount?: number;
 }
 
 interface AnalyticsMetrics {

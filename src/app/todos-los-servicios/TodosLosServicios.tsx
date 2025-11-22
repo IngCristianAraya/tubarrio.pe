@@ -1,3 +1,4 @@
+// Componente: TodosLosServicios
 'use client';
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
@@ -8,7 +9,7 @@ import ServiceCardSkeleton from '../../components/ServiceCardSkeleton';
 import EmptyState from '../../components/EmptyState';
 import CategoryChips from '../../components/CategoryChips';
 import { useSearchParams } from 'next/navigation';
-
+import { useAnalytics } from '../../context/AnalyticsContext';
 type AnyService = Service | ContextService;
 
 // Las categorías ahora vienen del contexto como `{ slug, name }`.
@@ -36,11 +37,10 @@ export default function TodosLosServicios({
   const [district, setDistrict] = useState(distritoParam || '');
 
   // Estado para recomendaciones por ubicación
+  const [radiusKm, setRadiusKm] = useState<number>(5);
   const [recommended, setRecommended] = useState<Service[]>([]);
   const [recommending, setRecommending] = useState<boolean>(false);
   const [recommendError, setRecommendError] = useState<string | null>(null);
-  const [radiusKm, setRadiusKm] = useState<number>(5);
-
   const { 
     services, 
     filteredServices,
@@ -52,13 +52,13 @@ export default function TodosLosServicios({
     selectedCategory,
     setSearchTerm,
     setSelectedCategory,
-    // Nuevos filtros geográficos
     selectedNeighborhood,
     selectedDistrict,
     setSelectedNeighborhood,
     setSelectedDistrict
   } = useServices();
 
+  // Asegurar que existan los arrays de barrios y distritos antes del render
   const neighborhoods = useMemo(() => {
     const set = new Set<string>();
     services.forEach(s => {
@@ -74,25 +74,91 @@ export default function TodosLosServicios({
     });
     return Array.from(set).sort((a, b) => a.localeCompare(b));
   }, [services]);
+  const { trackEvent } = useAnalytics();
 
-  // Update search term in context when local search changes
-  useEffect(() => {
-    setSearchTerm(search);
-  }, [search, setSearchTerm]);
+  // Helpers para URL y localStorage
+  const updateURLParams = useCallback((lat?: number, lon?: number, radius?: number) => {
+    if (typeof window === 'undefined') return;
+    const url = new URL(window.location.href);
+    if (lat != null && lon != null) {
+      url.searchParams.set('lat', String(lat));
+      url.searchParams.set('lon', String(lon));
+    }
+    if (radius != null) {
+      url.searchParams.set('radius', String(radius));
+    }
+    window.history.pushState({}, '', url.toString());
+  }, []);
 
-  // Update selected category in context when local category changes
-  useEffect(() => {
-    setSelectedCategory(category);
-  }, [category, setSelectedCategory]);
+  const clearURLParams = useCallback(() => {
+    if (typeof window === 'undefined') return;
+    const url = new URL(window.location.href);
+    url.searchParams.delete('lat');
+    url.searchParams.delete('lon');
+    url.searchParams.delete('radius');
+    window.history.pushState({}, '', url.toString());
+  }, []);
 
-  // Update selected neighborhood/district in context
+  // Restaurar estado (radius desde localStorage y recomendaciones desde URL)
   useEffect(() => {
-    setSelectedNeighborhood(neighborhood);
-  }, [neighborhood, setSelectedNeighborhood]);
+    if (typeof window === 'undefined') return;
+    const savedRadius = window.localStorage.getItem('radiusKm');
+    if (savedRadius) {
+      const r = Number(savedRadius);
+      if (!Number.isNaN(r)) setRadiusKm(r);
+    }
+    const latStr = searchParams?.get('lat');
+    const lonStr = searchParams?.get('lon');
+    const radiusStr = searchParams?.get('radius');
+    const lat = latStr ? Number(latStr) : undefined;
+    const lon = lonStr ? Number(lonStr) : undefined;
+    const r = radiusStr ? Number(radiusStr) : undefined;
+    if (r && !Number.isNaN(r)) setRadiusKm(r);
+    if (lat != null && lon != null && Number.isFinite(lat) && Number.isFinite(lon)) {
+      fetchRecommendations(lat, lon);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
+  // Guardar radius en localStorage y sincronizar URL si ya hay ubicación
   useEffect(() => {
-    setSelectedDistrict(district);
-  }, [district, setSelectedDistrict]);
+    if (typeof window === 'undefined') return;
+    window.localStorage.setItem('radiusKm', String(radiusKm));
+    const latStr = searchParams?.get('lat');
+    const lonStr = searchParams?.get('lon');
+    if (latStr && lonStr) {
+      updateURLParams(Number(latStr), Number(lonStr), radiusKm);
+    }
+  }, [radiusKm, searchParams, updateURLParams]);
+
+  const fetchRecommendations = useCallback(async (lat: number, lon: number) => {
+    setRecommendError(null);
+    setRecommending(true);
+    try {
+      await trackEvent({ type: 'use_location', page: '/todos-los-servicios', radiusKm });
+
+      const r = await fetch('/api/services/recommended', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ lat, lon, radiusKm })
+      });
+      if (!r.ok) throw new Error(`Error ${r.status}`);
+      const json = await r.json();
+      const items = Array.isArray(json.items) ? (json.items as Service[]) : [];
+      setRecommended(items);
+
+      if (typeof window !== 'undefined') {
+        window.localStorage.setItem('lastLocation', JSON.stringify({ lat, lon }));
+      }
+      updateURLParams(lat, lon, radiusKm);
+
+      await trackEvent({ type: 'recommendation_results', page: '/todos-los-servicios', radiusKm, resultsCount: items.length });
+    } catch (err) {
+      setRecommendError('No se pudieron cargar recomendaciones cercanas');
+    } finally {
+      setRecommending(false);
+    }
+  }, [radiusKm, trackEvent, updateURLParams]);
 
   // Solicitar ubicación y obtener recomendaciones
   const requestLocationAndRecommend = async () => {
@@ -104,36 +170,17 @@ export default function TodosLosServicios({
         setRecommending(false);
         return;
       }
-      // Pedir ubicación sólo al hacer clic
       await new Promise<void>((resolve, reject) => {
         navigator.geolocation.getCurrentPosition(
           (pos) => {
             const lat = pos.coords.latitude;
             const lon = pos.coords.longitude;
-            fetch('/api/services/recommended', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ lat, lon, radiusKm })
-            })
-              .then(async (r) => {
-                if (!r.ok) throw new Error(`Error ${r.status}`);
-                const json = await r.json();
-                const items = Array.isArray(json.items) ? json.items : [];
-                setRecommended(items as Service[]);
-                resolve();
-              })
-              .catch((err) => {
-                setRecommendError('No se pudieron cargar recomendaciones cercanas');
-                reject(err);
-              })
-              .finally(() => {
-                setRecommending(false);
-              });
+            fetchRecommendations(lat, lon).then(resolve).catch(reject);
           },
           (err) => {
             setRecommendError(
               err.code === err.PERMISSION_DENIED
-                ? 'Permiso de ubicación denegado'
+                ? 'Permiso de ubicación denegado. Habilítalo en la configuración del navegador y asegúrate de que este sitio esté en HTTPS.'
                 : err.code === err.POSITION_UNAVAILABLE
                 ? 'Ubicación no disponible'
                 : 'Tiempo de espera agotado'
@@ -144,7 +191,7 @@ export default function TodosLosServicios({
           { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 }
         );
       });
-    } catch (e) {
+    } catch {
       // ya manejado en callbacks
     }
   };
@@ -152,6 +199,19 @@ export default function TodosLosServicios({
   const clearRecommendations = () => {
     setRecommended([]);
     setRecommendError(null);
+  };
+
+  const resetFilters = () => {
+    setSearch('');
+    setCategory('');
+    setNeighborhood('');
+    setDistrict('');
+    setRecommended([]);
+    setRecommendError(null);
+    if (typeof window !== 'undefined') {
+      window.localStorage.removeItem('lastLocation');
+    }
+    clearURLParams();
   };
 
   if (loading && services.length === 0) {
@@ -224,6 +284,12 @@ export default function TodosLosServicios({
                   Limpiar recomendaciones
                 </button>
               )}
+              <button
+                onClick={resetFilters}
+                className="px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
+              >
+                Restablecer filtros
+              </button>
               {recommendError && (
                 <span className="text-sm text-red-600 ml-2">{recommendError}</span>
               )}

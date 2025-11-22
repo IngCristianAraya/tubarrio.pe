@@ -310,6 +310,7 @@ export const ServicesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           const desc = normalize(service.description || '');
           const catName = normalize(service.category || '');
           const catSlug = normalize(service.categorySlug || '');
+          // Dentro de la función donde se filtran por query/tags:
           const tags = (service.tags || []).map((t: string) => normalize(t));
           return (
             name.includes(q) ||
