@@ -20,10 +20,10 @@ interface TodosLosServiciosProps {
   isHome?: boolean;
 }
 
-export default function TodosLosServicios({ 
-  initialCategory = '', 
+export default function TodosLosServicios({
+  initialCategory = '',
   initialSearch = '',
-  isHome = false 
+  isHome = false
 }: TodosLosServiciosProps) {
   const searchParams = useSearchParams();
   const categoriaParam = searchParams?.get('categoria') || '';
@@ -41,11 +41,11 @@ export default function TodosLosServicios({
   const [recommended, setRecommended] = useState<Service[]>([]);
   const [recommending, setRecommending] = useState<boolean>(false);
   const [recommendError, setRecommendError] = useState<string | null>(null);
-  const { 
-    services, 
+  const {
+    services,
     filteredServices,
-    loading, 
-    error, 
+    loading,
+    error,
     refreshServices,
     categories,
     searchTerm,
@@ -117,7 +117,7 @@ export default function TodosLosServicios({
     if (lat != null && lon != null && Number.isFinite(lat) && Number.isFinite(lon)) {
       fetchRecommendations(lat, lon);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Guardar radius en localStorage y sincronizar URL si ya hay ubicación
@@ -182,8 +182,8 @@ export default function TodosLosServicios({
               err.code === err.PERMISSION_DENIED
                 ? 'Permiso de ubicación denegado. Habilítalo en la configuración del navegador y asegúrate de que este sitio esté en HTTPS.'
                 : err.code === err.POSITION_UNAVAILABLE
-                ? 'Ubicación no disponible'
-                : 'Tiempo de espera agotado'
+                  ? 'Ubicación no disponible'
+                  : 'Tiempo de espera agotado'
             );
             setRecommending(false);
             reject(err);
@@ -246,8 +246,8 @@ export default function TodosLosServicios({
         {!isHome && (
           <div className="mb-6">
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              {category 
-                ? `Servicios: ${categories.find(c => c.slug === category)?.name || category}` 
+              {category
+                ? `Servicios: ${categories.find(c => c.slug === category)?.name || category}`
                 : 'Todos Nuestros Servicios'}
             </h1>
             <p className="text-gray-600">
@@ -299,7 +299,7 @@ export default function TodosLosServicios({
             )}
           </div>
         )}
-        
+
         <div className="flex flex-col sm:flex-row gap-4 mb-6">
           <div className="flex-1 relative">
             <input
@@ -318,7 +318,7 @@ export default function TodosLosServicios({
               </button>
             )}
           </div>
-          
+
           <select
             value={category}
             onChange={(e) => setCategory(e.target.value)}
@@ -358,19 +358,19 @@ export default function TodosLosServicios({
             ))}
           </select>
         </div>
-        
-        <CategoryChips 
-          categories={categories} 
+
+        <CategoryChips
+          categories={categories}
           selected={category}
           onSelect={setCategory}
         />
-        
+
         {(recommended.length === 0 ? filteredServices.length === 0 : recommended.length === 0) ? (
-          <EmptyState 
+          <EmptyState
             message={search || category || neighborhood || district
-              ? "No se encontraron servicios para tu búsqueda o filtros seleccionados." 
+              ? "No se encontraron servicios para tu búsqueda o filtros seleccionados."
               : "No hay servicios disponibles por el momento."
-            } 
+            }
           />
         ) : (
           <div className="grid gap-4 sm:gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
