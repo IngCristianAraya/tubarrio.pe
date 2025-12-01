@@ -17,7 +17,7 @@ export default function PromoBar() {
         >
           <span className="text-sm md:text-base font-medium mb-1 sm:mb-0 sm:mr-2"></span>
           <a
-            href="https://forms.gle/JZ1jEBdU8RE3nsKBA"
+            href="https://registro.tubarrio.pe"
             target="_blank"
             rel="noopener noreferrer"
             className="text-sm md:text-base font-bold text-yellow-400 hover:underline transition-all duration-300 group flex flex-col sm:flex-row items-center"
