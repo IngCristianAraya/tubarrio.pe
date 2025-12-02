@@ -12,7 +12,7 @@ interface CategoryPageProps {
 
 export async function generateMetadata({ params }: CategoryPageProps) {
   const category = await getCategoryBySlug(params.slug);
-  
+
   if (!category) {
     return {
       title: 'Categoría no encontrada',
@@ -28,7 +28,7 @@ export async function generateMetadata({ params }: CategoryPageProps) {
 
 export default async function CategoryPage({ params }: CategoryPageProps) {
   const category = await getCategoryBySlug(params.slug);
-  
+
   if (!category) {
     notFound();
   }
@@ -57,8 +57,8 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
       <div className="bg-white shadow">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex items-center">
-            <Link 
-              href="/" 
+            <Link
+              href="/"
               className="text-gray-500 hover:text-gray-700 mr-4"
             >
               <ArrowLeft className="h-5 w-5" />
@@ -74,7 +74,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {services && services.map((service) => (
-            <div 
+            <div
               key={service.id}
               className="bg-white rounded-lg shadow overflow-hidden hover:shadow-md transition-shadow"
             >
@@ -108,7 +108,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
                 <p className="text-sm text-gray-500 line-clamp-2 mb-3">
                   {service.description}
                 </p>
-                <Link 
+                <Link
                   href={`/servicios/${service.id}`}
                   className="text-sm font-medium text-primary-600 hover:text-primary-800"
                 >
@@ -122,8 +122,8 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
         {(!services || services.length === 0) && (
           <div className="text-center py-12">
             <p className="text-gray-500">No hay servicios disponibles en esta categoría por el momento.</p>
-            <Link 
-              href="/" 
+            <Link
+              href="/"
               className="mt-4 inline-flex items-center text-primary-600 hover:text-primary-800"
             >
               <ArrowLeft className="h-4 w-4 mr-1" />

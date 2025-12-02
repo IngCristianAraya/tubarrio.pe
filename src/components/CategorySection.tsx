@@ -7,7 +7,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Service } from '@/types/service';
 import { useMediaQuery } from 'react-responsive';
-import ServiceCarousel from './ServiceCarousel'; 
+import ServiceCarousel from './ServiceCarousel';
 
 interface CategorySectionProps {
   category: {
@@ -18,10 +18,10 @@ interface CategorySectionProps {
   categorySlug?: string;
 }
 
-export default function CategorySection({ 
-  category, 
+export default function CategorySection({
+  category,
   services,
-  categorySlug = category.slug 
+  categorySlug = category.slug
 }: CategorySectionProps) {
   if (!services || services.length === 0) return null;
 
@@ -50,7 +50,7 @@ export default function CategorySection({
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{category.name}</h2>
-          <Link 
+          <Link
             href={`/categorias/${category.slug}`}
             className="text-primary-600 hover:text-primary-800 dark:text-primary-400 dark:hover:text-primary-300 font-medium flex items-center"
           >
@@ -60,7 +60,7 @@ export default function CategorySection({
             </svg>
           </Link>
         </div>
-        
+
         {isMobile ? (
           <ServiceCarousel services={previewServices} categoryName={category.name} />
         ) : (
