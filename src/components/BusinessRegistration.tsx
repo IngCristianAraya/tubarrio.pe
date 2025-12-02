@@ -32,7 +32,7 @@ function BusinessRegistration({
   onSuccess
 }: BusinessRegistrationProps) {
   const { play: playClickSound } = useSound('click', { volume: 0.5 });
-  
+
   const [formData, setFormData] = useState<FormData>({
     businessName: '',
     category: '',
@@ -40,7 +40,7 @@ function BusinessRegistration({
     email: '',
     description: ''
   });
-  
+
   const [status, setStatus] = useState<FormStatus>({
     submitting: false,
     success: false,
@@ -70,7 +70,7 @@ function BusinessRegistration({
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     playClickSound();
-    
+
     // Form validation
     if (!formData.businessName || !formData.category || !formData.phone) {
       setStatus({
@@ -81,24 +81,24 @@ function BusinessRegistration({
       });
       return;
     }
-    
+
     // Phone number validation - supports multiple numbers separated by dash
     const validatePhoneNumbers = (phoneString: string) => {
       // Split by dash and trim spaces
       const phoneNumbers = phoneString.split('-').map(phone => phone.trim());
-      
+
       // Validate each phone number
       for (const phone of phoneNumbers) {
         const cleanPhone = phone.replace(/\D/g, '');
         const phoneRegex = /^[0-9]{9,15}$/;
-        
+
         if (!phoneRegex.test(cleanPhone)) {
           return false;
         }
       }
       return true;
     };
-    
+
     if (!validatePhoneNumbers(formData.phone)) {
       setStatus({
         submitting: false,
@@ -108,10 +108,10 @@ function BusinessRegistration({
       });
       return;
     }
-    
+
     // Clean phone numbers for storage (keep original format with dashes)
     const cleanPhone = formData.phone;
-    
+
     // Email validation if provided
     if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       setStatus({
@@ -122,9 +122,9 @@ function BusinessRegistration({
       });
       return;
     }
-    
+
     setStatus(prev => ({ ...prev, submitting: true, error: false }));
-    
+
     try {
       const response = await fetch('/api/business-registration', {
         method: 'POST',
@@ -140,13 +140,13 @@ function BusinessRegistration({
           source: 'business-registration-page'
         }),
       });
-      
+
       const data = await response.json();
-      
+
       if (!response.ok) {
         throw new Error(data.message || 'Error en la respuesta del servidor');
       }
-      
+
       if (data.success) {
         setStatus({
           submitting: false,
@@ -154,7 +154,7 @@ function BusinessRegistration({
           error: false,
           message: '¡Gracias por registrarte! Nos pondremos en contacto contigo a la brevedad.'
         });
-        
+
         // Reset form
         setFormData({
           businessName: '',
@@ -163,14 +163,14 @@ function BusinessRegistration({
           email: '',
           description: ''
         });
-        
+
         // Call success callback if provided
         if (onSuccess) onSuccess();
-        
+
       } else {
         throw new Error(data.message || 'Error al procesar el registro');
       }
-      
+
     } catch (error: any) {
       console.error('Error al enviar el formulario:', error);
       setStatus({
@@ -179,7 +179,7 @@ function BusinessRegistration({
         error: true,
         message: error.message || 'Ocurrió un error al enviar el formulario. Por favor, inténtalo de nuevo más tarde.'
       });
-      
+
       // Reset error status after 5 seconds
       setTimeout(() => {
         setStatus(prev => ({
@@ -273,7 +273,7 @@ function BusinessRegistration({
               </p>
             </>
           )}
-          
+
           {status.error && (
             <div className="rounded-md bg-red-50 p-4 mb-6">
               <div className="flex">
@@ -289,7 +289,7 @@ function BusinessRegistration({
               </div>
             </div>
           )}
-          
+
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
               {/* Business Name */}
@@ -402,11 +402,10 @@ function BusinessRegistration({
               <button
                 type="submit"
                 disabled={status.submitting}
-                className={`w-full flex justify-center items-center px-4 py-3 border border-transparent rounded-md shadow-sm text-sm font-medium text-white ${
-                  status.submitting 
-                    ? 'bg-gray-500 cursor-not-allowed' 
+                className={`w-full flex justify-center items-center px-4 py-3 border border-transparent rounded-md shadow-sm text-sm font-medium text-white ${status.submitting
+                    ? 'bg-gray-500 cursor-not-allowed'
                     : 'bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500'
-                }`}
+                  }`}
               >
                 {status.submitting ? (
                   <>
@@ -417,7 +416,7 @@ function BusinessRegistration({
                   'Registrar mi negocio'
                 )}
               </button>
-              
+
               <p className="mt-3 text-xs text-center text-gray-500">
                 * Sin compromisos a largo plazo
               </p>

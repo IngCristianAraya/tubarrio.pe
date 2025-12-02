@@ -35,60 +35,60 @@ const Header = () => {
   const NavItem = ({ href, children }: { href: string; children: React.ReactNode }) => {
     // Determinar si el enlace es interno o externo (ancla)
     const isAnchor = href.startsWith('#') || href.startsWith('/#');
-    
+
     const handleClick = (e: React.MouseEvent) => {
       playFolderSound();
-      
+
       // Si es una ancla, manejar la navegación manualmente
       if (isAnchor) {
         e.preventDefault();
-        
+
         // Extraer el ID de la ancla
         const anchorId = href.replace('/#', '').replace('#', '');
-        
+
         // Si estamos en una página diferente a la home, navegar primero a home
         if (window.location.pathname !== '/') {
           window.location.href = `/#${anchorId}`;
           return;
         }
-        
+
         // Si ya estamos en home, hacer scroll a la sección
         const element = document.getElementById(anchorId);
         if (element) {
-          element.scrollIntoView({ 
+          element.scrollIntoView({
             behavior: 'smooth',
             block: 'start'
           });
         }
       }
     };
-    
+
     // Para enlaces internos, usar Link de Next.js
     if (!isAnchor) {
       return (
-        <Link 
+        <Link
           href={href}
           className="group relative px-3 py-2 font-semibold text-gray-700 hover:text-orange-500 transition-colors duration-200"
           onClick={() => playFolderSound()}
         >
           <span className="z-10 relative">{children}</span>
-          <span 
+          <span
             className="absolute left-1/2 -bottom-1 w-0 h-1 bg-gradient-to-r from-orange-500 to-yellow-400 rounded-full transition-all duration-300 ease-out -translate-x-1/2 group-hover:w-2/3"
             aria-hidden="true"
           />
         </Link>
       );
     }
-    
+
     // Para anclas, usar manejo personalizado
     return (
-      <a 
+      <a
         href={href}
         className="group relative px-3 py-2 font-semibold text-gray-700 hover:text-orange-500 transition-colors duration-200"
         onClick={handleClick}
       >
         <span className="z-10 relative">{children}</span>
-        <span 
+        <span
           className="absolute left-1/2 -bottom-1 w-0 h-1 bg-gradient-to-r from-orange-500 to-yellow-400 rounded-full transition-all duration-300 ease-out -translate-x-1/2 group-hover:w-2/3"
           aria-hidden="true"
         />
@@ -106,7 +106,7 @@ const Header = () => {
             <Link href="/" className="flex items-center" aria-label="Ir a inicio">
               <div className="relative h-14 w-44 md:h-18 md:w-60 lg:h-20 lg:w-72">
                 <Image
-                  src="/images/tubarriope_logo_penegro2.webp"
+                  src="/images/logonav.png"
                   alt="Logo TuBarrio.pe"
                   fill
                   className="object-contain"
@@ -151,15 +151,15 @@ const Header = () => {
           {/* Navegación desktop */}
           <nav className="hidden md:flex gap-3 lg:gap-6 items-center mx-4">
             <NavItem href="/">Inicio</NavItem>
-        <NavItem href="/servicios">Todos los servicios</NavItem>
+            <NavItem href="/servicios">Todos los servicios</NavItem>
             <NavItem href="/inmuebles">Inmuebles</NavItem>
             <NavItem href="/blog">Blog</NavItem>
           </nav>
 
           {/* Acciones desktop */}
           <div className="hidden md:flex items-center gap-4">
-            <a 
-              href="https://forms.gle/qhVw6sFc2VvkXDeL9" 
+            <a
+              href="https://forms.gle/qhVw6sFc2VvkXDeL9"
               target="_blank"
               rel="noopener noreferrer"
               className="px-4 py-2 rounded-xl font-bold bg-gradient-to-r from-orange-500 to-yellow-400 text-white shadow-md hover:from-orange-600 hover:to-yellow-500 transition-all duration-200 flex items-center"
@@ -178,7 +178,7 @@ const Header = () => {
                 <NavItem href="/">Inicio</NavItem>
               </div>
               <div className="py-3 px-4 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors duration-150 min-h-[48px] flex items-center">
-        <NavItem href="/servicios">Todos los servicios</NavItem>
+                <NavItem href="/servicios">Todos los servicios</NavItem>
               </div>
               <div className="py-3 px-4 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors duration-150 min-h-[48px] flex items-center">
                 <NavItem href="/inmuebles">Inmuebles</NavItem>
@@ -187,8 +187,8 @@ const Header = () => {
                 <NavItem href="/blog">Blog</NavItem>
               </div>
               <div className="mt-6">
-                <a 
-                  href="https://forms.gle/qhVw6sFc2VvkXDeL9" 
+                <a
+                  href="https://forms.gle/qhVw6sFc2VvkXDeL9"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="block w-full px-6 py-4 text-center rounded-xl font-bold bg-gradient-to-r from-orange-500 to-yellow-400 text-white shadow-md hover:from-orange-600 hover:to-yellow-500 active:from-orange-700 active:to-yellow-600 transition-all duration-200 min-h-[52px] flex items-center justify-center"

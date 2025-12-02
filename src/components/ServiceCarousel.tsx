@@ -25,7 +25,7 @@ interface ServiceCarouselProps {
 
 export default function ServiceCarousel({ services = [], categoryName = '' }: ServiceCarouselProps) {
   const [isMounted, setIsMounted] = useState(false);
-  
+
   useEffect(() => {
     setIsMounted(true);
   }, []);
@@ -81,7 +81,7 @@ export default function ServiceCarousel({ services = [], categoryName = '' }: Se
           {services.length} {services.length === 1 ? 'servicio' : 'servicios'} disponibles
         </p>
       </div>
-      
+
       <div ref={sliderRef} className="keen-slider overflow-visible" key={`slider-${categoryName}`}>
         {services.map((service) => (
           <div key={service.id} className="keen-slider__slide min-w-[280px] max-w-[280px]">

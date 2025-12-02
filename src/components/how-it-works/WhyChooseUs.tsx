@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { 
+import {
   ShieldCheckIcon,
   ClockIcon,
   CurrencyDollarIcon,
@@ -88,11 +88,11 @@ export default function WhyChooseUs() {
               <div className={`w-16 h-16 ${benefit.bgColor} rounded-2xl flex items-center justify-center mb-6`}>
                 <benefit.icon className={`w-8 h-8 ${benefit.color}`} />
               </div>
-              
+
               <h3 className="text-xl font-bold text-gray-900 mb-4">
                 {benefit.title}
               </h3>
-              
+
               <p className="text-gray-600 leading-relaxed">
                 {benefit.description}
               </p>
@@ -112,7 +112,7 @@ export default function WhyChooseUs() {
             <h3 className="text-2xl font-bold text-gray-900 mb-8">
               Confían en nosotros
             </h3>
-            
+
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
               <div className="text-center">
                 <div className="text-3xl font-bold text-orange-600 mb-2">1000+</div>

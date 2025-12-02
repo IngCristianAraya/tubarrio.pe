@@ -25,7 +25,7 @@ export default function CallToAction() {
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
             ¿Listo para conectar con tu barrio?
           </h2>
-          
+
           <p className="text-xl text-orange-100 mb-12 leading-relaxed">
             Únete a miles de personas que ya encontraron los mejores servicios locales.
             <br />
@@ -38,13 +38,13 @@ export default function CallToAction() {
               whileTap={{ scale: 0.95 }}
             >
               <Link
-        href="/servicios"
+                href="/servicios"
                 className="bg-white text-orange-600 hover:bg-orange-50 px-10 py-4 rounded-full font-bold text-lg shadow-xl transition-all inline-block"
               >
                 Explorar Servicios
               </Link>
             </motion.div>
-            
+
             <motion.div
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -74,7 +74,7 @@ export default function CallToAction() {
             <p className="text-orange-100 mb-6">
               Estamos trabajando en nuestra app móvil para que puedas acceder a todos los servicios desde tu teléfono.
             </p>
-            
+
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <div className="flex items-center gap-3 bg-black/20 px-6 py-3 rounded-xl">
                 <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center">
@@ -85,7 +85,7 @@ export default function CallToAction() {
                   <div className="text-white font-semibold">App Store</div>
                 </div>
               </div>
-              
+
               <div className="flex items-center gap-3 bg-black/20 px-6 py-3 rounded-xl">
                 <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center">
                   <span className="text-black font-bold text-sm">🤖</span>
@@ -110,16 +110,16 @@ export default function CallToAction() {
               ¿Tienes preguntas? Estamos aquí para ayudarte
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center text-white">
-              <a 
-                href="mailto:hola@tubarrio.pe" 
+              <a
+                href="mailto:hola@tubarrio.pe"
                 className="hover:text-orange-200 transition-colors"
               >
                 📧 hola@tubarrio.pe
               </a>
               <span className="hidden sm:inline">•</span>
-              <a 
-                href="https://wa.me/51999999999" 
-                target="_blank" 
+              <a
+                href="https://wa.me/51999999999"
+                target="_blank"
                 rel="noopener noreferrer"
                 className="hover:text-orange-200 transition-colors"
               >

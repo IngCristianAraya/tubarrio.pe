@@ -9,12 +9,12 @@ import { formatDistance } from '@/hooks/useGeolocation';
 
 // Helper function to get ARIA attributes for loading state
 function getAriaLoadingProps(isLoading: boolean) {
-  return isLoading 
-    ? { 
-        'aria-busy': true,
-        'aria-live': 'polite' as const,
-        'aria-disabled': true
-      }
+  return isLoading
+    ? {
+      'aria-busy': true,
+      'aria-live': 'polite' as const,
+      'aria-disabled': true
+    }
     : {};
 }
 
@@ -63,7 +63,7 @@ const ServiceCard: React.FC<ServiceCardProps> = ({ service, className, isLoading
   const imageSrc = firstValid ? sanitizeImageUrl(firstValid as string) : '/images/default-service.jpg';
 
   return (
-    <Link 
+    <Link
       href={`/servicio/${service.id}`}
       className={cn(
         'block bg-white rounded-lg shadow-md overflow-hidden transition-transform duration-300 hover:shadow-lg',
@@ -82,12 +82,12 @@ const ServiceCard: React.FC<ServiceCardProps> = ({ service, className, isLoading
           priority={false}
         />
       </div>
-      
+
       <div className="p-4">
         <h3 className="text-lg font-semibold text-gray-900 mb-1">
           {service.name}
         </h3>
-        
+
         {service.category && (
           <p className="text-sm text-gray-600 mb-2">{service.category}</p>
         )}
@@ -104,7 +104,7 @@ const ServiceCard: React.FC<ServiceCardProps> = ({ service, className, isLoading
               {service.price}
             </span>
           )}
-          
+
           <div className="flex items-center gap-2">
             {typeof service.distanceKm === 'number' && (
               <span className="text-xs px-2 py-1 rounded-full bg-orange-100 text-orange-700">

@@ -8,12 +8,12 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { 
-  CheckCircle, 
-  Clock, 
-  Shield, 
-  Star, 
-  Users, 
+import {
+  CheckCircle,
+  Clock,
+  Shield,
+  Star,
+  Users,
   Award,
   Heart,
   Zap,
@@ -113,25 +113,25 @@ const ServiceIncludes: React.FC<ServiceIncludesProps> = ({ service }) => {
             ¿Qué incluye nuestro servicio?
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Descubre todo lo que obtienes cuando eliges {service.nombre}. 
+            Descubre todo lo que obtienes cuando eliges {service.nombre}.
             Cada detalle está pensado para brindarte la mejor experiencia.
           </p>
         </motion.div>
 
         {/* Benefits Grid */}
-        <motion.div 
+        <motion.div
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
           variants={containerVariants}
         >
           {benefits.map((benefit, index) => {
             const IconComponent = universalIcons[benefit.icon as keyof typeof universalIcons];
-            
+
             return (
               <motion.div
                 key={index}
                 className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-orange-100"
                 variants={itemVariants}
-                whileHover={{ 
+                whileHover={{
                   scale: 1.02,
                   boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)"
                 }}
@@ -157,7 +157,7 @@ const ServiceIncludes: React.FC<ServiceIncludesProps> = ({ service }) => {
         </motion.div>
 
         {/* Call to Action */}
-        <motion.div 
+        <motion.div
           className="text-center mt-10"
           variants={itemVariants}
         >
@@ -171,7 +171,7 @@ const ServiceIncludes: React.FC<ServiceIncludesProps> = ({ service }) => {
               ¡Y mucho más!
             </h3>
             <p className="text-gray-600 mb-6 max-w-md mx-auto">
-              Cada servicio incluye detalles especiales que hacen la diferencia. 
+              Cada servicio incluye detalles especiales que hacen la diferencia.
               Contáctanos para conocer todos los beneficios.
             </p>
             <motion.button

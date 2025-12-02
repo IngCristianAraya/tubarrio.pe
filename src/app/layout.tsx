@@ -13,9 +13,9 @@ import dynamic from 'next/dynamic';
 // Dynamically import components with no SSR to avoid hydration issues
 const Header = dynamic(() => import('@/components/Header'), { ssr: false });
 const Footer = dynamic(() => import('@/components/Footer'), { ssr: false });
-const PromoBar = dynamic(() => import('@/components/PromoBar'), { 
+const PromoBar = dynamic(() => import('@/components/PromoBar'), {
   ssr: false,
-  loading: () => <div className="h-10 bg-gray-100 animate-pulse"></div> 
+  loading: () => <div className="h-10 bg-gray-100 animate-pulse"></div>
 });
 
 

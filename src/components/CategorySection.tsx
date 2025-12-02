@@ -51,11 +51,12 @@ export default function CategorySection({
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{category.name}</h2>
           <Link
-            href={`/categorias/${category.slug}`}
-            className="text-primary-600 hover:text-primary-800 dark:text-primary-400 dark:hover:text-primary-300 font-medium flex items-center"
+            href={`/servicios?categoria=${category.slug}`}
+            className="group subtle-pulse inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-gradient-to-r from-orange-500 to-orange-600 text-white font-semibold shadow-md hover:shadow-lg transition-all duration-200 active:scale-95 ring-1 ring-orange-300/40 hover:ring-orange-400/60"
+            aria-label={`Ver más de ${category.name}`}
           >
             Ver más
-            <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <svg className="w-4 h-4 ml-1.5 transition-transform group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
           </Link>
@@ -93,6 +94,38 @@ export default function CategorySection({
           </div>
         )}
       </div>
+
+      <style jsx>{`
+        @keyframes subtlePulse {
+          0% {
+            transform: scale(1);
+            filter: brightness(1);
+            box-shadow: 0 1px 4px rgba(255, 115, 0, 0.15);
+          }
+          50% {
+            transform: scale(1.015);
+            filter: brightness(1.03);
+            box-shadow: 0 2px 10px rgba(255, 115, 0, 0.25);
+          }
+          100% {
+            transform: scale(1);
+            filter: brightness(1);
+            box-shadow: 0 1px 4px rgba(255, 115, 0, 0.15);
+          }
+        }
+        .subtle-pulse {
+          animation: subtlePulse 3.8s ease-out infinite;
+          will-change: transform, filter, box-shadow;
+        }
+        .subtle-pulse:hover {
+          animation-play-state: paused;
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .subtle-pulse {
+            animation: none;
+          }
+        }
+      `}</style>
     </section>
   );
 }

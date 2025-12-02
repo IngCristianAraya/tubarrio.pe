@@ -15,6 +15,6 @@ interface PageTrackerProps {
 export function PageTracker({ children }: PageTrackerProps) {
   // TEMPORALMENTE DESHABILITADO: Este hook causaba bucle de errores
   // usePageTracking();
-  
+
   return <>{children}</>;
 }

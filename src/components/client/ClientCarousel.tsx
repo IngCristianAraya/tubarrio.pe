@@ -22,7 +22,7 @@ interface ClientCarouselProps {
 
 export default function ClientCarousel({ services = [], categoryName = '' }: ClientCarouselProps) {
   const [mounted, setMounted] = useState(false);
-  
+
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -76,7 +76,7 @@ export default function ClientCarousel({ services = [], categoryName = '' }: Cli
           {services.length} {services.length === 1 ? 'servicio' : 'servicios'} disponibles
         </p>
       </div>
-      
+
       <div ref={sliderRef} className="keen-slider overflow-visible">
         {services.map((service) => (
           <div key={service.id} className="keen-slider__slide min-w-[280px] max-w-[280px]">

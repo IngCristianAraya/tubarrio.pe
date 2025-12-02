@@ -36,7 +36,7 @@ export default function HowItWorksHero() {
                 <div className="absolute -bottom-2 left-0 right-0 h-1 bg-orange-600 rounded-full opacity-30"></div>
               </span>?
             </h1>
-            
+
             <p className="text-xl md:text-2xl text-gray-700 mb-12 leading-relaxed max-w-3xl mx-auto">
               Conectamos a tu barrio con los mejores servicios locales de manera{' '}
               <span className="text-orange-600 font-semibold">fácil, rápida y confiable</span>.
@@ -46,14 +46,14 @@ export default function HowItWorksHero() {
 
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-16">
               <motion.a
-        href="/servicios"
+                href="/servicios"
                 whileHover={{ scale: 1.05, y: -2 }}
                 whileTap={{ scale: 0.95 }}
                 className="bg-orange-600 hover:bg-orange-700 text-white px-10 py-5 rounded-full font-semibold text-lg shadow-xl hover:shadow-2xl transition-all duration-300 inline-block"
               >
                 Explorar Servicios
               </motion.a>
-              
+
               <motion.a
                 href="https://docs.google.com/forms/d/e/1FAIpQLSeAeaoi0L9mP6fh3DEww8yPc_4e8BJmf1sc1BhfRf7vk-pVNg/viewform"
                 target="_blank"
@@ -74,21 +74,21 @@ export default function HowItWorksHero() {
             transition={{ duration: 0.8, delay: 0.3 }}
             className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-8"
           >
-            <motion.div 
+            <motion.div
               whileHover={{ scale: 1.05 }}
               className="text-center bg-white/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg"
             >
               <div className="text-4xl md:text-5xl font-bold text-orange-600 mb-2">500+</div>
               <div className="text-gray-700 font-medium">Servicios Disponibles</div>
             </motion.div>
-            <motion.div 
+            <motion.div
               whileHover={{ scale: 1.05 }}
               className="text-center bg-white/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg"
             >
               <div className="text-4xl md:text-5xl font-bold text-orange-600 mb-2">24h</div>
               <div className="text-gray-700 font-medium">Respuesta Promedio</div>
             </motion.div>
-            <motion.div 
+            <motion.div
               whileHover={{ scale: 1.05 }}
               className="text-center bg-white/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg"
             >
@@ -102,7 +102,7 @@ export default function HowItWorksHero() {
       {/* Onda decorativa en la parte inferior */}
       <div className="absolute bottom-0 left-0 right-0">
         <svg viewBox="0 0 1200 120" fill="none" className="w-full h-auto">
-          <path d="M0,60 C300,120 900,0 1200,60 L1200,120 L0,120 Z" fill="white" fillOpacity="0.1"/>
+          <path d="M0,60 C300,120 900,0 1200,60 L1200,120 L0,120 Z" fill="white" fillOpacity="0.1" />
         </svg>
       </div>
     </section>

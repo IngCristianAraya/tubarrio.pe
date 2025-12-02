@@ -4,8 +4,8 @@ import dynamic from 'next/dynamic';
 
 // Componentes con carga perezosa y estados de carga personalizados
 const TodosLosServiciosWrapper = dynamic(
-() => import('../app/todos-los-servicios/TodosLosServicios'),
-  { 
+  () => import('../app/todos-los-servicios/TodosLosServicios'),
+  {
     loading: () => (
       <div className="py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -20,12 +20,12 @@ const TodosLosServiciosWrapper = dynamic(
         </div>
       </div>
     ),
-    ssr: false 
+    ssr: false
   }
 );
 const BusinessRegistration = dynamic(
-  () => import('./BusinessRegistration'), 
-  { 
+  () => import('./BusinessRegistration'),
+  {
     loading: () => (
       <div className="py-12 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -33,21 +33,21 @@ const BusinessRegistration = dynamic(
         </div>
       </div>
     ),
-    ssr: false 
+    ssr: false
   }
 );
 
 const WhatsAppButton = dynamic(
-  () => import('./WhatsAppButton'), 
-  { 
-    ssr: false 
+  () => import('./WhatsAppButton'),
+  {
+    ssr: false
   }
 );
 
 // Importación dinámica de FeaturedServices
 const FeaturedServices = dynamic(
   () => import('./FeaturedServices'),
-  { 
+  {
     ssr: false,
     loading: () => (
       <div className="py-16 bg-gray-50">
@@ -88,7 +88,7 @@ const HomeClient = () => {
           const anchorId = hash.replace('#', '');
           const element = document.getElementById(anchorId);
           if (element) {
-            element.scrollIntoView({ 
+            element.scrollIntoView({
               behavior: 'smooth',
               block: 'start'
             });
@@ -119,7 +119,7 @@ const HomeClient = () => {
     <div className="space-y-0">
       {/* Servicios Destacados */}
       <FeaturedServices />
-      
+
       {/* Botón flotante de WhatsApp */}
       <WhatsAppButton phoneNumber="+51901426737" />
     </div>

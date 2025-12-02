@@ -7,10 +7,10 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { 
-  CreditCard, 
-  Percent, 
-  Clock, 
+import {
+  CreditCard,
+  Percent,
+  Clock,
   Calculator,
   Tag,
   Sparkles,
@@ -26,7 +26,7 @@ interface ServicePricingProps {
 // Función simplificada para determinar el tipo de precio
 const getPricingType = (service: Service) => {
   const hasPrice = service.precio && service.precio > 0;
-  
+
   return {
     hasPrice,
     requiresQuotation: !hasPrice,
@@ -50,7 +50,7 @@ const getPromotions = (service: Service) => {
       highlight: false
     }
   ];
-  
+
   return promotions;
 };
 
@@ -105,7 +105,7 @@ const ServicePricing: React.FC<ServicePricingProps> = ({ service }) => {
             {hasPrice ? 'Precios y Promociones' : 'Cotización Personalizada'}
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            {hasPrice 
+            {hasPrice
               ? 'Conoce nuestros precios transparentes y aprovecha nuestras promociones especiales'
               : 'Cada proyecto es único. Te ofrecemos una cotización personalizada sin compromiso'
             }
@@ -124,7 +124,7 @@ const ServicePricing: React.FC<ServicePricingProps> = ({ service }) => {
                     <Calculator className="w-8 h-8 text-white" />
                   )}
                 </div>
-                
+
                 {hasPrice ? (
                   <>
                     <div className="text-4xl font-bold text-gray-900 mb-2">
@@ -174,39 +174,34 @@ const ServicePricing: React.FC<ServicePricingProps> = ({ service }) => {
                 <h3 className="text-xl font-bold text-gray-900 mb-6">
                   Promociones Especiales
                 </h3>
-                
+
                 {promotions.map((promo, index) => {
                   const IconComponent = iconMap[promo.icon as keyof typeof iconMap];
-                  
+
                   return (
                     <motion.div
                       key={index}
-                      className={`p-6 rounded-2xl border transition-all duration-300 ${
-                        promo.highlight
+                      className={`p-6 rounded-2xl border transition-all duration-300 ${promo.highlight
                           ? 'bg-gradient-to-br from-orange-500 to-amber-500 text-white border-orange-300 shadow-lg'
                           : 'bg-white border-gray-200 hover:border-orange-200 hover:shadow-md'
-                      }`}
+                        }`}
                       whileHover={{ scale: 1.02 }}
                     >
                       <div className="flex items-start space-x-4">
-                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
-                          promo.highlight
+                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${promo.highlight
                             ? 'bg-white bg-opacity-20'
                             : 'bg-gradient-to-br from-orange-500 to-amber-500'
-                        }`}>
-                          <IconComponent className={`w-6 h-6 ${
-                            promo.highlight ? 'text-white' : 'text-white'
-                          }`} />
+                          }`}>
+                          <IconComponent className={`w-6 h-6 ${promo.highlight ? 'text-white' : 'text-white'
+                            }`} />
                         </div>
                         <div className="flex-1">
-                          <h4 className={`font-semibold mb-1 ${
-                            promo.highlight ? 'text-white' : 'text-gray-900'
-                          }`}>
+                          <h4 className={`font-semibold mb-1 ${promo.highlight ? 'text-white' : 'text-gray-900'
+                            }`}>
                             {promo.title}
                           </h4>
-                          <p className={`text-sm ${
-                            promo.highlight ? 'text-white text-opacity-90' : 'text-gray-600'
-                          }`}>
+                          <p className={`text-sm ${promo.highlight ? 'text-white text-opacity-90' : 'text-gray-600'
+                            }`}>
                             {promo.description}
                           </p>
                         </div>
@@ -220,7 +215,7 @@ const ServicePricing: React.FC<ServicePricingProps> = ({ service }) => {
         </div>
 
         {/* Payment Methods */}
-        <motion.div 
+        <motion.div
           className="mt-10 text-center"
           variants={itemVariants}
         >

@@ -11,10 +11,10 @@ interface ServiceImagesProps {
   className?: string;
 }
 
-const ServiceImages = ({ 
-  images, 
-  name, 
-  className = '' 
+const ServiceImages = ({
+  images,
+  name,
+  className = ''
 }: ServiceImagesProps): JSX.Element => {
   const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
   const [isMobile, setIsMobile] = useState<boolean>(false);
@@ -26,10 +26,10 @@ const ServiceImages = ({
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768);
     };
-    
+
     checkMobile();
     window.addEventListener('resize', checkMobile);
-    
+
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
@@ -59,7 +59,7 @@ const ServiceImages = ({
 
   const handleTouchEnd = (): void => {
     if (!touchStartX.current || !touchEndX.current) return;
-    
+
     const distance = touchStartX.current - touchEndX.current;
     const isLeftSwipe = distance > 50;
     const isRightSwipe = distance < -50;
@@ -111,7 +111,7 @@ const ServiceImages = ({
       {isMobile ? (
         // Vista móvil - Carrusel con swipe
         <div className="relative">
-          <div 
+          <div
             className="relative w-full aspect-square rounded-lg overflow-hidden bg-gray-100"
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove}
@@ -174,11 +174,10 @@ const ServiceImages = ({
                         goToImage(index);
                       }
                     }}
-                    className={`w-2 h-2 rounded-full transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/50 ${
-                      index === currentImageIndex 
-                        ? 'bg-white scale-125' 
+                    className={`w-2 h-2 rounded-full transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/50 ${index === currentImageIndex
+                        ? 'bg-white scale-125'
                         : 'bg-white/50 hover:bg-white/75'
-                    }`}
+                      }`}
                     aria-label={`Ir a imagen ${index + 1}`}
                     title={`Imagen ${index + 1}`}
                   />
@@ -200,11 +199,10 @@ const ServiceImages = ({
                   e.stopPropagation();
                   goToImage(index);
                 }}
-                className={`relative w-20 h-20 rounded-lg overflow-hidden border-2 transition-all duration-200 hover:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 ${
-                  index === currentImageIndex 
-                    ? 'border-blue-500 ring-2 ring-blue-500/30' 
+                className={`relative w-20 h-20 rounded-lg overflow-hidden border-2 transition-all duration-200 hover:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 ${index === currentImageIndex
+                    ? 'border-blue-500 ring-2 ring-blue-500/30'
                     : 'border-gray-200 hover:border-gray-300'
-                }`}
+                  }`}
                 aria-label={`Ver imagen ${index + 1}`}
                 title={`Imagen ${index + 1}`}
               >

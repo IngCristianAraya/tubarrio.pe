@@ -14,7 +14,7 @@ const tabs = [
 export default function MobileBottomNav() {
   const pathname = usePathname();
   return (
-    <nav className="fixed bottom-0 left-0 right-0 md:hidden border-t border-gray-200 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80 z-50">
+    <nav className="fixed bottom-0 left-0 right-0 lg:hidden border-t border-gray-200 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80 z-50">
       <div className="mx-auto max-w-md">
         <ul className="grid grid-cols-4">
           {tabs.map((t) => {
@@ -24,8 +24,7 @@ export default function MobileBottomNav() {
               <li key={t.key} className="">
                 <Link
                   href={t.href}
-                  className={`flex flex-col items-center justify-center py-2.5 text-xs ${isActive ? "text-orange-600" : "text-gray-700"
-                    }`}
+                  className={`flex flex-col items-center justify-center py-2.5 text-xs ${isActive ? "text-orange-600" : "text-gray-700"}`}
                   target={isExternal ? "_blank" : undefined}
                   rel={isExternal ? "noopener noreferrer" : undefined}
                 >

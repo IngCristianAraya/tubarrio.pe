@@ -16,7 +16,7 @@ const CoverageSection = () => {
             Actualmente cubrimos las siguientes zonas y seguimos expandiéndonos
           </p>
         </div>
-        
+
         {/* Información de cobertura sin mapa */}
         <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl shadow-xl overflow-hidden border border-blue-200 mb-12 p-8">
           <div className="text-center">
@@ -55,7 +55,7 @@ const CoverageSection = () => {
         </div>
 
         <div className="grid md:grid-cols-3 gap-8 mt-12">
-          <motion.div 
+          <motion.div
             className={getCardStyle('elevated')}
             whileHover={{ y: -5 }}
           >
@@ -72,7 +72,7 @@ const CoverageSection = () => {
             </div>
           </motion.div>
 
-          <motion.div 
+          <motion.div
             className={getCardStyle('elevated')}
             whileHover={{ y: -5 }}
           >
@@ -89,7 +89,7 @@ const CoverageSection = () => {
             </div>
           </motion.div>
 
-          <motion.div 
+          <motion.div
             className={getCardStyle('elevated')}
             whileHover={{ y: -5 }}
           >

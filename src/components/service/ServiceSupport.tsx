@@ -7,11 +7,11 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { 
-  MessageCircle, 
-  Phone, 
-  Mail, 
-  Clock, 
+import {
+  MessageCircle,
+  Phone,
+  Mail,
+  Clock,
   MapPin,
   Headphones,
   Shield,
@@ -125,7 +125,7 @@ const ServiceSupport: React.FC<ServiceSupportProps> = ({ service }) => {
             ¿Tienes dudas? ¡Estamos aquí para ayudarte!
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Contacta directamente con el equipo de <strong>TuBarrio.pe</strong> para resolver 
+            Contacta directamente con el equipo de <strong>TuBarrio.pe</strong> para resolver
             todas tus preguntas y acompañarte en cada paso del proceso.
           </p>
         </motion.div>
@@ -136,53 +136,47 @@ const ServiceSupport: React.FC<ServiceSupportProps> = ({ service }) => {
             <h3 className="text-2xl font-bold text-gray-900 mb-6">
               Contáctanos Directamente
             </h3>
-            
+
             <div className="space-y-4">
               {contactMethods.map((method, index) => {
                 const IconComponent = method.icon;
-                
+
                 return (
                   <motion.div
                     key={index}
-                    className={`p-6 rounded-2xl border cursor-pointer transition-all duration-300 ${
-                      method.primary
+                    className={`p-6 rounded-2xl border cursor-pointer transition-all duration-300 ${method.primary
                         ? 'bg-gradient-to-br from-green-500 to-emerald-500 text-white border-green-300 shadow-lg'
                         : 'bg-white border-gray-200 hover:border-blue-200 hover:shadow-md'
-                    }`}
+                      }`}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={method.onClick}
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-4">
-                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
-                          method.primary
+                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${method.primary
                             ? 'bg-white bg-opacity-20'
                             : 'bg-gradient-to-br from-blue-500 to-indigo-500'
-                        }`}>
-                          <IconComponent className={`w-6 h-6 ${
-                            method.primary ? 'text-white' : 'text-white'
-                          }`} />
+                          }`}>
+                          <IconComponent className={`w-6 h-6 ${method.primary ? 'text-white' : 'text-white'
+                            }`} />
                         </div>
                         <div>
-                          <h4 className={`font-semibold ${
-                            method.primary ? 'text-white' : 'text-gray-900'
-                          }`}>
+                          <h4 className={`font-semibold ${method.primary ? 'text-white' : 'text-gray-900'
+                            }`}>
                             {method.title}
                           </h4>
-                          <p className={`text-sm ${
-                            method.primary ? 'text-white text-opacity-90' : 'text-gray-600'
-                          }`}>
+                          <p className={`text-sm ${method.primary ? 'text-white text-opacity-90' : 'text-gray-600'
+                            }`}>
                             {method.description}
                           </p>
                         </div>
                       </div>
                       <motion.button
-                        className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors ${
-                          method.primary
+                        className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors ${method.primary
                             ? 'bg-white text-green-600 hover:bg-gray-100'
                             : 'bg-blue-500 text-white hover:bg-blue-600'
-                        }`}
+                          }`}
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                       >
@@ -195,7 +189,7 @@ const ServiceSupport: React.FC<ServiceSupportProps> = ({ service }) => {
             </div>
 
             {/* Business Hours */}
-            <motion.div 
+            <motion.div
               className="mt-8 bg-white rounded-2xl p-6 border border-gray-200"
               variants={itemVariants}
             >
@@ -222,11 +216,11 @@ const ServiceSupport: React.FC<ServiceSupportProps> = ({ service }) => {
             <h3 className="text-2xl font-bold text-gray-900 mb-6">
               ¿Por qué elegirnos?
             </h3>
-            
+
             <div className="space-y-6">
               {supportFeatures.map((feature, index) => {
                 const IconComponent = feature.icon;
-                
+
                 return (
                   <motion.div
                     key={index}
@@ -251,7 +245,7 @@ const ServiceSupport: React.FC<ServiceSupportProps> = ({ service }) => {
 
             {/* Location Info */}
             {service.direccion && (
-              <motion.div 
+              <motion.div
                 className="mt-8 bg-white rounded-2xl p-6 border border-gray-200"
                 variants={itemVariants}
               >
@@ -267,22 +261,22 @@ const ServiceSupport: React.FC<ServiceSupportProps> = ({ service }) => {
                   {service.direccion}
                 </p>
                 <motion.button
-              className="text-blue-600 hover:text-blue-700 font-medium text-sm"
-              whileHover={{ scale: 1.05 }}
-              onClick={() => {
-                const address = encodeURIComponent(service.direccion || '');
-                window.open(`https://www.google.com/maps/search/?api=1&query=${address}`, '_blank');
-              }}
-            >
-              Ver en Google Maps →
-            </motion.button>
+                  className="text-blue-600 hover:text-blue-700 font-medium text-sm"
+                  whileHover={{ scale: 1.05 }}
+                  onClick={() => {
+                    const address = encodeURIComponent(service.direccion || '');
+                    window.open(`https://www.google.com/maps/search/?api=1&query=${address}`, '_blank');
+                  }}
+                >
+                  Ver en Google Maps →
+                </motion.button>
               </motion.div>
             )}
           </motion.div>
         </div>
 
         {/* Bottom CTA */}
-        <motion.div 
+        <motion.div
           className="mt-12 text-center"
           variants={itemVariants}
         >
@@ -296,7 +290,7 @@ const ServiceSupport: React.FC<ServiceSupportProps> = ({ service }) => {
               ¿Listo para comenzar?
             </h3>
             <p className="text-gray-600 mb-6 max-w-md mx-auto">
-              Nuestro equipo está esperando para brindarte el mejor servicio. 
+              Nuestro equipo está esperando para brindarte el mejor servicio.
               ¡Contáctanos ahora y comencemos juntos!
             </p>
             <motion.button

@@ -77,40 +77,40 @@ type CategoryColors = {
 };
 
 const categoryColors: CategoryColors = {
-  'Restaurantes': { 
-    from: 'from-red-500', 
+  'Restaurantes': {
+    from: 'from-red-500',
     to: 'to-orange-500',
-    via: 'via-red-400' 
+    via: 'via-red-400'
   },
-  'Abarrotes': { 
-    from: 'from-green-500', 
+  'Abarrotes': {
+    from: 'from-green-500',
     to: 'to-emerald-500',
-    via: 'via-green-400' 
+    via: 'via-green-400'
   },
-  'Lavanderías': { 
-    from: 'from-blue-500', 
+  'Lavanderías': {
+    from: 'from-blue-500',
     to: 'to-indigo-600',
-    via: 'via-blue-400' 
+    via: 'via-blue-400'
   },
-  'Gimnasios': { 
-    from: 'from-purple-500', 
+  'Gimnasios': {
+    from: 'from-purple-500',
     to: 'to-pink-600',
-    via: 'via-purple-400' 
+    via: 'via-purple-400'
   },
-  'Servicios': { 
-    from: 'from-amber-500', 
+  'Servicios': {
+    from: 'from-amber-500',
     to: 'to-orange-500',
-    via: 'via-amber-400' 
+    via: 'via-amber-400'
   },
-  'Peluquerías': { 
-    from: 'from-pink-500', 
+  'Peluquerías': {
+    from: 'from-pink-500',
     to: 'to-rose-500',
-    via: 'via-pink-400' 
+    via: 'via-pink-400'
   },
-  'default': { 
-    from: 'from-gray-500', 
+  'default': {
+    from: 'from-gray-500',
     to: 'to-gray-700',
-    via: 'via-gray-400' 
+    via: 'via-gray-400'
   },
 };
 
@@ -123,11 +123,11 @@ const ServiceHeader = ({ service }: ServiceHeaderProps): ReactElement => {
   // Función para formatear el horario
   const formatSchedule = (): string => {
     if (service.horario) return service.horario;
-    
+
     if (service.hours) {
       // Si hours es un string, retornarlo directamente
       if (typeof service.hours === 'string') return service.hours;
-      
+
       // Si hours es un objeto, formatearlo a un string legible
       if (typeof service.hours === 'object' && service.hours !== null) {
         const days = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domingo'] as const;
@@ -140,18 +140,18 @@ const ServiceHeader = ({ service }: ServiceHeaderProps): ReactElement => {
           'sábado': 'Sáb',
           'domingo': 'Dom'
         };
-        
+
         // Agrupar días consecutivos con el mismo horario
         let result: string[] = [];
         let currentGroup: string[] = [];
         let currentHours = '';
-        
+
         days.forEach(day => {
           const dayHours = (service.hours as Record<string, any>)?.[day];
           if (!dayHours || dayHours.closed) return;
-          
+
           const hoursStr = `${dayHours.open}-${dayHours.close}`;
-          
+
           if (currentHours === hoursStr) {
             // Extender el grupo actual
             currentGroup[1] = dayMap[day];
@@ -165,49 +165,49 @@ const ServiceHeader = ({ service }: ServiceHeaderProps): ReactElement => {
             currentHours = hoursStr;
           }
         });
-        
+
         // Agregar el último grupo si existe
         if (currentGroup.length > 0) {
           result.push(`${currentGroup[0]}-${currentGroup[1]} ${currentHours}`);
         }
-        
+
         return result.length > 0 ? result.join(', ') : 'No especificado';
       }
     }
-    
+
     return 'No especificado';
   };
 
   // Estados para favoritos y compartir
   const [isFavorite, setIsFavorite] = useState(false);
   const [showShareTooltip, setShowShareTooltip] = useState(false);
-  
+
   // Función para validar si una imagen es válida
   const isValidImage = (imageUrl: string | null | undefined): boolean => {
-    return !!imageUrl && 
-           imageUrl !== 'none' && 
-           imageUrl !== '' && 
-           imageUrl !== 'null' && 
-           imageUrl !== 'undefined' &&
-           !imageUrl.includes('invalid') &&
-           (imageUrl.startsWith('http') || imageUrl.startsWith('/'));
+    return !!imageUrl &&
+      imageUrl !== 'none' &&
+      imageUrl !== '' &&
+      imageUrl !== 'null' &&
+      imageUrl !== 'undefined' &&
+      !imageUrl.includes('invalid') &&
+      (imageUrl.startsWith('http') || imageUrl.startsWith('/'));
   };
 
   // Asegurarse de que siempre trabajamos con un array de imágenes
-  const serviceImages = Array.isArray(service.images) 
-    ? service.images 
-    : service.image 
-      ? [service.image] 
+  const serviceImages = Array.isArray(service.images)
+    ? service.images
+    : service.image
+      ? [service.image]
       : [];
-  
+
   // Filtrar y validar imágenes
-  const validImages = serviceImages.filter((img): img is string => 
+  const validImages = serviceImages.filter((img): img is string =>
     typeof img === 'string' && isValidImage(img)
   );
-  
+
   // Usar imágenes válidas o el placeholder si no hay imágenes
-  const images = validImages.length > 0 
-    ? validImages 
+  const images = validImages.length > 0
+    ? validImages
     : ['/images/placeholder-service.jpg'];
 
   // Manejar el cambio de favoritos
@@ -252,7 +252,7 @@ const ServiceHeader = ({ service }: ServiceHeaderProps): ReactElement => {
     const stars: ReactElement[] = [];
     const fullStars = Math.floor(rating);
     const hasHalfStar = rating % 1 >= 0.5;
-    
+
     for (let i = 1; i <= 5; i++) {
       if (i <= fullStars) {
         stars.push(<Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />);
@@ -262,7 +262,7 @@ const ServiceHeader = ({ service }: ServiceHeaderProps): ReactElement => {
         stars.push(<Star key={i} className="w-5 h-5 text-gray-300" />);
       }
     }
-    
+
     return (
       <div className="flex items-center">
         {stars}
@@ -279,10 +279,10 @@ const ServiceHeader = ({ service }: ServiceHeaderProps): ReactElement => {
   return (
     <div className="relative overflow-hidden">
       {/* Animated gradient background */}
-      <motion.div 
+      <motion.div
         className={`absolute inset-0 -z-10 ${gradientClass} opacity-90`}
         initial={{ scale: 1.2, opacity: 0 }}
-        animate={{ 
+        animate={{
           scale: 1,
           opacity: 0.9,
           transition: { duration: 0.8, ease: 'easeOut' }
@@ -290,32 +290,32 @@ const ServiceHeader = ({ service }: ServiceHeaderProps): ReactElement => {
       >
         <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent"></div>
       </motion.div>
-      
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative">
         {/* Encabezado fuera del grid para alinear imagen y descripción en desktop */}
-        <motion.div 
+        <motion.div
           className="space-y-6 mb-6 lg:mb-8"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
           {/* 1. Título */}
-          <motion.h1 
+          <motion.h1
             className="text-4xl lg:text-5xl font-bold text-gray-900 leading-tight bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent"
             variants={itemVariants}
           >
             {service.name}
           </motion.h1>
-          
+
           {/* Categoría, Ubicación y Rating */}
-          <motion.div 
+          <motion.div
             className="w-full"
             variants={itemVariants}
           >
             <div className="grid grid-cols-3 gap-2 sm:flex sm:flex-wrap sm:gap-3">
               {/* Categoría */}
               <motion.div className="flex-1 min-w-[100px]">
-                <motion.span 
+                <motion.span
                   className="inline-flex items-center justify-center w-full px-2 py-2 bg-white/80 backdrop-blur-sm text-gray-800 text-xs sm:text-sm font-semibold rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300 whitespace-nowrap overflow-hidden text-ellipsis"
                   whileHover={{ y: -2 }}
                   title={service.category}
@@ -332,11 +332,11 @@ const ServiceHeader = ({ service }: ServiceHeaderProps): ReactElement => {
                   <span className="truncate">{service.category}</span>
                 </motion.span>
               </motion.div>
-              
+
               {/* Barrio */}
               {service.neighborhood?.trim() && (
                 <motion.div className="flex-1 min-w-[100px]">
-                  <motion.span 
+                  <motion.span
                     className="inline-flex items-center justify-center w-full px-2 py-2 bg-blue-50/80 backdrop-blur-sm text-blue-800 text-xs sm:text-sm font-medium rounded-xl border border-blue-100 shadow-sm hover:shadow-md transition-all duration-300 whitespace-nowrap overflow-hidden text-ellipsis"
                     whileHover={{ y: -2 }}
                     title={service.neighborhood.trim()}
@@ -346,11 +346,11 @@ const ServiceHeader = ({ service }: ServiceHeaderProps): ReactElement => {
                   </motion.span>
                 </motion.div>
               )}
-              
+
               {/* Rating */}
               {service.rating && service.rating > 0 && (
                 <motion.div className="flex-1 min-w-[100px]">
-                  <motion.div 
+                  <motion.div
                     className="flex items-center justify-center w-full h-full px-2 py-2 bg-white/80 backdrop-blur-sm rounded-xl border border-gray-200 shadow-sm"
                     whileHover={{ scale: 1.03 }}
                   >
@@ -362,21 +362,21 @@ const ServiceHeader = ({ service }: ServiceHeaderProps): ReactElement => {
           </motion.div>
         </motion.div>
 
-        <motion.div 
+        <motion.div
           className="lg:grid lg:grid-cols-2 lg:gap-8"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
           {/* Columna izquierda - Galería de imágenes (solo desktop) */}
-          <motion.div 
+          <motion.div
             className="hidden lg:block lg:mt-2"
             variants={containerVariants}
             initial="hidden"
             animate="visible"
           >
             <motion.div variants={itemVariants}>
-              <ServiceImages 
+              <ServiceImages
                 images={images}
                 name={service.name}
                 className="sticky top-8"
@@ -385,7 +385,7 @@ const ServiceHeader = ({ service }: ServiceHeaderProps): ReactElement => {
           </motion.div>
 
           {/* Columna derecha - Información */}
-          <motion.div 
+          <motion.div
             className="space-y-6"
             variants={containerVariants}
             initial="hidden"
@@ -394,11 +394,11 @@ const ServiceHeader = ({ service }: ServiceHeaderProps): ReactElement => {
             {/* Título y chips movidos al encabezado superior fuera del grid */}
 
             {/* Galería de imágenes (solo móvil) */}
-            <motion.div 
+            <motion.div
               className="lg:hidden"
               variants={itemVariants}
             >
-              <ServiceImages 
+              <ServiceImages
                 images={images}
                 name={service.name}
                 className="mb-6"
@@ -407,7 +407,7 @@ const ServiceHeader = ({ service }: ServiceHeaderProps): ReactElement => {
 
             {/* Descripción */}
             {service.description && (
-              <motion.div 
+              <motion.div
                 className="bg-white/80 backdrop-blur-sm p-4 sm:p-6 rounded-xl sm:rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300"
                 whileHover={{ y: -2 }}
                 variants={itemVariants}
@@ -420,7 +420,7 @@ const ServiceHeader = ({ service }: ServiceHeaderProps): ReactElement => {
             )}
 
             {/* Información del Servicio */}
-            <motion.div 
+            <motion.div
               className="bg-white/80 backdrop-blur-sm p-4 sm:p-6 rounded-xl sm:rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300"
               whileHover={{ y: -2 }}
             >
@@ -428,7 +428,7 @@ const ServiceHeader = ({ service }: ServiceHeaderProps): ReactElement => {
               <div className="space-y-3 sm:space-y-4">
                 {/* Ubicación */}
                 {(service.location || service.address) && (
-                  <motion.div 
+                  <motion.div
                     className="flex items-start gap-4 p-4 bg-white/80 backdrop-blur-sm rounded-xl border border-blue-100 shadow-sm hover:shadow-md transition-all duration-300"
                     whileHover={{ y: -2 }}
                   >
@@ -444,10 +444,10 @@ const ServiceHeader = ({ service }: ServiceHeaderProps): ReactElement => {
                           const location = service.location?.trim();
                           const neighborhood = service.neighborhood?.trim();
                           const district = service.district?.trim();
-                          
+
                           // Crear un array para almacenar las partes de la dirección
                           const addressParts = [];
-                          
+
                           // Agregar barrio si existe
                           if (neighborhood) {
                             addressParts.push({
@@ -457,7 +457,7 @@ const ServiceHeader = ({ service }: ServiceHeaderProps): ReactElement => {
                               icon: <MapPin className="w-4 h-4 mr-1 text-blue-500 inline" />
                             });
                           }
-                          
+
                           // Agregar distrito si existe
                           if (district) {
                             addressParts.push({
@@ -467,7 +467,7 @@ const ServiceHeader = ({ service }: ServiceHeaderProps): ReactElement => {
                               icon: <MapPin className="w-4 h-4 mr-1 text-purple-500 inline" />
                             });
                           }
-                          
+
                           // Agregar dirección si existe
                           if (address) {
                             addressParts.push({
@@ -476,7 +476,7 @@ const ServiceHeader = ({ service }: ServiceHeaderProps): ReactElement => {
                               className: 'text-gray-700'
                             });
                           }
-                          
+
                           // Agregar referencia si existe y es diferente a la dirección
                           if (reference && reference !== address) {
                             addressParts.push({
@@ -485,7 +485,7 @@ const ServiceHeader = ({ service }: ServiceHeaderProps): ReactElement => {
                               className: 'text-gray-600 text-sm'
                             });
                           }
-                          
+
                           // Agregar ubicación general si no hay otros datos
                           if (addressParts.length === 0 && location) {
                             addressParts.push({
@@ -494,7 +494,7 @@ const ServiceHeader = ({ service }: ServiceHeaderProps): ReactElement => {
                               className: 'text-gray-700'
                             });
                           }
-                          
+
                           // Si no hay datos de ubicación
                           if (addressParts.length === 0) {
                             return (
@@ -503,7 +503,7 @@ const ServiceHeader = ({ service }: ServiceHeaderProps): ReactElement => {
                               </p>
                             );
                           }
-                          
+
                           // Renderizar solo dirección y referencia (sin barrio/distrito duplicados)
                           return (
                             <div className="space-y-2">
@@ -522,7 +522,7 @@ const ServiceHeader = ({ service }: ServiceHeaderProps): ReactElement => {
                                     </span>
                                   </div>
                                 ))}
-                              
+
                               {addressParts.length === 0 && (
                                 <p className="text-gray-500 text-sm">
                                   Ubicación no especificada
@@ -538,7 +538,7 @@ const ServiceHeader = ({ service }: ServiceHeaderProps): ReactElement => {
 
                 {/* Horario */}
                 {service.horario && (
-                  <motion.div 
+                  <motion.div
                     className="flex items-start gap-4 p-4 bg-white/80 backdrop-blur-sm rounded-xl border border-green-100 shadow-sm hover:shadow-md transition-all duration-300"
                     whileHover={{ y: -2 }}
                     variants={itemVariants}
@@ -554,7 +554,7 @@ const ServiceHeader = ({ service }: ServiceHeaderProps): ReactElement => {
                 )}
 
                 {/* Contacto */}
-                <motion.div 
+                <motion.div
                   className="flex flex-col gap-4 p-4 bg-white/80 backdrop-blur-sm rounded-xl border border-orange-100 shadow-sm hover:shadow-md transition-all duration-300"
                   whileHover={{ y: -2 }}
                   variants={itemVariants}
@@ -570,9 +570,9 @@ const ServiceHeader = ({ service }: ServiceHeaderProps): ReactElement => {
                           {service.phone.split('-').map((phone, index) => {
                             const cleanPhone = phone.trim();
                             return (
-                              <a 
+                              <a
                                 key={index}
-                                href={`tel:${cleanPhone}`} 
+                                href={`tel:${cleanPhone}`}
                                 className="text-gray-700 text-sm font-medium hover:text-orange-600 transition-colors"
                               >
                                 {cleanPhone}
@@ -583,11 +583,11 @@ const ServiceHeader = ({ service }: ServiceHeaderProps): ReactElement => {
                       )}
                     </div>
                   </div>
-                  
+
                   {/* Botones de acción */}
                   <div className="flex flex-col sm:flex-row gap-3 mt-2">
-                    <ServiceActions 
-                      service={service} 
+                    <ServiceActions
+                      service={service}
                       onFavoriteToggle={handleFavoriteToggle}
                     />
                   </div>

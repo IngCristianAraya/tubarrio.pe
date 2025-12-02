@@ -7,8 +7,8 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  ChevronDown, 
+import {
+  ChevronDown,
   ChevronUp,
   FileText,
   AlertCircle,
@@ -55,7 +55,7 @@ const ServiceCollapsibleDetails: React.FC<ServiceCollapsibleDetailsProps> = ({ s
       content: specifications
     },
     {
-      id: 'conditions', 
+      id: 'conditions',
       title: 'Condiciones del Servicio',
       icon: AlertCircle,
       content: conditions
@@ -69,7 +69,7 @@ const ServiceCollapsibleDetails: React.FC<ServiceCollapsibleDetailsProps> = ({ s
           {sections.map((section) => {
             const IconComponent = section.icon;
             const isActive = activeSection === section.id;
-            
+
             return (
               <div key={section.id} className="border border-gray-200 rounded-lg overflow-hidden">
                 <button
@@ -86,7 +86,7 @@ const ServiceCollapsibleDetails: React.FC<ServiceCollapsibleDetailsProps> = ({ s
                     <ChevronDown className="w-5 h-5 text-gray-500" />
                   )}
                 </button>
-                
+
                 <AnimatePresence>
                   {isActive && (
                     <motion.div

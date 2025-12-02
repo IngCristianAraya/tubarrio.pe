@@ -103,7 +103,7 @@ const OptimizedImage = ({
   // Manejar errores de carga con múltiples fallbacks
   const handleError = () => {
     console.warn('Error loading image:', currentSrc);
-    
+
     if (fallbackSrc && currentSrc !== fallbackSrc && !hasError) {
       console.log('Trying fallback image:', fallbackSrc);
       setCurrentSrc(fallbackSrc);
@@ -158,7 +158,7 @@ const OptimizedImage = ({
   // Si no estamos en el cliente y no es una imagen prioritaria, renderizar un placeholder
   if (!isClient && !priority) {
     return (
-      <div 
+      <div
         className={`${className} bg-gray-200 animate-pulse rounded-lg`}
         style={{
           width: width ? `${width}px` : '100%',
@@ -172,7 +172,7 @@ const OptimizedImage = ({
   // Si no hay fuente, mostrar un placeholder
   if (!currentSrc) {
     return (
-      <div 
+      <div
         className={`${className} bg-gray-200 flex items-center justify-center`}
         style={{
           width: width || '100%',
@@ -186,7 +186,7 @@ const OptimizedImage = ({
 
 
   return (
-    <div 
+    <div
       className={`relative ${className}`}
       style={{
         width: width ? `${width}px` : '100%',
@@ -195,7 +195,7 @@ const OptimizedImage = ({
       suppressHydrationWarning
     >
       {isLoading && placeholder === 'blur' && !currentBlurDataURL && (
-        <div 
+        <div
           className="absolute inset-0 bg-gray-200 animate-pulse rounded-lg"
           aria-hidden="true"
         />
