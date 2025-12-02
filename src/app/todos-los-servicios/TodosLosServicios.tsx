@@ -30,11 +30,8 @@ export default function TodosLosServicios({
   const busquedaParam = searchParams?.get('busqueda') || '';
   const barrioParam = searchParams?.get('barrio') || '';
   const distritoParam = searchParams?.get('distrito') || '';
+  const nearbyParam = searchParams?.get('nearby') || '';
 
-  const [search, setSearch] = useState(initialSearch || busquedaParam || '');
-  const [category, setCategory] = useState(initialCategory || categoriaParam || '');
-  const [neighborhood, setNeighborhood] = useState(barrioParam || '');
-  const [district, setDistrict] = useState(distritoParam || '');
 
   // Estado para recomendaciones por ubicación
   const [radiusKm, setRadiusKm] = useState<number>(5);
@@ -55,7 +52,8 @@ export default function TodosLosServicios({
     selectedNeighborhood,
     selectedDistrict,
     setSelectedNeighborhood,
-    setSelectedDistrict
+    setSelectedDistrict,
+    resetSearch
   } = useServices();
 
   // Asegurar que existan los arrays de barrios y distritos antes del render
@@ -117,8 +115,18 @@ export default function TodosLosServicios({
     if (lat != null && lon != null && Number.isFinite(lat) && Number.isFinite(lon)) {
       fetchRecommendations(lat, lon);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Sincronizar URL params y props iniciales con el contexto de filtros
+  useEffect(() => {
+    if (initialSearch) setSearchTerm(initialSearch);
+    if (initialCategory) setSelectedCategory(initialCategory);
+    if (busquedaParam) setSearchTerm(busquedaParam);
+    if (categoriaParam) setSelectedCategory(categoriaParam);
+    if (barrioParam) setSelectedNeighborhood(barrioParam);
+    if (distritoParam) setSelectedDistrict(distritoParam);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialSearch, initialCategory, busquedaParam, categoriaParam, barrioParam, distritoParam]);
 
   // Guardar radius en localStorage y sincronizar URL si ya hay ubicación
   useEffect(() => {
@@ -130,6 +138,13 @@ export default function TodosLosServicios({
       updateURLParams(Number(latStr), Number(lonStr), radiusKm);
     }
   }, [radiusKm, searchParams, updateURLParams]);
+
+  // Autodisparar uso de ubicación si viene desde la pestaña "Cerca"
+  useEffect(() => {
+    if (nearbyParam === '1' && !recommending && recommended.length === 0) {
+      requestLocationAndRecommend();
+    }
+  }, [nearbyParam]);
 
   const fetchRecommendations = useCallback(async (lat: number, lon: number) => {
     setRecommendError(null);
@@ -246,15 +261,15 @@ export default function TodosLosServicios({
         {!isHome && (
           <div className="mb-6">
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              {category
-                ? `Servicios: ${categories.find(c => c.slug === category)?.name || category}`
+              {selectedCategory
+                ? `Servicios: ${categories.find(c => c.slug === selectedCategory)?.name || selectedCategory}`
                 : 'Todos Nuestros Servicios'}
             </h1>
             <p className="text-gray-600">
               {filteredServices.length > 0 && (
                 <>
                   Mostrando {filteredServices.length} servicios
-                  {(search || category || neighborhood || district) && ' filtrados'}
+                  {(searchTerm || selectedCategory || selectedNeighborhood || selectedDistrict) && ' filtrados'}
                 </>
               )}
             </p>
@@ -305,13 +320,13 @@ export default function TodosLosServicios({
             <input
               type="text"
               placeholder="Buscar servicios..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
             />
-            {search && (
+            {searchTerm && (
               <button
-                onClick={() => setSearch('')}
+                onClick={() => setSearchTerm('')}
                 className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
               >
                 ✕
@@ -320,8 +335,8 @@ export default function TodosLosServicios({
           </div>
 
           <select
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
             className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white"
           >
             <option value="">Todas las categorías</option>
@@ -333,8 +348,8 @@ export default function TodosLosServicios({
           </select>
 
           <select
-            value={neighborhood}
-            onChange={(e) => setNeighborhood(e.target.value)}
+            value={selectedNeighborhood}
+            onChange={(e) => setSelectedNeighborhood(e.target.value)}
             className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white"
           >
             <option value="">Todos los barrios</option>
@@ -346,8 +361,8 @@ export default function TodosLosServicios({
           </select>
 
           <select
-            value={district}
-            onChange={(e) => setDistrict(e.target.value)}
+            value={selectedDistrict}
+            onChange={(e) => setSelectedDistrict(e.target.value)}
             className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white"
           >
             <option value="">Todos los distritos</option>
@@ -361,13 +376,13 @@ export default function TodosLosServicios({
 
         <CategoryChips
           categories={categories}
-          selected={category}
-          onSelect={setCategory}
+          selected={selectedCategory}
+          onSelect={setSelectedCategory}
         />
 
         {(recommended.length === 0 ? filteredServices.length === 0 : recommended.length === 0) ? (
           <EmptyState
-            message={search || category || neighborhood || district
+            message={searchTerm || selectedCategory || selectedNeighborhood || selectedDistrict
               ? "No se encontraron servicios para tu búsqueda o filtros seleccionados."
               : "No hay servicios disponibles por el momento."
             }

@@ -16,7 +16,7 @@ export const dynamic = 'force-dynamic';
 // Utility function to format business hours for JSON-LD
 const formatBusinessHours = (hours: Record<string, any>): string[] => {
   if (!hours) return ['Mo-Sa 09:00-18:00'];
-  
+
   const days = {
     monday: 'Mo',
     tuesday: 'Tu',
@@ -26,19 +26,19 @@ const formatBusinessHours = (hours: Record<string, any>): string[] => {
     saturday: 'Sa',
     sunday: 'Su'
   };
-  
+
   const result: string[] = [];
-  
+
   // Group consecutive days with the same hours
   let currentGroup: string[] = [];
   let currentHours = '';
-  
+
   Object.entries(days).forEach(([day, shortDay]) => {
     const dayHours = hours[day];
     if (!dayHours || dayHours.closed) return;
-    
+
     const hoursStr = `${dayHours.open}-${dayHours.close}`;
-    
+
     if (currentHours === hoursStr) {
       // Extend current group
       currentGroup[1] = shortDay;
@@ -52,12 +52,12 @@ const formatBusinessHours = (hours: Record<string, any>): string[] => {
       currentHours = hoursStr;
     }
   });
-  
+
   // Add the last group if exists
   if (currentGroup.length > 0) {
     result.push(`${currentGroup[0]}-${currentGroup[1]} ${currentHours}`);
   }
-  
+
   return result.length > 0 ? result : ['Mo-Sa 09:00-18:00'];
 };
 
@@ -71,6 +71,7 @@ import ServiceCollapsibleDetails from '@/components/service/ServiceCollapsibleDe
 import ServiceSupport from '@/components/service/ServiceSupport';
 import RecommendedServices from '@/components/service/RecommendedServices';
 import ServiceMap from '@/components/service/ServiceMap';
+import ContactBottomSheet from '@/components/service/ContactBottomSheet';
 
 export default function ServicioDetallePage() {
   // Obtener todos los servicios del contexto (esto solo funciona en Client Components)
@@ -85,7 +86,7 @@ export default function ServicioDetallePage() {
   const { id } = useParams() as { id: string };
 
   const pathname = usePathname();
-  
+
   // Obtener el servicio específico usando el hook optimizado
   const { service, loading, error } = useServiceById(id);
 
@@ -124,7 +125,7 @@ export default function ServicioDetallePage() {
       </div>
     );
   }
-  
+
   // Mostrar 404 si el servicio no existe
   if (error?.code === 'not-found' || (!loading && !service)) {
     notFound();
@@ -139,8 +140,8 @@ export default function ServicioDetallePage() {
             <div className="bg-white rounded-3xl shadow-xl overflow-hidden p-8 text-center">
               <h1 className="text-2xl font-bold text-gray-900 mb-4">Error al cargar el servicio</h1>
               <p className="text-gray-600 mb-6">No pudimos cargar la información del servicio. Por favor, intenta de nuevo.</p>
-              <button 
-                onClick={() => window.location.reload()} 
+              <button
+                onClick={() => window.location.reload()}
                 className="bg-orange-600 text-white px-6 py-2 rounded-lg hover:bg-orange-700"
               >
                 Reintentar
@@ -152,12 +153,12 @@ export default function ServicioDetallePage() {
       </div>
     );
   }
-  
+
   if (!service) return notFound();
-  
+
   // Generar URL canónica
   const canonicalUrl = `${SITE_URL}${pathname}`;
-  
+
   // Generar breadcrumbs
   const breadcrumbs = [
     { name: 'Inicio', item: SITE_URL },
@@ -168,7 +169,7 @@ export default function ServicioDetallePage() {
   return (
     <div className="min-h-screen bg-orange-50 flex flex-col">
       {/* SEO Metadata */}
-      <SocialMeta 
+      <SocialMeta
         title={service.name}
         description={service.description || `Descubre más sobre ${service.name} en TuBarrio.pe`}
         image={service.image || '/images/og-image.jpg'}
@@ -176,7 +177,7 @@ export default function ServicioDetallePage() {
         type="website"
         tags={[service.category, service.location, 'servicios locales'].filter(Boolean) as string[]}
       />
-      
+
       {/* JSON-LD Structured Data */}
       <LocalBusinessJsonLd
         name={service.name}
@@ -202,35 +203,38 @@ export default function ServicioDetallePage() {
         }
         priceRange="$$"
       />
-      
+
       <BreadcrumbJsonLd items={breadcrumbs} />
-      
-      
-      
+
+
+
       {/* Contenido principal */}
       <div className="flex-1 w-full">
         {/* Contenido del servicio */}
         <ServiceHeader service={service} />
-        
+
+        {/* Acciones rápidas de contacto: hoja inferior móvil */}
+        <ContactBottomSheet service={service as Service} />
+
         {/* Nueva sección: Detalles colapsables (Especificaciones y Condiciones) */}
         <ServiceCollapsibleDetails service={service} />
-        
+
         {/* Nueva sección: Ubicación del Servicio */}
         <div className="max-w-7xl mx-auto px-3 py-4 sm:px-6 sm:py-8 md:px-8">
           <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-3">Ubicación</h2>
           <ServiceMap service={service as Service} />
         </div>
-        
-        
+
+
         {/* Nueva sección: Soporte y Contacto */}
         <ServiceSupport service={service} />
-        
+
         {/* Divider */}
         <div className="border-t border-gray-200 max-w-7xl mx-auto" />
-        
+
         {/* Sección de servicios recomendados */}
         <div className="max-w-7xl mx-auto px-3 py-4 sm:px-6 sm:py-8 md:px-8">
-          <RecommendedServices 
+          <RecommendedServices
             currentServiceId={service.id}
             categorySlug={service.categorySlug || ''}
           />
