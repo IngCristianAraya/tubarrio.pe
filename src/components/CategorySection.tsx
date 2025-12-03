@@ -48,11 +48,11 @@ export default function CategorySection({
   return (
     <section className="mb-12">
       <div className="container mx-auto px-4">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{category.name}</h2>
+        <div className="flex flex-wrap items-start justify-between gap-2 mb-6">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white leading-tight break-words flex-1 min-w-0">{category.name}</h2>
           <Link
             href={`/servicios?categoria=${category.slug}`}
-            className="group subtle-pulse inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-gradient-to-r from-orange-500 to-orange-600 text-white font-semibold shadow-md hover:shadow-lg transition-all duration-200 active:scale-95 ring-1 ring-orange-300/40 hover:ring-orange-400/60"
+            className="group subtle-pulse inline-flex items-center gap-1.5 px-4 py-2 h-10 flex-none shrink-0 whitespace-nowrap rounded-full bg-gradient-to-r from-orange-500 to-orange-600 text-white font-semibold shadow-md hover:shadow-lg transition-all duration-200 active:scale-95 ring-1 ring-orange-300/40 hover:ring-orange-400/60"
             aria-label={`Ver más de ${category.name}`}
           >
             Ver más
