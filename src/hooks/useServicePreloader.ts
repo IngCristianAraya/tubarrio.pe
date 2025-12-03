@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { generateSlug } from '@/lib/utils';
 import { useServiceAnalytics } from './useServiceAnalytics';
 import { useServiceCache } from './useServiceCache';
 import { Service } from '@/types/service';
@@ -68,7 +69,15 @@ export const useServicePreloader = () => {
         name: data.name || 'Servicio sin nombre',
         description: data.description || 'Sin descripción',
         category: data.category || 'Sin categoría',
-        categorySlug: data.categorySlug || (data.category ? data.category.toLowerCase().replace(/\s+/g, '-') : 'sin-categoria'),
+        categorySlug: (() => {
+          const raw = data.categorySlug || data.category;
+          if (typeof raw === 'string') return generateSlug(raw);
+          if (raw && typeof raw === 'object') {
+            const maybe = (raw as any).name || (raw as any).label || String(raw);
+            return generateSlug(maybe);
+          }
+          return 'sin-categoria';
+        })(),
         rating: data.rating || 0,
         image: data.image || '/images/placeholder-service.jpg',
         images: data.images || [data.image || '/images/placeholder-service.jpg'],

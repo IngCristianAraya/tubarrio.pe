@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import useSWR from 'swr';
+import { generateSlug } from '@/lib/utils';
 import { Service } from '@/types/service';
 import { getFallbackServiceById } from '@/lib/fallback';
 import { logger } from '@/lib/utils/logger';
@@ -68,7 +69,15 @@ export const useService = (serviceId?: string): UseServiceResult => {
           name: row.name || 'Servicio sin nombre',
           description: row.description || 'Sin descripción disponible',
           category: row.category || 'Sin categoría',
-          categorySlug: row.categorySlug || row.category_slug || row.category?.toLowerCase?.().replace?.(/\s+/g, '-') || 'sin-categoria',
+          categorySlug: (() => {
+            const raw = row.categorySlug || row.category_slug || row.category;
+            if (typeof raw === 'string') return generateSlug(raw);
+            if (raw && typeof raw === 'object') {
+              const maybe = (raw as any).name || (raw as any).label || String(raw);
+              return generateSlug(maybe);
+            }
+            return 'sin-categoria';
+          })(),
           image: row.image || '/images/placeholder-service.jpg',
           images: row.images || [row.image || '/images/placeholder-service.jpg'],
           rating: row.rating || 0,

@@ -8,8 +8,8 @@ import type { Service } from '@/types/service';
 interface ContactBottomSheetProps {
   service: Service & {
     id: string;
-    whatsapp?: string;
-    phone?: string;
+    whatsapp?: any;
+    phone?: any;
     website?: string;
     social?: string;
     socialMedia?: {
@@ -23,9 +23,31 @@ interface ContactBottomSheetProps {
   };
 }
 
-function formatWhatsappNumber(raw?: string): string | null {
-  if (!raw) return null;
-  const digits = raw.replace(/\D/g, '');
+function normalizePhone(raw?: unknown): string | null {
+  if (raw === undefined || raw === null) return null;
+  let text = '';
+  if (typeof raw === 'string') {
+    text = raw;
+  } else if (typeof raw === 'number') {
+    text = String(raw);
+  } else if (Array.isArray(raw)) {
+    const first = raw.find((v) => !!v);
+    text = typeof first === 'string' ? first : String(first ?? '');
+  } else if (typeof raw === 'object') {
+    const obj: any = raw;
+    text = obj?.whatsapp || obj?.phone || obj?.contact?.whatsapp || obj?.toString?.() || '';
+  } else {
+    text = String(raw);
+  }
+  text = text.trim();
+  if (!text) return null;
+  const digits = text.replace(/\D/g, '');
+  if (!digits) return null;
+  return digits;
+}
+
+function formatWhatsappNumber(raw?: unknown): string | null {
+  const digits = normalizePhone(raw);
   if (!digits) return null;
   // Asumimos Perú si no está el prefijo
   const withCountry = digits.startsWith('51') ? digits : `51${digits}`;
@@ -62,7 +84,7 @@ const ContactBottomSheet: React.FC<ContactBottomSheetProps> = ({ service }) => {
   }, []);
 
   const wa = formatWhatsappNumber(service.whatsapp || service.social);
-  const tel = service.phone || null;
+  const tel = normalizePhone(service.phone);
   const maps = buildMapsLink(service);
   const web = service.website || null;
   const fb = service.socialMedia?.facebook || null;
@@ -196,4 +218,3 @@ const ContactBottomSheet: React.FC<ContactBottomSheetProps> = ({ service }) => {
 };
 
 export default ContactBottomSheet;
-
