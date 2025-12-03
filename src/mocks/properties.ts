@@ -54,10 +54,10 @@ export const mockProperties: Property[] = [
     priceType: 'rent',
     pricePerM2: 35,
     features: {
-      bedrooms: 3,
+      bedrooms: 5,
       bathrooms: 2,
       parking: 1,
-      area: 80,
+      area: 127,
       furnished: true,
       petFriendly: false,
       balcony: true,
@@ -93,6 +93,64 @@ export const mockProperties: Property[] = [
     coordinates: {
       lat: -12.0969,
       lng: -77.0428
+    }
+  },
+  {
+    id: 'dept-miraflores-venta-001',
+    slug: 'departamento-miraflores-venta-127m2',
+    title: 'Departamento en Miraflores – 5 habitaciones, 4 baños (2do piso)',
+    description: 'Amplio departamento ubicado a la vuelta de la Av. 28 de Julio. Área de 127 m², 5 habitaciones y 4 baños. El edificio cuenta con piscina para 17 departamentos y vigilancia. Ingreso con 3 llaves (puerta de reja, vigilancia y puerta del departamento). Segundo piso con balcón.',
+    type: 'Departamento',
+    typeSlug: 'departamentos',
+    neighborhood: 'Miraflores',
+    address: 'Cercanías de Av. 28 de Julio',
+    reference: 'A media cuadra y a una cuadra de avenidas; a dos cuadras de tres avenidas',
+    district: 'Miraflores',
+    zone: 'Lima Sur',
+    price: 280000,
+    currency: 'USD',
+    priceType: 'sale',
+    pricePerM2: 2204,
+    features: {
+      bedrooms: 5,
+      bathrooms: 4,
+      parking: 1,
+      area: 127,
+      furnished: false,
+      petFriendly: false,
+      balcony: true,
+      garden: false,
+      pool: true,
+      gym: false,
+      security: true,
+      elevator: false
+    },
+    image: 'https://images.pexels.com/photos/271795/pexels-photo-271795.jpeg?auto=compress&cs=tinysrgb&w=800',
+    images: [
+      'https://images.pexels.com/photos/271795/pexels-photo-271795.jpeg?auto=compress&cs=tinysrgb&w=800',
+      'https://images.pexels.com/photos/534151/pexels-photo-534151.jpeg?auto=compress&cs=tinysrgb&w=800',
+      'https://images.pexels.com/photos/259957/pexels-photo-259957.jpeg?auto=compress&cs=tinysrgb&w=800'
+    ],
+    contact: {
+      phone: '+51 900 000 000',
+      whatsapp: '+51900000000',
+      email: 'ventas@mirafloreshogar.pe',
+      agentName: 'Agente de Ventas',
+      agencyName: 'Miraflores Hogar'
+    },
+    rating: 4.8,
+    views: 12,
+    featured: true,
+    available: true,
+    publishedDate: new Date('2025-12-03'),
+    updatedDate: new Date('2025-12-03'),
+    detailsUrl: '/inmueble/departamento-miraflores-venta-127m2',
+    contactUrl: 'https://wa.me/51900000000',
+    tags: ['venta', 'balcón', 'piscina', 'segundo piso', 'vigilancia'],
+    amenities: ['Piscina (17 departamentos)', 'Vigilancia', 'Balcón'],
+    coordinates: {
+      lat: -12.1210,
+      lng: -77.0300
     }
   },
   {

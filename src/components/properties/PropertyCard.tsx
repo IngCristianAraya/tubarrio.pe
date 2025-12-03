@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import { Property, PropertyType } from '@/types/property';
+import { Property } from '@/types/property';
 
 interface PropertyCardProps {
   property: Property;
@@ -7,16 +7,22 @@ interface PropertyCardProps {
 }
 
 export default function PropertyCard({ property, onViewDetails }: PropertyCardProps) {
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('es-PE', {
-      style: 'currency',
-      currency: 'PEN',
-      minimumFractionDigits: 0,
-    }).format(price);
+  const formatPrice = (price: number, currency: string = 'PEN') => {
+    try {
+      return new Intl.NumberFormat('es-PE', {
+        style: 'currency',
+        currency,
+        minimumFractionDigits: 0,
+      }).format(price);
+    } catch {
+      // Fallback por si la moneda no es soportada
+      const symbol = currency === 'USD' ? 'US$' : currency === 'PEN' ? 'S/' : '';
+      return `${symbol} ${price.toLocaleString('es-PE')}`;
+    }
   };
 
-  const getPropertyTypeLabel = (type: PropertyType) => {
-    const typeLabels: Record<PropertyType, string> = {
+  const getPropertyTypeLabel = (type: string) => {
+    const typeLabels: Record<string, string> = {
       apartment: 'Departamento',
       house: 'Casa',
       office: 'Oficina',
@@ -49,7 +55,7 @@ export default function PropertyCard({ property, onViewDetails }: PropertyCardPr
             <span className="text-4xl">🏠</span>
           </div>
         )}
-        
+
         {/* Badge de tipo */}
         <div className="absolute top-3 left-3">
           <span className="bg-orange-500 text-white px-2 py-1 rounded-full text-xs font-medium">
@@ -59,12 +65,11 @@ export default function PropertyCard({ property, onViewDetails }: PropertyCardPr
 
         {/* Badge de operación */}
         <div className="absolute top-3 right-3">
-          <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-            property.operation === 'sale' 
-              ? 'bg-green-500 text-white' 
+          <span className={`px-2 py-1 rounded-full text-xs font-medium ${property.priceType === 'sale'
+              ? 'bg-green-500 text-white'
               : 'bg-blue-500 text-white'
-          }`}>
-            {property.operation === 'sale' ? 'Venta' : 'Alquiler'}
+            }`}>
+            {property.priceType === 'sale' ? 'Venta' : 'Alquiler'}
           </span>
         </div>
       </div>
@@ -74,10 +79,12 @@ export default function PropertyCard({ property, onViewDetails }: PropertyCardPr
         <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2">
           {property.title}
         </h3>
-        
+
         <p className="text-lg font-bold text-orange-600 mb-2">
-          {formatPrice(property.price)}
-          {property.operation === 'rent' && <span className="text-sm font-normal text-gray-500"> /mes</span>}
+          {formatPrice(property.price, property.currency || 'PEN')}
+          {property.priceType === 'rent' && (
+            <span className="text-sm font-normal text-gray-500"> /mes</span>
+          )}
         </p>
 
         <p className="text-sm text-gray-600 mb-2">
@@ -109,7 +116,7 @@ export default function PropertyCard({ property, onViewDetails }: PropertyCardPr
         </div>
 
         {/* Botón de contacto */}
-        <button 
+        <button
           onClick={handleViewDetails}
           className="w-full bg-orange-500 hover:bg-orange-600 text-white font-medium py-2 px-4 rounded-lg transition-colors"
         >

@@ -1,12 +1,14 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { mockProperties } from '@/mocks/properties';
 import { Property, PropertyType } from '@/types/property';
 import PropertyFilters from '@/components/properties/PropertyFilters';
 import PropertyGrid from '@/components/properties/PropertyGrid';
 
 export default function InmueblesPage() {
+  const router = useRouter();
   const [selectedType, setSelectedType] = useState<PropertyType | 'all'>('all');
   const [selectedDistrict, setSelectedDistrict] = useState<string>('all');
   const [selectedOperation, setSelectedOperation] = useState<'all' | 'rent' | 'sale'>('all');
@@ -17,7 +19,7 @@ export default function InmueblesPage() {
   const filteredProperties = mockProperties.filter(property => {
     const typeMatch = selectedType === 'all' || property.type === selectedType;
     const districtMatch = selectedDistrict === 'all' || property.district === selectedDistrict;
-    const operationMatch = selectedOperation === 'all' || property.operation === selectedOperation;
+    const operationMatch = selectedOperation === 'all' || property.priceType === selectedOperation;
     const priceMatch = property.price >= minPrice && property.price <= maxPrice;
     return typeMatch && districtMatch && operationMatch && priceMatch;
   });
@@ -26,8 +28,10 @@ export default function InmueblesPage() {
   const districts = Array.from(new Set(mockProperties.map(p => p.district)));
 
   const handleViewDetails = (property: Property) => {
-    // TODO: Implementar navegación a página de detalles
-    console.log('Ver detalles de:', property.title);
+    // Navegar a la página de detalle del inmueble por slug
+    if (property.slug) {
+      router.push(`/inmueble/${property.slug}`);
+    }
   };
 
   const handlePriceChange = (min: number, max: number) => {

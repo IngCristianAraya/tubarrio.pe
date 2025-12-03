@@ -274,8 +274,8 @@ export default function TodosLosServicios({
                 </>
               )}
             </p>
-            {/* Controles principales: pila vertical simple y responsiva */}
-            <div className="mt-4 flex flex-col gap-3">
+            {/* Controles principales: pila vertical simple y responsiva (centrada) */}
+            <div className="mt-4 flex flex-col gap-3 max-w-3xl mx-auto">
               {/* Búsqueda */}
               <div className="relative">
                 <input
@@ -301,7 +301,7 @@ export default function TodosLosServicios({
                 <button
                   onClick={requestLocationAndRecommend}
                   disabled={recommending}
-                  className="px-3 py-2 rounded-lg border border-orange-500 text-orange-600 hover:bg-orange-50 disabled:opacity-50"
+                  className="px-3 py-2 rounded-lg bg-orange-600 text-white hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {recommending ? 'Obteniendo ubicación…' : 'Usar mi ubicación'}
                 </button>
@@ -311,7 +311,7 @@ export default function TodosLosServicios({
                       key={r}
                       onClick={() => setRadiusKm(r)}
                       aria-pressed={radiusKm === r}
-                      className={`px-3 py-2 text-sm ${radiusKm === r ? 'bg-gray-900 text-white' : 'bg-white text-gray-700 hover:bg-gray-50'} ${r !== 10 ? 'border-r border-gray-300' : ''}`}
+                      className={`px-3 py-2 text-sm ${radiusKm === r ? 'bg-orange-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50'} ${r !== 10 ? 'border-r border-gray-300' : ''}`}
                     >
                       {`Radio ${r} km`}
                     </button>
