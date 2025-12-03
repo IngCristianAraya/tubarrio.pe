@@ -189,7 +189,7 @@ export default function FiltersDrawer({
         tabIndex={-1}
       >
         <div
-          className="mx-auto w-full max-w-md rounded-t-2xl bg-white shadow-lg flex flex-col h-screen md:h-[90vh] pb-[env(safe-area-inset-bottom)]"
+          className="mx-auto w-full max-w-md rounded-t-2xl bg-white shadow-lg flex flex-col h-screen md:h-[90vh] pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]"
         >
           <div className="flex justify-center pt-2">
             <div className="h-1.5 w-10 rounded-full bg-gray-300" />
@@ -202,7 +202,7 @@ export default function FiltersDrawer({
               className="rounded-md border border-gray-300 px-3 py-1.5 text-sm"
               onClick={() => setOpen(false)}
             >
-              Cerrar
+              Cancelar
             </button>
           </div>
 
