@@ -8,6 +8,7 @@ import ServiceCard from '../../components/ServiceCard';
 import ServiceCardSkeleton from '../../components/ServiceCardSkeleton';
 import EmptyState from '../../components/EmptyState';
 import CategoryChips from '../../components/CategoryChips';
+import FiltersDrawer from '@/components/filters/FiltersDrawer';
 import { useSearchParams } from 'next/navigation';
 import { useAnalytics } from '../../context/AnalyticsContext';
 type AnyService = Service | ContextService;
@@ -315,8 +316,9 @@ export default function TodosLosServicios({
           </div>
         )}
 
-        <div className="flex flex-col sm:flex-row gap-4 mb-6">
-          <div className="flex-1 relative">
+        {/* Buscador y Filtros: móvil-first con drawer */}
+        <div className="flex flex-col gap-4 mb-6">
+          <div className="relative">
             <input
               type="text"
               placeholder="Buscar servicios..."
@@ -328,50 +330,19 @@ export default function TodosLosServicios({
               <button
                 onClick={() => setSearchTerm('')}
                 className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                aria-label="Limpiar búsqueda"
               >
                 ✕
               </button>
             )}
           </div>
 
-          <select
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white"
-          >
-            <option value="">Todas las categorías</option>
-            {categories.map((cat) => (
-              <option key={cat.slug} value={cat.slug}>
-                {cat.name}
-              </option>
-            ))}
-          </select>
-
-          <select
-            value={selectedNeighborhood}
-            onChange={(e) => setSelectedNeighborhood(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white"
-          >
-            <option value="">Todos los barrios</option>
-            {neighborhoods.map((b) => (
-              <option key={b} value={b}>
-                {b}
-              </option>
-            ))}
-          </select>
-
-          <select
-            value={selectedDistrict}
-            onChange={(e) => setSelectedDistrict(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white"
-          >
-            <option value="">Todos los distritos</option>
-            {districts.map((d) => (
-              <option key={d} value={d}>
-                {d}
-              </option>
-            ))}
-          </select>
+          <FiltersDrawer
+            categories={categories}
+            neighborhoods={neighborhoods}
+            districts={districts}
+            basePath="/servicios"
+          />
         </div>
 
         <CategoryChips
