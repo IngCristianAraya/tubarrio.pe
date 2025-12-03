@@ -258,7 +258,7 @@ export default function TodosLosServicios({
 
   return (
     <div className="bg-white dark:bg-gray-900">
-      <div className="container mx-auto px-4 py-8 sm:px-6 lg:px-8">
+      <div className="container mx-auto px-4 py-6 sm:px-6 lg:px-8">
         {!isHome && (
           <div className="mb-6">
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
@@ -274,82 +274,92 @@ export default function TodosLosServicios({
                 </>
               )}
             </p>
-            {/* Controles de recomendación por ubicación */}
-            <div className="mt-3 flex flex-wrap items-center gap-2">
-              <button
-                onClick={requestLocationAndRecommend}
-                disabled={recommending}
-                className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 disabled:opacity-50"
-              >
-                {recommending ? 'Obteniendo ubicación…' : 'Usar mi ubicación'}
-              </button>
-              <select
-                value={radiusKm}
-                onChange={(e) => setRadiusKm(Number(e.target.value))}
-                className="px-3 py-2 border border-gray-300 rounded-lg bg-white"
-              >
-                <option value={3}>Radio 3 km</option>
-                <option value={5}>Radio 5 km</option>
-                <option value={10}>Radio 10 km</option>
-              </select>
-              {recommended.length > 0 && (
+            {/* Controles principales: pila vertical simple y responsiva */}
+            <div className="mt-4 flex flex-col gap-3">
+              {/* Búsqueda */}
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Buscar servicios..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                />
+                {searchTerm && (
+                  <button
+                    onClick={() => setSearchTerm('')}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    aria-label="Limpiar búsqueda"
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
+
+              {/* Ubicación, radio y restablecer */}
+              <div className="flex flex-wrap items-center gap-2">
                 <button
-                  onClick={clearRecommendations}
-                  className="px-3 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
+                  onClick={requestLocationAndRecommend}
+                  disabled={recommending}
+                  className="px-3 py-2 rounded-lg border border-orange-500 text-orange-600 hover:bg-orange-50 disabled:opacity-50"
                 >
-                  Limpiar recomendaciones
+                  {recommending ? 'Obteniendo ubicación…' : 'Usar mi ubicación'}
                 </button>
-              )}
-              <button
-                onClick={resetFilters}
-                className="px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
-              >
-                Restablecer filtros
-              </button>
+                <div className="flex flex-wrap rounded-lg overflow-hidden border border-gray-300">
+                  {[3, 5, 10].map(r => (
+                    <button
+                      key={r}
+                      onClick={() => setRadiusKm(r)}
+                      aria-pressed={radiusKm === r}
+                      className={`px-3 py-2 text-sm ${radiusKm === r ? 'bg-gray-900 text-white' : 'bg-white text-gray-700 hover:bg-gray-50'} ${r !== 10 ? 'border-r border-gray-300' : ''}`}
+                    >
+                      {`Radio ${r} km`}
+                    </button>
+                  ))}
+                </div>
+                {recommended.length > 0 && (
+                  <button
+                    onClick={clearRecommendations}
+                    className="px-3 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50"
+                  >
+                    Limpiar recomendaciones
+                  </button>
+                )}
+                <button
+                  onClick={resetFilters}
+                  className="px-3 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200"
+                >
+                  Restablecer filtros
+                </button>
+              </div>
+
               {recommendError && (
-                <span className="text-sm text-red-600 ml-2">{recommendError}</span>
+                <p className="text-sm text-red-600">{recommendError}</p>
               )}
+              {recommended.length > 0 && (
+                <p className="text-sm text-gray-600">Mostrando servicios cerca de tu ubicación (hasta {radiusKm} km)</p>
+              )}
+
+              {/* Filtros drawer */}
+              <FiltersDrawer
+                categories={categories}
+                neighborhoods={neighborhoods}
+                districts={districts}
+                basePath="/todos-los-servicios"
+              />
             </div>
-            {recommended.length > 0 && (
-              <p className="text-sm text-gray-600 mt-2">Mostrando servicios cerca de tu ubicación (hasta {radiusKm} km)</p>
-            )}
           </div>
         )}
 
-        {/* Buscador y Filtros: móvil-first con drawer */}
-        <div className="flex flex-col gap-4 mb-6">
-          <div className="relative">
-            <input
-              type="text"
-              placeholder="Buscar servicios..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-            />
-            {searchTerm && (
-              <button
-                onClick={() => setSearchTerm('')}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                aria-label="Limpiar búsqueda"
-              >
-                ✕
-              </button>
-            )}
-          </div>
-
-          <FiltersDrawer
+        {/* Chips de categorías */}
+        <div className="mt-6">
+          <CategoryChips
             categories={categories}
-            neighborhoods={neighborhoods}
-            districts={districts}
-            basePath="/servicios"
+            selected={selectedCategory}
+            onSelect={setSelectedCategory}
           />
         </div>
 
-        <CategoryChips
-          categories={categories}
-          selected={selectedCategory}
-          onSelect={setSelectedCategory}
-        />
 
         {(recommended.length === 0 ? filteredServices.length === 0 : recommended.length === 0) ? (
           <EmptyState
