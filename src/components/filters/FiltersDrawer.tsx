@@ -17,6 +17,9 @@ type FiltersDrawerProps = {
   neighborhoods: string[];
   districts: string[];
   basePath?: string;
+  mode?: 'buttonOnly' | 'responsive';
+  triggerClassName?: string;
+  triggerIconClassName?: string;
 };
 
 export default function FiltersDrawer({
@@ -24,6 +27,9 @@ export default function FiltersDrawer({
   neighborhoods,
   districts,
   basePath = '/servicios',
+  mode = 'responsive',
+  triggerClassName,
+  triggerIconClassName,
 }: FiltersDrawerProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -99,68 +105,71 @@ export default function FiltersDrawer({
   return (
     <>
       <div className="flex items-center justify-between mb-3">
-        <div className="hidden md:flex gap-3 w-full">
-          <select
-            aria-label="Filtrar por categoría"
-            className="w-1/3 rounded-md border border-gray-300 bg-white p-2 text-sm"
-            value={filters.categoria || ''}
-            onChange={e => setParam('categoria', e.target.value || undefined)}
-          >
-            <option value="">Todas las categorías</option>
-            {categories.map((c) => (
-              <option key={c.slug} value={c.slug}>{c.name}</option>
-            ))}
-          </select>
-          <select
-            aria-label="Filtrar por barrio"
-            className="w-1/3 rounded-md border border-gray-300 bg-white p-2 text-sm"
-            value={filters.barrio || ''}
-            onChange={e => setParam('barrio', e.target.value || undefined)}
-          >
-            <option value="">Todos los barrios</option>
-            {neighborhoods.map((b) => (
-              <option key={b} value={b}>{b}</option>
-            ))}
-          </select>
-          <select
-            aria-label="Filtrar por distrito"
-            className="w-1/3 rounded-md border border-gray-300 bg-white p-2 text-sm"
-            value={filters.distrito || ''}
-            onChange={e => setParam('distrito', e.target.value || undefined)}
-          >
-            <option value="">Todos los distritos</option>
-            {districts.map((d) => (
-              <option key={d} value={d}>{d}</option>
-            ))}
-          </select>
-          <div className="flex gap-2">
-            <button
-              type="button"
-              className="rounded-md bg-black text-white px-4 py-2 text-sm"
-              onClick={applyFilters}
+        {mode === 'responsive' && (
+          <div className="hidden md:flex gap-3 w-full">
+            <select
+              aria-label="Filtrar por categoría"
+              className="w-1/3 rounded-md border border-gray-300 bg-white p-2 text-sm"
+              value={filters.categoria || ''}
+              onChange={e => setParam('categoria', e.target.value || undefined)}
             >
-              Aplicar
-            </button>
-            <button
-              type="button"
-              className="rounded-md border border-gray-300 px-4 py-2 text-sm"
-              onClick={resetFilters}
+              <option value="">Todas las categorías</option>
+              {categories.map((c) => (
+                <option key={c.slug} value={c.slug}>{c.name}</option>
+              ))}
+            </select>
+            <select
+              aria-label="Filtrar por barrio"
+              className="w-1/3 rounded-md border border-gray-300 bg-white p-2 text-sm"
+              value={filters.barrio || ''}
+              onChange={e => setParam('barrio', e.target.value || undefined)}
             >
-              Restablecer
-            </button>
+              <option value="">Todos los barrios</option>
+              {neighborhoods.map((b) => (
+                <option key={b} value={b}>{b}</option>
+              ))}
+            </select>
+            <select
+              aria-label="Filtrar por distrito"
+              className="w-1/3 rounded-md border border-gray-300 bg-white p-2 text-sm"
+              value={filters.distrito || ''}
+              onChange={e => setParam('distrito', e.target.value || undefined)}
+            >
+              <option value="">Todos los distritos</option>
+              {districts.map((d) => (
+                <option key={d} value={d}>{d}</option>
+              ))}
+            </select>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                className="rounded-md bg-black text-white px-4 py-2 text-sm"
+                onClick={applyFilters}
+              >
+                Aplicar
+              </button>
+              <button
+                type="button"
+                className="rounded-md border border-gray-300 px-4 py-2 text-sm"
+                onClick={resetFilters}
+              >
+                Restablecer
+              </button>
+            </div>
           </div>
-        </div>
+        )}
 
         <button
           type="button"
-          className="md:hidden relative rounded-full border border-gray-300 bg-white text-gray-700 p-2 shadow-sm"
+          className={`${triggerClassName ?? 'relative rounded-full border border-gray-300 bg-white text-gray-700 p-2 shadow-sm md:hidden'} h-10 inline-flex items-center justify-center gap-2`}
           onClick={() => setOpen(true)}
           aria-haspopup="dialog"
           aria-expanded={open}
           aria-controls="filters-drawer"
           aria-label={activeCount > 0 ? `Abrir filtros (${activeCount} activos)` : 'Abrir filtros'}
         >
-          <FunnelIcon className="h-5 w-5" />
+          <FunnelIcon className={`h-5 w-5 ${triggerIconClassName ?? ''}`} />
+          <span className="text-sm">Filtros</span>
           {activeCount > 0 && (
             <span className="absolute -top-1 -right-1 inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-black px-1 text-[11px] font-medium text-white">
               {activeCount}

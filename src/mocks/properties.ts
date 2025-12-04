@@ -77,7 +77,7 @@ export const mockProperties: Property[] = [
       phone: '+51 999 123 456',
       whatsapp: '+51999123456',
       email: 'contacto@inmobiliariapremium.pe',
-      agentName: 'María González',
+      agentName: 'Yasmin Urrego',
       agencyName: 'Inmobiliaria Premium'
     },
     rating: 4.8,
@@ -104,7 +104,7 @@ export const mockProperties: Property[] = [
     typeSlug: 'departamentos',
     neighborhood: 'Miraflores',
     address: 'Cercanías de Av. 28 de Julio',
-    reference: 'A media cuadra y a una cuadra de avenidas; a dos cuadras de tres avenidas',
+    reference: 'A media cuadra de Avenida 28 de Julio',
     district: 'Miraflores',
     zone: 'Lima Sur',
     price: 280000,
@@ -125,15 +125,19 @@ export const mockProperties: Property[] = [
       security: true,
       elevator: false
     },
-    image: 'https://images.pexels.com/photos/271795/pexels-photo-271795.jpeg?auto=compress&cs=tinysrgb&w=800',
+    image: 'https://res.cloudinary.com/do2rpqupm/image/upload/v1764805472/depto10_ivumqn.jpg',
     images: [
-      'https://images.pexels.com/photos/271795/pexels-photo-271795.jpeg?auto=compress&cs=tinysrgb&w=800',
-      'https://images.pexels.com/photos/534151/pexels-photo-534151.jpeg?auto=compress&cs=tinysrgb&w=800',
-      'https://images.pexels.com/photos/259957/pexels-photo-259957.jpeg?auto=compress&cs=tinysrgb&w=800'
+      'https://res.cloudinary.com/do2rpqupm/image/upload/v1764805723/depto9_vomzki.jpg',
+      'https://res.cloudinary.com/do2rpqupm/image/upload/v1764805818/depto8_rzugxd.jpg',
+      'https://res.cloudinary.com/do2rpqupm/image/upload/v1764807375/depto11_bsn5u4.jpg',
+      'https://res.cloudinary.com/do2rpqupm/image/upload/v1764805472/depto10_ivumqn.jpg',
+      'https://res.cloudinary.com/do2rpqupm/image/upload/v1764807320/depto6_cnhyzk.jpg',
+      'https://res.cloudinary.com/do2rpqupm/image/upload/v1764807504/depto13_hhrlrp.jpg',
+      'https://res.cloudinary.com/do2rpqupm/image/upload/v1764807607/depto2_gzaflu.jpg'
     ],
     contact: {
-      phone: '+51 900 000 000',
-      whatsapp: '+51900000000',
+      phone: '+51 910 816 041',
+      whatsapp: '+51 910 816 041',
       email: 'ventas@mirafloreshogar.pe',
       agentName: 'Agente de Ventas',
       agencyName: 'Miraflores Hogar'
@@ -145,7 +149,7 @@ export const mockProperties: Property[] = [
     publishedDate: new Date('2025-12-03'),
     updatedDate: new Date('2025-12-03'),
     detailsUrl: '/inmueble/departamento-miraflores-venta-127m2',
-    contactUrl: 'https://wa.me/51900000000',
+    contactUrl: 'https://wa.me/51910816041',
     tags: ['venta', 'balcón', 'piscina', 'segundo piso', 'vigilancia'],
     amenities: ['Piscina (17 departamentos)', 'Vigilancia', 'Balcón'],
     coordinates: {

@@ -1,3 +1,0 @@
-Segundo trigger para forzar redeploy en Vercel.
-Timestamp: 2025-11-19T00:00:00Z
-Motivo: reconexión Vercel-GitHub y verificación de producción en master.

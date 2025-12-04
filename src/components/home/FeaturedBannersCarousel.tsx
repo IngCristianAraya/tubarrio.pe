@@ -279,8 +279,8 @@ export default function FeaturedBannersCarousel({
               key={idx}
               onClick={() => slider.current?.moveToIdx(idx)}
               className={`h-1.5 rounded-full transition-all ${currentSlide === idx
-                  ? 'bg-orange-500 w-6 opacity-100'
-                  : 'bg-orange-300 w-3 hover:bg-orange-400'
+                ? 'bg-orange-500 w-6 opacity-100'
+                : 'bg-orange-300 w-3 hover:bg-orange-400'
                 }`}
               aria-label={`Ir al banner ${idx + 1}`}
             />

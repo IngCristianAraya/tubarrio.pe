@@ -2,6 +2,7 @@
 'use client';
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { MapPin } from 'lucide-react';
 import { useServices, type Service as ContextService } from '../../context/ServicesContext';
 import type { Service } from '@/types/service';
 import ServiceCard from '../../components/ServiceCard';
@@ -274,8 +275,8 @@ export default function TodosLosServicios({
                 </>
               )}
             </p>
-            {/* Controles principales: pila vertical simple y responsiva (centrada) */}
-            <div className="mt-4 flex flex-col gap-3 max-w-3xl mx-auto">
+            {/* Controles principales: barra extendida en desktop y compacta en móvil */}
+            <div className="mt-4 flex flex-col gap-2">
               {/* Búsqueda */}
               <div className="relative">
                 <input
@@ -295,58 +296,55 @@ export default function TodosLosServicios({
                   </button>
                 )}
               </div>
+              {recommendError && (
+                <p className="text-xs text-red-600">{recommendError}</p>
+              )}
 
-              {/* Ubicación, radio y restablecer */}
+              {/* Acciones compactas: ubicación, radio y filtros (contorno naranja, alturas uniformes) */}
               <div className="flex flex-wrap items-center gap-2">
                 <button
                   onClick={requestLocationAndRecommend}
                   disabled={recommending}
-                  className="px-3 py-2 rounded-lg bg-orange-600 text-white hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="h-10 inline-flex items-center gap-2 px-3 rounded-lg bg-transparent text-orange-600 border border-orange-500 hover:bg-orange-50/30 focus:outline-none focus:ring-2 focus:ring-orange-500 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
+                  <MapPin className="w-4 h-4" />
                   {recommending ? 'Obteniendo ubicación…' : 'Usar mi ubicación'}
                 </button>
-                <div className="flex flex-wrap rounded-lg overflow-hidden border border-gray-300">
-                  {[3, 5, 10].map(r => (
-                    <button
-                      key={r}
-                      onClick={() => setRadiusKm(r)}
-                      aria-pressed={radiusKm === r}
-                      className={`px-3 py-2 text-sm ${radiusKm === r ? 'bg-orange-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50'} ${r !== 10 ? 'border-r border-gray-300' : ''}`}
-                    >
-                      {`Radio ${r} km`}
-                    </button>
-                  ))}
-                </div>
-                {recommended.length > 0 && (
-                  <button
-                    onClick={clearRecommendations}
-                    className="px-3 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50"
+                <label className="flex items-center gap-2 text-sm text-gray-700">
+                  <span className="sr-only">Seleccionar radio</span>
+                  <select
+                    value={radiusKm}
+                    onChange={(e) => setRadiusKm(Number(e.target.value))}
+                    className="h-10 px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-orange-500"
                   >
-                    Limpiar recomendaciones
-                  </button>
+                    <option value={3}>Radio 3 km</option>
+                    <option value={5}>Radio 5 km</option>
+                    <option value={10}>Radio 10 km</option>
+                  </select>
+                </label>
+
+                {/* Drawer de filtros inline */}
+                <FiltersDrawer
+                  categories={categories}
+                  neighborhoods={neighborhoods}
+                  districts={districts}
+                  basePath="/todos-los-servicios"
+                  mode="buttonOnly"
+                  triggerClassName="relative h-10 inline-flex items-center gap-2 rounded-lg border border-orange-500 bg-transparent text-orange-600 px-3 hover:bg-orange-50/30"
+                  triggerIconClassName="text-orange-500"
+                />
+
+                {/* Estado de recomendaciones en línea */}
+                {recommended.length > 0 && (
+                  <span className="ml-auto flex items-center gap-2 text-xs text-gray-600">
+                    Cerca de ti (≤ {radiusKm} km)
+                    <button onClick={clearRecommendations} className="underline text-orange-600 hover:text-orange-700">
+                      Limpiar
+                    </button>
+                  </span>
                 )}
-                <button
-                  onClick={resetFilters}
-                  className="px-3 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200"
-                >
-                  Restablecer filtros
-                </button>
               </div>
 
-              {recommendError && (
-                <p className="text-sm text-red-600">{recommendError}</p>
-              )}
-              {recommended.length > 0 && (
-                <p className="text-sm text-gray-600">Mostrando servicios cerca de tu ubicación (hasta {radiusKm} km)</p>
-              )}
-
-              {/* Filtros drawer */}
-              <FiltersDrawer
-                categories={categories}
-                neighborhoods={neighborhoods}
-                districts={districts}
-                basePath="/todos-los-servicios"
-              />
             </div>
           </div>
         )}

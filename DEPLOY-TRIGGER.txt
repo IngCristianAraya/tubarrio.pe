@@ -1,3 +1,0 @@
-Trigger de deploy
-Fecha: 2025-11-18T18:42:00Z
-Motivo: Forzar redeploy en Vercel tras cambio de marcador y endpoints

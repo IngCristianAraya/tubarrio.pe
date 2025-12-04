@@ -182,15 +182,15 @@ const ServicePricing: React.FC<ServicePricingProps> = ({ service }) => {
                     <motion.div
                       key={index}
                       className={`p-6 rounded-2xl border transition-all duration-300 ${promo.highlight
-                          ? 'bg-gradient-to-br from-orange-500 to-amber-500 text-white border-orange-300 shadow-lg'
-                          : 'bg-white border-gray-200 hover:border-orange-200 hover:shadow-md'
+                        ? 'bg-gradient-to-br from-orange-500 to-amber-500 text-white border-orange-300 shadow-lg'
+                        : 'bg-white border-gray-200 hover:border-orange-200 hover:shadow-md'
                         }`}
                       whileHover={{ scale: 1.02 }}
                     >
                       <div className="flex items-start space-x-4">
                         <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${promo.highlight
-                            ? 'bg-white bg-opacity-20'
-                            : 'bg-gradient-to-br from-orange-500 to-amber-500'
+                          ? 'bg-white bg-opacity-20'
+                          : 'bg-gradient-to-br from-orange-500 to-amber-500'
                           }`}>
                           <IconComponent className={`w-6 h-6 ${promo.highlight ? 'text-white' : 'text-white'
                             }`} />

@@ -145,8 +145,8 @@ const ServiceSupport: React.FC<ServiceSupportProps> = ({ service }) => {
                   <motion.div
                     key={index}
                     className={`p-6 rounded-2xl border cursor-pointer transition-all duration-300 ${method.primary
-                        ? 'bg-gradient-to-br from-green-500 to-emerald-500 text-white border-green-300 shadow-lg'
-                        : 'bg-white border-gray-200 hover:border-blue-200 hover:shadow-md'
+                      ? 'bg-gradient-to-br from-green-500 to-emerald-500 text-white border-green-300 shadow-lg'
+                      : 'bg-white border-gray-200 hover:border-blue-200 hover:shadow-md'
                       }`}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
@@ -155,8 +155,8 @@ const ServiceSupport: React.FC<ServiceSupportProps> = ({ service }) => {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-4">
                         <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${method.primary
-                            ? 'bg-white bg-opacity-20'
-                            : 'bg-gradient-to-br from-blue-500 to-indigo-500'
+                          ? 'bg-white bg-opacity-20'
+                          : 'bg-gradient-to-br from-blue-500 to-indigo-500'
                           }`}>
                           <IconComponent className={`w-6 h-6 ${method.primary ? 'text-white' : 'text-white'
                             }`} />
@@ -174,8 +174,8 @@ const ServiceSupport: React.FC<ServiceSupportProps> = ({ service }) => {
                       </div>
                       <motion.button
                         className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors ${method.primary
-                            ? 'bg-white text-green-600 hover:bg-gray-100'
-                            : 'bg-blue-500 text-white hover:bg-blue-600'
+                          ? 'bg-white text-green-600 hover:bg-gray-100'
+                          : 'bg-blue-500 text-white hover:bg-blue-600'
                           }`}
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}

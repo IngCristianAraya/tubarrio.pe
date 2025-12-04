@@ -1,5 +1,7 @@
 import { mockProperties } from '@/mocks/properties';
 import PropertyDetails from '@/components/properties/PropertyDetails';
+import Header from '@/components/Header';
+import PropertyDetailBottomBar from '@/components/properties/PropertyDetailBottomBar';
 
 interface PageProps {
   params: { slug: string };
@@ -18,9 +20,12 @@ export default function InmueblePage({ params }: PageProps) {
   }
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-8">
-      <PropertyDetails property={property} />
+    <div className="min-h-screen bg-gray-50">
+      <Header />
+      <div className="max-w-5xl mx-auto px-4 py-4 sm:py-6 pb-24">
+        <PropertyDetails property={property} />
+      </div>
+      <PropertyDetailBottomBar property={property} />
     </div>
   );
 }
-

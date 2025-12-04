@@ -146,8 +146,8 @@ const Hero = () => {
                       window.location.href = `/servicios?categoria=${encodeURIComponent(item.category)}`;
                     }}
                     className={`flex items-center gap-2 px-5 py-3 rounded-full shadow-sm hover:shadow-md transition-all duration-200 font-medium min-h-[44px] touch-manipulation active:scale-95 ${selectedCategory === item.category
-                        ? 'bg-orange-100 text-orange-600 border border-orange-200'
-                        : 'bg-white text-gray-700 border border-gray-200 hover:border-orange-200 hover:text-orange-600'
+                      ? 'bg-orange-100 text-orange-600 border border-orange-200'
+                      : 'bg-white text-gray-700 border border-gray-200 hover:border-orange-200 hover:text-orange-600'
                       }`}
                   >
                     <span className="text-lg">{item.icon}</span>

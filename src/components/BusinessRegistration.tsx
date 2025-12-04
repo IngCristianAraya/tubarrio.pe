@@ -403,8 +403,8 @@ function BusinessRegistration({
                 type="submit"
                 disabled={status.submitting}
                 className={`w-full flex justify-center items-center px-4 py-3 border border-transparent rounded-md shadow-sm text-sm font-medium text-white ${status.submitting
-                    ? 'bg-gray-500 cursor-not-allowed'
-                    : 'bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500'
+                  ? 'bg-gray-500 cursor-not-allowed'
+                  : 'bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500'
                   }`}
               >
                 {status.submitting ? (

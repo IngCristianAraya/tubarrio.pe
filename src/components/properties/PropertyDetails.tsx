@@ -26,6 +26,8 @@ export default function PropertyDetails({ property }: PropertyDetailsProps) {
 
   const images = Array.isArray(property.images) ? property.images : [];
   const activeImage = images[activeIndex];
+  const whatsappNumber = property.contact?.whatsapp || '+51 910 816 041';
+  const whatsappDigits = whatsappNumber.replace(/\D/g, '');
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
@@ -88,7 +90,7 @@ export default function PropertyDetails({ property }: PropertyDetailsProps) {
 
         {/* Galería (miniaturas) */}
         {images.length > 1 && (
-          <div className="mt-4">
+          <div id="gallery" className="mt-4">
             <h2 className="text-lg font-semibold text-gray-900 mb-2">Galería</h2>
             <div className="flex gap-3 overflow-x-auto pb-2">
               {images.map((img, idx) => (
@@ -115,7 +117,7 @@ export default function PropertyDetails({ property }: PropertyDetailsProps) {
         )}
 
         {/* Mapa del sector aproximado (sin ubicación exacta) */}
-        <div className="mt-6">
+        <div id="sector-map" className="mt-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-2">Zona aproximada</h2>
           <p className="text-sm text-gray-600 mb-2">
             Mostramos el sector aproximado (distrito/barrio), no la ubicación exacta.
@@ -134,24 +136,19 @@ export default function PropertyDetails({ property }: PropertyDetailsProps) {
         </div>
 
         {/* Contacto */}
-        {property.contact?.whatsapp && (
-          <div className="mt-6">
-            <a
-              href={`https://wa.me/${property.contact.whatsapp.replace('+', '')}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-4 rounded-lg"
-            >
-              💬 Contactar por WhatsApp
-            </a>
-          </div>
-        )}
+        <div className="mt-6">
+          <a
+            href={`https://wa.me/${whatsappDigits}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-4 rounded-lg"
+          >
+            💬 Contactar por WhatsApp
+          </a>
+        </div>
       </div>
 
-      {/* Botón flotante de WhatsApp (opcional) */}
-      {property.contact?.whatsapp && (
-        <WhatsAppButton phoneNumber={property.contact.whatsapp} message={`Hola, me interesa el inmueble: ${property.title}`} />
-      )}
+      {/* Botón flotante removido: el efecto de destello se traslada a la barra inferior */}
     </div>
   );
 }
