@@ -2,9 +2,42 @@ import { mockProperties } from '@/mocks/properties';
 import PropertyDetails from '@/components/properties/PropertyDetails';
 import Header from '@/components/Header';
 import PropertyDetailBottomBar from '@/components/properties/PropertyDetailBottomBar';
+import type { Metadata } from 'next';
+import { generateMetadata as buildMetadata } from '@/lib/seo';
 
 interface PageProps {
   params: { slug: string };
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const property = mockProperties.find((p) => p.slug === params.slug);
+
+  // Fallback seguro si no se encuentra el inmueble
+  if (!property) {
+    return buildMetadata({
+      title: 'Inmueble no encontrado',
+      description: 'Verifica el enlace o regresa a la lista de inmuebles.',
+      url: `/inmueble/${params.slug}`,
+      image: '/images/hero_3.webp',
+      type: 'article',
+    });
+  }
+
+  // Elegir imagen destacada: primero property.image, luego la primera de images
+  const featuredImage = property.image || (Array.isArray(property.images) ? property.images[0] : undefined) || '/images/hero_3.webp';
+
+  return buildMetadata({
+    title: property.title,
+    description: property.description,
+    url: `/inmueble/${params.slug}`,
+    image: featuredImage,
+    type: 'article',
+    publishedTime: property.publishedDate ? new Date(property.publishedDate).toISOString() : undefined,
+    modifiedTime: property.updatedDate ? new Date(property.updatedDate).toISOString() : undefined,
+    author: property.contact?.agentName || 'TuBarrio.pe',
+    section: property.type,
+    tags: property.tags || [],
+  });
 }
 
 export default function InmueblePage({ params }: PageProps) {

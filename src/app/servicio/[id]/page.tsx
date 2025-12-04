@@ -1,5 +1,10 @@
 'use client';
 
+// Metadata dinámica para Open Graph/Twitter a nivel de servidor
+import type { Metadata } from 'next';
+import { generateMetadata as buildMetadata } from '@/lib/seo';
+import { fetchServiceById } from '@/lib/repositories/servicesRepository';
+
 import { notFound, useParams } from 'next/navigation';
 import { useServiceById } from '@/hooks/useServices';
 import type { Service } from '@/types/service';
@@ -242,4 +247,52 @@ export default function ServicioDetallePage() {
       </div>
     </div>
   );
+}
+
+// Exportar metadata dinámica para que OG/Twitter usen la imagen del servicio
+export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
+  try {
+    const raw = await fetchServiceById(params.id);
+    const service = raw?.service || raw || null;
+
+    // Fallback si no existe el servicio
+    if (!service) {
+      return buildMetadata({
+        title: 'Servicio no encontrado',
+        description: 'El servicio solicitado no existe o fue removido.',
+        url: `/servicio/${params.id}`,
+        image: '/images/og-image.jpg',
+        type: 'article',
+        tags: ['servicio', 'no encontrado'],
+      });
+    }
+
+    const image = service.image || (Array.isArray(service.images) ? service.images[0] : undefined) || '/images/og-image.jpg';
+    const title = service.name || 'Servicio';
+    const description = service.description || `Descubre más sobre ${title} en TuBarrio.pe`;
+    const slugOrId = service.slug || params.id;
+    const url = `/servicio/${slugOrId}`;
+
+    return buildMetadata({
+      title,
+      description,
+      url,
+      image,
+      type: 'article',
+      tags: [service.category, service.location, 'servicios locales'].filter(Boolean) as string[],
+      publishedTime: service.createdAt ? new Date(service.createdAt).toISOString() : undefined,
+      modifiedTime: service.updatedAt ? new Date(service.updatedAt).toISOString() : undefined,
+      section: service.category || undefined,
+      author: 'TuBarrio.pe',
+    });
+  } catch (err) {
+    // En caso de error, devolver metadata segura
+    return buildMetadata({
+      title: 'Servicio',
+      description: 'Explora servicios locales en TuBarrio.pe',
+      url: `/servicio/${params.id}`,
+      image: '/images/og-image.jpg',
+      type: 'article',
+    });
+  }
 }

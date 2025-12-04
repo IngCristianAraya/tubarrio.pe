@@ -4,6 +4,16 @@ import ClientOnlyTodosLosServicios from '@/components/ClientOnlyTodosLosServicio
 import FeaturedBannersCarousel from '@/components/home/FeaturedBannersCarousel';
 import { featuredBanners } from '@/mocks/featuredBanners';
 import dynamicImport from 'next/dynamic';
+import { generateMetadata as buildMetadata } from '@/lib/seo';
+
+export const metadata = buildMetadata({
+  title: 'Servicios locales',
+  description: 'Explora servicios cerca de ti: restaurantes, profesionales, tecnología y más en TuBarrio.pe.',
+  url: '/servicios',
+  image: '/images/og-image.jpg',
+  type: 'website',
+  keywords: ['servicios', 'directorio', 'restaurantes', 'profesionales', 'tecnología'],
+});
 
 const Header = dynamicImport(() => import('@/components/Header'), { ssr: false });
 const Footer = dynamicImport(() => import('@/components/Footer'), { ssr: false });
