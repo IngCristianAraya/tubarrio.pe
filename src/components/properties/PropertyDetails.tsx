@@ -1,7 +1,7 @@
 "use client";
 import Image from 'next/image';
 import { useState } from 'react';
-import WhatsAppButton from '@/components/WhatsAppButton';
+import PropertyImageCarousel from '@/components/properties/PropertyImageCarousel';
 import { Property } from '@/types/property';
 
 interface PropertyDetailsProps {
@@ -22,22 +22,16 @@ const formatPrice = (price: number, currency: string = 'PEN') => {
 };
 
 export default function PropertyDetails({ property }: PropertyDetailsProps) {
-  const [activeIndex, setActiveIndex] = useState<number>(0);
-
   const images = Array.isArray(property.images) ? property.images : [];
-  const activeImage = images[activeIndex];
   const whatsappNumber = property.contact?.whatsapp || '+51 910 816 041';
   const whatsappDigits = whatsappNumber.replace(/\D/g, '');
+  // Ancla para scroll desde la barra inferior: movemos "gallery" al carrusel superior
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-      {/* Hero imagen / imagen activa */}
-      <div className="relative h-72 md:h-96 bg-gray-100">
-        {activeImage ? (
-          <Image src={activeImage} alt={property.title} fill className="object-cover" />
-        ) : (
-          <div className="flex items-center justify-center h-full text-gray-400 text-5xl">🏠</div>
-        )}
+      {/* Carrusel de imágenes */}
+      <div id="gallery" className="relative">
+        <PropertyImageCarousel images={images} title={property.title} />
         {/* Badges */}
         <div className="absolute top-4 left-4 flex gap-2">
           <span className="bg-orange-500 text-white px-3 py-1 rounded-full text-xs font-medium">{property.type}</span>
@@ -88,26 +82,6 @@ export default function PropertyDetails({ property }: PropertyDetailsProps) {
           ) : null}
         </div>
 
-        {/* Galería (miniaturas) */}
-        {images.length > 1 && (
-          <div id="gallery" className="mt-4">
-            <h2 className="text-lg font-semibold text-gray-900 mb-2">Galería</h2>
-            <div className="flex gap-3 overflow-x-auto pb-2">
-              {images.map((img, idx) => (
-                <button
-                  key={img + idx}
-                  onClick={() => setActiveIndex(idx)}
-                  className={`relative w-28 h-20 flex-shrink-0 rounded overflow-hidden border ${activeIndex === idx ? 'border-orange-500' : 'border-gray-200'
-                    }`}
-                  aria-label={`Ver imagen ${idx + 1}`}
-                >
-                  <Image src={img} alt={`Imagen ${idx + 1}`} fill className="object-cover" />
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
         {/* Descripción */}
         {property.description && (
           <div className="mt-4">
@@ -116,7 +90,7 @@ export default function PropertyDetails({ property }: PropertyDetailsProps) {
           </div>
         )}
 
-        {/* Mapa del sector aproximado (sin ubicación exacta) */}
+        {/* Mapa del sector aproximado (sin pestañas) */}
         <div id="sector-map" className="mt-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-2">Zona aproximada</h2>
           <p className="text-sm text-gray-600 mb-2">
@@ -134,6 +108,8 @@ export default function PropertyDetails({ property }: PropertyDetailsProps) {
             />
           </div>
         </div>
+
+        {/* Mapa directo sin pestañas */}
 
         {/* Contacto */}
         <div className="mt-6">
