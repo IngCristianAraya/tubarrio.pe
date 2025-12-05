@@ -5,6 +5,20 @@ const nextConfig = {
     // Habilita optimización de imágenes para mejorar LCP
     unoptimized: false,
     formats: ['image/avif', 'image/webp'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'images.pexels.com',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'res.cloudinary.com',
+        port: '',
+        pathname: '/**',
+      },
+    ],
     domains: [
       'localhost',
       'vercel.app',

@@ -297,7 +297,7 @@ export default function ClientHomePage() {
       </div>
 
       {/* Container sin padding superior para eliminar espacio con banner */}
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 pb-6 md:pb-12">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 pb-6 md:pb-12 cv-auto contain-layout">
 
         {/* ✅ CATEGORIES GRID - Optimizado para móvil, con content-visibility */}
         <div className="mb-8 md:mb-12 mt-0 cv-auto">

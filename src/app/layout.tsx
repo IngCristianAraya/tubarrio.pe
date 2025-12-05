@@ -81,6 +81,8 @@ export default function RootLayout({ children }: RootLayoutProps) {
         <link rel="dns-prefetch" href="https://fyekrdhzerjagradhxvv.supabase.co" />
         <link rel="preconnect" href="https://res.cloudinary.com" />
         <link rel="dns-prefetch" href="https://res.cloudinary.com" />
+        <link rel="preconnect" href="https://images.pexels.com" />
+        <link rel="dns-prefetch" href="https://images.pexels.com" />
         {/* Prevenir inyección de estilos por extensiones */}
         <meta name="theme-color" content="#ffffff" />
         <JsonLd
