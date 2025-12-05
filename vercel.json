@@ -1,10 +1,9 @@
 {
-  "installCommand": "npm install --legacy-peer-deps",
-  "buildCommand": "npm run build",
+  "installCommand": "pnpm install --frozen-lockfile",
+  "buildCommand": "pnpm build",
   "build": {
     "env": {
-      "NODE_ENV": "production",
-      "NPM_CONFIG_LEGACY_PEER_DEPS": "true"
+      "NEXT_TELEMETRY_DISABLED": "1"
     }
   }
 }
