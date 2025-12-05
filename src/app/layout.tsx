@@ -76,6 +76,11 @@ export default function RootLayout({ children }: RootLayoutProps) {
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, orientation=portrait" />
         <link rel="manifest" href="/manifest.json" />
+        {/* Preconnect/DNS Prefetch to reduce LCP to key origins */}
+        <link rel="preconnect" href="https://fyekrdhzerjagradhxvv.supabase.co" />
+        <link rel="dns-prefetch" href="https://fyekrdhzerjagradhxvv.supabase.co" />
+        <link rel="preconnect" href="https://res.cloudinary.com" />
+        <link rel="dns-prefetch" href="https://res.cloudinary.com" />
         {/* Prevenir inyección de estilos por extensiones */}
         <meta name="theme-color" content="#ffffff" />
         <JsonLd

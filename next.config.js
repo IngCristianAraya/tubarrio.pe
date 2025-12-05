@@ -2,8 +2,9 @@
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    // Evita optimización de imágenes (reduce dependencia de Sharp en build)
-    unoptimized: true,
+    // Habilita optimización de imágenes para mejorar LCP
+    unoptimized: false,
+    formats: ['image/avif', 'image/webp'],
     domains: [
       'localhost',
       'vercel.app',
