@@ -170,8 +170,8 @@ export default function FeaturedBannersCarousel({
   return (
     <div className="w-full cv-auto">
       <div className="relative w-full mb-0 contain-layout" onMouseEnter={stopAutoplay} onMouseLeave={() => startAutoplay(slider.current)}>
-        <div ref={sliderRef} className="keen-slider mb-0" style={{ height: '300px' }}>
-          {banners.map((banner) => (
+        <div ref={sliderRef} className="keen-slider mb-0 h-[220px] md:h-[300px]">
+          {banners.map((banner, index) => (
             <div key={banner.id} className="keen-slider__slide h-full will-change-transform">
               <div className="relative w-full h-full">
                 {/* Versión desktop - oculta en móviles */}
@@ -183,9 +183,8 @@ export default function FeaturedBannersCarousel({
                         alt={banner.title || 'Banner promocional'}
                         width={1200}
                         height={300}
-                        className="object-contain w-full h-auto max-h-[300px]"
-                        priority={true}
-                        loading="eager"
+                        className="object-contain w-full h-full"
+                        priority={index === 0}
                         quality={85}
                         sizes="(max-width: 767px) 0px, 1200px"
                         onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
@@ -209,9 +208,8 @@ export default function FeaturedBannersCarousel({
                         alt={banner.title || 'Banner promocional'}
                         width={800}
                         height={400}
-                        className="object-cover w-full h-auto"
-                        priority={true}
-                        loading="eager"
+                        className="object-cover w-full h-full"
+                        priority={index === 0}
                         quality={85}
                         sizes="100vw"
                         onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
