@@ -8,7 +8,16 @@ import NearbyGrid from '@/components/home/NearbyGrid';
 import { useGeolocation } from '@/hooks/useGeolocation';
 import type { Service } from '@/types/service';
 import { featuredBanners } from '@/mocks/featuredBanners';
-import FeaturedBannersCarousel from '@/components/home/FeaturedBannersCarousel';
+// Lazy-load banners to avoid render-blocking CSS
+const FeaturedBannersCarousel = dynamic(
+  () => import('@/components/home/FeaturedBannersCarousel'),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="w-full h-[300px] bg-gray-100 animate-pulse" aria-hidden="true" />
+    )
+  }
+);
 import CategoryChips from '@/components/home/CategoryChips';
 
 
@@ -277,19 +286,21 @@ export default function ClientHomePage() {
 
       {/* Cercanos (si disponibles) */}
       {nearbyServices.length > 0 && (
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 pb-2 md:pb-4">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 pb-2 md:pb-4 cv-auto">
           <NearbyGrid services={nearbyServices} title="Cerca de ti" />
         </div>
       )}
 
-      {/* ✅ CARRUSEL DE BANNERS DESTACADOS - Sin espaciado superior */}
-      <FeaturedBannersCarousel banners={featuredBanners} interval={5000} />
+      {/* ✅ CARRUSEL DE BANNERS DESTACADOS - Lazy load y content-visibility para reducir CLS */}
+      <div className="cv-auto">
+        <FeaturedBannersCarousel banners={featuredBanners} interval={5000} />
+      </div>
 
       {/* Container sin padding superior para eliminar espacio con banner */}
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 pb-6 md:pb-12">
 
-        {/* ✅ CATEGORIES GRID - Optimizado para móvil */}
-        <div className="mb-8 md:mb-12 mt-0">
+        {/* ✅ CATEGORIES GRID - Optimizado para móvil, con content-visibility */}
+        <div className="mb-8 md:mb-12 mt-0 cv-auto">
           <h2 className="text-xl md:text-2xl font-bold text-orange-700 mb-4 md:mb-8 text-center mt-0 pt-0 md:mt-8 md:pt-8">🔎 Explora por categoría</h2>
 
           {/* Vista móvil: Chips horizontales (como barra superior) */}

@@ -74,7 +74,7 @@ export default function ServiceCarousel({ services = [], categoryName = '' }: Se
   }
 
   return (
-    <div className="relative py-4">
+    <div className="relative py-4 cv-auto contain-layout">
       <div className="px-4 mb-3">
         <h3 className="text-lg font-bold text-gray-900">{categoryName}</h3>
         <p className="text-sm text-gray-500">
@@ -84,7 +84,7 @@ export default function ServiceCarousel({ services = [], categoryName = '' }: Se
 
       <div ref={sliderRef} className="keen-slider overflow-visible" key={`slider-${categoryName}`}>
         {services.map((service) => (
-          <div key={service.id} className="keen-slider__slide min-w-[280px] max-w-[280px]">
+          <div key={service.id} className="keen-slider__slide min-w-[280px] max-w-[280px] will-change-transform">
             <div className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow overflow-hidden border border-gray-100 h-full flex flex-col">
               <div className="relative h-40 bg-gray-100">
                 <Image

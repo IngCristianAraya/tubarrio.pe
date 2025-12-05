@@ -168,11 +168,11 @@ export default function FeaturedBannersCarousel({
   if (!banners || banners.length === 0) return null;
 
   return (
-    <div className="w-full">
-      <div className="relative w-full mb-0" onMouseEnter={stopAutoplay} onMouseLeave={() => startAutoplay(slider.current)}>
+    <div className="w-full cv-auto">
+      <div className="relative w-full mb-0 contain-layout" onMouseEnter={stopAutoplay} onMouseLeave={() => startAutoplay(slider.current)}>
         <div ref={sliderRef} className="keen-slider mb-0" style={{ height: '300px' }}>
           {banners.map((banner) => (
-            <div key={banner.id} className="keen-slider__slide h-full">
+            <div key={banner.id} className="keen-slider__slide h-full will-change-transform">
               <div className="relative w-full h-full">
                 {/* Versión desktop - oculta en móviles */}
                 <div className="hidden md:block w-full h-full relative">

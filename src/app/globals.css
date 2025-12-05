@@ -141,3 +141,17 @@
   .hide-scrollbar::-webkit-scrollbar {
     display: none;             /* Chrome, Safari, Opera */
   }
+
+  /* Performance: reduce rendering/layout cost for below-the-fold sections */
+  .cv-auto {
+    content-visibility: auto;
+    contain-intrinsic-size: 600px; /* reserve height to avoid CLS */
+  }
+
+  .contain-layout {
+    contain: layout paint;
+  }
+
+  .will-change-transform {
+    will-change: transform;
+  }
