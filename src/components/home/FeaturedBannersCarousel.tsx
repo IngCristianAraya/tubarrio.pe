@@ -2,7 +2,6 @@
 'use client';
 
 import { useKeenSlider } from 'keen-slider/react';
-import 'keen-slider/keen-slider.min.css';
 import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
 
@@ -294,6 +293,19 @@ export default function FeaturedBannersCarousel({
           ))}
         </div>
       )}
+      {/* CSS mínimo inline para Keen Slider, evita CSS bloqueante */}
+      <style jsx>{`
+        .keen-slider {
+          display: flex;
+          overflow: hidden;
+          position: relative;
+          touch-action: pan-y;
+          -webkit-overflow-scrolling: touch;
+        }
+        .keen-slider__slide {
+          min-width: 100%;
+        }
+      `}</style>
     </div>
   );
 }

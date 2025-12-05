@@ -14,7 +14,7 @@ const FeaturedBannersCarousel = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="w-full h-[300px] bg-gray-100 animate-pulse" aria-hidden="true" />
+      <div className="w-full h-[220px] md:h-[300px] bg-gray-100 animate-pulse" aria-hidden="true" />
     )
   }
 );
@@ -260,7 +260,7 @@ export default function ClientHomePage() {
         <div className="h-[70vh] bg-gray-100 animate-pulse"></div>
         <div className="container mx-auto px-4 py-12">
           {[...Array(3)].map((_, i) => (
-            <div key={i} className="mb-12">
+            <div key={i} className="mb-12 min-h-[320px] md:min-h-[360px]">
               <div className="h-8 bg-gray-200 rounded w-1/3 mb-4"></div>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 {[...Array(4)].map((_, j) => (
@@ -300,7 +300,7 @@ export default function ClientHomePage() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 pb-6 md:pb-12 cv-auto contain-layout">
 
         {/* ✅ CATEGORIES GRID - Optimizado para móvil, con content-visibility */}
-        <div className="mb-8 md:mb-12 mt-0 cv-auto">
+        <div className="mb-8 md:mb-12 mt-0 cv-auto min-h-[160px]">
           <h2 className="text-xl md:text-2xl font-bold text-orange-700 mb-4 md:mb-8 text-center mt-0 pt-0 md:mt-8 md:pt-8">🔎 Explora por categoría</h2>
 
           {/* Vista móvil: Chips horizontales (como barra superior) */}
@@ -326,7 +326,7 @@ export default function ClientHomePage() {
 
         {/* ✅ CATEGORY SECTIONS */}
         {categories.map((category: Category) => (
-          <div key={category.id} className="mb-12">
+          <div key={category.id} className="mb-12 min-h-[320px] md:min-h-[360px]">
             <CategorySection
               category={category}
               services={servicesByCategory[category.slug] || []}
