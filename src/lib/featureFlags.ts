@@ -1,17 +1,12 @@
-export type DataSource = 'firebase' | 'supabase';
+export type DataSource = 'supabase';
 
 export function getDataSource(): DataSource {
   // Default a Supabase para evitar dependencias de Firebase
-  const val = (process.env.NEXT_PUBLIC_DATA_SOURCE || 'supabase').toLowerCase();
-  return val === 'firebase' ? 'firebase' : 'supabase';
+  return 'supabase';
 }
 
 export function isSupabaseEnabled(): boolean {
   return getDataSource() === 'supabase';
-}
-
-export function isFirebaseEnabled(): boolean {
-  return getDataSource() === 'firebase';
 }
 
 // Country helper: returns a 2-letter country code (e.g., 'pe'), or null if not set/invalid

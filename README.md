@@ -8,26 +8,25 @@ Aplicación web de directorio de servicios construida con Next.js (App Router) y
 - Lista completa y filtrada en `/todos-los-servicios` (búsqueda, categoría, barrio, distrito).
 - SEO completo: metadata dinámica, JSON‑LD, Open Graph/Twitter, sitemap.
 - Imágenes optimizadas con `next/image` y sanitización de URLs.
-- Arquitectura preparada para múltiples fuentes (Supabase/Firebase) con bandera de entorno.
+- Arquitectura centrada en Supabase como origen de datos único.
 
 ## Requisitos
 
 - Node.js 18+
 - npm o yarn
-- Cuenta de Supabase (proyecto público tubarrio). Opcional: Firebase si se usa como fallback.
+- Cuenta de Supabase (proyecto público tubarrio).
 
 ## Configuración de entorno
 
 Crear `.env.local` con las variables mínimas para Supabase:
 
 ```env
-NEXT_PUBLIC_DATA_SOURCE=supabase
 NEXT_PUBLIC_COUNTRY=pe
-SUPABASE_URL=https://<tu-proyecto>.supabase.co
-SUPABASE_ANON_KEY=<tu-anon-key>
+NEXT_PUBLIC_SUPABASE_URL=https://<tu-proyecto>.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=<tu-anon-key>
 ```
 
-Si usas Firebase como fallback, puedes incluir las `NEXT_PUBLIC_FIREBASE_*`; revisa `SUPABASE_ENV.md` y `VERCEL-DEPLOYMENT-GUIDE.md` para detalles.
+El proyecto ya no usa Firebase; revisa `SUPABASE_ENV.md` y `VERCEL-DEPLOYMENT-GUIDE.md` para detalles.
 
 ## Instalación y ejecución
 
@@ -76,9 +75,8 @@ images: {
 ## Despliegue (Vercel)
 
 - Configura variables en Vercel (`Settings` → `Environment Variables`):
-  - `NEXT_PUBLIC_DATA_SOURCE=supabase`
   - `NEXT_PUBLIC_COUNTRY=pe`
-  - `SUPABASE_URL` y `SUPABASE_ANON_KEY` del proyecto público tubarrio.
+  - `NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_ANON_KEY` del proyecto público tubarrio.
 - Realiza un redeploy para que se aplique la configuración.
 - Revisar `VERCEL-DEPLOYMENT-GUIDE.md` para pasos detallados.
 

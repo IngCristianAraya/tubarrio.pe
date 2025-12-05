@@ -3,8 +3,6 @@ import { generateSlug } from '@/lib/utils';
 import { useServiceAnalytics } from './useServiceAnalytics';
 import { useServiceCache } from './useServiceCache';
 import { Service } from '@/types/service';
-import { db } from '@/lib/firebase/config';
-import { doc, getDoc } from 'firebase/firestore';
 
 interface PreloadStatus {
   isPreloading: boolean;
@@ -47,30 +45,50 @@ export const useServicePreloader = () => {
         return true;
       }
 
-      if (!db) {
-        console.warn('Firebase no disponible para precarga');
+      console.log(`🔄 Precargando servicio: ${serviceId}`);
+
+      // Supabase-only: leer servicio por ID
+      const { getSupabaseClient } = await import('@/lib/supabase/client');
+      const supabase = await getSupabaseClient();
+      let { data, error } = await supabase
+        .from('services')
+        .select('*')
+        .eq('id', serviceId)
+        .limit(1);
+
+      if (error) {
+        console.error('❌ Error leyendo servicio desde Supabase:', error);
         return false;
       }
 
-      console.log(`🔄 Precargando servicio: ${serviceId}`);
-      
-      const serviceDocRef = doc(db, 'services', serviceId);
-      const serviceDoc = await getDoc(serviceDocRef);
-      
-      if (!serviceDoc.exists()) {
-        console.warn(`Servicio ${serviceId} no encontrado para precarga`);
-        return false;
+      let row = (data || [])[0];
+      if (!row) {
+        // Intento alterno por uid
+        const alt = await supabase
+          .from('services')
+          .select('*')
+          .eq('uid', serviceId)
+          .limit(1);
+        if (alt.error) {
+          console.error('❌ Error alterno leyendo servicio por uid:', alt.error);
+          return false;
+        }
+        row = (alt.data || [])[0];
+        if (!row) {
+          console.warn(`Servicio ${serviceId} no encontrado en Supabase`);
+          return false;
+        }
       }
-      
-      const data = serviceDoc.data();
+
+      const dataObj = row as any;
       const service: Service = {
-        id: serviceDoc.id,
-        slug: data.slug || serviceDoc.id,
-        name: data.name || 'Servicio sin nombre',
-        description: data.description || 'Sin descripción',
-        category: data.category || 'Sin categoría',
+        id: dataObj.id?.toString?.() || dataObj.uid || serviceId,
+        slug: dataObj.slug || serviceId,
+        name: dataObj.name || 'Servicio sin nombre',
+        description: dataObj.description || 'Sin descripción',
+        category: dataObj.category || 'Sin categoría',
         categorySlug: (() => {
-          const raw = data.categorySlug || data.category;
+          const raw = dataObj.categorySlug || dataObj.category || '';
           if (typeof raw === 'string') return generateSlug(raw);
           if (raw && typeof raw === 'object') {
             const maybe = (raw as any).name || (raw as any).label || String(raw);
@@ -78,12 +96,12 @@ export const useServicePreloader = () => {
           }
           return 'sin-categoria';
         })(),
-        rating: data.rating || 0,
-        image: data.image || '/images/placeholder-service.jpg',
-        images: data.images || [data.image || '/images/placeholder-service.jpg'],
-        ...data, // Spread the rest of the data to include optional fields
-        createdAt: data.createdAt?.toDate?.() || new Date(),
-        updatedAt: data.updatedAt?.toDate?.() || new Date()
+        rating: dataObj.rating || 0,
+        image: dataObj.image || '/images/placeholder-service.jpg',
+        images: dataObj.images || [dataObj.image || '/images/placeholder-service.jpg'],
+        ...dataObj,
+        createdAt: dataObj.createdAt ? new Date(dataObj.createdAt) : new Date(),
+        updatedAt: dataObj.updatedAt ? new Date(dataObj.updatedAt) : new Date()
       };
       
       // Guardar en cache

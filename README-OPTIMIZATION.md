@@ -1,4 +1,6 @@
-# 🚀 Guía de Optimización Firebase - TuBarrio.pe
+# 🚀 Guía de Optimización (Legacy Firebase) - TuBarrio.pe
+
+Nota: Este documento es legacy y aplica a la antigua integración con Firebase. El proyecto actual usa exclusivamente Supabase como origen de datos.
 
 ## 📋 Resumen de Optimizaciones
 

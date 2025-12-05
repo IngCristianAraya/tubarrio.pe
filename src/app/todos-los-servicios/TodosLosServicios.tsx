@@ -3,6 +3,7 @@
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { MapPin } from 'lucide-react';
+import { CiFilter } from 'react-icons/ci';
 import { useServices, type Service as ContextService } from '../../context/ServicesContext';
 import type { Service } from '@/types/service';
 import ServiceCard from '../../components/ServiceCard';
@@ -305,7 +306,7 @@ export default function TodosLosServicios({
                 <button
                   onClick={requestLocationAndRecommend}
                   disabled={recommending}
-                  className="h-10 inline-flex items-center gap-2 px-3 rounded-lg bg-transparent text-orange-600 border border-orange-500 hover:bg-orange-50/30 focus:outline-none focus:ring-2 focus:ring-orange-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="h-10 inline-flex items-center gap-2 px-3 rounded-lg bg-transparent text-orange-600 border border-orange-500 hover:bg-orange-50/30 focus:outline-none focus:ring-2 focus:ring-orange-500 disabled:opacity-50 disabled:cursor-not-allowed leading-none"
                 >
                   <MapPin className="w-4 h-4" />
                   {recommending ? 'Obteniendo ubicación…' : 'Usar mi ubicación'}
@@ -315,7 +316,7 @@ export default function TodosLosServicios({
                   <select
                     value={radiusKm}
                     onChange={(e) => setRadiusKm(Number(e.target.value))}
-                    className="h-10 px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    className="h-10 px-3 -mt-[2px] border border-gray-300 rounded-lg bg-white text-gray-700 leading-none focus:outline-none focus:ring-2 focus:ring-orange-500"
                   >
                     <option value={3}>Radio 3 km</option>
                     <option value={5}>Radio 5 km</option>
@@ -330,8 +331,9 @@ export default function TodosLosServicios({
                   districts={districts}
                   basePath="/todos-los-servicios"
                   mode="buttonOnly"
-                  triggerClassName="relative h-10 inline-flex items-center gap-2 rounded-lg border border-orange-500 bg-transparent text-orange-600 px-3 hover:bg-orange-50/30"
-                  triggerIconClassName="text-orange-500"
+                  triggerClassName="relative h-10 inline-flex items-center gap-2 rounded-lg border border-orange-500 bg-transparent text-gray-700 px-3 hover:bg-orange-50/30 group mt-[2px]"
+                  triggerIconClassName="text-white group-hover:text-orange-500"
+                  triggerIcon={<CiFilter />}
                 />
 
                 {/* Estado de recomendaciones en línea */}

@@ -20,6 +20,7 @@ type FiltersDrawerProps = {
   mode?: 'buttonOnly' | 'responsive';
   triggerClassName?: string;
   triggerIconClassName?: string;
+  triggerIcon?: React.ReactElement;
 };
 
 export default function FiltersDrawer({
@@ -30,6 +31,7 @@ export default function FiltersDrawer({
   mode = 'responsive',
   triggerClassName,
   triggerIconClassName,
+  triggerIcon,
 }: FiltersDrawerProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -168,8 +170,12 @@ export default function FiltersDrawer({
           aria-controls="filters-drawer"
           aria-label={activeCount > 0 ? `Abrir filtros (${activeCount} activos)` : 'Abrir filtros'}
         >
-          <FunnelIcon className={`h-5 w-5 ${triggerIconClassName ?? ''}`} />
-          <span className="text-sm">Filtros</span>
+          {triggerIcon
+            ? React.cloneElement(triggerIcon, {
+              className: `${(triggerIcon.props as any)?.className ?? ''} h-4 w-4 ${triggerIconIconClass(triggerIconClassName)}`.trim(),
+            })
+            : <FunnelIcon className={`h-4 w-4 ${triggerIconClassName ?? ''}`} />}
+          <span className="text-sm leading-none group-hover:text-orange-600">Filtros</span>
           {activeCount > 0 && (
             <span className="absolute -top-1 -right-1 inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-black px-1 text-[11px] font-medium text-white">
               {activeCount}
@@ -292,4 +298,8 @@ export default function FiltersDrawer({
       </div>
     </>
   );
+}
+
+function triggerIconIconClass(triggerIconClassName?: string) {
+  return triggerIconClassName ?? '';
 }

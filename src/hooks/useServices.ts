@@ -65,29 +65,6 @@ const servicesFetcher = async ([_, options]: [string, UseServicesOptions]): Prom
   // Verificar caché primero
   
   // 1. Verificar caché primero
-  // Helper to generate a slug from a category name (handles accents)
-  const slugify = (name?: string) => {
-    if (!name) return '';
-    return name
-      .toString()
-      .trim()
-      .toLowerCase()
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '') // remove diacritics
-      .replace(/[^a-z0-9\s-]/g, '')
-      .replace(/\s+/g, '-')
-      .replace(/-+/g, '-')
-      .replace(/^-+|-+$/g, '');
-  };
-
-  // Alias map for category slugs to handle legacy inconsistencies
-  const CATEGORY_ALIAS: Record<string, string[]> = {
-    'restaurantes-y-menus': ['restaurantes-y-menus', 'restaurantes-y-mens'],
-    'comida-rapida': ['comida-rapida', 'comida-rpida'],
-    'lavanderias': ['lavanderias', 'lavanderas'],
-    'peluquerias': ['peluquerias', 'peluqueras']
-  };
-  const getCategoryAliases = (slug: string) => CATEGORY_ALIAS[slug] || [slug];
 
   try {
     // Si es una consulta de servicios destacados, verificar primero ese caché
@@ -240,154 +217,28 @@ const servicesFetcher = async ([_, options]: [string, UseServicesOptions]): Prom
     return fallbackData;
   }
   
-  console.log('🔍 Ejecutando consulta a Firebase...');
-
+  // Fallback: datos locales cuando el origen remoto no está disponible
+  const fallbackData = filterFallbackServices({
+    category,
+    barrio,
+    search,
+    featured,
+    limit: pageSize
+  });
   try {
-    // Construir consulta optimizada con solo los filtros necesarios
-    const constraints = [];
-    
-    // Filtros del lado del servidor (solo los estrictamente necesarios)
-    if (userId) {
-      constraints.push(where('userId', '==', userId));
-    }
-    
-    // Otros filtros según sea necesario
-    if (category && category !== 'Todas' && category !== 'Todos') {
-      // Interpret `category` option as a slug, include aliases when available
-      const aliases = getCategoryAliases(category);
-      if (aliases.length > 1) {
-        constraints.push(where('categorySlug', 'in', aliases));
-      } else {
-        constraints.push(where('categorySlug', '==', category));
-      }
-    }
-    
-    if (barrio) {
-      constraints.push(where('barrio', '==', barrio));
-    }
-    
-    // Solo servicios activos
-    constraints.push(where('active', '==', true));
-    
-    // Si es una consulta de destacados, agregar filtro
-    if (featured) {
-      constraints.push(where('featured', '==', true));
-    }
-    
-    // Construir la consulta
-    let q = query(collection(db, 'services'), ...constraints, orderBy('createdAt', 'desc'));
-    
-    // Aplicar paginación si es necesario
-    if (pageSize) {
-      q = query(q, limit(pageSize));
-    }
-    
-    // Ejecutar la consulta
-    const querySnapshot = await getDocs(q);
-    const services = querySnapshot.docs.map(doc => {
-      const data = doc.data();
-      
-      // Debug log para verificar los tags
-      console.log(`🔍 useServices - Service ${data.name}:`, {
-        id: doc.id,
-        hasTag: !!data.tag,
-        hasTags: !!data.tags,
-        tagValue: data.tag,
-        tagsValue: data.tags,
-        tagType: typeof data.tag,
-        tagsType: typeof data.tags
-      });
-      
-      return {
-        id: doc.id,
-        name: data.name || 'Servicio sin nombre',
-        description: data.description || 'Sin descripción',
-        category: data.category || 'Sin categoría',
-        categorySlug: data.categorySlug || slugify(data.category) || '',
-        image: data.image || '/images/placeholder-service.jpg',
-        rating: data.rating || 0,
-        location: data.location || 'Ubicación no especificada',
-        contactUrl: data.contactUrl || '',
-        detailsUrl: data.detailsUrl || '',
-        tags: data.tag || [],
-        createdAt: data.createdAt?.toDate?.() || new Date(),
-        updatedAt: data.updatedAt?.toDate?.() || new Date(),
-        featured: data.featured || false,
-        active: data.active !== false // Default to true if not specified
-      } as Service;
-    });
-    
-    // Si hay búsqueda, aplicar filtros adicionales
-    const filteredServices = search && search.trim() !== ''
-      ? services.filter(service => 
-          (service.name?.toLowerCase().includes(search.toLowerCase()) ||
-          service.description?.toLowerCase().includes(search.toLowerCase()) ||
-          service.tags?.some((tag: string) => tag.toLowerCase().includes(search.toLowerCase())))
-        )
-      : services;
-    
-    // Deduplicar por id para evitar servicios repetidos
-    const uniqueById = (list: Service[]) => {
-      const seen = new Set<string>();
-      const result: Service[] = [];
-      for (const item of list) {
-        const key = String(item.id);
-        if (!seen.has(key)) {
-          seen.add(key);
-          result.push(item);
+    if (fallbackData.length > 0) {
+      setAllServicesCache(fallbackData);
+      if (featured) {
+        const featuredData = fallbackData.filter(service => service.featured === true);
+        if (featuredData.length > 0) {
+          setFeaturedServicesCache(featuredData);
         }
       }
-      return result;
-    };
-    const deduped = uniqueById(filteredServices);
-      
-    // Aplicar paginación
-    const paginatedServices = pageSize 
-      ? deduped.slice(0, pageSize)
-      : deduped;
-      
-    // Actualizar cachés
-    try {
-      // Actualizar caché de servicios completos si no hay búsqueda
-      if (deduped.length > 0 && (!search || search.trim() === '')) {
-        setAllServicesCache(deduped);
-        
-        // Actualizar caché de servicios destacados si corresponde
-        if (featured || deduped.some(s => s.featured)) {
-          const featuredServices = deduped.filter(s => s.featured);
-          if (featuredServices.length > 0) {
-            setFeaturedServicesCache(featuredServices);
-          }
-        }
-      }
-      
-      // Actualizar caché de servicios individuales
-      deduped.forEach(service => {
-        serviceByIdCache.set(service.id, { 
-          data: service, 
-          timestamp: now 
-        });
-      });
-      
-    } catch (cacheError) {
-      console.warn('⚠️ Error actualizando caché:', cacheError);
-      // No lanzar el error, solo registrar
     }
-    
-    return paginatedServices;
-  } catch (error: any) {
-    console.error('❌ Error al conectar con Firebase:', error.message);
-    
-    // Usar datos de respaldo en caso de error
-    console.warn('🔄 Error en Firebase, usando datos de respaldo:', error.message);
-    return filterFallbackServices({
-      category,
-      barrio,
-      search: options?.search,
-      featured,
-      limit: options?.pageSize
-    });
+  } catch (error) {
+    console.warn('⚠️ Error guardando datos de respaldo en caché:', error);
   }
+  return fallbackData;
 };
 
 // Hook principal para servicios

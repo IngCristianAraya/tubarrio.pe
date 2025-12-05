@@ -29,7 +29,7 @@ export const useService = (serviceId?: string): UseServiceResult => {
     const shouldUseFallback = isOffline;
     
     if (shouldUseFallback) {
-      const message = isOffline ? 'Modo offline' : 'Firebase no disponible';
+      const message = isOffline ? 'Modo offline' : 'Supabase no disponible';
       logger.warn(`${message}, usando datos de respaldo para servicio ${id}`);
       
       const fallbackService = getFallbackServiceById(id);
@@ -116,7 +116,7 @@ export const useService = (serviceId?: string): UseServiceResult => {
       if (serviceId) {
         const fallbackService = getFallbackServiceById(serviceId);
         if (fallbackService) {
-          logger.debug(`Firebase falló, usando datos de respaldo para el servicio ${serviceId}`);
+          logger.debug(`Supabase falló, usando datos de respaldo para el servicio ${serviceId}`);
           setIsFallbackData(true);
           return fallbackService;
         }

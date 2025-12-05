@@ -37,7 +37,6 @@ Esta guía te permite operar la app con múltiples dominios (uno por país) usan
 2) En cada proyecto, configura variables de entorno:
 
    Comunes (idénticas para todos):
-   - `NEXT_PUBLIC_DATA_SOURCE=supabase`
    - `NEXT_PUBLIC_SUPABASE_URL=...`
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY=...`
 

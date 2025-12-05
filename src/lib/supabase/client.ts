@@ -1,5 +1,5 @@
 // Supabase client factory with dynamic import to avoid build-time dependency
-// Note: Requires @supabase/supabase-js when NEXT_PUBLIC_DATA_SOURCE = 'supabase'
+// Requires @supabase/supabase-js and Supabase public env vars
 
 export async function getSupabaseClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;

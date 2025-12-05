@@ -2,6 +2,8 @@
 
 Objetivo: migrar lecturas/escrituras a Supabase en ~1 mes, manteniendo fallback y minimizando riesgo y costes.
 
+Estado actual del repo: la app ya es Supabase‑only y no utiliza Firebase en producción ni desarrollo. Este documento queda como referencia histórica para la migración.
+
 **Estado Actual (resumen)**
 - Lecturas cliente: `src/lib/services.ts`, `src/hooks/useServices.ts`, `src/hooks/useService.ts` usando Firestore (`collection`, `query`, `where`, `orderBy`, `limit`, `startAfter`, `getDoc`, `getDocs`).
 - Fallback: `src/lib/firebase/fallback.ts` y funciones `filterFallbackServices`, `getFallbackServiceById`.
@@ -64,7 +66,7 @@ Objetivo: migrar lecturas/escrituras a Supabase en ~1 mes, manteniendo fallback 
 - Verificar integridad: conteos por categoría, muestra aleatoria de 50 servicios, revisión de slugs/IDs.
 
 **Plan de Corte**
-- Feature flag `NEXT_PUBLIC_DATA_SOURCE=firebase|supabase` y toggle por entorno.
+- Feature flag eliminado; el origen de datos es exclusivamente Supabase.
 - Fase 1 (staging): lecturas en Supabase, escrituras siguen en Firebase (si aplica).
 - Fase 2 (canary): 5–10% tráfico Supabase + logs/observabilidad.
 - Fase 3 (prod): 100% lecturas Supabase; API admin a Supabase.
