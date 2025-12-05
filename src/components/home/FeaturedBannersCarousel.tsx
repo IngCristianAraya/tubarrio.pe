@@ -170,7 +170,14 @@ export default function FeaturedBannersCarousel({
   return (
     <div className="w-full cv-auto">
       <div className="relative w-full mb-0 contain-layout" onMouseEnter={stopAutoplay} onMouseLeave={() => startAutoplay(slider.current)}>
-        <div ref={sliderRef} className="keen-slider mb-0 h-[220px] md:h-[300px]">
+        <div
+          ref={sliderRef}
+          className="keen-slider mb-0 h-[220px] md:h-[300px]"
+          role="region"
+          aria-roledescription="carousel"
+          aria-label="Banners destacados"
+          aria-live="polite"
+        >
           {banners.map((banner, index) => (
             <div key={banner.id} className="keen-slider__slide h-full will-change-transform">
               <div className="relative w-full h-full">
@@ -185,6 +192,7 @@ export default function FeaturedBannersCarousel({
                         height={300}
                         className="object-contain w-full h-full"
                         priority={index === 0}
+                        fetchPriority={index === 0 ? 'high' : 'auto'}
                         quality={85}
                         sizes="(max-width: 767px) 0px, 1200px"
                         onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
@@ -210,6 +218,7 @@ export default function FeaturedBannersCarousel({
                         height={400}
                         className="object-cover w-full h-full"
                         priority={index === 0}
+                        fetchPriority={index === 0 ? 'high' : 'auto'}
                         quality={85}
                         sizes="100vw"
                         onError={(e: React.SyntheticEvent<HTMLImageElement>) => {

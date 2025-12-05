@@ -77,11 +77,11 @@ export default function RootLayout({ children }: RootLayoutProps) {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="manifest" href="/manifest.json" />
         {/* Preconnect/DNS Prefetch to reduce LCP to key origins */}
-        <link rel="preconnect" href="https://fyekrdhzerjagradhxvv.supabase.co" />
+        <link rel="preconnect" href="https://fyekrdhzerjagradhxvv.supabase.co" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://fyekrdhzerjagradhxvv.supabase.co" />
-        <link rel="preconnect" href="https://res.cloudinary.com" />
+        <link rel="preconnect" href="https://res.cloudinary.com" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://res.cloudinary.com" />
-        <link rel="preconnect" href="https://images.pexels.com" />
+        <link rel="preconnect" href="https://images.pexels.com" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://images.pexels.com" />
         {/* Prevenir inyección de estilos por extensiones */}
         <meta name="theme-color" content="#ffffff" />
