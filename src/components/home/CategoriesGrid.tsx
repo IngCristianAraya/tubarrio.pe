@@ -14,7 +14,7 @@ export default function CategoriesGrid({ categories, onCategoryClick }: Categori
   return (
     <section className="w-full py-8">
       <div className="max-w-6xl mx-auto px-4">
-        <h2 className="text-xl sm:text-2xl font-bold text-orange-600 mb-4">Categorías populares</h2>
+        <h2 className="text-xl sm:text-2xl font-bold text-orange-700 mb-4">Categorías populares</h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
           {categories.map((cat) => (
             <button
@@ -32,4 +32,3 @@ export default function CategoriesGrid({ categories, onCategoryClick }: Categori
     </section>
   );
 }
-

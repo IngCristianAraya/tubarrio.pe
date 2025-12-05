@@ -19,7 +19,7 @@ export default function HeroSearch({ initialQuery = '', placeholder = 'Busca por
   return (
     <section className="w-full py-10 sm:py-14 bg-gradient-to-b from-orange-50 to-white">
       <div className="max-w-5xl mx-auto px-4">
-        <h1 className="text-3xl sm:text-4xl font-extrabold text-orange-600 mb-4">Encuentra servicios en tu barrio</h1>
+        <h1 className="text-3xl sm:text-4xl font-extrabold text-orange-700 mb-4">Encuentra servicios en tu barrio</h1>
         <p className="text-gray-600 mb-6">Búsqueda inteligente por categoría, barrio y más.</p>
         <form onSubmit={submit} className="flex gap-2">
           <input
@@ -40,4 +40,3 @@ export default function HeroSearch({ initialQuery = '', placeholder = 'Busca por
     </section>
   );
 }
-

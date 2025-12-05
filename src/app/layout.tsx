@@ -74,7 +74,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
     <html lang="es" suppressHydrationWarning>
       <head>
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, orientation=portrait" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="manifest" href="/manifest.json" />
         {/* Preconnect/DNS Prefetch to reduce LCP to key origins */}
         <link rel="preconnect" href="https://fyekrdhzerjagradhxvv.supabase.co" />

@@ -290,7 +290,7 @@ export default function ClientHomePage() {
 
         {/* ✅ CATEGORIES GRID - Optimizado para móvil */}
         <div className="mb-8 md:mb-12 mt-0">
-          <h2 className="text-xl md:text-2xl font-bold text-orange-500 mb-4 md:mb-8 text-center mt-0 pt-0 md:mt-8 md:pt-8">🔎 Explora por categoría</h2>
+          <h2 className="text-xl md:text-2xl font-bold text-orange-700 mb-4 md:mb-8 text-center mt-0 pt-0 md:mt-8 md:pt-8">🔎 Explora por categoría</h2>
 
           {/* Vista móvil: Chips horizontales (como barra superior) */}
           <CategoryChips categories={categories} variant="embedded" />

@@ -104,7 +104,7 @@ export default function ServiceCarousel({ services = [], categoryName = '' }: Se
                 </p>
                 <Link
                   href={`/servicio/${service.slug}`}
-                  className="mt-auto text-sm font-medium text-orange-600 hover:text-orange-700 transition-colors"
+                  className="mt-auto text-sm font-medium text-orange-700 hover:text-orange-800 transition-colors"
                 >
                   Ver detalles →
                 </Link>
