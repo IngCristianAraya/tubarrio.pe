@@ -324,15 +324,19 @@ export default function ClientHomePage() {
           </div>
         </div>
 
-        {/* ✅ CATEGORY SECTIONS */}
-        {categories.map((category: Category) => (
-          <div key={category.id} className="mb-12 min-h-[320px] md:min-h-[360px]">
-            <CategorySection
-              category={category}
-              services={servicesByCategory[category.slug] || []}
-            />
-          </div>
-        ))}
+        {/* ✅ CATEGORY SECTIONS (renderizar solo si hay servicios para evitar espacios en blanco) */}
+        {categories.map((category: Category) => {
+          const list = servicesByCategory[category.slug] || [];
+          if (!list || list.length === 0) return null;
+          return (
+            <div key={category.id} className="mb-12">
+              <CategorySection
+                category={category}
+                services={list}
+              />
+            </div>
+          );
+        })}
       </div>
     </main>
   );
