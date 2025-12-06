@@ -1,13 +1,13 @@
 import { MetadataRoute } from 'next';
 import { SITE_URL } from '@/lib/constants';
-import sampleServices from '@/mocks/services';
-import sampleCategories from '@/mocks/categories';
+import { getCountry } from '@/lib/featureFlags';
+import { getSupabaseClient } from '@/lib/supabase/client';
 
 // Tipos para los datos de servicios y categorías
 type Service = {
   id: string;
   slug: string;
-  name: string;
+  name?: string;
   categorySlug?: string;
   updatedAt?: Date;
 };
@@ -20,32 +20,49 @@ type Category = {
 
 // Función para obtener servicios
 export async function getServices(): Promise<Service[]> {
-  // Aplanar el objeto de servicios por categoría a un solo array
-  const allServices: Service[] = [];
-  
-  Object.values(sampleServices).forEach(categoryServices => {
-    categoryServices.forEach(service => {
-      allServices.push({
-        id: service.id,
-        slug: service.slug,
-        name: service.name,
-        categorySlug: service.categorySlug,
-        updatedAt: new Date() // Usamos la fecha actual como última modificación
-      });
-    });
-  });
-  
-  return allServices;
+  try {
+    const supabase = await getSupabaseClient();
+    const country = getCountry();
+    let qb = supabase
+      .from('services')
+      .select('id, slug, categorySlug, updated_at, active')
+      .eq('active', true)
+      .limit(5000); // límite razonable
+    if (country) qb = qb.eq('country', country);
+    const { data, error } = await qb;
+    if (error) throw error;
+    const items: Service[] = (data || []).map((row: any) => ({
+      id: row.id?.toString?.() || row.id,
+      slug: row.slug,
+      categorySlug: row.categorySlug || row.category_slug,
+      updatedAt: row.updated_at ? new Date(row.updated_at) : new Date(),
+    }));
+    return items;
+  } catch (err) {
+    console.error('[sitemap] Error obteniendo servicios desde Supabase:', err);
+    return [];
+  }
 }
 
 // Función para obtener categorías
 export async function getCategories(): Promise<Category[]> {
-  // Mapear las categorías de muestra al formato esperado
-  return sampleCategories.map(category => ({
-    id: category.id,
-    slug: category.slug,
-    name: category.name
-  }));
+  try {
+    const supabase = await getSupabaseClient();
+    const { data, error } = await supabase
+      .from('categories')
+      .select('id, slug, name, status')
+      .eq('status', 'active')
+      .order('name', { ascending: true });
+    if (error) throw error;
+    return (data || []).map((row: any) => ({
+      id: row.id?.toString?.() || row.id,
+      slug: row.slug,
+      name: row.name,
+    }));
+  } catch (err) {
+    console.error('[sitemap] Error obteniendo categorías desde Supabase:', err);
+    return [];
+  }
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
