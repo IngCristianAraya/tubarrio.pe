@@ -9,6 +9,7 @@ import { SITE_URL } from '@/lib/constants';
 import { getThemeCssFromEnv } from '@/lib/designSystem';
 import { generateMetadata } from "@/lib/seo";
 import dynamic from 'next/dynamic';
+import TabAttention from '@/components/client/TabAttention';
 
 // Dynamically import components with no SSR to avoid hydration issues
 const Header = dynamic(() => import('@/components/Header'), { ssr: false });
@@ -73,13 +74,11 @@ export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="es" suppressHydrationWarning>
       <head>
-        {/* Favicon e íconos multiplataforma */}
-        <link rel="icon" href="/favicon.ico" sizes="any" />
-        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
-        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-        {/* Mantener SVG para navegadores modernos */}
-        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+        {/* Favicon e íconos multiplataforma (ordenado para que el último sea el efectivo) */}
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=20251206" />
+        <link rel="icon" href="/favicon.ico?v=20251206" sizes="any" />
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png?v=20251206" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png?v=20251206" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="manifest" href="/manifest.json" />
         {/* Preconnect/DNS Prefetch to reduce LCP to key origins */}
@@ -136,6 +135,13 @@ export default function RootLayout({ children }: RootLayoutProps) {
 
       </head>
       <body className={`${GeistSans.className} antialiased bg-white text-gray-900 transition-colors duration-200`}>
+        {/* Atención de pestaña cuando el usuario navega a otra web (desktop) */}
+        <TabAttention
+          message="Lo que buscas, más cerca de ti"
+          intervalMs={2000}
+          usePin={true}
+          pinColor="#E11D48" /* rosa-600, puedes pedir otro color */
+        />
         <Providers>
           <div className="min-h-screen flex flex-col">
             {/* TEMPORALMENTE DESHABILITADO: AnalyticsInitializer causaba bucle de errores */}
