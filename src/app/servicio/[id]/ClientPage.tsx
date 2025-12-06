@@ -6,6 +6,7 @@ import type { Service } from '@/types/service';
 import React from 'react';
 import Head from 'next/head';
 import { usePathname } from 'next/navigation';
+import dynamic from 'next/dynamic';
 import { LocalBusinessJsonLd, BreadcrumbJsonLd } from '@/components/seo/JsonLd';
 import { SocialMeta } from '@/components/seo/SocialMeta';
 import { SITE_URL } from '@/lib/constants';
@@ -68,7 +69,12 @@ import ServiceCollapsibleDetails from '@/components/service/ServiceCollapsibleDe
 import ServiceSupport from '@/components/service/ServiceSupport';
 import RecommendedServices from '@/components/service/RecommendedServices';
 import ServiceMap from '@/components/service/ServiceMap';
-import ContactBottomSheet from '@/components/service/ContactBottomSheet';
+
+// Barra inferior móvil específica para página de servicio
+const ServiceMobileBottomNav = dynamic(
+  () => import('@/components/service/ServiceMobileBottomNav'),
+  { ssr: false }
+);
 
 export default function ServicioClientPage({ id }: { id: string }) {
   // Obtener todos los servicios del contexto (esto solo funciona en Client Components)
@@ -207,14 +213,13 @@ export default function ServicioClientPage({ id }: { id: string }) {
         {/* Contenido del servicio */}
         <ServiceHeader service={service} />
 
-        {/* Acciones rápidas de contacto: hoja inferior móvil */}
-        <ContactBottomSheet service={service as Service} />
+        {/* Acciones rápidas: la barra inferior móvil reemplaza el botón flotante de contacto */}
 
         {/* Nueva sección: Detalles colapsables (Especificaciones y Condiciones) */}
         <ServiceCollapsibleDetails service={service} />
 
         {/* Nueva sección: Ubicación del Servicio */}
-        <div className="max-w-7xl mx-auto px-3 py-4 sm:px-6 sm:py-8 md:px-8">
+        <div id="service-map" className="max-w-7xl mx-auto px-3 py-4 sm:px-6 sm:py-8 md:px-8">
           <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-3">Ubicación</h2>
           <ServiceMap service={service as Service} />
         </div>
@@ -234,6 +239,8 @@ export default function ServicioClientPage({ id }: { id: string }) {
           />
         </div>
       </div>
+      {/* Barra inferior móvil fija (solo móviles) */}
+      <ServiceMobileBottomNav service={service as Service} />
     </div>
   );
 }
