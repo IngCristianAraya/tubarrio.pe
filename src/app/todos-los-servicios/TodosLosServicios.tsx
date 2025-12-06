@@ -306,7 +306,7 @@ export default function TodosLosServicios({
                 <button
                   onClick={requestLocationAndRecommend}
                   disabled={recommending}
-                  className="h-10 inline-flex items-center gap-2 px-3 rounded-lg bg-transparent text-orange-600 border border-orange-500 hover:bg-orange-50/30 focus:outline-none focus:ring-2 focus:ring-orange-500 disabled:opacity-50 disabled:cursor-not-allowed leading-none"
+                  className="h-10 inline-flex items-center gap-2 px-3 rounded-lg bg-transparent text-orange-600 border border-orange-500 hover:bg-orange-50/30 focus:outline-none focus:ring-2 focus:ring-orange-500 disabled:opacity-50 disabled:cursor-not-allowed leading-none text-sm"
                 >
                   <MapPin className="w-4 h-4" />
                   {recommending ? 'Obteniendo ubicación…' : 'Usar mi ubicación'}
@@ -316,7 +316,7 @@ export default function TodosLosServicios({
                   <select
                     value={radiusKm}
                     onChange={(e) => setRadiusKm(Number(e.target.value))}
-                    className="h-10 px-3 -mt-[2px] border border-gray-300 rounded-lg bg-white text-gray-700 leading-none focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    className="h-10 px-3 border border-gray-300 rounded-lg bg-white text-gray-700 leading-none focus:outline-none focus:ring-2 focus:ring-orange-500"
                   >
                     <option value={3}>Radio 3 km</option>
                     <option value={5}>Radio 5 km</option>
@@ -324,14 +324,14 @@ export default function TodosLosServicios({
                   </select>
                 </label>
 
-                {/* Drawer de filtros inline */}
+                {/* Filtros: barra responsive en desktop y drawer en móvil */}
                 <FiltersDrawer
                   categories={categories}
                   neighborhoods={neighborhoods}
                   districts={districts}
                   basePath="/todos-los-servicios"
-                  mode="buttonOnly"
-                  triggerClassName="relative h-10 inline-flex items-center gap-2 rounded-lg border border-orange-500 bg-transparent text-gray-700 px-3 hover:bg-orange-50/30 group mt-[2px]"
+                  mode="responsive"
+                  triggerClassName="relative h-10 inline-flex items-center gap-2 rounded-lg border border-orange-500 bg-transparent text-gray-700 px-3 hover:bg-orange-50/30 group mt-[2px] md:hidden"
                   triggerIconClassName="text-white group-hover:text-orange-500"
                   triggerIcon={<CiFilter />}
                 />
@@ -357,6 +357,7 @@ export default function TodosLosServicios({
             categories={categories}
             selected={selectedCategory}
             onSelect={setSelectedCategory}
+            variant="segmented"
           />
         </div>
 
