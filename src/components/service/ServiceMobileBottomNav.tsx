@@ -18,7 +18,7 @@ export default function ServiceMobileBottomNav({ service }: { service: Service }
 
   const contactHref = service.contactUrl
     || (service.whatsapp ? `https://wa.me/${service.whatsapp.replace(/[^\d]/g, '')}`
-    : (service.phone ? `https://wa.me/${service.phone.replace(/[^\d]/g, '')}` : undefined));
+      : (service.phone ? `https://wa.me/${service.phone.replace(/[^\d]/g, '')}` : undefined));
 
   const detailsHref = service.detailsUrl;
 
@@ -35,14 +35,14 @@ export default function ServiceMobileBottomNav({ service }: { service: Service }
     external?: boolean;
     onClick?: () => void;
   }> = [
-    { key: 'contacto', label: 'Contacto', icon: '💬', href: contactHref, external: true },
-    { key: 'web', label: 'Web', icon: '🌐', href: detailsHref, external: true },
-    { key: 'mapa', label: 'Mapa', icon: '📍', onClick: handleMapClick },
-    { key: 'llamar', label: 'Llamar', icon: '📞', href: telHref },
-  ];
+      { key: 'contacto', label: 'Contacto', icon: '💬', href: contactHref, external: true },
+      { key: 'web', label: 'Web', icon: '🌐', href: detailsHref, external: true },
+      { key: 'mapa', label: 'Mapa', icon: '📍', onClick: handleMapClick },
+      { key: 'llamar', label: 'Llamar', icon: '📞', href: telHref },
+    ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 lg:hidden border-t border-gray-200 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80 z-50">
+    <nav className="fixed bottom-0 left-0 right-0 lg:hidden border-t border-gray-200 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80 z-[10000]">
       <div className="mx-auto max-w-md">
         <ul className="grid grid-cols-4">
           {items.map((item) => {
@@ -82,4 +82,3 @@ export default function ServiceMobileBottomNav({ service }: { service: Service }
     </nav>
   );
 }
-
